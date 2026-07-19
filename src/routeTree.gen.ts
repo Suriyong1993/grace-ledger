@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppProjectsRouteImport } from './routes/_app.projects'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppOfferingRouteImport } from './routes/_app.offering'
 import { Route as AppMembersRouteImport } from './routes/_app.members'
 import { Route as AppIncomeRouteImport } from './routes/_app.income'
@@ -51,6 +52,11 @@ const AppReportsRoute = AppReportsRouteImport.update({
 const AppProjectsRoute = AppProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOfferingRoute = AppOfferingRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/income': typeof AppIncomeRoute
   '/members': typeof AppMembersRoute
   '/offering': typeof AppOfferingRoute
+  '/profile': typeof AppProfileRoute
   '/projects': typeof AppProjectsRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/income': typeof AppIncomeRoute
   '/members': typeof AppMembersRoute
   '/offering': typeof AppOfferingRoute
+  '/profile': typeof AppProfileRoute
   '/projects': typeof AppProjectsRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/_app/income': typeof AppIncomeRoute
   '/_app/members': typeof AppMembersRoute
   '/_app/offering': typeof AppOfferingRoute
+  '/_app/profile': typeof AppProfileRoute
   '/_app/projects': typeof AppProjectsRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/income'
     | '/members'
     | '/offering'
+    | '/profile'
     | '/projects'
     | '/reports'
     | '/settings'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/income'
     | '/members'
     | '/offering'
+    | '/profile'
     | '/projects'
     | '/reports'
     | '/settings'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/_app/income'
     | '/_app/members'
     | '/_app/offering'
+    | '/_app/profile'
     | '/_app/projects'
     | '/_app/reports'
     | '/_app/settings'
@@ -238,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/offering': {
@@ -308,6 +327,7 @@ interface AppRouteChildren {
   AppIncomeRoute: typeof AppIncomeRoute
   AppMembersRoute: typeof AppMembersRoute
   AppOfferingRoute: typeof AppOfferingRoute
+  AppProfileRoute: typeof AppProfileRoute
   AppProjectsRoute: typeof AppProjectsRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -322,6 +342,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppIncomeRoute: AppIncomeRoute,
   AppMembersRoute: AppMembersRoute,
   AppOfferingRoute: AppOfferingRoute,
+  AppProfileRoute: AppProfileRoute,
   AppProjectsRoute: AppProjectsRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
