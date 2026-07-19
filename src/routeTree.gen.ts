@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppProjectsRouteImport } from './routes/_app.projects'
 import { Route as AppOfferingRouteImport } from './routes/_app.offering'
 import { Route as AppIncomeRouteImport } from './routes/_app.income'
 import { Route as AppFundsRouteImport } from './routes/_app.funds'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppProjectsRoute = AppProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppOfferingRoute = AppOfferingRouteImport.update({
   id: '/offering',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/funds': typeof AppFundsRoute
   '/income': typeof AppIncomeRoute
   '/offering': typeof AppOfferingRoute
+  '/projects': typeof AppProjectsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/funds': typeof AppFundsRoute
   '/income': typeof AppIncomeRoute
   '/offering': typeof AppOfferingRoute
+  '/projects': typeof AppProjectsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_app/funds': typeof AppFundsRoute
   '/_app/income': typeof AppIncomeRoute
   '/_app/offering': typeof AppOfferingRoute
+  '/_app/projects': typeof AppProjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/funds'
     | '/income'
     | '/offering'
+    | '/projects'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/funds'
     | '/income'
     | '/offering'
+    | '/projects'
   id:
     | '__root__'
     | '/'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_app/funds'
     | '/_app/income'
     | '/_app/offering'
+    | '/_app/projects'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/projects': {
+      id: '/_app/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/offering': {
       id: '/_app/offering'
@@ -211,6 +230,7 @@ interface AppRouteChildren {
   AppFundsRoute: typeof AppFundsRoute
   AppIncomeRoute: typeof AppIncomeRoute
   AppOfferingRoute: typeof AppOfferingRoute
+  AppProjectsRoute: typeof AppProjectsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -220,6 +240,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppFundsRoute: AppFundsRoute,
   AppIncomeRoute: AppIncomeRoute,
   AppOfferingRoute: AppOfferingRoute,
+  AppProjectsRoute: AppProjectsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
