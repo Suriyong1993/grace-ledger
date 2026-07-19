@@ -21,6 +21,7 @@ import { Route as AppFundsRouteImport } from './routes/_app.funds'
 import { Route as AppExpenseRouteImport } from './routes/_app.expense'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppBudgetRouteImport } from './routes/_app.budget'
+import { Route as AppAuditRouteImport } from './routes/_app.audit'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -81,10 +82,16 @@ const AppBudgetRoute = AppBudgetRouteImport.update({
   path: '/budget',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/audit': typeof AppAuditRoute
   '/budget': typeof AppBudgetRoute
   '/dashboard': typeof AppDashboardRoute
   '/expense': typeof AppExpenseRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/audit': typeof AppAuditRoute
   '/budget': typeof AppBudgetRoute
   '/dashboard': typeof AppDashboardRoute
   '/expense': typeof AppExpenseRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_app/audit': typeof AppAuditRoute
   '/_app/budget': typeof AppBudgetRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/expense': typeof AppExpenseRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/audit'
     | '/budget'
     | '/dashboard'
     | '/expense'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/audit'
     | '/budget'
     | '/dashboard'
     | '/expense'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/auth'
+    | '/_app/audit'
     | '/_app/budget'
     | '/_app/dashboard'
     | '/_app/expense'
@@ -258,10 +270,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBudgetRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/audit': {
+      id: '/_app/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAuditRoute: typeof AppAuditRoute
   AppBudgetRoute: typeof AppBudgetRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppExpenseRoute: typeof AppExpenseRoute
@@ -274,6 +294,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAuditRoute: AppAuditRoute,
   AppBudgetRoute: AppBudgetRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppExpenseRoute: AppExpenseRoute,
