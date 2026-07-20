@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listExpense, listFunds, listIncome, listOffering } from "@/services/church";
 import { thb } from "@/lib/format";
+import { FundTransferDialog } from "@/components/shared/FundTransferDialog";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_app/funds")({
   head: () => ({ meta: [{ title: "กองทุน — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -14,6 +16,7 @@ export const Route = createFileRoute("/_app/funds")({
 });
 
 function FundsPage() {
+  const { can } = useAuth();
   const fundsQ = useQuery({ queryKey: ["funds"], queryFn: listFunds });
   const inQ = useQuery({ queryKey: ["income"], queryFn: listIncome });
   const exQ = useQuery({ queryKey: ["expense"], queryFn: listExpense });
@@ -24,7 +27,11 @@ function FundsPage() {
   const off = offQ.data ?? [];
   return (
     <div>
-      <PageHeader title="กองทุน" description="บริหารกองทุนและติดตามยอดคงเหลือ" />
+      <PageHeader
+        title="กองทุน"
+        description="บริหารกองทุนและติดตามยอดคงเหลือ"
+        actions={can("fund.write") ? <FundTransferDialog /> : null}
+      />
       {fundsQ.isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-3xl" />)}

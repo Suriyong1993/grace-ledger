@@ -39,6 +39,9 @@ export interface Income {
   fundId: string;
   description?: string;
   attachmentName?: string;
+  attachmentDataUrl?: string;
+  attachmentType?: string;
+  attachmentSize?: number;
   createdBy: string;
   approvedBy?: string;
   status: TxStatus;
@@ -52,6 +55,9 @@ export interface Expense {
   fundId: string;
   description?: string;
   attachmentName?: string;
+  attachmentDataUrl?: string;
+  attachmentType?: string;
+  attachmentSize?: number;
   createdBy: string;
   approvedBy?: string;
   status: TxStatus;

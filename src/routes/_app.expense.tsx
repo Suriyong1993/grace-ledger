@@ -24,6 +24,8 @@ import { createExpense, deleteExpense, listCategories, listExpense, listFunds, s
 import { useAuth } from "@/lib/auth";
 import { fmtDate, thb, today } from "@/lib/format";
 import { downloadCsv, toCsv } from "@/lib/csv";
+import { AttachmentInput, AttachmentPreview, type AttachmentValue } from "@/components/shared/AttachmentInput";
+import { Receipt } from "lucide-react";
 
 export const Route = createFileRoute("/_app/expense")({
   head: () => ({ meta: [{ title: "รายจ่าย — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -45,14 +47,27 @@ function ExpensePage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [receipt, setReceipt] = useState<AttachmentValue | undefined>();
 
   const expQ = useQuery({ queryKey: ["expense"], queryFn: listExpense });
   const catsQ = useQuery({ queryKey: ["categories"], queryFn: listCategories });
   const fundsQ = useQuery({ queryKey: ["funds"], queryFn: listFunds });
 
   const create = useMutation({
-    mutationFn: (v: Values) => createExpense({ ...v }, user!),
-    onSuccess: () => { toast.success("บันทึกรายจ่ายเรียบร้อย"); qc.invalidateQueries({ queryKey: ["expense"] }); setOpen(false); },
+    mutationFn: (v: Values) => createExpense({
+      ...v,
+      attachmentName: receipt?.name,
+      attachmentDataUrl: receipt?.dataUrl,
+      attachmentType: receipt?.type,
+      attachmentSize: receipt?.size,
+    }, user!),
+    onSuccess: () => {
+      toast.success("บันทึกรายจ่ายเรียบร้อย");
+      qc.invalidateQueries({ queryKey: ["expense"] });
+      setOpen(false);
+      setReceipt(undefined);
+      form.reset({ date: today(), amount: 0, categoryId: "", fundId: "", vendor: "", description: "" });
+    },
   });
   const remove = useMutation({
     mutationFn: (id: string) => deleteExpense(id, user!),
@@ -131,6 +146,10 @@ function ExpensePage() {
                       <FormField name="description" control={form.control} render={({ field }) => (
                         <FormItem><FormLabel>รายละเอียด</FormLabel><FormControl><Textarea className="rounded-xl" rows={3} {...field} /></FormControl></FormItem>
                       )} />
+                      <div>
+                        <p className="text-sm font-medium mb-2 flex items-center gap-2"><Receipt className="h-4 w-4" /> ใบเสร็จ / ใบกำกับภาษี</p>
+                        <AttachmentInput value={receipt} onChange={setReceipt} label="ถ่ายรูปหรือแนบไฟล์ (JPG, PNG, PDF ไม่เกิน 10MB)" capture />
+                      </div>
                       <DialogFooter>
                         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>ยกเลิก</Button>
                         <Button type="submit" disabled={create.isPending}>บันทึก</Button>
@@ -157,7 +176,7 @@ function ExpensePage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>วันที่</TableHead><TableHead>หมวดหมู่</TableHead><TableHead>ผู้ขาย</TableHead>
-                  <TableHead>กองทุน</TableHead><TableHead>สถานะ</TableHead>
+                  <TableHead>กองทุน</TableHead><TableHead>ใบเสร็จ</TableHead><TableHead>สถานะ</TableHead>
                   <TableHead className="text-right">จำนวน</TableHead><TableHead className="text-right">การจัดการ</TableHead>
                 </TableRow>
               </TableHeader>
@@ -168,6 +187,11 @@ function ExpensePage() {
                     <TableCell>{catName(r.categoryId)}</TableCell>
                     <TableCell className="max-w-xs truncate">{r.vendor}</TableCell>
                     <TableCell>{fundName(r.fundId)}</TableCell>
+                    <TableCell>{r.attachmentDataUrl ? (
+                      <AttachmentPreview value={{ name: r.attachmentName, dataUrl: r.attachmentDataUrl, type: r.attachmentType, size: r.attachmentSize }} />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}</TableCell>
                     <TableCell><StatusBadge status={r.status} /></TableCell>
                     <TableCell className="text-right"><MoneyText value={r.amount} tone="expense" /></TableCell>
                     <TableCell className="text-right space-x-1">
