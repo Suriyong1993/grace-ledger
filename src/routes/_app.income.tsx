@@ -26,6 +26,8 @@ import { approveIncome, createIncome, deleteIncome, listCategories, listFunds, l
 import { useAuth } from "@/lib/auth";
 import { fmtDate, today, thb } from "@/lib/format";
 import { downloadCsv, toCsv } from "@/lib/csv";
+import { AttachmentInput, AttachmentPreview, type AttachmentValue } from "@/components/shared/AttachmentInput";
+import { Paperclip } from "lucide-react";
 
 export const Route = createFileRoute("/_app/income")({
   head: () => ({ meta: [{ title: "รายรับ — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -46,17 +48,27 @@ function IncomePage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [attachment, setAttachment] = useState<AttachmentValue | undefined>();
 
   const incomeQ = useQuery({ queryKey: ["income"], queryFn: listIncome });
   const catsQ = useQuery({ queryKey: ["categories"], queryFn: listCategories });
   const fundsQ = useQuery({ queryKey: ["funds"], queryFn: listFunds });
 
   const create = useMutation({
-    mutationFn: (v: FormValues) => createIncome({ ...v, description: v.description ?? "" }, user!),
+    mutationFn: (v: FormValues) => createIncome({
+      ...v,
+      description: v.description ?? "",
+      attachmentName: attachment?.name,
+      attachmentDataUrl: attachment?.dataUrl,
+      attachmentType: attachment?.type,
+      attachmentSize: attachment?.size,
+    }, user!),
     onSuccess: () => {
       toast.success("บันทึกรายรับเรียบร้อย");
       qc.invalidateQueries({ queryKey: ["income"] });
       setOpen(false);
+      setAttachment(undefined);
+      form.reset({ date: today(), amount: 0, categoryId: "", fundId: "", description: "" });
     },
   });
 
@@ -164,6 +176,10 @@ function IncomePage() {
                           <FormControl><Textarea className="rounded-xl" rows={3} {...field} /></FormControl>
                         </FormItem>
                       )} />
+                      <div>
+                        <p className="text-sm font-medium mb-2">เอกสารแนบ (ไม่บังคับ)</p>
+                        <AttachmentInput value={attachment} onChange={setAttachment} />
+                      </div>
                       <DialogFooter>
                         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>ยกเลิก</Button>
                         <Button type="submit" disabled={create.isPending}>บันทึก</Button>
@@ -195,6 +211,7 @@ function IncomePage() {
                   <TableHead>หมวดหมู่</TableHead>
                   <TableHead>กองทุน</TableHead>
                   <TableHead>รายละเอียด</TableHead>
+                  <TableHead>ไฟล์แนบ</TableHead>
                   <TableHead>สถานะ</TableHead>
                   <TableHead className="text-right">จำนวน</TableHead>
                   <TableHead className="text-right">การจัดการ</TableHead>
@@ -207,6 +224,11 @@ function IncomePage() {
                     <TableCell>{catName(r.categoryId)}</TableCell>
                     <TableCell>{fundName(r.fundId)}</TableCell>
                     <TableCell className="max-w-xs truncate">{r.description}</TableCell>
+                    <TableCell>{r.attachmentDataUrl ? (
+                      <AttachmentPreview value={{ name: r.attachmentName, dataUrl: r.attachmentDataUrl, type: r.attachmentType, size: r.attachmentSize }} />
+                    ) : (
+                      <span className="text-xs text-muted-foreground inline-flex items-center gap-1"><Paperclip className="h-3 w-3" />—</span>
+                    )}</TableCell>
                     <TableCell><StatusBadge status={r.status} /></TableCell>
                     <TableCell className="text-right"><MoneyText value={r.amount} tone="income" /></TableCell>
                     <TableCell className="text-right space-x-1">
