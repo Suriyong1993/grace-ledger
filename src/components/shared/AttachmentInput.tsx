@@ -38,7 +38,8 @@ export function AttachmentInput({
     if (!ALLOWED.includes(file.type)) return toast.error("รองรับเฉพาะ JPG, PNG, PDF");
     if (file.size > MAX_BYTES) return toast.error("ไฟล์ต้องไม่เกิน 10MB");
     const reader = new FileReader();
-    reader.onprogress = (e) => e.lengthComputable && setProgress(Math.round((e.loaded / e.total) * 100));
+    reader.onprogress = (e) =>
+      e.lengthComputable && setProgress(Math.round((e.loaded / e.total) * 100));
     reader.onload = () => {
       setProgress(100);
       onChange({
@@ -60,11 +61,16 @@ export function AttachmentInput({
     <div className="space-y-2">
       {!value?.dataUrl ? (
         <div
-          onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDrag(true);
+          }}
           onDragLeave={() => setDrag(false)}
           onDrop={(e) => {
-            e.preventDefault(); setDrag(false);
-            const f = e.dataTransfer.files?.[0]; if (f) handleFile(f);
+            e.preventDefault();
+            setDrag(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) handleFile(f);
           }}
           onClick={() => ref.current?.click()}
           className={`cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition ${drag ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/40"}`}
@@ -83,27 +89,57 @@ export function AttachmentInput({
             accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
             {...(capture ? { capture: "environment" as const } : {})}
             className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+              e.target.value = "";
+            }}
           />
         </div>
       ) : (
         <div className="flex items-center gap-3 rounded-2xl border p-3 bg-card">
           <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary shrink-0 overflow-hidden">
-            {isImage ? <img src={value.dataUrl} alt="" className="h-full w-full object-cover" /> : <FileText className="h-5 w-5" />}
+            {isImage ? (
+              <img src={value.dataUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <FileText className="h-5 w-5" />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium truncate">{value.name}</p>
-            <p className="text-xs text-muted-foreground">{value.size ? `${(value.size / 1024).toFixed(1)} KB` : ""}</p>
+            <p className="text-xs text-muted-foreground">
+              {value.size ? `${(value.size / 1024).toFixed(1)} KB` : ""}
+            </p>
           </div>
-          <Button type="button" size="icon" variant="ghost" className="rounded-xl" onClick={() => setPreview(true)} aria-label="ดู">
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="rounded-xl"
+            onClick={() => setPreview(true)}
+            aria-label="ดู"
+          >
             <Eye className="h-4 w-4" />
           </Button>
           <a href={value.dataUrl} download={value.name}>
-            <Button type="button" size="icon" variant="ghost" className="rounded-xl" aria-label="ดาวน์โหลด">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="rounded-xl"
+              aria-label="ดาวน์โหลด"
+            >
               <Download className="h-4 w-4" />
             </Button>
           </a>
-          <Button type="button" size="icon" variant="ghost" className="rounded-xl" onClick={() => onChange(undefined)} aria-label="ลบ">
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="rounded-xl"
+            onClick={() => onChange(undefined)}
+            aria-label="ลบ"
+          >
             <X className="h-4 w-4 text-destructive" />
           </Button>
         </div>
@@ -112,9 +148,17 @@ export function AttachmentInput({
       <Dialog open={preview} onOpenChange={setPreview}>
         <DialogContent className="max-w-4xl rounded-3xl p-2">
           {isImage ? (
-            <img src={value?.dataUrl} alt={value?.name} className="max-h-[80vh] w-full object-contain rounded-2xl" />
+            <img
+              src={value?.dataUrl}
+              alt={value?.name}
+              className="max-h-[80vh] w-full object-contain rounded-2xl"
+            />
           ) : (
-            <iframe src={value?.dataUrl} className="w-full h-[80vh] rounded-2xl" title={value?.name} />
+            <iframe
+              src={value?.dataUrl}
+              className="w-full h-[80vh] rounded-2xl"
+              title={value?.name}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -126,7 +170,12 @@ export function AttachmentPreview({ value }: { value?: AttachmentValue }) {
   if (!value?.dataUrl) return null;
   const isImage = value.type?.startsWith("image/");
   return (
-    <a href={value.dataUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+    <a
+      href={value.dataUrl}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+    >
       {isImage ? <ImageIcon className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
       {value.name}
     </a>

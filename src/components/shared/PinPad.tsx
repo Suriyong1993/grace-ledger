@@ -12,7 +12,13 @@ interface Props {
   subtitle?: string;
 }
 
-export function PinPad({ length = 6, onSubmit, autoSubmit = true, title = "กรอกรหัส PIN", subtitle }: Props) {
+export function PinPad({
+  length = 6,
+  onSubmit,
+  autoSubmit = true,
+  title = "กรอกรหัส PIN",
+  subtitle,
+}: Props) {
   const [pin, setPin] = useState("");
   const [shake, setShake] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -70,7 +76,7 @@ export function PinPad({ length = 6, onSubmit, autoSubmit = true, title = "ก�
       </motion.div>
 
       <div className="grid grid-cols-3 gap-3">
-        {["1","2","3","4","5","6","7","8","9"].map((n) => (
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((n) => (
           <Button
             key={n}
             variant="secondary"

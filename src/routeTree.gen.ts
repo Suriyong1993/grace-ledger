@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
+import { Route as AppReconciliationRouteImport } from './routes/_app.reconciliation'
 import { Route as AppProjectsRouteImport } from './routes/_app.projects'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppOfferingRouteImport } from './routes/_app.offering'
@@ -47,6 +48,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
 const AppReportsRoute = AppReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReconciliationRoute = AppReconciliationRouteImport.update({
+  id: '/reconciliation',
+  path: '/reconciliation',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProjectsRoute = AppProjectsRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/offering': typeof AppOfferingRoute
   '/profile': typeof AppProfileRoute
   '/projects': typeof AppProjectsRoute
+  '/reconciliation': typeof AppReconciliationRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
 }
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/offering': typeof AppOfferingRoute
   '/profile': typeof AppProfileRoute
   '/projects': typeof AppProjectsRoute
+  '/reconciliation': typeof AppReconciliationRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
 }
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/_app/offering': typeof AppOfferingRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/projects': typeof AppProjectsRoute
+  '/_app/reconciliation': typeof AppReconciliationRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
 }
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/offering'
     | '/profile'
     | '/projects'
+    | '/reconciliation'
     | '/reports'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/offering'
     | '/profile'
     | '/projects'
+    | '/reconciliation'
     | '/reports'
     | '/settings'
   id:
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/_app/offering'
     | '/_app/profile'
     | '/_app/projects'
+    | '/_app/reconciliation'
     | '/_app/reports'
     | '/_app/settings'
   fileRoutesById: FileRoutesById
@@ -243,6 +255,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reconciliation': {
+      id: '/_app/reconciliation'
+      path: '/reconciliation'
+      fullPath: '/reconciliation'
+      preLoaderRoute: typeof AppReconciliationRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/projects': {
@@ -329,6 +348,7 @@ interface AppRouteChildren {
   AppOfferingRoute: typeof AppOfferingRoute
   AppProfileRoute: typeof AppProfileRoute
   AppProjectsRoute: typeof AppProjectsRoute
+  AppReconciliationRoute: typeof AppReconciliationRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
 }
@@ -344,6 +364,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppOfferingRoute: AppOfferingRoute,
   AppProfileRoute: AppProfileRoute,
   AppProjectsRoute: AppProjectsRoute,
+  AppReconciliationRoute: AppReconciliationRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
 }
@@ -358,3 +379,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

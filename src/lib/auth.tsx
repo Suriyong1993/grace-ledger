@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { loadDb, logAudit, updateDb } from "@/lib/mock-db";
 import type { Role, User } from "@/lib/types";
 
@@ -14,8 +22,10 @@ interface AuthCtx {
 const Ctx = createContext<AuthCtx | null>(null);
 
 export type Permission =
-  | "income.write" | "income.approve"
-  | "expense.write" | "expense.approve"
+  | "income.write"
+  | "income.approve"
+  | "expense.write"
+  | "expense.approve"
   | "offering.write"
   | "fund.write"
   | "budget.write"
@@ -25,10 +35,30 @@ export type Permission =
   | "audit.view";
 
 const MATRIX: Record<Role, Permission[]> = {
-  super_admin: ["income.write","income.approve","expense.write","expense.approve","offering.write","fund.write","budget.write","project.write","member.write","settings.write","audit.view"],
-  pastor: ["income.approve","expense.approve","audit.view"],
-  treasurer: ["income.write","expense.write","offering.write","fund.write","budget.write","project.write","member.write"],
-  finance_staff: ["income.write","expense.write","offering.write","member.write"],
+  super_admin: [
+    "income.write",
+    "income.approve",
+    "expense.write",
+    "expense.approve",
+    "offering.write",
+    "fund.write",
+    "budget.write",
+    "project.write",
+    "member.write",
+    "settings.write",
+    "audit.view",
+  ],
+  pastor: ["income.approve", "expense.approve", "audit.view"],
+  treasurer: [
+    "income.write",
+    "expense.write",
+    "offering.write",
+    "fund.write",
+    "budget.write",
+    "project.write",
+    "member.write",
+  ],
+  finance_staff: ["income.write", "expense.write", "offering.write", "member.write"],
   auditor: ["audit.view"],
   viewer: [],
 };
@@ -50,27 +80,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const db = loadDb();
     const u = db.users.find((x) => x.pin === pin) ?? null;
     if (u) {
-      updateDb((d) => { d.session.userId = u.id; });
+      updateDb((d) => {
+        d.session.userId = u.id;
+      });
       setUser(u);
-      logAudit({ userId: u.id, userName: u.name, action: "login", entity: "auth", details: "เข้าสู่ระบบด้วย PIN" });
+      logAudit({
+        userId: u.id,
+        userName: u.name,
+        action: "login",
+        entity: "auth",
+        details: "เข้าสู่ระบบด้วย PIN",
+      });
     }
     return u;
   }, []);
 
   const logout = useCallback(() => {
     if (user) logAudit({ userId: user.id, userName: user.name, action: "logout", entity: "auth" });
-    updateDb((d) => { d.session.userId = null; });
+    updateDb((d) => {
+      d.session.userId = null;
+    });
     setUser(null);
   }, [user]);
 
-  const value = useMemo<AuthCtx>(() => ({
-    user,
-    loading,
-    login,
-    logout,
-    can: (perm) => (user ? MATRIX[user.role].includes(perm) : false),
-    hasRole: (...roles) => (user ? roles.includes(user.role) : false),
-  }), [user, loading, login, logout]);
+  const value = useMemo<AuthCtx>(
+    () => ({
+      user,
+      loading,
+      login,
+      logout,
+      can: (perm) => (user ? MATRIX[user.role].includes(perm) : false),
+      hasRole: (...roles) => (user ? roles.includes(user.role) : false),
+    }),
+    [user, loading, login, logout],
+  );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

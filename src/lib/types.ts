@@ -1,10 +1,4 @@
-export type Role =
-  | "super_admin"
-  | "pastor"
-  | "treasurer"
-  | "finance_staff"
-  | "auditor"
-  | "viewer";
+export type Role = "super_admin" | "pastor" | "treasurer" | "finance_staff" | "auditor" | "viewer";
 
 export const ROLE_LABEL: Record<Role, string> = {
   super_admin: "ผู้ดูแลระบบ",
@@ -64,36 +58,41 @@ export interface Expense {
   vendor?: string;
 }
 
-export type OfferingType =
-  | "sunday"
-  | "mission"
-  | "building"
-  | "special"
-  | "youth"
-  | "children"
-  | "online";
+export interface OfferingCategory {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  icon: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export const OFFERING_LABEL: Record<OfferingType, string> = {
-  sunday: "ถวายวันอาทิตย์",
-  mission: "ถวายพันธกิจ",
-  building: "ถวายก่อสร้าง",
-  special: "ถวายพิเศษ",
-  youth: "ถวายอนุชน",
-  children: "ถวายเด็ก",
-  online: "ถวายออนไลน์",
-};
+export interface OfferingSubcategory {
+  id: string;
+  categoryId: string;
+  name: string;
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export type PaymentChannel = "cash" | "bank" | "qr";
 export const CHANNEL_LABEL: Record<PaymentChannel, string> = {
   cash: "เงินสด",
-  bank: "โอนธนาคาร",
+  bank: "ออนไลน์",
   qr: "QR Payment",
 };
 
 export interface Offering {
   id: string;
   date: string;
-  type: OfferingType;
+  categoryId: string;
+  subcategoryId?: string;
   channel: PaymentChannel;
   amount: number;
   memberId?: string;

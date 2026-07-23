@@ -37,17 +37,16 @@ export function exportExcel<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportM
     [meta.churchName ?? ""],
     [meta.title],
     meta.subtitle ? [meta.subtitle] : [""],
-    [`สร้างเมื่อ ${dayjs().format("D MMM YYYY HH:mm")}${meta.generatedBy ? ` โดย ${meta.generatedBy}` : ""}`],
+    [
+      `สร้างเมื่อ ${dayjs().format("D MMM YYYY HH:mm")}${meta.generatedBy ? ` โดย ${meta.generatedBy}` : ""}`,
+    ],
     [],
     header,
     ...body,
   ];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   const colWidths = cols.map((c, i) => {
-    const maxLen = Math.max(
-      c.label.length,
-      ...body.map((r) => String(r[i] ?? "").length),
-    );
+    const maxLen = Math.max(c.label.length, ...body.map((r) => String(r[i] ?? "").length));
     return { wch: Math.min(Math.max(maxLen + 2, 12), 40) };
   });
   ws["!cols"] = colWidths;
@@ -59,7 +58,11 @@ export function exportExcel<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportM
 
 export function exportPDF<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMeta) {
   const landscape = cols.length > 6;
-  const doc = new jsPDF({ orientation: landscape ? "landscape" : "portrait", unit: "pt", format: "a4" });
+  const doc = new jsPDF({
+    orientation: landscape ? "landscape" : "portrait",
+    unit: "pt",
+    format: "a4",
+  });
   const pageWidth = doc.internal.pageSize.getWidth();
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
@@ -83,9 +86,7 @@ export function exportPDF<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMet
     styles: { font: "helvetica", fontSize: 9, cellPadding: 6 },
     headStyles: { fillColor: [249, 115, 22], textColor: 255, fontStyle: "bold" },
     alternateRowStyles: { fillColor: [255, 249, 244] },
-    columnStyles: Object.fromEntries(
-      cols.map((c, i) => [i, { halign: c.align ?? "left" }]),
-    ),
+    columnStyles: Object.fromEntries(cols.map((c, i) => [i, { halign: c.align ?? "left" }])),
     didDrawPage: () => {
       const pageCount = doc.getNumberOfPages();
       const current = doc.getCurrentPageInfo().pageNumber;

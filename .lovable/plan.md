@@ -1,4 +1,3 @@
-
 # แผนพัฒนา — ระบบจัดการการเงินคริสตจักร (Phase 1: Frontend + Mock API)
 
 สร้าง UI/UX ครบทุกโมดูลด้วย mock data ผ่าน Axios service layer (สลับเป็น backend จริงได้ในภายหลัง) ภาษาไทยทั้งระบบ, PIN login, สกุลเงิน ฿ (ค.ศ.)
@@ -82,14 +81,14 @@ Layout: Sidebar (collapsible, icon-only mode), Topbar (global search, notificati
 
 ## 7) RBAC Matrix
 
-| Role | Income | Expense | Offering | Funds | Budget | Reports | Audit | Settings |
-|---|---|---|---|---|---|---|---|---|
-| Super Admin | CRUD | CRUD+Approve | CRUD | CRUD | CRUD | View | View | Edit |
-| Pastor | View | Approve | View | View | View | View | View | — |
-| Treasurer | CRUD | CRUD | CRUD | CRUD | Edit | View | — | — |
-| Finance Staff | CRU | CRU | CRUD | View | View | View | — | — |
-| Auditor | View | View | View | View | View | View | View | — |
-| Viewer | View | View | View | View | View | View | — | — |
+| Role          | Income | Expense      | Offering | Funds | Budget | Reports | Audit | Settings |
+| ------------- | ------ | ------------ | -------- | ----- | ------ | ------- | ----- | -------- |
+| Super Admin   | CRUD   | CRUD+Approve | CRUD     | CRUD  | CRUD   | View    | View  | Edit     |
+| Pastor        | View   | Approve      | View     | View  | View   | View    | View  | —        |
+| Treasurer     | CRUD   | CRUD         | CRUD     | CRUD  | Edit   | View    | —     | —        |
+| Finance Staff | CRU    | CRU          | CRUD     | View  | View   | View    | —     | —        |
+| Auditor       | View   | View         | View     | View  | View   | View    | View  | —        |
+| Viewer        | View   | View         | View     | View  | View   | View    | —     | —        |
 
 `<RoleGuard allow={[...]}>` ครอบทั้ง route และปุ่ม action
 

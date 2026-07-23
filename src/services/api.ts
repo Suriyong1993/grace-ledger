@@ -3,8 +3,7 @@ import axios from "axios";
 // Base URL is intentionally empty in Phase 1 (frontend-first).
 // To switch to a real backend later: set VITE_API_URL and remove/disable
 // the mock adapter used by the service files under src/services/*.
-export const API_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+export const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 export const http = axios.create({
   baseURL: API_URL,

@@ -1,11 +1,5 @@
 import { MoreHorizontal } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Link, MOBILE_NAV, NAV, useCurrentPath } from "./AppNav";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +38,9 @@ export function BottomNav() {
                   to={item.to}
                   className={cn(
                     "flex flex-col items-center gap-2 rounded-2xl border p-4 text-xs font-medium",
-                    isActive(item.to) ? "border-primary bg-primary/10 text-primary" : "bg-card text-foreground",
+                    isActive(item.to)
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "bg-card text-foreground",
                   )}
                 >
                   <item.icon className="h-6 w-6" />

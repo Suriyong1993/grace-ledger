@@ -13,8 +13,18 @@ import {
   Plus,
 } from "lucide-react";
 import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
@@ -25,10 +35,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
-  listIncome, listExpense, listOffering, listFunds, listBudget, listProjects,
+  listIncome,
+  listExpense,
+  listOffering,
+  listFunds,
+  listBudget,
+  listProjects,
+  listOfferingCategories,
+  listOfferingSubcategories,
 } from "@/services/church";
 import { thb, fmtDate, dayjs } from "@/lib/format";
-import { OFFERING_LABEL } from "@/lib/types";
 import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -46,6 +62,11 @@ function Dashboard() {
   const fundsQ = useQuery({ queryKey: ["funds"], queryFn: listFunds });
   const budgetQ = useQuery({ queryKey: ["budget"], queryFn: listBudget });
   const projectsQ = useQuery({ queryKey: ["projects"], queryFn: listProjects });
+  const catsQ = useQuery({ queryKey: ["offering-categories"], queryFn: listOfferingCategories });
+  const subsQ = useQuery({
+    queryKey: ["offering-subcategories"],
+    queryFn: () => listOfferingSubcategories(),
+  });
 
   const isLoading = incomeQ.isLoading || expenseQ.isLoading || offeringQ.isLoading;
 
@@ -55,6 +76,10 @@ function Dashboard() {
   const funds = fundsQ.data ?? [];
   const budgets = budgetQ.data ?? [];
   const projects = projectsQ.data ?? [];
+  const offeringCats = catsQ.data ?? [];
+  const allSubs = subsQ.data ?? [];
+  const catName = (id: string) => offeringCats.find((c) => c.id === id)?.name ?? id;
+  const subShortName = (id?: string) => (id ? allSubs.find((s) => s.id === id)?.name : undefined);
 
   const totalIncome = incomes.reduce((s, x) => s + x.amount, 0);
   const totalExpense = expenses.reduce((s, x) => s + x.amount, 0);
@@ -62,9 +87,13 @@ function Dashboard() {
   const openingSum = funds.reduce((s, f) => s + f.openingBalance, 0);
   const cashBalance = openingSum + totalIncome + totalOffering - totalExpense;
   const todayStr = dayjs().format("YYYY-MM-DD");
-  const todayOffering = offerings.filter((o) => o.date === todayStr).reduce((s, x) => s + x.amount, 0);
+  const todayOffering = offerings
+    .filter((o) => o.date === todayStr)
+    .reduce((s, x) => s + x.amount, 0);
   const thisMonth = dayjs().format("YYYY-MM");
-  const monthlyOffering = offerings.filter((o) => o.date.startsWith(thisMonth)).reduce((s, x) => s + x.amount, 0);
+  const monthlyOffering = offerings
+    .filter((o) => o.date.startsWith(thisMonth))
+    .reduce((s, x) => s + x.amount, 0);
   const annualBudget = budgets.find((b) => b.period === "annual");
   const projectBudget = projects.reduce((s, p) => s + p.budget, 0);
   const pendingApprovals =
@@ -86,29 +115,53 @@ function Dashboard() {
   // Fund distribution
   const fundDist = funds.map((f) => ({
     name: f.name,
-    value: f.openingBalance
-      + incomes.filter((i) => i.fundId === f.id).reduce((s, x) => s + x.amount, 0)
-      + offerings.filter((o) => o.fundId === f.id).reduce((s, x) => s + x.amount, 0)
-      - expenses.filter((e) => e.fundId === f.id).reduce((s, x) => s + x.amount, 0),
+    value:
+      f.openingBalance +
+      incomes.filter((i) => i.fundId === f.id).reduce((s, x) => s + x.amount, 0) +
+      offerings.filter((o) => o.fundId === f.id).reduce((s, x) => s + x.amount, 0) -
+      expenses.filter((e) => e.fundId === f.id).reduce((s, x) => s + x.amount, 0),
   }));
 
-  // Offering by type
-  const offeringByType = Object.entries(OFFERING_LABEL).map(([k, v]) => ({
-    name: v,
-    value: offerings.filter((o) => o.type === k).reduce((s, x) => s + x.amount, 0),
-  })).filter((x) => x.value > 0);
+  // Offering by category
+  const offeringByType = offeringCats
+    .map((c) => ({
+      name: c.name,
+      color: c.color,
+      value: offerings.filter((o) => o.categoryId === c.id).reduce((s, x) => s + x.amount, 0),
+    }))
+    .filter((x) => x.value > 0);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.04,
+        delayChildren: 0.02,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } },
+  };
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="show" variants={containerVariants} className="space-y-6">
       <PageHeader
         title="แดชบอร์ด"
         description="ภาพรวมการเงินคริสตจักร"
         actions={
           <>
-            <Button variant="outline" className="rounded-2xl" onClick={() => navigate({ to: "/reports" })}>
+            <Button
+              variant="outline"
+              className="rounded-2xl active:scale-[0.97]"
+              onClick={() => navigate({ to: "/reports" })}
+            >
               <CalendarClock className="h-4 w-4 mr-2" /> รายงาน
             </Button>
-            <Button className="rounded-2xl" onClick={() => navigate({ to: "/offering" })}>
+            <Button className="rounded-2xl active:scale-[0.97]" onClick={() => navigate({ to: "/offering" })}>
               <Plus className="h-4 w-4 mr-2" /> บันทึกเงินถวาย
             </Button>
           </>
@@ -116,22 +169,50 @@ function Dashboard() {
       />
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {isLoading ? (
-          Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-3xl" />)
+          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-3xl" />)
         ) : (
           <>
-            <StatCard label="รายรับรวม" value={thb(totalIncome)} icon={ArrowDownCircle} tone="success" hint="สะสมทั้งหมด" />
-            <StatCard label="รายจ่ายรวม" value={thb(totalExpense)} icon={ArrowUpCircle} tone="danger" hint="สะสมทั้งหมด" />
-            <StatCard label="ยอดเงินสดคงเหลือ" value={thb(cashBalance)} icon={Wallet} tone="primary" hint="ทุกกองทุนรวมกัน" />
-            <StatCard label="เงินถวายวันนี้" value={thb(todayOffering)} icon={HandHeart} tone="accent" hint={fmtDate(todayStr)} />
-            <StatCard label="เงินถวายเดือนนี้" value={thb(monthlyOffering)} icon={HandHeart} tone="secondary" hint={dayjs().format("MMMM YYYY")} />
-            <StatCard label="งบประมาณประจำปี" value={annualBudget ? thb(annualBudget.amount) : "-"} icon={PiggyBank} tone="primary" hint={annualBudget ? `ใช้ ${thb(annualBudget.used)}` : "ยังไม่ตั้งงบ"} />
-            <StatCard label="งบประมาณโครงการ" value={thb(projectBudget)} icon={Briefcase} tone="secondary" hint={`${projects.length} โครงการ`} />
-            <StatCard label="รออนุมัติ" value={pendingApprovals} icon={ClipboardCheck} tone="danger" hint="ทั้งรายรับและรายจ่าย" />
+            <motion.div variants={itemVariants}>
+              <StatCard
+                label="รายรับรวมคริสตจักร"
+                value={thb(totalIncome)}
+                icon={ArrowDownCircle}
+                tone="success"
+                hint="ยอดสะสมทั้งหมด"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <StatCard
+                label="รายจ่ายรวมคริสตจักร"
+                value={thb(totalExpense)}
+                icon={ArrowUpCircle}
+                tone="danger"
+                hint="ยอดสะสมทั้งหมด"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <StatCard
+                label="ยอดเงินสดคงเหลือสุทธิ"
+                value={thb(cashBalance)}
+                icon={Wallet}
+                tone="primary"
+                hint="รวมกองทุนและธนาคาร"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <StatCard
+                label="เงินถวายประจำเดือนนี้"
+                value={thb(monthlyOffering)}
+                icon={HandHeart}
+                tone="secondary"
+                hint={dayjs().format("MMMM YYYY")}
+              />
+            </motion.div>
           </>
         )}
-      </div>
+      </motion.div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
@@ -143,12 +224,40 @@ function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthly}>
                 <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickFormatter={(v) => (v / 1000).toFixed(0) + "k"} />
-                <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }} />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(v) => (v / 1000).toFixed(0) + "k"}
+                />
+                <Tooltip
+                  formatter={(v: number) => thb(v)}
+                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }}
+                />
                 <Legend />
-                <Line type="monotone" dataKey="income" name="รายรับ" stroke="#22C55E" strokeWidth={3} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="expense" name="รายจ่าย" stroke="#EF4444" strokeWidth={3} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="offering" name="ถวาย" stroke="#F97316" strokeWidth={3} dot={{ r: 4 }} />
+                <Line
+                  type="monotone"
+                  dataKey="income"
+                  name="รายรับ"
+                  stroke="#22C55E"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="expense"
+                  name="รายจ่าย"
+                  stroke="#EF4444"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="offering"
+                  name="ถวาย"
+                  stroke="#F97316"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -161,8 +270,17 @@ function Dashboard() {
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={fundDist} dataKey="value" nameKey="name" innerRadius={45} outerRadius={80} paddingAngle={3}>
-                  {fundDist.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                <Pie
+                  data={fundDist}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={45}
+                  outerRadius={80}
+                  paddingAngle={3}
+                >
+                  {fundDist.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
                 </Pie>
                 <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12 }} />
                 <Legend />
@@ -179,7 +297,11 @@ function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthly}>
                 <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} tickFormatter={(v) => (v / 1000).toFixed(0) + "k"} />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(v) => (v / 1000).toFixed(0) + "k"}
+                />
                 <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12 }} />
                 <Legend />
                 <Bar dataKey="income" name="รายรับ" fill="#22C55E" radius={[8, 8, 0, 0]} />
@@ -207,7 +329,13 @@ function Dashboard() {
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
                       transition={{ duration: 0.6 }}
-                      className={pct > 90 ? "h-full bg-destructive" : pct > 70 ? "h-full bg-warning" : "h-full bg-primary"}
+                      className={
+                        pct > 90
+                          ? "h-full bg-destructive"
+                          : pct > 70
+                            ? "h-full bg-warning"
+                            : "h-full bg-primary"
+                      }
                     />
                   </div>
                   <div className="flex justify-between text-[11px] text-muted-foreground mt-1">
@@ -226,23 +354,34 @@ function Dashboard() {
         <Card className="rounded-3xl">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">รายการล่าสุด</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/income" })}>ดูทั้งหมด</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/income" })}>
+              ดูทั้งหมด
+            </Button>
           </CardHeader>
           <CardContent className="divide-y">
-            {[...incomes.slice(0, 3).map((i) => ({ ...i, kind: "income" as const })),
-              ...expenses.slice(0, 3).map((e) => ({ ...e, kind: "expense" as const }))]
-              .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6).map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between py-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{tx.description || (tx.kind === "income" ? "รายรับ" : "รายจ่าย")}</p>
-                  <p className="text-xs text-muted-foreground">{fmtDate(tx.date)}</p>
+            {[
+              ...incomes.slice(0, 3).map((i) => ({ ...i, kind: "income" as const })),
+              ...expenses.slice(0, 3).map((e) => ({ ...e, kind: "expense" as const })),
+            ]
+              .sort((a, b) => b.date.localeCompare(a.date))
+              .slice(0, 6)
+              .map((tx) => (
+                <div key={tx.id} className="flex items-center justify-between py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {tx.description || (tx.kind === "income" ? "รายรับ" : "รายจ่าย")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{fmtDate(tx.date)}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <StatusBadge status={tx.status} />
+                    <MoneyText
+                      value={tx.amount}
+                      tone={tx.kind === "income" ? "income" : "expense"}
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <StatusBadge status={tx.status} />
-                  <MoneyText value={tx.amount} tone={tx.kind === "income" ? "income" : "expense"} />
-                </div>
-              </div>
-            ))}
+              ))}
             {incomes.length === 0 && expenses.length === 0 && (
               <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีรายการ</p>
             )}
@@ -252,17 +391,24 @@ function Dashboard() {
         <Card className="rounded-3xl">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">เงินถวายล่าสุด</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/offering" })}>ดูทั้งหมด</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/offering" })}>
+              ดูทั้งหมด
+            </Button>
           </CardHeader>
           <CardContent className="divide-y">
             {offerings.slice(0, 6).map((o) => (
               <div key={o.id} className="flex items-center justify-between py-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{OFFERING_LABEL[o.type]}</p>
+                  <p className="text-sm font-medium truncate">
+                    {catName(o.categoryId)}
+                    {subShortName(o.subcategoryId) ? ` · ${subShortName(o.subcategoryId)}` : ""}
+                  </p>
                   <p className="text-xs text-muted-foreground">{fmtDate(o.date)}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant="outline" className="rounded-full text-[10px]">{o.channel === "cash" ? "เงินสด" : o.channel === "bank" ? "โอน" : "QR"}</Badge>
+                  <Badge variant="outline" className="rounded-full text-[10px]">
+                    {o.channel === "cash" ? "เงินสด" : o.channel === "bank" ? "โอน" : "QR"}
+                  </Badge>
                   <MoneyText value={o.amount} tone="income" />
                 </div>
               </div>
@@ -278,22 +424,35 @@ function Dashboard() {
       {offeringByType.length > 0 && (
         <Card className="rounded-3xl mt-6">
           <CardHeader>
-            <CardTitle className="text-base">การกระจายเงินถวายตามประเภท</CardTitle>
+            <CardTitle className="text-base">การกระจายเงินถวายตามหมวดหมู่</CardTitle>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={offeringByType} layout="vertical" margin={{ left: 80 }}>
-                <XAxis type="number" stroke="var(--color-muted-foreground)" fontSize={12} tickFormatter={(v) => (v / 1000).toFixed(0) + "k"} />
-                <YAxis type="category" dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} width={80} />
+                <XAxis
+                  type="number"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(v) => (v / 1000).toFixed(0) + "k"}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  width={80}
+                />
                 <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12 }} />
-                <Bar dataKey="value" fill="#F97316" radius={[0, 8, 8, 0]}>
-                  {offeringByType.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                <Bar dataKey="value" radius={[0, 8, 8, 0]}>
+                  {offeringByType.map((d, i) => (
+                    <Cell key={i} fill={d.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       )}
-    </div>
+    </motion.div>
   );
 }

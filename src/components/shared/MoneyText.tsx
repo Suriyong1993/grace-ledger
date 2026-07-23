@@ -11,10 +11,14 @@ export function MoneyText({
   className?: string;
 }) {
   const color =
-    tone === "income" ? "text-success" : tone === "expense" ? "text-destructive" : "text-foreground";
+    tone === "income"
+      ? "text-success"
+      : tone === "expense"
+        ? "text-destructive"
+        : "text-foreground";
   const prefix = tone === "income" ? "+" : tone === "expense" ? "−" : "";
   return (
-    <span className={cn("tabular-nums font-semibold", color, className)}>
+    <span className={cn("tabular-nums font-mono font-semibold tracking-tight", color, className)}>
       {prefix}
       {thb(Math.abs(value))}
     </span>

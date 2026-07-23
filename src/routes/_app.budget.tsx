@@ -13,7 +13,12 @@ export const Route = createFileRoute("/_app/budget")({
   component: BudgetPage,
 });
 
-const PERIOD_LABEL: Record<string, string> = { annual: "ประจำปี", monthly: "รายเดือน", department: "แผนก", project: "โครงการ" };
+const PERIOD_LABEL: Record<string, string> = {
+  annual: "ประจำปี",
+  monthly: "รายเดือน",
+  department: "แผนก",
+  project: "โครงการ",
+};
 
 function BudgetPage() {
   const q = useQuery({ queryKey: ["budget"], queryFn: listBudget });
@@ -22,7 +27,11 @@ function BudgetPage() {
     <div>
       <PageHeader title="งบประมาณ" description="ติดตามการใช้งบประมาณ" />
       {q.isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-40 rounded-3xl" />)}</div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 rounded-3xl" />
+          ))}
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {budgets.map((b) => {
@@ -34,18 +43,44 @@ function BudgetPage() {
                   <div className="min-w-0">
                     <CardTitle className="text-lg truncate">{b.name}</CardTitle>
                     <div className="mt-1 flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className="rounded-full">{PERIOD_LABEL[b.period]}</Badge>
+                      <Badge variant="outline" className="rounded-full">
+                        {PERIOD_LABEL[b.period]}
+                      </Badge>
                       <span className="text-xs text-muted-foreground">ปี {b.year}</span>
                     </div>
                   </div>
-                  {alert && <Badge variant="outline" className="rounded-full bg-destructive/15 text-destructive border-destructive/30 gap-1"><AlertTriangle className="h-3 w-3" /> ใกล้เต็ม</Badge>}
+                  {alert && (
+                    <Badge
+                      variant="outline"
+                      className="rounded-full bg-destructive/15 text-destructive border-destructive/30 gap-1"
+                    >
+                      <AlertTriangle className="h-3 w-3" /> ใกล้เต็ม
+                    </Badge>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">ใช้ไป</span><span className="font-semibold">{thb(b.used)} / {thb(b.amount)}</span></div>
-                  <div className="h-3 rounded-full bg-muted overflow-hidden">
-                    <div className={pct > 90 ? "h-full bg-destructive" : pct > 70 ? "h-full bg-warning" : "h-full bg-primary"} style={{ width: `${pct}%` }} />
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">ใช้ไป</span>
+                    <span className="font-semibold">
+                      {thb(b.used)} / {thb(b.amount)}
+                    </span>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground mt-2"><span>{pct}%</span><span>คงเหลือ {thb(b.amount - b.used)}</span></div>
+                  <div className="h-3 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className={
+                        pct > 90
+                          ? "h-full bg-destructive"
+                          : pct > 70
+                            ? "h-full bg-warning"
+                            : "h-full bg-primary"
+                      }
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>{pct}%</span>
+                    <span>คงเหลือ {thb(b.amount - b.used)}</span>
+                  </div>
                 </CardContent>
               </Card>
             );

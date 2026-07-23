@@ -12,6 +12,7 @@ import {
   ScrollText,
   Settings,
   UserCircle2,
+  FileSpreadsheet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,23 +23,17 @@ export interface NavItem {
 }
 
 export const NAV: NavItem[] = [
-  { to: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
-  { to: "/income", label: "รายรับ", icon: ArrowDownCircle },
-  { to: "/expense", label: "รายจ่าย", icon: ArrowUpCircle },
-  { to: "/offering", label: "เงินถวาย", icon: HandHeart },
-  { to: "/funds", label: "กองทุน", icon: Wallet },
-  { to: "/budget", label: "งบประมาณ", icon: PiggyBank },
-  { to: "/projects", label: "โครงการ", icon: Briefcase },
-  { to: "/members", label: "สมาชิก", icon: Users },
-  { to: "/reports", label: "รายงาน", icon: FileBarChart2 },
-  { to: "/audit", label: "Audit Logs", icon: ScrollText },
-  { to: "/settings", label: "ตั้งค่า", icon: Settings },
-  { to: "/profile", label: "โปรไฟล์", icon: UserCircle2 },
+  { to: "/dashboard", label: "ภาพรวม (แดชบอร์ด)", icon: LayoutDashboard },
+  { to: "/offering", label: "บันทึกเงินถวายวันอาทิตย์", icon: HandHeart },
+  { to: "/expense", label: "บันทึกรายจ่าย", icon: ArrowUpCircle },
+  { to: "/members", label: "รายชื่อสมาชิก", icon: Users },
+  { to: "/funds", label: "กองทุน & บัญชีธนาคาร", icon: Wallet },
+  { to: "/reports", label: "รายงานสรุปการเงิน", icon: FileBarChart2 },
+  { to: "/reconciliation", label: "กระทบยอดเงินสด", icon: FileSpreadsheet },
+  { to: "/settings", label: "ตั้งค่าระบบ", icon: Settings },
 ];
 
-export const MOBILE_NAV: NavItem[] = [
-  NAV[0], NAV[1], NAV[2], NAV[3],
-];
+export const MOBILE_NAV: NavItem[] = [NAV[0], NAV[1], NAV[2], NAV[5]];
 
 export function useCurrentPath() {
   return useRouterState({ select: (s) => s.location.pathname });

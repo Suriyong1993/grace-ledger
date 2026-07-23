@@ -1,4 +1,7 @@
-export function toCsv<T extends Record<string, unknown>>(rows: T[], headers?: Record<keyof T, string>) {
+export function toCsv<T extends Record<string, unknown>>(
+  rows: T[],
+  headers?: Record<keyof T, string>,
+) {
   if (rows.length === 0) return "";
   const keys = (headers ? Object.keys(headers) : Object.keys(rows[0])) as (keyof T)[];
   const escape = (v: unknown) => {

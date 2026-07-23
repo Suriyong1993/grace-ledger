@@ -60,7 +60,9 @@ function AuthPage() {
           className="relative max-w-md"
         >
           <h1 className="text-4xl font-bold leading-tight">
-            ดูแลการเงินคริสตจักร<br />ด้วยความโปร่งใสและง่ายดาย
+            ดูแลการเงินคริสตจักร
+            <br />
+            ด้วยความโปร่งใสและง่ายดาย
           </h1>
           <p className="mt-4 text-white/85">
             บันทึกรายรับ รายจ่าย เงินถวาย บริหารกองทุน งบประมาณ และออกรายงานได้ในที่เดียว
@@ -82,7 +84,9 @@ function AuthPage() {
             onSubmit={handleSubmit}
           />
           <div className="mt-8 rounded-2xl border bg-card p-4">
-            <p className="text-xs font-semibold text-muted-foreground mb-2">บัญชีตัวอย่าง (คลิกเพื่อกรอกให้)</p>
+            <p className="text-xs font-semibold text-muted-foreground mb-2">
+              บัญชีตัวอย่าง (คลิกเพื่อกรอกให้)
+            </p>
             <div className="grid grid-cols-2 gap-1.5">
               {demoUsers.map((u) => (
                 <button
@@ -91,7 +95,9 @@ function AuthPage() {
                   className="text-left rounded-xl px-2.5 py-1.5 hover:bg-accent text-xs"
                 >
                   <div className="font-medium text-foreground truncate">{u.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{ROLE_LABEL[u.role]} · {u.pin}</div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {ROLE_LABEL[u.role]} · {u.pin}
+                  </div>
                 </button>
               ))}
             </div>

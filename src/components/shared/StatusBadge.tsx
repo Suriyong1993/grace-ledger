@@ -10,7 +10,10 @@ export function StatusBadge({ status }: { status: TxStatus }) {
     rejected: "bg-destructive/15 text-destructive border-destructive/30",
   };
   return (
-    <Badge variant="outline" className={cn("rounded-full px-3 py-0.5 text-xs font-medium", map[status])}>
+    <Badge
+      variant="outline"
+      className={cn("rounded-full px-3 py-0.5 text-xs font-medium", map[status])}
+    >
       {STATUS_LABEL[status]}
     </Badge>
   );

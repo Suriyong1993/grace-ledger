@@ -22,11 +22,25 @@ function ProfilePage() {
       <Card className="rounded-3xl max-w-md">
         <CardContent className="p-6 flex flex-col items-center text-center">
           <Avatar className="h-24 w-24 mb-4">
-            <AvatarFallback style={{ background: user.avatarColor ?? "#F97316" }} className="text-white text-3xl">{user.name[0]}</AvatarFallback>
+            <AvatarFallback
+              style={{ background: user.avatarColor ?? "#F97316" }}
+              className="text-white text-3xl"
+            >
+              {user.name[0]}
+            </AvatarFallback>
           </Avatar>
           <h2 className="text-xl font-bold">{user.name}</h2>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><ShieldCheck className="h-4 w-4" /> {ROLE_LABEL[user.role]}</p>
-          <Button variant="outline" className="rounded-2xl mt-6" onClick={() => { logout(); navigate({ to: "/auth" }); }}>
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+            <ShieldCheck className="h-4 w-4" /> {ROLE_LABEL[user.role]}
+          </p>
+          <Button
+            variant="outline"
+            className="rounded-2xl mt-6"
+            onClick={() => {
+              logout();
+              navigate({ to: "/auth" });
+            }}
+          >
             <LogOut className="h-4 w-4 mr-2" /> ออกจากระบบ
           </Button>
         </CardContent>
