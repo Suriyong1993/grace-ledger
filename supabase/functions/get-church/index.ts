@@ -7,7 +7,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders(req) });
   }
 
   try {
@@ -22,7 +22,7 @@ serve(async (req) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -32,33 +32,47 @@ serve(async (req) => {
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get user's church data
-    const { data: userData, error } = await supabase
+    // Get user's church data — explicit safe columns only
+    const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('*, churches(*)')
+      .select('id, auth_user_id, church_id, name, role, avatar_color, is_active, created_at, updated_at')
       .eq('auth_user_id', user.id)
       .single();
 
-    if (error || !userData) {
+    if (userError || !userData) {
       return new Response(
         JSON.stringify({ error: 'User not found in church' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fetch church data separately
+    const { data: churchData, error: churchError } = await supabase
+      .from('churches')
+      .select('*')
+      .eq('id', userData.church_id)
+      .single();
+
+    if (churchError) {
+      return new Response(
+        JSON.stringify({ error: 'Church not found' }),
+        { status: 404, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
-      JSON.stringify({ user: userData, church: userData.churches }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ user: userData, church: churchData }),
+      { status: 200, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Get church error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

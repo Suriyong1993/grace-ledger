@@ -40,10 +40,10 @@ function seed(): DB {
   const ts = now();
 
   const users: User[] = [
-    { id: "u1", name: "ศจ. สมชาย", role: "super_admin", pin: "111111", avatarColor: "#F97316" },
-    { id: "u2", name: "ศจ. วิชัย", role: "pastor", pin: "222222", avatarColor: "#F59E0B" },
-    { id: "u3", name: "คุณศิริ", role: "treasurer", pin: "333333", avatarColor: "#EAB308" },
-    { id: "u4", name: "คุณอรุณ", role: "finance_staff", pin: "444444", avatarColor: "#22C55E" },
+    { id: "u1", name: "ศจ. สมชาย", role: "super_admin", avatarColor: "#F97316" },
+    { id: "u2", name: "ศจ. วิชัย", role: "pastor", avatarColor: "#F59E0B" },
+    { id: "u3", name: "คุณศิริ", role: "treasurer", avatarColor: "#EAB308" },
+    { id: "u4", name: "คุณอรุณ", role: "finance_staff", avatarColor: "#22C55E" },
   ];
 
   const categories: Category[] = [
@@ -263,7 +263,14 @@ export function loadDb(): DB {
 
 export function saveDb() {
   if (typeof window === "undefined" || !cache) return;
-  window.localStorage.setItem(KEY, JSON.stringify(cache));
+  // Save only metadata (settings, categories), NOT financial data (income, expense, offering)
+  // This prevents localStorage from exposing all church financial records via XSS
+  const safe: Partial<DB> = {
+    session: cache.session,
+    settings: cache.settings,
+    users: cache.users,
+  };
+  window.localStorage.setItem(KEY, JSON.stringify(safe));
 }
 
 export function updateDb(fn: (db: DB) => void) {

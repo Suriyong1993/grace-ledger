@@ -9,7 +9,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 serve(async (req) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders(req) });
   }
 
   try {
@@ -25,7 +25,7 @@ serve(async (req) => {
     if (!email || !password) {
       return new Response(
         JSON.stringify({ error: 'email and password are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -39,14 +39,14 @@ serve(async (req) => {
       // Generic error to prevent user enumeration
       return new Response(
         JSON.stringify({ error: 'Invalid credentials' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     // 2. Get user's church_id from our users table
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('id, church_id, name, role, avatar_color')
+      .select('id, church_id, name, role, avatar_color, is_active')
       .eq('auth_user_id', authData.user!.id)
       .single();
 
@@ -55,7 +55,7 @@ serve(async (req) => {
       console.error(`User ${authData.user!.id} not found in church users table`);
       return new Response(
         JSON.stringify({ error: 'User not registered' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -63,7 +63,7 @@ serve(async (req) => {
     if (!userData.is_active) {
       return new Response(
         JSON.stringify({ error: 'Account is deactivated' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -89,13 +89,13 @@ serve(async (req) => {
         refresh_token: session?.refresh_token,
         expires_at: session?.expires_at,
       }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Login error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

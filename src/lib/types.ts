@@ -13,16 +13,16 @@ export interface User {
   id: string;
   name: string;
   role: Role;
-  pin: string; // 6-digit
   avatarColor?: string;
 }
 
-export type TxStatus = "draft" | "pending" | "approved" | "rejected";
+export type TxStatus = "draft" | "pending" | "approved" | "rejected" | "voided";
 export const STATUS_LABEL: Record<TxStatus, string> = {
   draft: "ร่าง",
   pending: "รออนุมัติ",
   approved: "อนุมัติแล้ว",
   rejected: "ปฏิเสธ",
+  voided: "ยกเลิก",
 };
 
 export interface Income {

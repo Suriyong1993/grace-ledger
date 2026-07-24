@@ -7,7 +7,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders(req) });
   }
 
   try {
@@ -17,13 +17,54 @@ serve(async (req) => {
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
+    // Require caller to be authenticated as super_admin
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user: caller }, error: callerError } = await supabase.auth.getUser(token);
+
+    if (callerError || !caller) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication token' }),
+        { status: 401, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify caller is super_admin in their church
+    const { data: callerData, error: callerDataError } = await supabase
+      .from('users')
+      .select('id, role, church_id')
+      .eq('auth_user_id', caller.id)
+      .single();
+
+    if (callerDataError || !callerData || callerData.role !== 'super_admin') {
+      return new Response(
+        JSON.stringify({ error: 'Only super_admin can register new users' }),
+        { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { email, password, name, church_id, role } = await req.json();
+
+    // Validate: new user must be for same church as caller
+    if (church_id !== callerData.church_id) {
+      return new Response(
+        JSON.stringify({ error: 'Cannot register user for a different church' }),
+        { status: 403, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Validate
     if (!email || !password || !name || !church_id) {
       return new Response(
         JSON.stringify({ error: 'email, password, name, and church_id are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -32,7 +73,7 @@ serve(async (req) => {
     if (role && !validRoles.includes(role)) {
       return new Response(
         JSON.stringify({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -46,8 +87,8 @@ serve(async (req) => {
 
     if (authError) {
       return new Response(
-        JSON.stringify({ error: authError.message }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Failed to create user account' }),
+        { status: 400, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -69,7 +110,7 @@ serve(async (req) => {
       await supabase.auth.admin.deleteUser(userId);
       return new Response(
         JSON.stringify({ error: 'Failed to create user record' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
@@ -87,13 +128,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ message: 'User registered successfully', user_id: userId }),
-      { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 201, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Registration error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

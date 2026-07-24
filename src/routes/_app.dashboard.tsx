@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowDownCircle,
@@ -34,6 +34,7 @@ import {
   listOfferingSubcategories,
 } from "@/services/church";
 import { useRealtime } from "@/hooks/useRealtime";
+import { supabase } from "@/services/supabaseClient";
 import { thb, fmtDate, dayjs } from "@/lib/format";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -61,16 +62,33 @@ function Dashboard() {
   // Realtime subscriptions — live updates when data changes
   const [lastUpdated, setLastUpdated] = useState(Date.now());
   const [realtimeError, setRealtimeError] = useState<string | null>(null);
+  const [churchId, setChurchId] = useState<string>("");
 
-  useRealtime("dashboard-income", "incomes", "", (event) => {
+  // Fetch churchId for realtime subscriptions
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("users")
+        .select("church_id")
+        .eq("auth_user_id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.church_id) setChurchId(data.church_id);
+        })
+        .catch(() => {});
+    });
+  }, []);
+
+  useRealtime("dashboard-income", "incomes", churchId, (event) => {
     incomeQ.refetch();
     setLastUpdated(Date.now());
   });
-  useRealtime("dashboard-expense", "expenses", "", (event) => {
+  useRealtime("dashboard-expense", "expenses", churchId, (event) => {
     expenseQ.refetch();
     setLastUpdated(Date.now());
   });
-  useRealtime("dashboard-offering", "offerings", "", (event) => {
+  useRealtime("dashboard-offering", "offerings", churchId, (event) => {
     offeringQ.refetch();
     setLastUpdated(Date.now());
   });
