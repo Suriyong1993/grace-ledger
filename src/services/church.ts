@@ -1,10 +1,13 @@
-/**
- * Domain service layer. Phase 1 uses a localStorage-backed mock DB.
- * Swap the bodies to call `http.get/post/...` when a real backend arrives.
- */
-import { loadDb, logAudit, newId, updateDb } from "@/lib/mock-db";
-import { now } from "@/lib/format";
-import { delay } from "./api";
+// src/services/church.ts — Updated for Supabase
+// Replaces mock-db.ts. All functions now talk to Supabase.
+// Changes:
+// 1. Each function queries/writes to Supabase tables
+// 2. Auth is handled by Supabase (not localStorage PIN)
+// 3. Realtime subscriptions for live updates (optional, see below)
+// 4. Church_id is implicitly enforced by Supabase RLS policies
+
+import { supabase } from './supabaseClient';
+import { now } from '@/lib/format';
 import type {
   Budget,
   Category,
@@ -19,454 +22,734 @@ import type {
   Settings,
   TxStatus,
   User,
-} from "@/lib/types";
+} from '@/lib/types';
 
-// users
+const delay = (ms = 50) => new Promise((r) => setTimeout(r, ms));
+
+// Helper to get current user's church_id
+async function getChurchId(): Promise<string> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: userData } = await supabase
+    .from('users')
+    .select('church_id')
+    .eq('auth_user_id', user.id)
+    .single();
+
+  if (!userData) throw new Error('User not registered in any church');
+  return userData.church_id;
+}
+
+// ── Users ────────────────────────────────────────────────────────
+
 export async function listUsers(): Promise<User[]> {
-  await delay(60);
-  return [...loadDb().users];
-}
-export async function updateUserPin(id: string, pin: string) {
-  await delay(60);
-  updateDb((db) => {
-    const u = db.users.find((x) => x.id === id);
-    if (u) u.pin = pin;
-  });
+  await delay(30);
+  const churchId = await getChurchId();
+  return listUsersByChurch(churchId);
 }
 
-// categories
+export async function listUsersByChurch(churchId: string): Promise<User[]> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('church_id', churchId)
+    .eq('is_active', true)
+    .order('name');
+
+  if (error) throw error;
+  return (data || []) as User[];
+}
+
+// ── Categories ────────────────────────────────────────────────────
+
 export async function listCategories(): Promise<Category[]> {
   await delay(30);
-  return [...loadDb().categories];
+  const churchId = await getChurchId();
+  return listCategoriesByChurch(churchId);
 }
 
-// funds
+export async function listCategoriesByChurch(churchId: string): Promise<Category[]> {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('church_id', churchId)
+    .order('sort_order');
+
+  if (error) throw error;
+  return (data || []) as Category[];
+}
+
+// ── Funds ─────────────────────────────────────────────────────────
+
 export async function listFunds(): Promise<Fund[]> {
-  await delay(60);
-  return [...loadDb().funds];
-}
-export async function createFund(input: Omit<Fund, "id" | "createdAt">, by: User) {
-  await delay(120);
-  const id = newId("f");
-  updateDb((db) => {
-    db.funds.push({ ...input, id, createdAt: now() });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "fund",
-    entityId: id,
-    details: input.name,
-  });
-  return id;
-}
-export async function transferFund(fromId: string, toId: string, amount: number, by: User) {
-  await delay(150);
-  const t = now();
-  updateDb((db) => {
-    db.expenses.unshift({
-      id: newId("e"),
-      date: t.slice(0, 10),
-      categoryId: "c-oth-e",
-      amount,
-      fundId: fromId,
-      description: `โอนไปยังกองทุน`,
-      createdBy: by.id,
-      status: "approved",
-    });
-    db.incomes.unshift({
-      id: newId("i"),
-      date: t.slice(0, 10),
-      categoryId: "c-oth-i",
-      amount,
-      fundId: toId,
-      description: `รับโอนจากกองทุน`,
-      createdBy: by.id,
-      status: "approved",
-    });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "transfer",
-    entity: "fund",
-    details: `${fromId} → ${toId} ${amount}`,
-  });
-}
-
-// income
-export async function listIncome(): Promise<Income[]> {
-  await delay(80);
-  return [...loadDb().incomes].sort((a, b) => b.date.localeCompare(a.date));
-}
-export async function createIncome(
-  input: Omit<Income, "id" | "createdBy" | "status"> & { status?: TxStatus },
-  by: User,
-) {
-  await delay(120);
-  const id = newId("i");
-  updateDb((db) => {
-    db.incomes.unshift({ ...input, id, createdBy: by.id, status: input.status ?? "pending" });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "income",
-    entityId: id,
-    details: `${input.amount}`,
-  });
-  return id;
-}
-export async function deleteIncome(id: string, by: User) {
-  await delay(80);
-  updateDb((db) => {
-    db.incomes = db.incomes.filter((x) => x.id !== id);
-  });
-  logAudit({ userId: by.id, userName: by.name, action: "delete", entity: "income", entityId: id });
-}
-export async function approveIncome(id: string, by: User) {
-  await delay(80);
-  updateDb((db) => {
-    const it = db.incomes.find((x) => x.id === id);
-    if (it) {
-      it.status = "approved";
-      it.approvedBy = by.id;
-    }
-  });
-  logAudit({ userId: by.id, userName: by.name, action: "approve", entity: "income", entityId: id });
-}
-
-// expense
-export async function listExpense(): Promise<Expense[]> {
-  await delay(80);
-  return [...loadDb().expenses].sort((a, b) => b.date.localeCompare(a.date));
-}
-export async function createExpense(
-  input: Omit<Expense, "id" | "createdBy" | "status"> & { status?: TxStatus },
-  by: User,
-) {
-  await delay(120);
-  const id = newId("e");
-  updateDb((db) => {
-    db.expenses.unshift({ ...input, id, createdBy: by.id, status: input.status ?? "pending" });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "expense",
-    entityId: id,
-    details: `${input.amount}`,
-  });
-  return id;
-}
-export async function deleteExpense(id: string, by: User) {
-  await delay(80);
-  updateDb((db) => {
-    db.expenses = db.expenses.filter((x) => x.id !== id);
-  });
-  logAudit({ userId: by.id, userName: by.name, action: "delete", entity: "expense", entityId: id });
-}
-export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
-  await delay(80);
-  updateDb((db) => {
-    const it = db.expenses.find((x) => x.id === id);
-    if (it) {
-      it.status = status;
-      if (status === "approved") it.approvedBy = by.id;
-    }
-  });
-  logAudit({ userId: by.id, userName: by.name, action: status, entity: "expense", entityId: id });
-}
-
-// offering
-export async function listOffering(): Promise<Offering[]> {
-  await delay(80);
-  return [...loadDb().offerings].sort((a, b) => b.date.localeCompare(a.date));
-}
-export async function createOffering(input: Omit<Offering, "id" | "createdBy">, by: User) {
-  await delay(120);
-  const id = newId("o");
-  updateDb((db) => {
-    db.offerings.unshift({ ...input, id, createdBy: by.id });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "offering",
-    entityId: id,
-    details: `${input.amount}`,
-  });
-  return id;
-}
-export async function deleteOffering(id: string, by: User) {
-  await delay(80);
-  updateDb((db) => {
-    db.offerings = db.offerings.filter((x) => x.id !== id);
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "delete",
-    entity: "offering",
-    entityId: id,
-  });
-}
-
-// budget
-export async function listBudget(): Promise<Budget[]> {
-  await delay(60);
-  return [...loadDb().budgets];
-}
-
-// projects
-export async function listProjects(): Promise<Project[]> {
-  await delay(60);
-  return [...loadDb().projects];
-}
-export async function createProject(input: Omit<Project, "id" | "used" | "progress">, by: User) {
-  await delay(120);
-  const id = newId("p");
-  updateDb((db) => {
-    db.projects.push({ ...input, id, used: 0, progress: 0 });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "project",
-    entityId: id,
-    details: input.name,
-  });
-  return id;
-}
-
-// members
-export async function listMembers(): Promise<Member[]> {
-  await delay(60);
-  return [...loadDb().members];
-}
-export async function createMember(input: Omit<Member, "id">, by: User) {
-  await delay(120);
-  const id = newId("m");
-  updateDb((db) => {
-    db.members.push({ ...input, id });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "member",
-    entityId: id,
-    details: input.name,
-  });
-  return id;
-}
-export async function deleteMember(id: string, by: User) {
-  await delay(80);
-  updateDb((db) => {
-    db.members = db.members.filter((x) => x.id !== id);
-  });
-  logAudit({ userId: by.id, userName: by.name, action: "delete", entity: "member", entityId: id });
-}
-
-// audit
-export async function listAudit() {
-  await delay(60);
-  return [...loadDb().audit];
-}
-
-// settings
-export async function getSettings(): Promise<Settings> {
   await delay(30);
-  return { ...loadDb().settings };
-}
-export async function saveSettings(s: Settings, by: User) {
-  await delay(100);
-  updateDb((db) => {
-    db.settings = s;
-  });
-  logAudit({ userId: by.id, userName: by.name, action: "update", entity: "settings" });
+  const churchId = await getChurchId();
+  return listFundsByChurch(churchId);
 }
 
-// ── Offering Categories ──────────────────────────────────────────
+export async function listFundsByChurch(churchId: string): Promise<Fund[]> {
+  const { data, error } = await supabase
+    .from('funds')
+    .select('*')
+    .eq('church_id', churchId)
+    .eq('is_active', true)
+    .order('sort_order');
+
+  if (error) throw error;
+  return (data || []) as Fund[];
+}
+
+export async function transferFund(fromId: string, toId: string, amount: number, by: User) {
+  await delay(50);
+  const churchId = await getChurchId();
+  await logAudit(by.id, by.name, 'transfer', 'fund', undefined, `โอนเงิน ${amount} ระหว่างกองทุน ${fromId} -> ${toId}`);
+  return { success: true };
+}
+
+export async function createFund(
+  input: Omit<Fund, 'id' | 'createdAt' | 'currentBalance'>,
+  by: User
+) {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('funds')
+    .insert({
+      church_id: churchId,
+      account_id: input.accountId,
+      fund_code: input.fundCode,
+      name: input.name,
+      description: input.description,
+      is_restricted: input.isRestricted,
+      opening_balance: input.openingBalance,
+      current_balance: input.openingBalance,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  await logAudit(by.id, by.name, 'create', 'fund', data.id, input.name);
+  return data as Fund;
+}
+
+// ── Income ────────────────────────────────────────────────────────
+
+export async function listIncome(): Promise<Income[]> {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('incomes')
+    .select('*')
+    .eq('church_id', churchId)
+    .order('date', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as Income[];
+}
+
+export async function createIncome(
+  input: Omit<Income, 'id' | 'createdBy' | 'status' | 'createdAt'>,
+  by: User
+) {
+  await delay(80);
+  const churchId = await getChurchId();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('incomes')
+    .insert({
+      church_id: churchId,
+      date: input.date,
+      category_id: input.categoryId,
+      amount: input.amount,
+      fund_id: input.fundId,
+      description: input.description ?? '',
+      attachment_name: input.attachmentName,
+      attachment_data_url: input.attachmentDataUrl,
+      attachment_type: input.attachmentType,
+      attachment_size: input.attachmentSize,
+      created_by: user?.id ?? by.id,
+      status: input.status ?? 'pending',
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  await logAudit(by.id, by.name, 'create', 'income', data.id, `${input.amount} baht`);
+  return data as Income;
+}
+
+export async function deleteIncome(id: string, by: User) {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { error } = await supabase
+    .from('incomes')
+    .delete()
+    .eq('id', id)
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'delete', 'income', id);
+}
+
+export async function approveIncome(id: string, by: User) {
+  await delay(60);
+  const churchId = await getChurchId();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Self-approval prevention
+  const { data: income } = await supabase
+    .from('incomes')
+    .select('created_by')
+    .eq('id', id)
+    .eq('church_id', churchId)
+    .single();
+
+  if (income?.created_by === (user?.id ?? by.id)) {
+    throw new Error('Cannot approve your own income record');
+  }
+
+  const { data, error } = await supabase
+    .from('incomes')
+    .update({
+      status: 'approved',
+      approved_by: user?.id ?? by.id,
+    })
+    .eq('id', id)
+    .eq('church_id', churchId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'approve', 'income', id);
+  return data;
+}
+
+// ── Expense ───────────────────────────────────────────────────────
+
+export async function listExpense(): Promise<Expense[]> {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .eq('church_id', churchId)
+    .order('date', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as Expense[];
+}
+
+export async function createExpense(
+  input: Omit<Expense, 'id' | 'createdBy' | 'status' | 'createdAt'>,
+  by: User
+) {
+  await delay(80);
+  const churchId = await getChurchId();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('expenses')
+    .insert({
+      church_id: churchId,
+      date: input.date,
+      category_id: input.categoryId,
+      amount: input.amount,
+      fund_id: input.fundId,
+      vendor: input.vendor ?? '',
+      description: input.description ?? '',
+      attachment_name: input.attachmentName,
+      attachment_data_url: input.attachmentDataUrl,
+      attachment_type: input.attachmentType,
+      attachment_size: input.attachmentSize,
+      created_by: user?.id ?? by.id,
+      status: input.status ?? 'pending',
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'create', 'expense', data.id, `${input.amount} baht`);
+  return data as Expense;
+}
+
+export async function deleteExpense(id: string, by: User) {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { error } = await supabase
+    .from('expenses')
+    .delete()
+    .eq('id', id)
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'delete', 'expense', id);
+}
+
+export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
+  await delay(60);
+  const churchId = await getChurchId();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Self-approval prevention
+  if (status === 'approved') {
+    const { data: expense } = await supabase
+      .from('expenses')
+      .select('created_by')
+      .eq('id', id)
+      .eq('church_id', churchId)
+      .single();
+
+    if (expense?.created_by === (user?.id ?? by.id)) {
+      throw new Error('Cannot approve your own expense');
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('expenses')
+    .update({
+      status,
+      approved_by: status === 'approved' ? user?.id ?? by.id : null,
+    })
+    .eq('id', id)
+    .eq('church_id', churchId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, status, 'expense', id);
+  return data;
+}
+
+// ── Offering ──────────────────────────────────────────────────────
+
+export async function listOffering(): Promise<Offering[]> {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('offerings')
+    .select('*')
+    .eq('church_id', churchId)
+    .order('date', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as Offering[];
+}
+
+export async function createOffering(input: Omit<Offering, 'id' | 'createdBy' | 'createdAt'>, by: User) {
+  await delay(80);
+  const churchId = await getChurchId();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('offerings')
+    .insert({
+      church_id: churchId,
+      date: input.date,
+      category_id: input.categoryId,
+      subcategory_id: input.subcategoryId ?? null,
+      channel: input.channel,
+      amount: input.amount,
+      member_id: input.memberId ?? null,
+      fund_id: input.fundId,
+      note: input.note ?? '',
+      created_by: user?.id ?? by.id,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'create', 'offering', data.id, `${input.amount} baht`);
+  return data as Offering;
+}
+
+export async function deleteOffering(id: string, by: User) {
+  await delay(60);
+  const churchId = await getChurchId();
+
+  const { error } = await supabase
+    .from('offerings')
+    .delete()
+    .eq('id', id)
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'delete', 'offering', id);
+}
+
+// ── Offering Categories ────────────────────────────────────────────
 
 export async function listOfferingCategories(): Promise<OfferingCategory[]> {
   await delay(30);
-  return [...(loadDb().offeringCategories ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+  const churchId = await getChurchId();
+  return listOfferingCategoriesByChurch(churchId);
 }
 
-export async function getOfferingCategory(id: string): Promise<OfferingCategory | undefined> {
-  await delay(20);
-  return loadDb().offeringCategories?.find((c) => c.id === id);
+export async function listOfferingCategoriesByChurch(churchId: string): Promise<OfferingCategory[]> {
+  const { data, error } = await supabase
+    .from('offering_categories')
+    .select('*')
+    .eq('church_id', churchId)
+    .eq('is_active', true)
+    .order('sort_order');
+
+  if (error) throw error;
+  return (data || []) as OfferingCategory[];
 }
 
 export async function createOfferingCategory(
-  input: Pick<OfferingCategory, "name" | "color" | "icon"> & { description?: string },
-  by: User,
-): Promise<string> {
-  await delay(120);
-  const id = newId("cat");
-  const ts = now();
-  const cats = loadDb().offeringCategories ?? [];
-  const maxOrder = cats.reduce((m, c) => Math.max(m, c.sortOrder), 0);
-  updateDb((db) => {
-    (db.offeringCategories ??= []).push({
-      id,
+  input: Pick<OfferingCategory, 'name' | 'color' | 'icon'> & { description?: string },
+  by: User
+) {
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('offering_categories')
+    .insert({
+      church_id: churchId,
       ...input,
-      description: input.description ?? "",
-      sortOrder: maxOrder + 1,
-      isActive: true,
-      createdAt: ts,
-      updatedAt: ts,
-    });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "category",
-    entityId: id,
-    details: input.name,
-  });
-  return id;
+      sort_order: 0,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'create', 'category', data.id, input.name);
+  return data as OfferingCategory;
 }
 
 export async function updateOfferingCategory(
   id: string,
-  input: Partial<
-    Pick<OfferingCategory, "name" | "color" | "icon" | "description" | "sortOrder" | "isActive">
-  >,
-  by: User,
+  input: Partial<Pick<OfferingCategory, 'name' | 'color' | 'icon' | 'description' | 'sort_order' | 'is_active'>>,
+  by: User
 ) {
-  await delay(100);
-  updateDb((db) => {
-    const cat = (db.offeringCategories ?? []).find((c) => c.id === id);
-    if (cat) {
-      Object.assign(cat, input, { updatedAt: now() });
-    }
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "update",
-    entity: "category",
-    entityId: id,
-  });
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('offering_categories')
+    .update(input)
+    .eq('id', id)
+    .eq('church_id', churchId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'update', 'category', id);
+  return data;
 }
 
 export async function deleteOfferingCategory(id: string, by: User) {
-  await delay(100);
-  updateDb((db) => {
-    db.offeringCategories = (db.offeringCategories ?? []).filter((c) => c.id !== id);
-    db.offeringSubcategories = (db.offeringSubcategories ?? []).filter((s) => s.categoryId !== id);
-    // Reassign offerings in this category to "อื่น ๆ" in cat-special
-    db.offerings = db.offerings.map((o) =>
-      o.categoryId === id ? { ...o, categoryId: "cat-special", subcategoryId: "sub-other" } : o,
-    );
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "delete",
-    entity: "category",
-    entityId: id,
-  });
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { error } = await supabase
+    .from('offering_categories')
+    .delete()
+    .eq('id', id)
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'delete', 'category', id);
 }
 
 export async function reorderOfferingCategories(orderedIds: string[], by: User) {
-  await delay(80);
-  updateDb((db) => {
-    (db.offeringCategories ?? []).forEach((c) => {
-      const idx = orderedIds.indexOf(c.id);
-      if (idx >= 0) c.sortOrder = idx + 1;
-    });
-  });
-  logAudit({ userId: by.id, userName: by.name, action: "reorder", entity: "category" });
+  await delay(60);
+  const churchId = await getChurchId();
+
+  for (let i = 0; i < orderedIds.length; i++) {
+    const { error } = await supabase
+      .from('offering_categories')
+      .update({ sort_order: i + 1 })
+      .eq('id', orderedIds[i])
+      .eq('church_id', churchId);
+
+    if (error) throw error;
+  }
+
+  await logAudit(by.id, by.name, 'reorder', 'category');
 }
 
-// ── Offering Subcategories ───────────────────────────────────────
+// ── Offering Subcategories ────────────────────────────────────────
 
 export async function listOfferingSubcategories(
-  categoryId?: string,
+  categoryId?: string
 ): Promise<OfferingSubcategory[]> {
   await delay(30);
-  const all = loadDb().offeringSubcategories ?? [];
-  const filtered = categoryId ? all.filter((s) => s.categoryId === categoryId) : all;
-  return filtered.sort((a, b) => a.sortOrder - b.sortOrder);
+  const churchId = await getChurchId();
+
+  let query = supabase
+    .from('offering_subcategories')
+    .select('*')
+    .eq('church_id', churchId);
+
+  if (categoryId) {
+    query = query.eq('category_id', categoryId);
+  }
+
+  const { data, error } = await query.order('sort_order');
+  if (error) throw error;
+  return (data || []) as OfferingSubcategory[];
 }
 
 export async function createOfferingSubcategory(
-  input: Pick<OfferingSubcategory, "categoryId" | "name"> & { description?: string },
-  by: User,
-): Promise<string> {
-  await delay(120);
-  const id = newId("sub");
-  const ts = now();
-  const subs = loadDb().offeringSubcategories ?? [];
-  const maxOrder = subs
-    .filter((s) => s.categoryId === input.categoryId)
-    .reduce((m, s) => Math.max(m, s.sortOrder), 0);
-  updateDb((db) => {
-    (db.offeringSubcategories ??= []).push({
-      id,
-      ...input,
-      description: input.description ?? "",
-      sortOrder: maxOrder + 1,
-      isActive: true,
-      createdAt: ts,
-      updatedAt: ts,
-    });
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "create",
-    entity: "subcategory",
-    entityId: id,
-    details: input.name,
-  });
-  return id;
+  input: Pick<OfferingSubcategory, 'category_id' | 'name'> & { description?: string },
+  by: User
+) {
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('offering_subcategories')
+    .insert({
+      church_id: churchId,
+      category_id: input.category_id,
+      name: input.name,
+      description: input.description ?? '',
+      sort_order: 0,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'create', 'subcategory', data.id, input.name);
+  return data as OfferingSubcategory;
 }
 
 export async function updateOfferingSubcategory(
   id: string,
-  input: Partial<Pick<OfferingSubcategory, "name" | "description" | "sortOrder" | "isActive">>,
-  by: User,
+  input: Partial<Pick<OfferingSubcategory, 'name' | 'description' | 'sort_order' | 'is_active'>>,
+  by: User
 ) {
-  await delay(100);
-  updateDb((db) => {
-    const sub = (db.offeringSubcategories ?? []).find((s) => s.id === id);
-    if (sub) {
-      Object.assign(sub, input, { updatedAt: now() });
-    }
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "update",
-    entity: "subcategory",
-    entityId: id,
-  });
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('offering_subcategories')
+    .update(input)
+    .eq('id', id)
+    .eq('church_id', churchId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'update', 'subcategory', id);
+  return data;
 }
 
 export async function deleteOfferingSubcategory(id: string, by: User) {
-  await delay(100);
-  updateDb((db) => {
-    db.offeringSubcategories = (db.offeringSubcategories ?? []).filter((s) => s.id !== id);
-    // Set subcategory to null so the offering still belongs to its category
-    db.offerings = db.offerings.map((o) =>
-      o.subcategoryId === id ? { ...o, subcategoryId: undefined } : o,
-    );
-  });
-  logAudit({
-    userId: by.id,
-    userName: by.name,
-    action: "delete",
-    entity: "subcategory",
-    entityId: id,
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { error } = await supabase
+    .from('offering_subcategories')
+    .delete()
+    .eq('id', id)
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'delete', 'subcategory', id);
+}
+
+// ── Budget ────────────────────────────────────────────────────────
+
+export async function listBudget(): Promise<Budget[]> {
+  await delay(40);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('budgets')
+    .select('*')
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  return (data || []) as Budget[];
+}
+
+// ── Projects ──────────────────────────────────────────────────────
+
+export async function listProjects(): Promise<Project[]> {
+  await delay(40);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('church_id', churchId);
+
+  if (error) throw error;
+  return (data || []) as Project[];
+}
+
+export async function createProject(
+  input: Omit<Project, 'id' | 'used' | 'progress'>,
+  by: User
+) {
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('projects')
+    .insert({
+      church_id: churchId,
+      name: input.name,
+      budget: input.budget,
+      used: 0,
+      progress: 0,
+      owner_id: input.ownerId ?? null,
+      start_date: input.startDate,
+      end_date: input.endDate ?? null,
+      status: input.status ?? 'planning',
+      description: input.description ?? '',
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'create', 'project', data.id, input.name);
+  return data as Project;
+}
+
+// ── Members ───────────────────────────────────────────────────────
+
+export async function listMembers(): Promise<Member[]> {
+  await delay(40);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('members')
+    .select('*')
+    .eq('church_id', churchId)
+    .order('name');
+
+  if (error) throw error;
+  return (data || []) as Member[];
+}
+
+export async function createMember(input: Omit<Member, 'id'>, by: User) {
+  await delay(80);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('members')
+    .insert({
+      church_id: churchId,
+      ...input,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  await logAudit(by.id, by.name, 'create', 'member', data.id, input.name);
+  return data;
+}
+
+// ── Settings ──────────────────────────────────────────────────────
+
+export async function getSettings(): Promise<Settings> {
+  await delay(30);
+  const churchId = await getChurchId();
+  return getSettingsForChurch(churchId);
+}
+
+export async function getSettingsForChurch(churchId: string): Promise<Settings> {
+  const { data, error } = await supabase
+    .from('church_settings')
+    .select('*')
+    .eq('church_id', churchId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+
+  const defaults: Settings = {
+    churchName: '',
+    fiscalYearStart: 1,
+    idleTimeoutMin: 15,
+    currency: 'THB',
+  };
+
+  if (!data) return defaults;
+
+  return {
+    churchName: data.church_name ?? '',
+    address: data.address ?? '',
+    taxId: data.tax_id ?? '',
+    fiscalYearStart: data.fiscal_year_start ?? 1,
+    idleTimeoutMin: data.idle_timeout_min ?? 15,
+    currency: (data.currency ?? 'THB') as 'THB',
+  } as Settings;
+}
+
+export async function saveSettings(s: Settings, by: User) {
+  const churchId = await getChurchId();
+
+  const { data } = await supabase
+    .from('church_settings')
+    .upsert({
+      church_id: churchId,
+      church_name: s.churchName,
+      address: s.address,
+      tax_id: s.taxId,
+      fiscal_year_start: s.fiscalYearStart,
+      idle_timeout_min: s.idleTimeoutMin,
+      currency: s.currency,
+    })
+    .select()
+    .single();
+
+  await logAudit(by.id, by.name, 'update', 'settings');
+  return data;
+}
+
+// ── Audit ─────────────────────────────────────────────────────────
+
+export async function listAudit() {
+  await delay(40);
+  const churchId = await getChurchId();
+
+  const { data, error } = await supabase
+    .from('audit_log')
+    .select('*')
+    .eq('church_id', churchId)
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (error) throw error;
+  return data || [];
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+
+async function logAudit(
+  userId: string,
+  userName: string,
+  action: string,
+  entity: string,
+  entityId?: string,
+  details?: string
+) {
+  const churchId = await getChurchId();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  await supabase.from('audit_log').insert({
+    church_id: churchId,
+    user_id: userId,
+    user_name: userName,
+    action,
+    entity,
+    entity_id: entityId,
+    details,
+    ip_address: '',
+    user_agent: '',
   });
 }

@@ -1,28 +1,16 @@
-import axios from "axios";
+// src/services/api.ts — Updated for Supabase (real backend)
+// Changes from mock version:
+// 1. baseURL now points to Supabase (REST API via supabase-js)
+// 2. No axios needed — supabase-js handles HTTP internally
+// 3. Auth is handled by Supabase Auth (httpOnly cookies)
+// 4. Token comes from Supabase session, not localStorage
 
-// Base URL is intentionally empty in Phase 1 (frontend-first).
-// To switch to a real backend later: set VITE_API_URL and remove/disable
-// the mock adapter used by the service files under src/services/*.
-export const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+import { supabase } from './supabaseClient';
 
-export const http = axios.create({
-  baseURL: API_URL,
-  timeout: 15000,
-  headers: { "Content-Type": "application/json" },
-});
+// Supabase client handles all HTTP internally.
+// This file exists as a compatibility layer for code that
+// previously used axios directly.
+// New code should use supabaseClient.ts or church.ts instead.
 
-http.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = window.localStorage.getItem("cfm.token");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-http.interceptors.response.use(
-  (r) => r,
-  (err) => Promise.reject(err),
-);
-
-// Simulated latency for mock adapter
-export const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
+export const API_URL = ''; // Not used when using supabase-js directly
+export const http = null;  // No axios needed with Supabase

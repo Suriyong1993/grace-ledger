@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowDownCircle,
@@ -11,21 +12,9 @@ import {
   ClipboardCheck,
   CalendarClock,
   Plus,
+  RefreshCw,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { MoneyText } from "@/components/shared/MoneyText";
@@ -44,6 +33,7 @@ import {
   listOfferingCategories,
   listOfferingSubcategories,
 } from "@/services/church";
+import { useRealtime } from "@/hooks/useRealtime";
 import { thb, fmtDate, dayjs } from "@/lib/format";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -67,6 +57,62 @@ function Dashboard() {
     queryKey: ["offering-subcategories"],
     queryFn: () => listOfferingSubcategories(),
   });
+
+  // Realtime subscriptions — live updates when data changes
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
+  const [realtimeError, setRealtimeError] = useState<string | null>(null);
+
+  useRealtime("dashboard-income", "incomes", "", (event) => {
+    incomeQ.refetch();
+    setLastUpdated(Date.now());
+  });
+  useRealtime("dashboard-expense", "expenses", "", (event) => {
+    expenseQ.refetch();
+    setLastUpdated(Date.now());
+  });
+  useRealtime("dashboard-offering", "offerings", "", (event) => {
+    offeringQ.refetch();
+    setLastUpdated(Date.now());
+  });
+
+  // Error handling — RLS 403 and session expiry
+  const hasError = incomeQ.isError || expenseQ.isError || offeringQ.isError;
+  const errorMessage =
+    (incomeQ.error as Error)?.message ||
+    (expenseQ.error as Error)?.message ||
+    (offeringQ.error as Error)?.message ||
+    realtimeError ||
+    null;
+
+  if (hasError && !incomeQ.data && !expenseQ.data && !offeringQ.data) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Card className="max-w-md">
+          <CardHeader>
+            <CardTitle>ไม่สามารถโหลดข้อมูลได้</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {errorMessage?.includes("403")
+                ? "คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้"
+                : errorMessage || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"}
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => {
+                incomeQ.refetch();
+                expenseQ.refetch();
+                offeringQ.refetch();
+              }}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" /> ลองใหม่
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const isLoading = incomeQ.isLoading || expenseQ.isLoading || offeringQ.isLoading;
 
