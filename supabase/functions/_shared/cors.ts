@@ -3,8 +3,9 @@
 // Restrict to production origin in production, fallback for dev
 
 const ALLOWED_ORIGINS = [
-  Deno.env.get('APP_URL') ?? 'http://localhost:3000',
-  'http://localhost:5173',  // Vite dev
+  Deno.env.get('APP_URL') ?? 'http://localhost:8080',
+  'http://localhost:8080',  // Vite dev (current)
+  'http://localhost:5173',  // Vite dev (legacy)
   'http://localhost:3000',  // TanStack dev
 ];
 

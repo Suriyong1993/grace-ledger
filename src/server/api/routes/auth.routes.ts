@@ -4,13 +4,23 @@
 
 import { AuthService } from "@/server/services/auth.service";
 import { loginSchema, changePasswordSchema } from "@/server/domain/validation";
-import { requireAuth, optionalAuth, wrapError, jsonResponse, errorResponse } from "@/server/api/middleware";
+import {
+  requireAuth,
+  optionalAuth,
+  wrapError,
+  jsonResponse,
+  errorResponse,
+} from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { db } from "@/server/infrastructure/db";
 import { churches } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-function route(method: "GET" | "POST", path: string, handler: RouteDefinition["handler"]): RouteDefinition {
+function route(
+  method: "GET" | "POST",
+  path: string,
+  handler: RouteDefinition["handler"],
+): RouteDefinition {
   return { method, path, handler };
 }
 
@@ -63,7 +73,11 @@ export const authRoutes: RouteDefinition[] = [
       const ctx = await requireAuth(request);
       const body = await request.json();
       const input = changePasswordSchema.parse(body);
-      await AuthService.changePassword(ctx.session.userId, input.currentPassword, input.newPassword);
+      await AuthService.changePassword(
+        ctx.session.userId,
+        input.currentPassword,
+        input.newPassword,
+      );
       return jsonResponse({ success: true });
     });
   }),

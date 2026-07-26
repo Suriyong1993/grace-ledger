@@ -33,15 +33,20 @@ export class FundService {
     if (!includeInactive) {
       conditions.push(eq(funds.isActive, true));
     }
-    const rows = await db.select().from(funds).where(and(...conditions));
+    const rows = await db
+      .select()
+      .from(funds)
+      .where(and(...conditions));
     return rows.map(FundService.toView);
   }
 
   /** Get a single fund */
   static async getFund(churchId: string, fundId: string): Promise<FundView | null> {
-    const rows = await db.select().from(funds).where(
-      and(eq(funds.id, fundId), eq(funds.churchId, churchId))
-    ).limit(1);
+    const rows = await db
+      .select()
+      .from(funds)
+      .where(and(eq(funds.id, fundId), eq(funds.churchId, churchId)))
+      .limit(1);
     if (!rows[0]) return null;
     return FundService.toView(rows[0]);
   }
@@ -77,16 +82,19 @@ export class FundService {
 
     const openingBalance = input.openingBalance ?? Money.zero();
 
-    const [row] = await db.insert(funds).values({
-      churchId: input.churchId,
-      fundCode: input.fundCode,
-      name: input.name,
-      accountId: input.accountId,
-      description: input.description ?? null,
-      isRestricted: input.isRestricted ?? false,
-      openingBalance: openingBalance.toSqlDecimal(),
-      currentBalance: openingBalance.toSqlDecimal(),
-    }).returning();
+    const [row] = await db
+      .insert(funds)
+      .values({
+        churchId: input.churchId,
+        fundCode: input.fundCode,
+        name: input.name,
+        accountId: input.accountId,
+        description: input.description ?? null,
+        isRestricted: input.isRestricted ?? false,
+        openingBalance: openingBalance.toSqlDecimal(),
+        currentBalance: openingBalance.toSqlDecimal(),
+      })
+      .returning();
 
     await AuditService.logCreate(
       input.churchId,
@@ -120,13 +128,19 @@ export class FundService {
     const existing = await FundService.getFund(input.churchId, input.fundId);
     if (!existing) throw new DomainError("NOT_FOUND", "Fund not found");
 
-    const updates: Record<string, unknown> = { updatedAt: new Date(), version: existing.version + 1 };
+    const updates: Record<string, unknown> = {
+      updatedAt: new Date(),
+      version: existing.version + 1,
+    };
     if (input.name !== undefined) updates.name = input.name;
     if (input.description !== undefined) updates.description = input.description;
     if (input.isActive !== undefined) updates.isActive = input.isActive;
     if (input.isRestricted !== undefined) updates.isRestricted = input.isRestricted;
 
-    await db.update(funds).set(updates).where(and(eq(funds.id, input.fundId), eq(funds.churchId, input.churchId)));
+    await db
+      .update(funds)
+      .set(updates)
+      .where(and(eq(funds.id, input.fundId), eq(funds.churchId, input.churchId)));
 
     const updated = await FundService.getFund(input.churchId, input.fundId);
 
@@ -150,7 +164,8 @@ export class FundService {
     const fund = await FundService.getFund(churchId, fundId);
     if (!fund) throw new DomainError("NOT_FOUND", "Fund not found");
 
-    const glRows = await db.select({ runningBalance: generalLedger.runningBalance })
+    const glRows = await db
+      .select({ runningBalance: generalLedger.runningBalance })
       .from(generalLedger)
       .where(
         and(
@@ -168,7 +183,7 @@ export class FundService {
     return fund.openingBalance;
   }
 
-  private static toView(row: Record<string, any>): FundView {
+  private static toView(row: typeof funds.$inferSelect): FundView {
     return {
       id: row.id,
       churchId: row.churchId,

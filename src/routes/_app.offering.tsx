@@ -196,7 +196,7 @@ function OfferingPage() {
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button variant="outline" className="rounded-2xl" onClick={exportCsv}>
+            <Button variant="outline" className="" onClick={exportCsv}>
               <Download className="h-4 w-4 mr-2" /> Export
             </Button>
             {can("offering.write") && (
@@ -208,11 +208,11 @@ function OfferingPage() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button className="rounded-2xl">
+                  <Button className="">
                     <Plus className="h-4 w-4 mr-2" /> บันทึกเงินถวาย
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="rounded-3xl">
+                <DialogContent className="">
                   <DialogHeader>
                     <DialogTitle>บันทึกเงินถวาย</DialogTitle>
                   </DialogHeader>
@@ -418,7 +418,7 @@ function OfferingPage() {
       />
 
       <Tabs defaultValue="sunday-sheet" className="space-y-6">
-        <TabsList className="rounded-2xl p-1 bg-muted/60 mb-2">
+        <TabsList className=" p-1 bg-muted/60 mb-2">
           <TabsTrigger value="sunday-sheet" className="rounded-xl px-4 py-2 text-sm font-semibold">
             ใบนับเงิน & ถวายรายบุคคล (ประจำวันอาทิตย์)
           </TabsTrigger>
@@ -434,7 +434,7 @@ function OfferingPage() {
         <TabsContent value="all-records" className="space-y-4">
           <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหาเงินถวาย..." />
 
-          <Card className="rounded-3xl overflow-hidden">
+          <Card className=" overflow-hidden">
             <CardContent className="p-0">
               {offQ.isLoading ? (
                 <div className="p-6 space-y-3">

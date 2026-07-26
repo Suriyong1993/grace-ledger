@@ -23,10 +23,10 @@ function ProjectsPage() {
         {projects.map((p) => {
           const pct = Math.min(100, Math.round((p.used / p.budget) * 100));
           return (
-            <Card key={p.id} className="rounded-3xl">
+            <Card key={p.id} className="">
               <CardHeader className="flex flex-row items-start justify-between">
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+                  <div className="grid h-11 w-11 shrink-0 place-items-center  bg-primary/10 text-primary">
                     <Briefcase className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">

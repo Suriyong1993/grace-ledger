@@ -37,28 +37,27 @@ export class ReconciliationService {
     periodId: string,
     fundId: string,
   ): Promise<ReconciliationView | null> {
-    const rows = await db.select().from(reconciliations).where(
-      and(
-        eq(reconciliations.churchId, churchId),
-        eq(reconciliations.periodId, periodId),
-        eq(reconciliations.fundId, fundId),
-      ),
-    ).limit(1);
+    const rows = await db
+      .select()
+      .from(reconciliations)
+      .where(
+        and(
+          eq(reconciliations.churchId, churchId),
+          eq(reconciliations.periodId, periodId),
+          eq(reconciliations.fundId, fundId),
+        ),
+      )
+      .limit(1);
     if (!rows[0]) return null;
     return ReconciliationService.toView(rows[0]);
   }
 
   /** List reconciliations for a period */
-  static async listForPeriod(
-    churchId: string,
-    periodId: string,
-  ): Promise<ReconciliationView[]> {
-    const rows = await db.select().from(reconciliations).where(
-      and(
-        eq(reconciliations.churchId, churchId),
-        eq(reconciliations.periodId, periodId),
-      ),
-    );
+  static async listForPeriod(churchId: string, periodId: string): Promise<ReconciliationView[]> {
+    const rows = await db
+      .select()
+      .from(reconciliations)
+      .where(and(eq(reconciliations.churchId, churchId), eq(reconciliations.periodId, periodId)));
     return rows.map(ReconciliationService.toView);
   }
 
@@ -86,12 +85,14 @@ export class ReconciliationService {
     const systemBalance = await FundService.getFundBalance(input.churchId, input.fundId);
 
     // Get previous reconciliation opening balance
-    const prevRec = await db.select().from(reconciliations).where(
-      and(
-        eq(reconciliations.churchId, input.churchId),
-        eq(reconciliations.fundId, input.fundId),
-      ),
-    ).orderBy(desc(reconciliations.createdAt)).limit(1);
+    const prevRec = await db
+      .select()
+      .from(reconciliations)
+      .where(
+        and(eq(reconciliations.churchId, input.churchId), eq(reconciliations.fundId, input.fundId)),
+      )
+      .orderBy(desc(reconciliations.createdAt))
+      .limit(1);
 
     const openingBalance = prevRec[0]
       ? Money.fromSqlDecimal(prevRec[0].actualBalance)
@@ -99,28 +100,29 @@ export class ReconciliationService {
 
     const variance = input.actualBalance.subtract(systemBalance);
 
-    const [row] = await db.insert(reconciliations).values({
-      churchId: input.churchId,
-      periodId: input.periodId,
-      fundId: input.fundId,
-      openingBalance: openingBalance.toSqlDecimal(),
-      systemBalance: systemBalance.toSqlDecimal(),
-      actualBalance: input.actualBalance.toSqlDecimal(),
-      variance: variance.toSqlDecimal(),
-      explanation: input.explanation ?? null,
-      isReconciled: true,
-      previousReconciliationId: prevRec[0]?.id ?? null,
-      reconciledBy: userId,
-      reconciledAt: new Date(),
-    }).returning();
+    const [row] = await db
+      .insert(reconciliations)
+      .values({
+        churchId: input.churchId,
+        periodId: input.periodId,
+        fundId: input.fundId,
+        openingBalance: openingBalance.toSqlDecimal(),
+        systemBalance: systemBalance.toSqlDecimal(),
+        actualBalance: input.actualBalance.toSqlDecimal(),
+        variance: variance.toSqlDecimal(),
+        explanation: input.explanation ?? null,
+        isReconciled: true,
+        previousReconciliationId: prevRec[0]?.id ?? null,
+        reconciledBy: userId,
+        reconciledAt: new Date(),
+      })
+      .returning();
 
     // Update period status to reconciled
-    await db.update(fiscalPeriods)
+    await db
+      .update(fiscalPeriods)
       .set({ status: "reconciled", updatedAt: new Date() })
-      .where(and(
-        eq(fiscalPeriods.id, input.periodId),
-        eq(fiscalPeriods.churchId, input.churchId),
-      ));
+      .where(and(eq(fiscalPeriods.id, input.periodId), eq(fiscalPeriods.churchId, input.churchId)));
 
     const view = ReconciliationService.toView(row);
 
@@ -138,7 +140,7 @@ export class ReconciliationService {
     return view;
   }
 
-  private static toView(row: Record<string, any>): ReconciliationView {
+  private static toView(row: typeof reconciliations.$inferSelect): ReconciliationView {
     return {
       id: row.id,
       churchId: row.churchId,

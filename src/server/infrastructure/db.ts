@@ -10,7 +10,8 @@ import * as schema from "@/db/schema";
 const { Pool } = pg;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/grace_ledger",
+  connectionString:
+    process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/grace_ledger",
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,

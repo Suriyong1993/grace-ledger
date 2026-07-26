@@ -1,5 +1,5 @@
 import { Church } from "lucide-react";
-import { Link, NAV, useCurrentPath } from "./AppNav";
+import { Link, NAV, NAV_SECONDARY, useCurrentPath } from "./AppNav";
 import {
   Sidebar,
   SidebarContent,
@@ -19,24 +19,26 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="border-b border-sidebar-border/60 pb-3 pt-3">
-        <div className="flex items-center gap-3 px-3">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <span className="text-base font-bold">✦</span>
+    <Sidebar collapsible="icon" className="border-r border-border">
+      <SidebarHeader className="border-b border-border px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="grid h-8 w-8 shrink-0 place-items-center bg-primary text-primary-foreground">
+            <span className="text-sm font-bold">✦</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="truncate text-xs tracking-widest font-bold uppercase text-foreground/90 font-mono">GRACE LEDGER</p>
-              <p className="truncate text-[11px] font-medium text-muted-foreground">ระบบการเงินคริสตจักร</p>
+              <p className="truncate text-xs font-semibold tracking-wide text-foreground">
+                Grace Ledger
+              </p>
+              <p className="truncate text-[11px] text-muted-foreground">ระบบการเงินคริสตจักร</p>
             </div>
           )}
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="pt-2">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-0.5">
               {NAV.map((item) => {
                 const active = path === item.to || path.startsWith(item.to + "/");
                 return (
@@ -46,14 +48,14 @@ export function AppSidebar() {
                       isActive={active}
                       tooltip={item.label}
                       className={cn(
-                        "rounded-2xl h-10 px-3 transition-all duration-150 ease-[var(--ease-out)] active:scale-[0.98]",
+                        "h-9 px-3 text-[13px] transition-colors duration-100",
                         active
-                          ? "bg-primary/12 text-primary font-semibold shadow-2xs hover:bg-primary/18"
-                          : "hover:bg-accent/70 hover:text-foreground",
+                          ? "bg-primary/10 text-primary font-medium"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}
                     >
                       <Link to={item.to} className="flex items-center gap-3">
-                        <item.icon className={cn("h-4 w-4 shrink-0 transition-transform duration-150", active && "scale-110")} />
+                        <item.icon className="h-4 w-4 shrink-0" />
                         <span className="truncate">{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -63,6 +65,42 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Secondary nav — church-specific features */}
+        {!collapsed && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <p className="px-3 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                เพิ่มเติม
+              </p>
+              <SidebarMenu className="gap-0.5">
+                {NAV_SECONDARY.map((item) => {
+                  const active = path === item.to || path.startsWith(item.to + "/");
+                  return (
+                    <SidebarMenuItem key={item.to}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={active}
+                        tooltip={item.label}
+                        className={cn(
+                          "h-8 px-3 text-xs transition-colors duration-100",
+                          active
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        )}
+                      >
+                        <Link to={item.to} className="flex items-center gap-3">
+                          <item.icon className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   );

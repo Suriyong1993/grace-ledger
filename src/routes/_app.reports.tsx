@@ -12,7 +12,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { listExpense, listIncome, listOffering, getSettings } from "@/services/church";
 import { thb, fmtMonth, dayjs } from "@/lib/format";
-import { exportCSV, exportExcel, exportPDF, printReport, type ExportColumn } from "@/lib/exporters";
+import {
+  exportCSV,
+  exportExcel,
+  exportPDF,
+  exportGoogleSheets,
+  exportGoogleDrive,
+  printReport,
+  type ExportColumn,
+} from "@/lib/exporters";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -64,11 +72,19 @@ function ReportsPage() {
     generatedBy: user?.name,
     fileBase: "Monthly_Report",
   };
-  const doExport = (fmt: "csv" | "excel" | "pdf") => {
+  const doExport = async (fmt: "csv" | "excel" | "pdf" | "gsheets" | "gdrive") => {
     try {
       if (fmt === "csv") exportCSV(months, cols, meta);
-      if (fmt === "excel") exportExcel(months, cols, meta);
-      if (fmt === "pdf") exportPDF(months, cols, meta);
+      if (fmt === "excel") await exportExcel(months, cols, meta);
+      if (fmt === "pdf") await exportPDF(months, cols, meta);
+      if (fmt === "gsheets") {
+        const sheetId = prompt("กรอก Google Sheet ID:");
+        if (!sheetId) return;
+        await exportGoogleSheets(months, cols, meta, sheetId);
+      }
+      if (fmt === "gdrive") {
+        await exportGoogleDrive(months, cols, meta);
+      }
       toast.success("ส่งออกรายงานสำเร็จ");
     } catch (e) {
       toast.error("ส่งออกไม่สำเร็จ");
@@ -82,16 +98,16 @@ function ReportsPage() {
         description="สรุปรายงานการเงิน"
         actions={
           <>
-            <Button variant="outline" className="rounded-2xl" onClick={printReport}>
+            <Button variant="outline" className="" onClick={printReport}>
               <Printer className="h-4 w-4 mr-2" /> พิมพ์
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="rounded-2xl">
+                <Button className="">
                   <Download className="h-4 w-4 mr-2" /> ส่งออก
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="rounded-2xl">
+              <DropdownMenuContent align="end" className="">
                 <DropdownMenuItem onClick={() => doExport("pdf")}>
                   <FileText className="h-4 w-4 mr-2 text-destructive" /> PDF
                 </DropdownMenuItem>
@@ -101,13 +117,19 @@ function ReportsPage() {
                 <DropdownMenuItem onClick={() => doExport("csv")}>
                   <Download className="h-4 w-4 mr-2" /> CSV
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => doExport("gsheets")}>
+                  <FileSpreadsheet className="h-4 w-4 mr-2 text-[#0F9D58]" /> Google Sheets
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => doExport("gdrive")}>
+                  <Download className="h-4 w-4 mr-2 text-[#4285F4]" /> Google Drive
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
         }
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="rounded-3xl">
+        <Card className="">
           <CardContent className="p-5">
             <p className="text-sm text-muted-foreground">รายรับสะสม</p>
             <p className="mt-2 text-3xl font-bold text-success tabular-nums">
@@ -115,7 +137,7 @@ function ReportsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card className="rounded-3xl">
+        <Card className="">
           <CardContent className="p-5">
             <p className="text-sm text-muted-foreground">เงินถวายสะสม</p>
             <p className="mt-2 text-3xl font-bold text-primary tabular-nums">
@@ -123,7 +145,7 @@ function ReportsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card className="rounded-3xl">
+        <Card className="">
           <CardContent className="p-5">
             <p className="text-sm text-muted-foreground">รายจ่ายสะสม</p>
             <p className="mt-2 text-3xl font-bold text-destructive tabular-nums">
@@ -132,7 +154,7 @@ function ReportsPage() {
           </CardContent>
         </Card>
       </div>
-      <Card className="rounded-3xl">
+      <Card className="">
         <CardHeader className="flex flex-row items-center gap-2">
           <FileBarChart2 className="h-5 w-5 text-primary" />
           <CardTitle>รายงานรายเดือน (6 เดือน)</CardTitle>

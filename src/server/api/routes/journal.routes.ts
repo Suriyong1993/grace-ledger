@@ -11,13 +11,23 @@ import {
   voidEntrySchema,
   journalQuerySchema,
 } from "@/server/domain/validation";
-import { requireAuth, wrapError, jsonResponse, errorResponse, requirePermission } from "@/server/api/middleware";
+import {
+  requireAuth,
+  wrapError,
+  jsonResponse,
+  errorResponse,
+  requirePermission,
+} from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { db } from "@/server/infrastructure/db";
 import { journalEntries, journalEntryLines } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull, desc } from "drizzle-orm";
 
-function route(method: "GET" | "POST", path: string, handler: RouteDefinition["handler"]): RouteDefinition {
+function route(
+  method: "GET" | "POST",
+  path: string,
+  handler: RouteDefinition["handler"],
+): RouteDefinition {
   return { method, path, handler };
 }
 
@@ -56,10 +66,18 @@ export const journalRoutes: RouteDefinition[] = [
       );
 
       await AuditService.logCreate(
-        ctx.session.churchId, "journal_entry", entry.id,
-        ctx.session.userId, ctx.session.name,
-        { entryNumber: entry.entryNumber, entryType: entry.entryType, postingDate: entry.postingDate.toISOString() },
-        ctx.ipAddress, ctx.userAgent,
+        ctx.session.churchId,
+        "journal_entry",
+        entry.id,
+        ctx.session.userId,
+        ctx.session.name,
+        {
+          entryNumber: entry.entryNumber,
+          entryType: entry.entryType,
+          postingDate: entry.postingDate.toISOString(),
+        },
+        ctx.ipAddress,
+        ctx.userAgent,
       );
 
       return jsonResponse(entry, 201);
@@ -70,7 +88,11 @@ export const journalRoutes: RouteDefinition[] = [
     return wrapError(async () => {
       const ctx = await requireAuth(request);
       requirePermission(ctx.session, "journal.write");
-      await JournalService.submitForApproval(params.entryId, ctx.session.userId, ctx.session.churchId);
+      await JournalService.submitForApproval(
+        params.entryId,
+        ctx.session.userId,
+        ctx.session.churchId,
+      );
       return jsonResponse({ success: true });
     });
   }),
@@ -79,7 +101,12 @@ export const journalRoutes: RouteDefinition[] = [
     return wrapError(async () => {
       const ctx = await requireAuth(request);
       requirePermission(ctx.session, "journal.approve");
-      const entry = await JournalService.approveEntry(params.entryId, ctx.session.userId, ctx.session.role, ctx.session.churchId);
+      const entry = await JournalService.approveEntry(
+        params.entryId,
+        ctx.session.userId,
+        ctx.session.role,
+        ctx.session.churchId,
+      );
       return jsonResponse(entry);
     });
   }),
@@ -101,7 +128,12 @@ export const journalRoutes: RouteDefinition[] = [
       requirePermission(ctx.session, "journal.void");
       const body = await request.json();
       const input = voidEntrySchema.parse(body);
-      const entry = await JournalService.voidEntry(params.entryId, ctx.session.userId, input.reason, ctx.session.churchId);
+      const entry = await JournalService.voidEntry(
+        params.entryId,
+        ctx.session.userId,
+        input.reason,
+        ctx.session.churchId,
+      );
       return jsonResponse(entry);
     });
   }),
@@ -111,10 +143,17 @@ export const journalRoutes: RouteDefinition[] = [
       const ctx = await requireAuth(request);
       requirePermission(ctx.session, "journal.read");
       const entry = await db.query.journalEntries.findFirst({
-        where: and(eq(journalEntries.id, params.entryId), eq(journalEntries.churchId, ctx.session.churchId)),
+        where: and(
+          eq(journalEntries.id, params.entryId),
+          eq(journalEntries.churchId, ctx.session.churchId),
+          isNull(journalEntries.deletedAt), // Exclude soft-deleted
+        ),
       });
       if (!entry) return errorResponse(404, "NOT_FOUND", "Journal entry not found");
-      const lines = await db.select().from(journalEntryLines).where(eq(journalEntryLines.journalEntryId, params.entryId));
+      const lines = await db
+        .select()
+        .from(journalEntryLines)
+        .where(eq(journalEntryLines.journalEntryId, params.entryId));
       return jsonResponse({ ...entry, lines });
     });
   }),
@@ -124,15 +163,23 @@ export const journalRoutes: RouteDefinition[] = [
       const ctx = await requireAuth(request);
       requirePermission(ctx.session, "journal.read");
       const filters = journalQuerySchema.parse(Object.fromEntries(query));
-      const conditions = [eq(journalEntries.churchId, ctx.session.churchId)];
+      const conditions = [
+        eq(journalEntries.churchId, ctx.session.churchId),
+        isNull(journalEntries.deletedAt), // Exclude soft-deleted
+      ];
       if (filters.status) conditions.push(eq(journalEntries.status, filters.status));
       if (filters.entryType) conditions.push(eq(journalEntries.entryType, filters.entryType));
       if (filters.fundId) conditions.push(eq(journalEntries.fundId, filters.fundId));
       if (filters.fiscalYear) conditions.push(eq(journalEntries.fiscalYear, filters.fiscalYear));
-      if (filters.fiscalPeriod) conditions.push(eq(journalEntries.fiscalPeriod, filters.fiscalPeriod));
-      const entries = await db.select().from(journalEntries).where(and(...conditions))
-        .limit(filters.limit).offset(filters.offset)
-        .orderBy(journalEntries.createdAt, "desc" as any);
+      if (filters.fiscalPeriod)
+        conditions.push(eq(journalEntries.fiscalPeriod, filters.fiscalPeriod));
+      const entries = await db
+        .select()
+        .from(journalEntries)
+        .where(and(...conditions))
+        .limit(filters.limit)
+        .offset(filters.offset)
+        .orderBy(desc(journalEntries.createdAt));
       return jsonResponse(entries);
     });
   }),

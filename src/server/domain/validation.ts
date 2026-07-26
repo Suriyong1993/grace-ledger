@@ -6,7 +6,14 @@
  */
 
 import { z } from "zod";
-import type { AccountType, NormalBalance, EntryType, EntryStatus, LineType, UserRole } from "./types";
+import type {
+  AccountType,
+  NormalBalance,
+  EntryType,
+  EntryStatus,
+  LineType,
+  UserRole,
+} from "./types";
 
 // ============================================================================
 // Money validation
@@ -14,7 +21,10 @@ import type { AccountType, NormalBalance, EntryType, EntryStatus, LineType, User
 
 export const moneySchema = z
   .string()
-  .regex(/^\d{1,15}(\.\d{2})$/, "Amount must be a decimal string with 2 decimal places (e.g. '100.50')")
+  .regex(
+    /^\d{1,15}(\.\d{2})$/,
+    "Amount must be a decimal string with 2 decimal places (e.g. '100.50')",
+  )
   .describe("Monetary amount in baht as string with 2 decimal places");
 
 // ============================================================================
@@ -54,7 +64,15 @@ export const journalLineSchema = z.object({
 });
 
 export const createJournalEntrySchema = z.object({
-  entryType: z.enum(["offering", "expense", "income", "transfer", "opening", "adjustment", "closing"] as const),
+  entryType: z.enum([
+    "offering",
+    "expense",
+    "income",
+    "transfer",
+    "opening",
+    "adjustment",
+    "closing",
+  ] as const),
   postingDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
   description: z.string().min(3, "Description must be at least 3 characters").max(1000),
   fundId: z.string().uuid(),
@@ -99,7 +117,11 @@ export const reopenPeriodSchema = z.object({
 // ============================================================================
 
 export const createFundSchema = z.object({
-  fundCode: z.string().min(1).max(20).regex(/^[A-Z0-9_]+$/, "Fund code must be uppercase alphanumeric"),
+  fundCode: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^[A-Z0-9_]+$/, "Fund code must be uppercase alphanumeric"),
   name: z.string().min(1).max(255),
   accountId: z.string().uuid(),
   description: z.string().max(1000).optional(),
@@ -192,7 +214,10 @@ export const createMemberSchema = z.object({
   email: z.string().email().max(255).optional(),
   address: z.string().max(500).optional(),
   departmentId: z.string().uuid().optional(),
-  joinedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  joinedAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export const updateMemberSchema = createMemberSchema.partial().extend({
@@ -209,7 +234,10 @@ export const createProjectSchema = z.object({
   description: z.string().max(2000).optional(),
   budgetAmount: moneySchema,
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   departmentId: z.string().uuid().optional(),
   ownerId: z.string().uuid().optional(),
 });
@@ -241,12 +269,29 @@ export const paginationSchema = z.object({
 
 export const journalQuerySchema = paginationSchema.extend({
   status: z.enum(["draft", "pending", "approved", "rejected", "voided"] as const).optional(),
-  entryType: z.enum(["offering", "expense", "income", "transfer", "opening", "adjustment", "void", "closing"] as const).optional(),
+  entryType: z
+    .enum([
+      "offering",
+      "expense",
+      "income",
+      "transfer",
+      "opening",
+      "adjustment",
+      "void",
+      "closing",
+    ] as const)
+    .optional(),
   fundId: z.string().uuid().optional(),
   fiscalYear: z.coerce.number().int().optional(),
   fiscalPeriod: z.coerce.number().int().min(1).max(12).optional(),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export const auditQuerySchema = paginationSchema.extend({

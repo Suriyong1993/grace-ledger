@@ -1,18 +1,16 @@
-export type Role = "super_admin" | "pastor" | "treasurer" | "finance_staff" | "auditor" | "viewer";
+export type Role = "super_admin" | "admin";
 
 export const ROLE_LABEL: Record<Role, string> = {
   super_admin: "ผู้ดูแลระบบ",
-  pastor: "ศิษยาภิบาล",
-  treasurer: "เหรัญญิก",
-  finance_staff: "เจ้าหน้าที่การเงิน",
-  auditor: "ผู้ตรวจสอบ",
-  viewer: "ผู้ชม",
+  admin: "ผู้ดูแล",
 };
 
 export interface User {
   id: string;
   name: string;
   role: Role;
+  email?: string;
+  churchId?: string;
   avatarColor?: string;
 }
 
@@ -39,6 +37,8 @@ export interface Income {
   createdBy: string;
   approvedBy?: string;
   status: TxStatus;
+  source?: "manual" | "line";
+  lineMessageId?: string;
 }
 
 export interface Expense {
@@ -56,6 +56,8 @@ export interface Expense {
   approvedBy?: string;
   status: TxStatus;
   vendor?: string;
+  source?: "manual" | "line";
+  lineMessageId?: string;
 }
 
 export interface OfferingCategory {
@@ -104,8 +106,13 @@ export interface Offering {
 export interface Fund {
   id: string;
   name: string;
+  fundCode?: string;
+  accountId?: string;
+  isRestricted?: boolean;
   openingBalance: number;
+  currentBalance?: number;
   description?: string;
+  isActive?: boolean;
   createdAt: string;
 }
 
@@ -180,4 +187,12 @@ export interface Settings {
   fiscalYearStart: number; // month 1-12
   idleTimeoutMin: number;
   currency: "THB";
+}
+
+export interface LineUser {
+  id: string;
+  churchId: string;
+  lineUserId: string;
+  userId?: string;
+  linkedAt: string;
 }

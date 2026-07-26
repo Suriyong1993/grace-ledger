@@ -1,6 +1,3 @@
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { dayjs } from "./format";
 
 export interface ExportColumn<T> {
@@ -30,7 +27,8 @@ function cellValue<T>(row: T, col: ExportColumn<T>): string | number {
   return String(v);
 }
 
-export function exportExcel<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMeta) {
+export async function exportExcel<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMeta) {
+  const XLSX = await import("xlsx");
   const header = cols.map((c) => c.label);
   const body = rows.map((r) => cols.map((c) => cellValue(r, c)));
   const aoa = [
@@ -56,7 +54,9 @@ export function exportExcel<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportM
   XLSX.writeFile(wb, `${meta.fileBase}-${stamp()}.xlsx`);
 }
 
-export function exportPDF<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMeta) {
+export async function exportPDF<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMeta) {
+  const { default: jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
   const landscape = cols.length > 6;
   const doc = new jsPDF({
     orientation: landscape ? "landscape" : "portrait",
@@ -122,4 +122,39 @@ export function exportCSV<T>(rows: T[], cols: ExportColumn<T>[], meta: ExportMet
 
 export function printReport() {
   window.print();
+}
+
+// ── Google Export ─────────────────────────────────────────────────
+
+export async function exportGoogleSheets<T>(
+  rows: T[],
+  cols: ExportColumn<T>[],
+  meta: ExportMeta,
+  sheetId: string,
+) {
+  const { appendToSheet } = await import("@/services/google");
+  const header = cols.map((c) => c.label);
+  const body = rows.map((r) => cols.map((c) => cellValue(r, c)));
+  await appendToSheet(sheetId, "A1", [
+    [meta.churchName ?? ""],
+    [meta.title],
+    meta.subtitle ? [meta.subtitle] : [""],
+    [],
+    header,
+    ...body,
+  ]);
+}
+
+export async function exportGoogleDrive<T>(
+  rows: T[],
+  cols: ExportColumn<T>[],
+  meta: ExportMeta,
+  folderId?: string,
+) {
+  const { uploadToDrive } = await import("@/services/google");
+  const header = cols.map((c) => c.label).join(",");
+  const body = rows.map((r) => cols.map((c) => String(cellValue(r, c))).join(",")).join("\n");
+  const csv = `${header}\n${body}`;
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  await uploadToDrive(`${meta.fileBase}-${stamp()}.csv`, blob, "text/csv", folderId);
 }

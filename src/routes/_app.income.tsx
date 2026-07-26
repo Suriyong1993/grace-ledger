@@ -102,7 +102,7 @@ function IncomePage() {
           ...v,
           description: v.description ?? "",
           attachmentName: attachment?.name,
-          attachmentDataUrl: attachment?.dataUrl,
+          attachmentDataUrl: attachment?.url,
           attachmentType: attachment?.type,
           attachmentSize: attachment?.size,
         },
@@ -220,17 +220,17 @@ function IncomePage() {
         description={`รายรับ ${thb(totalIncome)} + เงินถวาย ${thb(totalOffering)} = ${thb(totalAll)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button variant="outline" className="rounded-2xl" onClick={exportCsv}>
+            <Button variant="outline" className="" onClick={exportCsv}>
               <Download className="h-4 w-4 mr-2" /> Export
             </Button>
             {can("income.write") && (
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <Button className="rounded-2xl">
+                  <Button className="">
                     <Plus className="h-4 w-4 mr-2" /> เพิ่มรายรับ
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="rounded-3xl">
+                <DialogContent className="">
                   <DialogHeader>
                     <DialogTitle>บันทึกรายรับ</DialogTitle>
                   </DialogHeader>
@@ -355,7 +355,7 @@ function IncomePage() {
 
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายรับทั้งหมด..." />
 
-      <Card className="rounded-3xl overflow-hidden">
+      <Card className=" overflow-hidden">
         <CardContent className="p-0">
           {incomeQ.isLoading || offeringQ.isLoading ? (
             <div className="p-6 space-y-3">

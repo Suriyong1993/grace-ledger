@@ -31,7 +31,10 @@ export class PeriodService {
     const conditions = [eq(fiscalPeriods.churchId, churchId)];
     if (fiscalYear) conditions.push(eq(fiscalPeriods.fiscalYear, fiscalYear));
 
-    const rows = await db.select().from(fiscalPeriods).where(and(...conditions))
+    const rows = await db
+      .select()
+      .from(fiscalPeriods)
+      .where(and(...conditions))
       .orderBy(fiscalPeriods.fiscalYear, fiscalPeriods.periodNumber);
 
     return rows.map(PeriodService.toView);
@@ -39,22 +42,32 @@ export class PeriodService {
 
   /** Get a single period */
   static async getPeriod(churchId: string, periodId: string): Promise<PeriodView | null> {
-    const rows = await db.select().from(fiscalPeriods).where(
-      and(eq(fiscalPeriods.id, periodId), eq(fiscalPeriods.churchId, churchId)),
-    ).limit(1);
+    const rows = await db
+      .select()
+      .from(fiscalPeriods)
+      .where(and(eq(fiscalPeriods.id, periodId), eq(fiscalPeriods.churchId, churchId)))
+      .limit(1);
     if (!rows[0]) return null;
     return PeriodService.toView(rows[0]);
   }
 
   /** Check if a period is open (for journal entry validation) */
-  static async isPeriodOpen(churchId: string, fiscalYear: number, periodNumber: number): Promise<boolean> {
-    const rows = await db.select({ status: fiscalPeriods.status }).from(fiscalPeriods).where(
-      and(
-        eq(fiscalPeriods.churchId, churchId),
-        eq(fiscalPeriods.fiscalYear, fiscalYear),
-        eq(fiscalPeriods.periodNumber, periodNumber),
-      ),
-    ).limit(1);
+  static async isPeriodOpen(
+    churchId: string,
+    fiscalYear: number,
+    periodNumber: number,
+  ): Promise<boolean> {
+    const rows = await db
+      .select({ status: fiscalPeriods.status })
+      .from(fiscalPeriods)
+      .where(
+        and(
+          eq(fiscalPeriods.churchId, churchId),
+          eq(fiscalPeriods.fiscalYear, fiscalYear),
+          eq(fiscalPeriods.periodNumber, periodNumber),
+        ),
+      )
+      .limit(1);
     return rows[0]?.status === "open";
   }
 
@@ -70,30 +83,43 @@ export class PeriodService {
     const period = await PeriodService.getPeriod(churchId, periodId);
     if (!period) throw new DomainError("NOT_FOUND", "Period not found");
     if (period.status !== "open") {
-      throw new DomainError("PERIOD_NOT_OPEN", `Period ${period.fiscalYear}-${period.periodNumber} is already ${period.status}`);
+      throw new DomainError(
+        "PERIOD_NOT_OPEN",
+        `Period ${period.fiscalYear}-${period.periodNumber} is already ${period.status}`,
+      );
     }
 
     // Check no pending/draft entries in this period
-    const pendingEntries = await db.select({ id: journalEntries.id }).from(journalEntries).where(
-      and(
-        eq(journalEntries.churchId, churchId),
-        eq(journalEntries.fiscalYear, period.fiscalYear),
-        eq(journalEntries.fiscalPeriod, period.periodNumber),
-        eq(journalEntries.status, "draft"),
-      ),
-    ).limit(1);
+    const pendingEntries = await db
+      .select({ id: journalEntries.id })
+      .from(journalEntries)
+      .where(
+        and(
+          eq(journalEntries.churchId, churchId),
+          eq(journalEntries.fiscalYear, period.fiscalYear),
+          eq(journalEntries.fiscalPeriod, period.periodNumber),
+          eq(journalEntries.status, "draft"),
+        ),
+      )
+      .limit(1);
 
     if (pendingEntries[0]) {
-      throw new DomainError("PENDING_ENTRIES", "Cannot close period with draft entries. Submit or delete them first.");
+      throw new DomainError(
+        "PENDING_ENTRIES",
+        "Cannot close period with draft entries. Submit or delete them first.",
+      );
     }
 
-    await db.update(fiscalPeriods).set({
-      status: "closed",
-      closedBy: userId,
-      closedAt: new Date(),
-      updatedAt: new Date(),
-      version: period.version + 1,
-    }).where(eq(fiscalPeriods.id, periodId));
+    await db
+      .update(fiscalPeriods)
+      .set({
+        status: "closed",
+        closedBy: userId,
+        closedAt: new Date(),
+        updatedAt: new Date(),
+        version: period.version + 1,
+      })
+      .where(eq(fiscalPeriods.id, periodId));
 
     const updated = await PeriodService.getPeriod(churchId, periodId);
 
@@ -127,15 +153,18 @@ export class PeriodService {
       throw new DomainError("PERIOD_NOT_CLOSED", "Only closed periods can be reopened");
     }
 
-    await db.update(fiscalPeriods).set({
-      status: "open",
-      reopenedBy: userId,
-      reopenedAt: new Date(),
-      closedBy: null,
-      closedAt: null,
-      updatedAt: new Date(),
-      version: period.version + 1,
-    }).where(eq(fiscalPeriods.id, periodId));
+    await db
+      .update(fiscalPeriods)
+      .set({
+        status: "open",
+        reopenedBy: userId,
+        reopenedAt: new Date(),
+        closedBy: null,
+        closedAt: null,
+        updatedAt: new Date(),
+        version: period.version + 1,
+      })
+      .where(eq(fiscalPeriods.id, periodId));
 
     const updated = await PeriodService.getPeriod(churchId, periodId);
 
@@ -156,20 +185,22 @@ export class PeriodService {
 
   /** Get current active period for a date */
   static async getPeriodForDate(churchId: string, dateStr: string): Promise<PeriodView | null> {
-    const rows = await db.select().from(fiscalPeriods).where(
-      and(
-        eq(fiscalPeriods.churchId, churchId),
-        // Period contains the date
-        eq(fiscalPeriods.startDate, dateStr.slice(0, 10)),
-      ),
-    ).limit(1);
+    const rows = await db
+      .select()
+      .from(fiscalPeriods)
+      .where(
+        and(
+          eq(fiscalPeriods.churchId, churchId),
+          // Period contains the date
+          eq(fiscalPeriods.startDate, dateStr.slice(0, 10)),
+        ),
+      )
+      .limit(1);
 
     if (rows[0]) return PeriodService.toView(rows[0]);
 
     // Fallback: find period that contains this date
-    const all = await db.select().from(fiscalPeriods).where(
-      eq(fiscalPeriods.churchId, churchId),
-    );
+    const all = await db.select().from(fiscalPeriods).where(eq(fiscalPeriods.churchId, churchId));
 
     for (const p of all) {
       if (dateStr >= p.startDate && dateStr <= p.endDate) {
@@ -179,7 +210,7 @@ export class PeriodService {
     return null;
   }
 
-  private static toView(row: Record<string, any>): PeriodView {
+  private static toView(row: typeof fiscalPeriods.$inferSelect): PeriodView {
     return {
       id: row.id,
       churchId: row.churchId,

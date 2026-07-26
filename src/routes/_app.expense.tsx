@@ -97,7 +97,7 @@ function ExpensePage() {
         {
           ...v,
           attachmentName: receipt?.name,
-          attachmentDataUrl: receipt?.dataUrl,
+          attachmentDataUrl: receipt?.url,
           attachmentType: receipt?.type,
           attachmentSize: receipt?.size,
         },
@@ -194,17 +194,17 @@ function ExpensePage() {
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button variant="outline" className="rounded-2xl" onClick={exportCsv}>
+            <Button variant="outline" className="" onClick={exportCsv}>
               <Download className="h-4 w-4 mr-2" /> Export
             </Button>
             {can("expense.write") && (
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <Button className="rounded-2xl">
+                  <Button className="">
                     <Plus className="h-4 w-4 mr-2" /> เพิ่มรายจ่าย
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="rounded-3xl">
+                <DialogContent className="">
                   <DialogHeader>
                     <DialogTitle>บันทึกรายจ่าย</DialogTitle>
                   </DialogHeader>
@@ -348,7 +348,7 @@ function ExpensePage() {
 
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายจ่าย..." />
 
-      <Card className="rounded-3xl overflow-hidden">
+      <Card className=" overflow-hidden">
         <CardContent className="p-0">
           {expQ.isLoading ? (
             <div className="p-6 space-y-3">
@@ -390,7 +390,7 @@ function ExpensePage() {
                         <AttachmentPreview
                           value={{
                             name: r.attachmentName,
-                            dataUrl: r.attachmentDataUrl,
+                            url: r.attachmentDataUrl,
                             type: r.attachmentType,
                             size: r.attachmentSize,
                           }}

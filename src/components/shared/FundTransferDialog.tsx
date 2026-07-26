@@ -277,10 +277,19 @@ export function FundTransferDialog({
                 </p>
               )}
               <DialogFooter className="gap-2">
-                <Button type="button" variant="ghost" className="rounded-xl active:scale-[0.97]" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="rounded-xl active:scale-[0.97]"
+                  onClick={() => setOpen(false)}
+                >
                   ยกเลิก
                 </Button>
-                <Button type="submit" className="rounded-xl active:scale-[0.97]" disabled={mut.isPending || !!insufficient}>
+                <Button
+                  type="submit"
+                  className="rounded-xl active:scale-[0.97]"
+                  disabled={mut.isPending || !!insufficient}
+                >
                   ตรวจสอบและโอน
                 </Button>
               </DialogFooter>
@@ -309,7 +318,9 @@ export function FundTransferDialog({
                 </div>
                 <div className="flex justify-between">
                   <span>จำนวน</span>
-                  <span className="font-semibold font-mono tabular-nums text-primary">{thb(confirm?.amount ?? 0)}</span>
+                  <span className="font-semibold font-mono tabular-nums text-primary">
+                    {thb(confirm?.amount ?? 0)}
+                  </span>
                 </div>
                 {confirm?.reference && (
                   <div className="flex justify-between">

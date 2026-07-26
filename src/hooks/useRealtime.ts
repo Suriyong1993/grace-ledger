@@ -12,14 +12,15 @@
 // Why this matters:
 // - Dashboard, Income, Expense, Offering pages need live updates
 // - Without realtime: users must manually refresh or navigate away and back
-// - With realtime: when pastor approves income, treasurer sees it instantly
+// - With realtime: when admin approves income, other admins see it instantly
 // - Reduces polling overhead and unnecessary DB reads
 
-import { useEffect, useRef } from 'react';
-import { supabase } from '@/services/supabaseClient';
+import { useEffect, useRef } from "react";
+import { supabase } from "@/services/supabaseClient";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
-export interface RealtimeEvent<T = any> {
-  type: 'INSERT' | 'UPDATE' | 'DELETE';
+export interface RealtimeEvent<T = unknown> {
+  type: "INSERT" | "UPDATE" | "DELETE";
   new: T;
   old: T | null;
 }
@@ -33,11 +34,11 @@ export interface RealtimeEvent<T = any> {
  * @param callback - fired on each INSERT/UPDATE/DELETE matching the filter
  * @returns void (auto-cleans up on unmount)
  */
-export function useRealtime<T = any>(
+export function useRealtime<T = unknown>(
   channelName: string,
   table: string,
   churchId: string,
-  callback: (event: RealtimeEvent<T>) => void
+  callback: (event: RealtimeEvent<T>) => void,
 ) {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
@@ -48,10 +49,10 @@ export function useRealtime<T = any>(
     const channel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',  // Listen to all events (INSERT, UPDATE, DELETE)
-          schema: 'public',
+          event: "*", // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: "public",
           table,
         },
         (payload) => {
@@ -59,19 +60,19 @@ export function useRealtime<T = any>(
           // rows belonging to this church, but we double-check to avoid
           // unnecessary re-renders for rows from other churches (if any leak)
           const row = payload.new ?? payload.old;
-          if (row && (row as any).church_id !== churchId) return;
+          if (row && (row as Record<string, unknown>).church_id !== churchId) return;
 
           callbackRef.current({
-            type: payload.eventType as RealtimeEvent<T>['type'],
+            type: payload.eventType as RealtimeEvent<T>["type"],
             new: payload.new as T,
             old: payload.old as T | null,
           });
-        }
+        },
       )
       .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
+        if (status === "SUBSCRIBED") {
           // successfully connected
-        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        } else if (status === "CLOSED" || status === "CHANNEL_ERROR") {
           // Will auto-reconnect when Supabase client reconnects
           console.warn(`Realtime channel "${channelName}" status: ${status}`);
         }
@@ -88,20 +89,20 @@ export function useRealtime<T = any>(
  * Convenience hook for batching multiple realtime subscriptions.
  * Returns a list of events from all subscribed tables.
  */
-export function useRealtimeBatch<T extends Record<string, any>>(
+export function useRealtimeBatch<T extends Record<string, unknown>>(
   subscriptions: {
     channelName: string;
     table: string;
     churchId: string;
   }[],
-  onEvent: (event: RealtimeEvent<T>) => void
+  onEvent: (event: RealtimeEvent<T>) => void,
 ) {
   // Use a single combined callback + ref to avoid duplicate subscriptions
   const combinedRef = useRef(onEvent);
   combinedRef.current = onEvent;
 
   useEffect(() => {
-    const channels: { name: string; channel: any }[] = [];
+    const channels: { name: string; channel: RealtimeChannel }[] = [];
 
     for (const sub of subscriptions) {
       if (!sub.channelName || !sub.table || !sub.churchId) continue;
@@ -109,22 +110,22 @@ export function useRealtimeBatch<T extends Record<string, any>>(
       const channel = supabase
         .channel(sub.channelName)
         .on(
-          'postgres_changes',
+          "postgres_changes",
           {
-            event: '*',
-            schema: 'public',
+            event: "*",
+            schema: "public",
             table: sub.table,
           },
           (payload) => {
             const row = payload.new ?? payload.old;
-            if (row && (row as any).church_id !== sub.churchId) return;
+            if (row && (row as Record<string, unknown>).church_id !== sub.churchId) return;
 
             combinedRef.current({
-              type: payload.eventType as RealtimeEvent<T>['type'],
+              type: payload.eventType as RealtimeEvent<T>["type"],
               new: payload.new as T,
               old: payload.old as T | null,
             });
-          }
+          },
         )
         .subscribe();
 
@@ -136,5 +137,5 @@ export function useRealtimeBatch<T extends Record<string, any>>(
         supabase.removeChannel(channel);
       }
     };
-  }, [subscriptions.map((s) => `${s.channelName}:${s.table}:${s.churchId}`).join(',')]);
+  }, [subscriptions.map((s) => `${s.channelName}:${s.table}:${s.churchId}`).join(",")]);
 }

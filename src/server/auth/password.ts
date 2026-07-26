@@ -1,6 +1,6 @@
 /**
  * Grace Ledger v2 — Password Service
- * 
+ *
  * CRITICAL FIX (MF-12): Forces password change on first login after migration.
  * Uses argon2id consistently (fixes the bcrypt/argon2id inconsistency from mF-1).
  */

@@ -36,3 +36,8 @@ dist-ssr
 .agents/
 Refer/
 .uploads/
+.vercel
+.vercel-tmp
+.qoder
+supabase/.temp
+

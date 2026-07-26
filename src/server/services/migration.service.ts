@@ -1,7 +1,7 @@
 /**
  * Grace Ledger v2 — Migration Service
  * Migrates v1 localStorage data to v2 PostgreSQL.
- * 
+ *
  * CRITICAL FIX (MF-12): Passwords hashed from PIN are flagged as temporary.
  * Users must change password on first login.
  */
@@ -53,13 +53,16 @@ export class MigrationService {
     const v1Funds = v1Data.funds;
 
     // 1. Create church record
-    const [church] = await db.insert(churches).values({
-      name: v1Settings.churchName || "คริสตจักรของฉัน",
-      address: v1Settings.address || null,
-      taxId: v1Settings.taxId || null,
-      fiscalYearStart: v1Settings.fiscalYearStart || 1,
-      currency: "THB",
-    }).returning();
+    const [church] = await db
+      .insert(churches)
+      .values({
+        name: v1Settings.churchName || "คริสตจักรของฉัน",
+        address: v1Settings.address || null,
+        taxId: v1Settings.taxId || null,
+        fiscalYearStart: v1Settings.fiscalYearStart || 1,
+        currency: "THB",
+      })
+      .returning();
 
     const churchId = church.id;
 
@@ -93,12 +96,12 @@ export class MigrationService {
     let migratedUsers = 0;
     for (const v1User of v1Users) {
       // Hash the 6-digit PIN as initial password
-      const tempPassword = await PasswordService.hashPassword(v1User.pin);
-      
+      const tempPassword = await PasswordService.hashPassword((v1User as { pin?: string }).pin ?? "");
+
       await db.insert(users).values({
         churchId,
         name: v1User.name,
-        role: v1User.role as any, // Map v1 roles directly
+        role: v1User.role as "super_admin" | "admin", // Map v1 roles directly
         passwordHash: tempPassword,
         // MF-12: Set passwordChangedAt = createdAt so system detects "must change"
         // This is done by keeping the default, which Drizzle sets to now()

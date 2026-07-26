@@ -22,7 +22,7 @@ function AuditPage() {
   return (
     <div>
       <PageHeader title="Audit Logs" description="บันทึกกิจกรรมและการเปลี่ยนแปลง" />
-      <Card className="rounded-3xl">
+      <Card className="">
         <CardContent className="p-0">
           {rows.length === 0 ? (
             <div className="p-6">
@@ -32,7 +32,7 @@ function AuditPage() {
             <ul className="divide-y">
               {rows.map((a) => (
                 <li key={a.id} className="flex items-start gap-3 px-5 py-3.5">
-                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center  bg-primary/10 text-primary">
                     <ScrollText className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">

@@ -7,14 +7,14 @@ export function BottomNav() {
   const path = useCurrentPath();
   const isActive = (to: string) => path === to || path.startsWith(to + "/");
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-5 h-16">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background pb-[env(safe-area-inset-bottom)]">
+      <div className="grid grid-cols-5 h-14">
         {MOBILE_NAV.map((item) => (
           <Link
             key={item.to}
             to={item.to}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 text-[11px] font-medium",
+              "flex flex-col items-center justify-center gap-0.5 text-[10px]",
               isActive(item.to) ? "text-primary" : "text-muted-foreground",
             )}
           >
@@ -23,27 +23,27 @@ export function BottomNav() {
           </Link>
         ))}
         <Sheet>
-          <SheetTrigger className="flex flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground">
+          <SheetTrigger className="flex flex-col items-center justify-center gap-0.5 text-[10px] text-muted-foreground">
             <MoreHorizontal className="h-5 w-5" />
             <span>เพิ่มเติม</span>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-3xl">
+          <SheetContent side="bottom">
             <SheetHeader>
               <SheetTitle>เมนูทั้งหมด</SheetTitle>
             </SheetHeader>
-            <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="grid grid-cols-3 gap-2 mt-4">
               {NAV.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-2xl border p-4 text-xs font-medium",
+                    "flex flex-col items-center gap-2 border p-3 text-xs",
                     isActive(item.to)
                       ? "border-primary bg-primary/10 text-primary"
-                      : "bg-card text-foreground",
+                      : "border-border bg-card text-foreground",
                   )}
                 >
-                  <item.icon className="h-6 w-6" />
+                  <item.icon className="h-5 w-5" />
                   <span className="text-center leading-tight">{item.label}</span>
                 </Link>
               ))}

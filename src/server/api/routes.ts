@@ -22,7 +22,11 @@ export interface RouteDefinition {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   /** Path with :param placeholders, e.g. "/journal/:entryId/approve" */
   path: string;
-  handler: (request: Request, params: Record<string, string>, query: URLSearchParams) => Promise<Response>;
+  handler: (
+    request: Request,
+    params: Record<string, string>,
+    query: URLSearchParams,
+  ) => Promise<Response>;
 }
 
 const routes: RouteDefinition[] = [

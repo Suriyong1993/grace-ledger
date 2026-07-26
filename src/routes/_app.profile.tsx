@@ -19,7 +19,7 @@ function ProfilePage() {
   return (
     <div>
       <PageHeader title="โปรไฟล์" description="จัดการบัญชีของคุณ" />
-      <Card className="rounded-3xl max-w-md">
+      <Card className=" max-w-md">
         <CardContent className="p-6 flex flex-col items-center text-center">
           <Avatar className="h-24 w-24 mb-4">
             <AvatarFallback
@@ -35,7 +35,7 @@ function ProfilePage() {
           </p>
           <Button
             variant="outline"
-            className="rounded-2xl mt-6"
+            className=" mt-6"
             onClick={() => {
               logout();
               navigate({ to: "/auth" });

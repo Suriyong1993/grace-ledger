@@ -7,7 +7,7 @@ import { uploadAttachment, deleteAttachment } from "@/services/storage";
 
 export interface AttachmentValue {
   name?: string;
-  url?: string;        // Supabase public URL
+  url?: string; // Supabase public URL
   storagePath?: string; // Supabase storage path for deletion
   type?: string;
   size?: number;
@@ -64,9 +64,9 @@ export function AttachmentInput({
       });
 
       toast.success("อัปโหลดไฟล์แล้ว");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Upload error:", err);
-      toast.error(err.message || "อัปโหลดไม่สำเร็จ");
+      toast.error(err instanceof Error ? err.message : "อัปโหลดไม่สำเร็จ");
     } finally {
       setUploading(false);
       setTimeout(() => setProgress(0), 400);
@@ -77,8 +77,8 @@ export function AttachmentInput({
     if (value?.storagePath) {
       try {
         await deleteAttachment(value.storagePath);
-      } catch (err: any) {
-        toast.error(err.message || "ลบไฟล์ไม่สำเร็จ");
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : "ลบไฟล์ไม่สำเร็จ");
         return;
       }
     }
@@ -194,11 +194,7 @@ export function AttachmentInput({
               className="max-h-[80vh] w-full object-contain rounded-2xl"
             />
           ) : (
-            <iframe
-              src={value?.url}
-              className="w-full h-[80vh] rounded-2xl"
-              title={value?.name}
-            />
+            <iframe src={value?.url} className="w-full h-[80vh] rounded-2xl" title={value?.name} />
           )}
         </DialogContent>
       </Dialog>

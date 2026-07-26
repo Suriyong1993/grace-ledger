@@ -1,108 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import {
-  ArrowDownCircle,
-  ArrowUpCircle,
-  HandHeart,
-  Wallet,
-  PiggyBank,
-  Briefcase,
-  ClipboardCheck,
-  CalendarClock,
-  Plus,
-  RefreshCw,
-} from "lucide-react";
-import { toast } from "sonner";
+import { useState } from "react";
+import { ArrowDownCircle, ArrowUpCircle, Wallet, Plus, RefreshCw } from "lucide-react";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import {
-  listIncome,
-  listExpense,
-  listOffering,
-  listFunds,
-  listBudget,
-  listProjects,
-  listOfferingCategories,
-  listOfferingSubcategories,
-} from "@/services/church";
-import { useRealtime } from "@/hooks/useRealtime";
-import { supabase } from "@/services/supabaseClient";
+import { listIncome, listExpense, listCategories } from "@/services/church";
 import { thb, fmtDate, dayjs } from "@/lib/format";
 import { useNavigate } from "@tanstack/react-router";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/dashboard")({
-  head: () => ({ meta: [{ title: "แดชบอร์ด — ระบบจัดการการเงินคริสตจักร" }] }),
+  head: () => ({ meta: [{ title: "แดชบอร์ด — ระบบจัดการการเงิน" }] }),
   component: Dashboard,
 });
 
-const CHART_COLORS = ["#F97316", "#F59E0B", "#EAB308", "#22C55E", "#EF4444", "#0EA5E9", "#A855F7"];
+type Period = "today" | "week" | "month";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [period, setPeriod] = useState<Period>("month");
+
   const incomeQ = useQuery({ queryKey: ["income"], queryFn: listIncome });
   const expenseQ = useQuery({ queryKey: ["expense"], queryFn: listExpense });
-  const offeringQ = useQuery({ queryKey: ["offering"], queryFn: listOffering });
-  const fundsQ = useQuery({ queryKey: ["funds"], queryFn: listFunds });
-  const budgetQ = useQuery({ queryKey: ["budget"], queryFn: listBudget });
-  const projectsQ = useQuery({ queryKey: ["projects"], queryFn: listProjects });
-  const catsQ = useQuery({ queryKey: ["offering-categories"], queryFn: listOfferingCategories });
-  const subsQ = useQuery({
-    queryKey: ["offering-subcategories"],
-    queryFn: () => listOfferingSubcategories(),
-  });
+  const catsQ = useQuery({ queryKey: ["categories"], queryFn: listCategories });
 
-  // Realtime subscriptions — live updates when data changes
-  const [lastUpdated, setLastUpdated] = useState(Date.now());
-  const [realtimeError, setRealtimeError] = useState<string | null>(null);
-  const [churchId, setChurchId] = useState<string>("");
-
-  // Fetch churchId for realtime subscriptions
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      supabase
-        .from("users")
-        .select("church_id")
-        .eq("auth_user_id", user.id)
-        .single()
-        .then(({ data }) => {
-          if (data?.church_id) setChurchId(data.church_id);
-        })
-        .catch(() => {});
-    });
-  }, []);
-
-  useRealtime("dashboard-income", "incomes", churchId, (event) => {
-    incomeQ.refetch();
-    setLastUpdated(Date.now());
-  });
-  useRealtime("dashboard-expense", "expenses", churchId, (event) => {
-    expenseQ.refetch();
-    setLastUpdated(Date.now());
-  });
-  useRealtime("dashboard-offering", "offerings", churchId, (event) => {
-    offeringQ.refetch();
-    setLastUpdated(Date.now());
-  });
-
-  // Error handling — RLS 403 and session expiry
-  const hasError = incomeQ.isError || expenseQ.isError || offeringQ.isError;
-  const errorMessage =
-    (incomeQ.error as Error)?.message ||
-    (expenseQ.error as Error)?.message ||
-    (offeringQ.error as Error)?.message ||
-    realtimeError ||
-    null;
-
-  if (hasError && !incomeQ.data && !expenseQ.data && !offeringQ.data) {
+  const hasError = incomeQ.isError || expenseQ.isError;
+  if (hasError && !incomeQ.data && !expenseQ.data) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <Card className="max-w-md">
@@ -111,9 +40,7 @@ function Dashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              {errorMessage?.includes("403")
-                ? "คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้"
-                : errorMessage || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"}
+              {(incomeQ.error as Error)?.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"}
             </p>
             <Button
               variant="outline"
@@ -121,7 +48,6 @@ function Dashboard() {
               onClick={() => {
                 incomeQ.refetch();
                 expenseQ.refetch();
-                offeringQ.refetch();
               }}
             >
               <RefreshCw className="h-4 w-4 mr-2" /> ลองใหม่
@@ -132,159 +58,133 @@ function Dashboard() {
     );
   }
 
-  const isLoading = incomeQ.isLoading || expenseQ.isLoading || offeringQ.isLoading;
-
+  const isLoading = incomeQ.isLoading || expenseQ.isLoading;
   const incomes = incomeQ.data ?? [];
   const expenses = expenseQ.data ?? [];
-  const offerings = offeringQ.data ?? [];
-  const funds = fundsQ.data ?? [];
-  const budgets = budgetQ.data ?? [];
-  const projects = projectsQ.data ?? [];
-  const offeringCats = catsQ.data ?? [];
-  const allSubs = subsQ.data ?? [];
-  const catName = (id: string) => offeringCats.find((c) => c.id === id)?.name ?? id;
-  const subShortName = (id?: string) => (id ? allSubs.find((s) => s.id === id)?.name : undefined);
+  const categories = catsQ.data ?? [];
 
-  const totalIncome = incomes.reduce((s, x) => s + x.amount, 0);
-  const totalExpense = expenses.reduce((s, x) => s + x.amount, 0);
-  const totalOffering = offerings.reduce((s, x) => s + x.amount, 0);
-  const openingSum = funds.reduce((s, f) => s + f.openingBalance, 0);
-  const cashBalance = openingSum + totalIncome + totalOffering - totalExpense;
-  const todayStr = dayjs().format("YYYY-MM-DD");
-  const todayOffering = offerings
-    .filter((o) => o.date === todayStr)
-    .reduce((s, x) => s + x.amount, 0);
-  const thisMonth = dayjs().format("YYYY-MM");
-  const monthlyOffering = offerings
-    .filter((o) => o.date.startsWith(thisMonth))
-    .reduce((s, x) => s + x.amount, 0);
-  const annualBudget = budgets.find((b) => b.period === "annual");
-  const projectBudget = projects.reduce((s, p) => s + p.budget, 0);
-  const pendingApprovals =
-    incomes.filter((i) => i.status === "pending").length +
-    expenses.filter((e) => e.status === "pending").length;
+  // Filter by period
+  const now = dayjs();
+  const filterByPeriod = (dateStr: string) => {
+    const d = dayjs(dateStr);
+    if (period === "today") return d.isSame(now, "day");
+    if (period === "week") return d.isAfter(now.subtract(7, "day"));
+    return d.isSame(now, "month");
+  };
 
-  // Monthly comparison chart
+  const filteredIncomes = incomes.filter((i) => filterByPeriod(i.date));
+  const filteredExpenses = expenses.filter((e) => filterByPeriod(e.date));
+
+  const totalIncome = filteredIncomes.reduce((s, x) => s + x.amount, 0);
+  const totalExpense = filteredExpenses.reduce((s, x) => s + x.amount, 0);
+  const balance = totalIncome - totalExpense;
+
+  // Monthly trend (6 months)
   const monthly = Array.from({ length: 6 }).map((_, i) => {
-    const d = dayjs().subtract(5 - i, "month");
+    const d = now.subtract(5 - i, "month");
     const key = d.format("YYYY-MM");
     return {
       month: d.format("MMM"),
       income: incomes.filter((x) => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0),
       expense: expenses.filter((x) => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0),
-      offering: offerings.filter((x) => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0),
     };
   });
 
-  // Fund distribution
-  const fundDist = funds.map((f) => ({
-    name: f.name,
-    value:
-      f.openingBalance +
-      incomes.filter((i) => i.fundId === f.id).reduce((s, x) => s + x.amount, 0) +
-      offerings.filter((o) => o.fundId === f.id).reduce((s, x) => s + x.amount, 0) -
-      expenses.filter((e) => e.fundId === f.id).reduce((s, x) => s + x.amount, 0),
-  }));
+  // Top expense categories
+  const catName = (id: string) => categories.find((c) => c.id === id)?.name ?? "อื่นๆ";
+  const expenseByCat = Object.entries(
+    filteredExpenses.reduce<Record<string, number>>((acc, e) => {
+      const key = e.categoryId || "other";
+      acc[key] = (acc[key] ?? 0) + e.amount;
+      return acc;
+    }, {}),
+  )
+    .map(([id, amount]) => ({ name: catName(id), amount }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
 
-  // Offering by category
-  const offeringByType = offeringCats
-    .map((c) => ({
-      name: c.name,
-      color: c.color,
-      value: offerings.filter((o) => o.categoryId === c.id).reduce((s, x) => s + x.amount, 0),
-    }))
-    .filter((x) => x.value > 0);
+  // Recent transactions (last 10)
+  const recent = [
+    ...filteredIncomes.map((i) => ({ ...i, kind: "income" as const })),
+    ...filteredExpenses.map((e) => ({ ...e, kind: "expense" as const })),
+  ]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 10);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.04,
-        delayChildren: 0.02,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 12 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } },
+  const PERIOD_LABELS: Record<Period, string> = {
+    today: "วันนี้",
+    week: "สัปดาห์นี้",
+    month: "เดือนนี้",
   };
 
   return (
-    <motion.div initial="hidden" animate="show" variants={containerVariants} className="space-y-6">
+    <div className="space-y-6">
       <PageHeader
         title="แดชบอร์ด"
-        description="ภาพรวมการเงินคริสตจักร"
+        description="ภาพรวมการเงิน"
         actions={
-          <>
-            <Button
-              variant="outline"
-              className="rounded-2xl active:scale-[0.97]"
-              onClick={() => navigate({ to: "/reports" })}
-            >
-              <CalendarClock className="h-4 w-4 mr-2" /> รายงาน
-            </Button>
-            <Button className="rounded-2xl active:scale-[0.97]" onClick={() => navigate({ to: "/offering" })}>
-              <Plus className="h-4 w-4 mr-2" /> บันทึกเงินถวาย
-            </Button>
-          </>
+          <Button onClick={() => navigate({ to: "/expense" })}>
+            <Plus className="h-4 w-4 mr-2" /> บันทึกรายการ
+          </Button>
         }
       />
 
-      {/* Stat cards */}
-      <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Period toggle */}
+      <div className="flex gap-px border border-border bg-border w-fit">
+        {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPeriod(p)}
+            className={cn(
+              "px-4 py-1.5 text-sm font-medium transition-colors",
+              period === p
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {PERIOD_LABELS[p]}
+          </button>
+        ))}
+      </div>
+
+      {/* 3 Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-border border border-border">
         {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-3xl" />)
+          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 bg-card" />)
         ) : (
           <>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                label="รายรับรวมคริสตจักร"
-                value={thb(totalIncome)}
-                icon={ArrowDownCircle}
-                tone="success"
-                hint="ยอดสะสมทั้งหมด"
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                label="รายจ่ายรวมคริสตจักร"
-                value={thb(totalExpense)}
-                icon={ArrowUpCircle}
-                tone="danger"
-                hint="ยอดสะสมทั้งหมด"
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                label="ยอดเงินสดคงเหลือสุทธิ"
-                value={thb(cashBalance)}
-                icon={Wallet}
-                tone="primary"
-                hint="รวมกองทุนและธนาคาร"
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                label="เงินถวายประจำเดือนนี้"
-                value={thb(monthlyOffering)}
-                icon={HandHeart}
-                tone="secondary"
-                hint={dayjs().format("MMMM YYYY")}
-              />
-            </motion.div>
+            <StatCard
+              label="รายรับ"
+              value={thb(totalIncome)}
+              icon={ArrowDownCircle}
+              tone="success"
+              hint={PERIOD_LABELS[period]}
+            />
+            <StatCard
+              label="รายจ่าย"
+              value={thb(totalExpense)}
+              icon={ArrowUpCircle}
+              tone="danger"
+              hint={PERIOD_LABELS[period]}
+            />
+            <StatCard
+              label="คงเหลือ"
+              value={thb(balance)}
+              icon={Wallet}
+              tone={balance >= 0 ? "primary" : "danger"}
+              hint={PERIOD_LABELS[period]}
+            />
           </>
         )}
-      </motion.div>
+      </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-        <Card className="lg:col-span-2 rounded-3xl">
+      {/* Charts + Top Categories */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">แนวโน้มรายรับ / รายจ่าย 6 เดือน</CardTitle>
+            <CardTitle className="text-sm font-medium">แนวโน้มรายรับ / รายจ่าย 6 เดือน</CardTitle>
           </CardHeader>
-          <CardContent className="h-72">
+          <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthly}>
                 <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
@@ -295,7 +195,7 @@ function Dashboard() {
                 />
                 <Tooltip
                   formatter={(v: number) => thb(v)}
-                  contentStyle={{ borderRadius: 12, border: "1px solid var(--color-border)" }}
+                  contentStyle={{ borderRadius: 2, border: "1px solid var(--color-border)" }}
                 />
                 <Legend />
                 <Line
@@ -303,108 +203,45 @@ function Dashboard() {
                   dataKey="income"
                   name="รายรับ"
                   stroke="#22C55E"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="expense"
                   name="รายจ่าย"
                   stroke="#EF4444"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="offering"
-                  name="ถวาย"
-                  stroke="#F97316"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl">
+        {/* Top Categories */}
+        <Card>
           <CardHeader>
-            <CardTitle className="text-base">การกระจายกองทุน</CardTitle>
+            <CardTitle className="text-sm font-medium">หมวดหมู่รายจ่ายสูงสุด</CardTitle>
           </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={fundDist}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={45}
-                  outerRadius={80}
-                  paddingAngle={3}
-                >
-                  {fundDist.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12 }} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2 rounded-3xl">
-          <CardHeader>
-            <CardTitle className="text-base">เปรียบเทียบรายเดือน</CardTitle>
-          </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthly}>
-                <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
-                <YAxis
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  tickFormatter={(v) => (v / 1000).toFixed(0) + "k"}
-                />
-                <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12 }} />
-                <Legend />
-                <Bar dataKey="income" name="รายรับ" fill="#22C55E" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="expense" name="รายจ่าย" fill="#EF4444" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-3xl">
-          <CardHeader>
-            <CardTitle className="text-base">การใช้งบประมาณ</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {budgets.slice(0, 4).map((b) => {
-              const pct = Math.min(100, Math.round((b.used / b.amount) * 100));
+          <CardContent className="space-y-3">
+            {expenseByCat.length === 0 && (
+              <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีข้อมูล</p>
+            )}
+            {expenseByCat.map((cat, i) => {
+              const maxAmount = expenseByCat[0]?.amount ?? 1;
+              const pct = Math.round((cat.amount / maxAmount) * 100);
               return (
-                <div key={b.id}>
-                  <div className="flex justify-between text-xs mb-1.5">
-                    <span className="font-medium truncate">{b.name}</span>
-                    <span className="text-muted-foreground">{pct}%</span>
+                <div key={i}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-medium">{cat.name}</span>
+                    <span className="text-muted-foreground">{thb(cat.amount)}</span>
                   </div>
-                  <div className="h-2 rounded-full bg-muted overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pct}%` }}
-                      transition={{ duration: 0.6 }}
-                      className={
-                        pct > 90
-                          ? "h-full bg-destructive"
-                          : pct > 70
-                            ? "h-full bg-warning"
-                            : "h-full bg-primary"
-                      }
+                  <div className="h-1.5 bg-muted overflow-hidden">
+                    <div
+                      style={{ width: `${pct}%` }}
+                      className="h-full bg-primary transition-all duration-300"
                     />
-                  </div>
-                  <div className="flex justify-between text-[11px] text-muted-foreground mt-1">
-                    <span>{thb(b.used)}</span>
-                    <span>{thb(b.amount)}</span>
                   </div>
                 </div>
               );
@@ -413,110 +250,34 @@ function Dashboard() {
         </Card>
       </div>
 
-      {/* Latest transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-        <Card className="rounded-3xl">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">รายการล่าสุด</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/income" })}>
-              ดูทั้งหมด
-            </Button>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {[
-              ...incomes.slice(0, 3).map((i) => ({ ...i, kind: "income" as const })),
-              ...expenses.slice(0, 3).map((e) => ({ ...e, kind: "expense" as const })),
-            ]
-              .sort((a, b) => b.date.localeCompare(a.date))
-              .slice(0, 6)
-              .map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between py-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {tx.description || (tx.kind === "income" ? "รายรับ" : "รายจ่าย")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{fmtDate(tx.date)}</p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <StatusBadge status={tx.status} />
-                    <MoneyText
-                      value={tx.amount}
-                      tone={tx.kind === "income" ? "income" : "expense"}
-                    />
-                  </div>
-                </div>
-              ))}
-            {incomes.length === 0 && expenses.length === 0 && (
-              <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีรายการ</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-3xl">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">เงินถวายล่าสุด</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/offering" })}>
-              ดูทั้งหมด
-            </Button>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {offerings.slice(0, 6).map((o) => (
-              <div key={o.id} className="flex items-center justify-between py-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {catName(o.categoryId)}
-                    {subShortName(o.subcategoryId) ? ` · ${subShortName(o.subcategoryId)}` : ""}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{fmtDate(o.date)}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant="outline" className="rounded-full text-[10px]">
-                    {o.channel === "cash" ? "เงินสด" : o.channel === "bank" ? "โอน" : "QR"}
-                  </Badge>
-                  <MoneyText value={o.amount} tone="income" />
-                </div>
+      {/* Recent Transactions */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-sm font-medium">รายการล่าสุด</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/expense" })}>
+            ดูทั้งหมด
+          </Button>
+        </CardHeader>
+        <CardContent className="divide-y">
+          {recent.map((tx) => (
+            <div key={tx.id} className="flex items-center justify-between py-3">
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">
+                  {tx.description || (tx.kind === "income" ? "รายรับ" : "รายจ่าย")}
+                </p>
+                <p className="text-xs text-muted-foreground">{fmtDate(tx.date)}</p>
               </div>
-            ))}
-            {offerings.length === 0 && (
-              <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีข้อมูล</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Offering distribution */}
-      {offeringByType.length > 0 && (
-        <Card className="rounded-3xl mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">การกระจายเงินถวายตามหมวดหมู่</CardTitle>
-          </CardHeader>
-          <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={offeringByType} layout="vertical" margin={{ left: 80 }}>
-                <XAxis
-                  type="number"
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  tickFormatter={(v) => (v / 1000).toFixed(0) + "k"}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  width={80}
-                />
-                <Tooltip formatter={(v: number) => thb(v)} contentStyle={{ borderRadius: 12 }} />
-                <Bar dataKey="value" radius={[0, 8, 8, 0]}>
-                  {offeringByType.map((d, i) => (
-                    <Cell key={i} fill={d.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
-    </motion.div>
+              <div className="flex items-center gap-2 shrink-0">
+                <StatusBadge status={tx.status} />
+                <MoneyText value={tx.amount} tone={tx.kind === "income" ? "income" : "expense"} />
+              </div>
+            </div>
+          ))}
+          {recent.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีรายการ</p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

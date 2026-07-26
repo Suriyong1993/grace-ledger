@@ -36,7 +36,7 @@ function MembersPage() {
     <div>
       <PageHeader title="สมาชิก" description={`สมาชิกทั้งหมด ${rows.length} คน`} />
       <DataToolbar query={query} onQueryChange={setQuery} placeholder="ค้นหาสมาชิก..." />
-      <Card className="rounded-3xl overflow-hidden">
+      <Card className=" overflow-hidden">
         <CardContent className="p-0">
           {rows.length === 0 ? (
             <div className="p-6">

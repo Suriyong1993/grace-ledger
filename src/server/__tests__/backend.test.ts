@@ -31,16 +31,23 @@ import {
   moneySchema,
 } from "@/server/domain/validation";
 import { DEFAULT_CHART_OF_ACCOUNTS } from "@/server/domain/chart-of-accounts";
-import { churches, users, funds, chartOfAccounts, fiscalPeriods, journalEntries } from "@/db/schema";
+import {
+  churches,
+  users,
+  funds,
+  chartOfAccounts,
+  fiscalPeriods,
+  journalEntries,
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 // Test session tokens
 let adminToken: string;
-let pastorToken: string;
-let treasurerToken: string;
+let staffToken: string;
+let staff2Token: string;
 let adminUserId: string;
-let pastorUserId: string;
-let treasurerUserId: string;
+let staffUserId: string;
+let staff2UserId: string;
 let churchId: string;
 let fundId: string;
 
@@ -66,41 +73,47 @@ beforeAll(async () => {
   });
   adminToken = adminLogin.token;
 
-  // Create pastor user
-  const pastorHash = await PasswordService.hashPassword("Pastor@Pass123!");
-  const [pastor] = await db.insert(users).values({
-    churchId,
-    name: "ศิษยาภิบาลทดสอบ",
-    role: "pastor",
-    passwordHash: pastorHash,
-    isActive: true,
-  }).returning();
-  pastorUserId = pastor.id;
+  // Create staff user
+  const staffHash = await PasswordService.hashPassword("Pastor@Pass123!");
+  const [staff] = await db
+    .insert(users)
+    .values({
+      churchId,
+      name: "ศิษยาภิบาลทดสอบ",
+      role: "admin",
+      passwordHash: staffHash,
+      isActive: true,
+    })
+    .returning();
+  staffUserId = staff.id;
 
-  const pastorLogin = await AuthService.login({
+  const staffLogin = await AuthService.login({
     churchId,
     username: "ศิษยาภิบาลทดสอบ",
     password: "Pastor@Pass123!",
   });
-  pastorToken = pastorLogin.token;
+  staffToken = staffLogin.token;
 
-  // Create treasurer user
-  const treasurerHash = await PasswordService.hashPassword("Treas@Pass123!");
-  const [treasurer] = await db.insert(users).values({
-    churchId,
-    name: "เหรัญญิกทดสอบ",
-    role: "treasurer",
-    passwordHash: treasurerHash,
-    isActive: true,
-  }).returning();
-  treasurerUserId = treasurer.id;
+  // Create staff2 user
+  const staff2Hash = await PasswordService.hashPassword("Treas@Pass123!");
+  const [staff2] = await db
+    .insert(users)
+    .values({
+      churchId,
+      name: "เหรัญญิกทดสอบ",
+      role: "admin",
+      passwordHash: staff2Hash,
+      isActive: true,
+    })
+    .returning();
+  staff2UserId = staff2.id;
 
-  const treasurerLogin = await AuthService.login({
+  const staff2Login = await AuthService.login({
     churchId,
     username: "เหรัญญิกทดสอบ",
     password: "Treas@Pass123!",
   });
-  treasurerToken = treasurerLogin.token;
+  staff2Token = staff2Login.token;
 
   // Get a fund
   const fundList = await FundService.listFunds(churchId);
@@ -114,13 +127,13 @@ beforeAll(async () => {
 describe("Money", () => {
   it("creates from baht string", () => {
     const m = Money.fromBaht("100.50");
-    expect(m.toNumber()).toBe(100.50);
+    expect(m.toNumber()).toBe(100.5);
   });
 
   it("handles addition", () => {
     const a = Money.fromBaht("10.00");
     const b = Money.fromBaht("20.50");
-    expect(a.add(b).toNumber()).toBe(30.50);
+    expect(a.add(b).toNumber()).toBe(30.5);
   });
 
   it("handles subtraction", () => {
@@ -160,50 +173,58 @@ describe("Validation", () => {
   });
 
   it("validates login input", () => {
-    expect(() => loginSchema.parse({
-      churchName: "My Church",
-      username: "user",
-      password: "pass",
-    })).not.toThrow();
+    expect(() =>
+      loginSchema.parse({
+        churchName: "My Church",
+        username: "user",
+        password: "pass",
+      }),
+    ).not.toThrow();
   });
 
   it("rejects short passwords", () => {
-    expect(() => changePasswordSchema.parse({
-      currentPassword: "old",
-      newPassword: "short",
-    })).toThrow();
+    expect(() =>
+      changePasswordSchema.parse({
+        currentPassword: "old",
+        newPassword: "short",
+      }),
+    ).toThrow();
   });
 
   it("validates strong passwords", () => {
-    expect(() => changePasswordSchema.parse({
-      currentPassword: "oldpassword1!",
-      newPassword: "NewPass@2026!",
-    })).not.toThrow();
+    expect(() =>
+      changePasswordSchema.parse({
+        currentPassword: "oldpassword1!",
+        newPassword: "NewPass@2026!",
+      }),
+    ).not.toThrow();
   });
 
   it("validates journal entry schema", () => {
-    expect(() => createJournalEntrySchema.parse({
-      entryType: "offering",
-      postingDate: "2026-07-22",
-      description: "Test offering entry",
-      fundId: "550e8400-e29b-41d4-a716-446655440000",
-      fiscalYear: 2026,
-      fiscalPeriod: 7,
-      lines: [
-        {
-          accountId: "550e8400-e29b-41d4-a716-446655440001",
-          lineType: "debit",
-          amount: "100.00",
-          fundId: "550e8400-e29b-41d4-a716-446655440000",
-        },
-        {
-          accountId: "550e8400-e29b-41d4-a716-446655440002",
-          lineType: "credit",
-          amount: "100.00",
-          fundId: "550e8400-e29b-41d4-a716-446655440000",
-        },
-      ],
-    })).not.toThrow();
+    expect(() =>
+      createJournalEntrySchema.parse({
+        entryType: "offering",
+        postingDate: "2026-07-22",
+        description: "Test offering entry",
+        fundId: "550e8400-e29b-41d4-a716-446655440000",
+        fiscalYear: 2026,
+        fiscalPeriod: 7,
+        lines: [
+          {
+            accountId: "550e8400-e29b-41d4-a716-446655440001",
+            lineType: "debit",
+            amount: "100.00",
+            fundId: "550e8400-e29b-41d4-a716-446655440000",
+          },
+          {
+            accountId: "550e8400-e29b-41d4-a716-446655440002",
+            lineType: "credit",
+            amount: "100.00",
+            fundId: "550e8400-e29b-41d4-a716-446655440000",
+          },
+        ],
+      }),
+    ).not.toThrow();
   });
 });
 
@@ -218,18 +239,18 @@ describe("Authorization", () => {
     expect(hasPermission("super_admin", "fund.manage")).toBe(true);
   });
 
-  it("treasurer cannot approve (CF-1)", () => {
-    expect(hasPermission("treasurer", "journal.approve")).toBe(false);
-    expect(hasPermission("treasurer", "offering.approve")).toBe(false);
+  it("admin can approve journal and offerings", () => {
+    expect(hasPermission("admin", "journal.approve")).toBe(true);
+    expect(hasPermission("admin", "offering.approve")).toBe(true);
   });
 
-  it("treasurer can write journal entries", () => {
-    expect(hasPermission("treasurer", "journal.write")).toBe(true);
+  it("admin can write journal entries", () => {
+    expect(hasPermission("admin", "journal.write")).toBe(true);
   });
 
-  it("pastor can approve single amounts", () => {
-    expect(canApproveAmount("pastor", 1000)).toBe(true);
-    expect(canApproveAmount("pastor", 10000)).toBe(true);
+  it("admin can approve single amounts", () => {
+    expect(canApproveAmount("admin", 1000)).toBe(true);
+    expect(canApproveAmount("admin", 10000)).toBe(true);
   });
 
   it("amount > 50,000 requires dual approval", () => {
@@ -237,16 +258,16 @@ describe("Authorization", () => {
     expect(threshold.requiresDualApproval).toBe(true);
   });
 
-  it("viewer has read-only access", () => {
-    expect(hasPermission("viewer", "journal.read")).toBe(true);
-    expect(hasPermission("viewer", "journal.write")).toBe(false);
-    expect(hasPermission("viewer", "fund.manage")).toBe(false);
+  it("admin has write access for journals", () => {
+    expect(hasPermission("admin", "journal.read")).toBe(true);
+    expect(hasPermission("admin", "journal.write")).toBe(true);
+    expect(hasPermission("admin", "fund.manage")).toBe(false);
   });
 
-  it("auditor can read journal, funds, audit; no PII", () => {
-    expect(hasPermission("auditor", "journal.read")).toBe(true);
-    expect(hasPermission("auditor", "audit.read")).toBe(true);
-    expect(hasPermission("auditor", "fund.read")).toBe(true);
+  it("admin can read journal, funds, audit", () => {
+    expect(hasPermission("admin", "journal.read")).toBe(true);
+    expect(hasPermission("admin", "audit.read")).toBe(true);
+    expect(hasPermission("admin", "fund.read")).toBe(true);
   });
 });
 
@@ -256,21 +277,25 @@ describe("Authorization", () => {
 
 describe("Authentication", () => {
   it("rejects wrong password", async () => {
-    await expect(AuthService.login({
-      churchId,
-      username: "ผู้ดูแลระบบ",
-      password: "wrongpassword",
-    })).rejects.toThrow(AuthError);
+    await expect(
+      AuthService.login({
+        churchId,
+        username: "ผู้ดูแลระบบ",
+        password: "wrongpassword",
+      }),
+    ).rejects.toThrow(AuthError);
   });
 
   it("rejects inactive user", async () => {
     // Deactivate then try login
     await db.update(users).set({ isActive: false }).where(eq(users.id, adminUserId));
-    await expect(AuthService.login({
-      churchId,
-      username: "ผู้ดูแลระบบ",
-      password: "Admin@Grace2026!",
-    })).rejects.toThrow();
+    await expect(
+      AuthService.login({
+        churchId,
+        username: "ผู้ดูแลระบบ",
+        password: "Admin@Grace2026!",
+      }),
+    ).rejects.toThrow();
     // Re-activate
     await db.update(users).set({ isActive: true }).where(eq(users.id, adminUserId));
   });
@@ -303,9 +328,13 @@ describe("Journal Engine", () => {
 
   it("creates a balanced journal entry", async () => {
     // Get COA accounts
-    const accounts = await db.select().from(chartOfAccounts).where(eq(chartOfAccounts.churchId, churchId)).limit(5);
-    const cashAccount = accounts.find(a => a.accountCode === "1-1001")!;
-    const incomeAccount = accounts.find(a => a.accountCode === "4-4001")!;
+    const accounts = await db
+      .select()
+      .from(chartOfAccounts)
+      .where(eq(chartOfAccounts.churchId, churchId))
+      .limit(5);
+    const cashAccount = accounts.find((a) => a.accountCode === "1-1001")!;
+    const incomeAccount = accounts.find((a) => a.accountCode === "4-4001")!;
 
     const entry = await JournalService.createEntry(
       {
@@ -316,8 +345,18 @@ describe("Journal Engine", () => {
         fiscalYear: 2026,
         fiscalPeriod: 7,
         lines: [
-          { accountId: cashAccount.id, lineType: "debit", amount: Money.fromBaht("500.00"), fundId },
-          { accountId: incomeAccount.id, lineType: "credit", amount: Money.fromBaht("500.00"), fundId },
+          {
+            accountId: cashAccount.id,
+            lineType: "debit",
+            amount: Money.fromBaht("500.00"),
+            fundId,
+          },
+          {
+            accountId: incomeAccount.id,
+            lineType: "credit",
+            amount: Money.fromBaht("500.00"),
+            fundId,
+          },
         ],
       },
       churchId,
@@ -330,9 +369,13 @@ describe("Journal Engine", () => {
   });
 
   it("rejects unbalanced entries", async () => {
-    const accounts = await db.select().from(chartOfAccounts).where(eq(chartOfAccounts.churchId, churchId)).limit(5);
-    const cashAccount = accounts.find(a => a.accountCode === "1-1001")!;
-    const incomeAccount = accounts.find(a => a.accountCode === "4-4001")!;
+    const accounts = await db
+      .select()
+      .from(chartOfAccounts)
+      .where(eq(chartOfAccounts.churchId, churchId))
+      .limit(5);
+    const cashAccount = accounts.find((a) => a.accountCode === "1-1001")!;
+    const incomeAccount = accounts.find((a) => a.accountCode === "4-4001")!;
 
     await expect(
       JournalService.createEntry(
@@ -344,13 +387,23 @@ describe("Journal Engine", () => {
           fiscalYear: 2026,
           fiscalPeriod: 7,
           lines: [
-            { accountId: cashAccount.id, lineType: "debit", amount: Money.fromBaht("500.00"), fundId },
-            { accountId: incomeAccount.id, lineType: "credit", amount: Money.fromBaht("400.00"), fundId },
+            {
+              accountId: cashAccount.id,
+              lineType: "debit",
+              amount: Money.fromBaht("500.00"),
+              fundId,
+            },
+            {
+              accountId: incomeAccount.id,
+              lineType: "credit",
+              amount: Money.fromBaht("400.00"),
+              fundId,
+            },
           ],
         },
         churchId,
         adminUserId,
-      )
+      ),
     ).rejects.toThrow("UNBALANCED");
   });
 
@@ -360,12 +413,17 @@ describe("Journal Engine", () => {
 
   it("rejects self-approval", async () => {
     await expect(
-      JournalService.approveEntry(createdEntryId, adminUserId, "super_admin", churchId)
+      JournalService.approveEntry(createdEntryId, adminUserId, "super_admin", churchId),
     ).rejects.toThrow("SELF_APPROVAL");
   });
 
-  it("pastor approves the entry", async () => {
-    const entry = await JournalService.approveEntry(createdEntryId, pastorUserId, "pastor", churchId);
+  it("admin approves the entry", async () => {
+    const entry = await JournalService.approveEntry(
+      createdEntryId,
+      staffUserId,
+      "admin",
+      churchId,
+    );
     expect(entry.status).toBe("approved");
     expect(entry.entryNumber).toBeTruthy();
   });
@@ -382,8 +440,11 @@ describe("Funds", () => {
   });
 
   it("creates a new fund", async () => {
-    const accounts = await db.select().from(chartOfAccounts).where(eq(chartOfAccounts.churchId, churchId));
-    const equityAccount = accounts.find(a => a.accountCode === "3-3001")!;
+    const accounts = await db
+      .select()
+      .from(chartOfAccounts)
+      .where(eq(chartOfAccounts.churchId, churchId));
+    const equityAccount = accounts.find((a) => a.accountCode === "3-3001")!;
 
     const fund = await FundService.createFund(
       {
@@ -400,15 +461,18 @@ describe("Funds", () => {
   });
 
   it("rejects fund linking to non-equity account", async () => {
-    const accounts = await db.select().from(chartOfAccounts).where(eq(chartOfAccounts.churchId, churchId));
-    const assetAccount = accounts.find(a => a.accountCode === "1-1001")!;
+    const accounts = await db
+      .select()
+      .from(chartOfAccounts)
+      .where(eq(chartOfAccounts.churchId, churchId));
+    const assetAccount = accounts.find((a) => a.accountCode === "1-1001")!;
 
     await expect(
       FundService.createFund(
         { churchId, fundCode: "BAD", name: "Bad Fund", accountId: assetAccount.id },
         adminUserId,
         "ผู้ดูแลระบบ",
-      )
+      ),
     ).rejects.toThrow("INVALID_ACCOUNT_TYPE");
   });
 
@@ -537,12 +601,12 @@ describe("Audit Trail", () => {
 describe("Chart of Accounts", () => {
   it("has the correct default accounts", () => {
     expect(DEFAULT_CHART_OF_ACCOUNTS.length).toBe(30);
-    const equityAccounts = DEFAULT_CHART_OF_ACCOUNTS.filter(a => a.accountType === "equity");
+    const equityAccounts = DEFAULT_CHART_OF_ACCOUNTS.filter((a) => a.accountType === "equity");
     expect(equityAccounts.length).toBeGreaterThanOrEqual(5); // Includes 3-3005
   });
 
   it("includes Opening Balance Equity (3-3005)", () => {
-    const obe = DEFAULT_CHART_OF_ACCOUNTS.find(a => a.accountCode === "3-3005");
+    const obe = DEFAULT_CHART_OF_ACCOUNTS.find((a) => a.accountCode === "3-3005");
     expect(obe).toBeDefined();
     expect(obe!.accountType).toBe("equity");
   });
@@ -608,7 +672,9 @@ describe("Session Management", () => {
 
     await SessionService.invalidateAllSessions(adminUserId);
 
-    await expect(SessionService.validateSession(beforeLogin.token)).rejects.toThrow("Session revoked");
+    await expect(SessionService.validateSession(beforeLogin.token)).rejects.toThrow(
+      "Session revoked",
+    );
   });
 
   it("cleans up expired sessions", async () => {

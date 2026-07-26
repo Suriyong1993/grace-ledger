@@ -1,12 +1,12 @@
 /**
  * Grace Ledger v2 — Money Value Object
- * 
+ *
  * Immutable value object representing monetary amounts in Thai Baht.
  * Uses BigInt internally for exact satang (1/100 THB) precision.
- * 
+ *
  * CRITICAL FIX (MF-9): Rejects floating-point input. fromBaht() accepts
  * string only. All arithmetic uses BigInt multiplication/division.
- * 
+ *
  * CRITICAL FIX (CF-4): Money carries churchId for tenant isolation
  * on audit events emitted by money operations.
  */
@@ -20,7 +20,7 @@ export class Money {
   /** Create Money from a string baht amount, e.g. "100.50" = ฿100.50 */
   static fromBaht(baht: string): Money {
     // Parse string to avoid floating-point (MF-9 fix)
-    const cleaned = baht.replace(/[^\d.\-]/g, "");
+    const cleaned = baht.replace(/[^\d.-]/g, "");
     const parts = cleaned.split(".");
     const whole = BigInt(parts[0] || "0") * 100n;
     let satang = 0n;

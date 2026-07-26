@@ -29,7 +29,7 @@ function BudgetPage() {
       {q.isLoading ? (
         <div className="grid gap-4 md:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 rounded-3xl" />
+            <Skeleton key={i} className="h-40 " />
           ))}
         </div>
       ) : (
@@ -38,7 +38,7 @@ function BudgetPage() {
             const pct = Math.min(100, Math.round((b.used / b.amount) * 100));
             const alert = pct >= 90;
             return (
-              <Card key={b.id} className="rounded-3xl">
+              <Card key={b.id} className="">
                 <CardHeader className="flex flex-row items-start justify-between">
                   <div className="min-w-0">
                     <CardTitle className="text-lg truncate">{b.name}</CardTitle>

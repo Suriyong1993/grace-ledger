@@ -34,10 +34,7 @@ export class AuthService {
   /** Authenticate a user and create a session */
   static async login(input: LoginInput): Promise<LoginResult> {
     const user = await db.query.users.findFirst({
-      where: and(
-        eq(users.name, input.username),
-        eq(users.churchId, input.churchId),
-      ),
+      where: and(eq(users.name, input.username), eq(users.churchId, input.churchId)),
     });
 
     if (!user || !user.isActive) {
@@ -66,7 +63,8 @@ export class AuthService {
     }
 
     // Reset failed attempts on success
-    await db.update(users)
+    await db
+      .update(users)
       .set({ failedAttempts: 0, lockedUntil: null })
       .where(eq(users.id, user.id));
 
@@ -122,7 +120,8 @@ export class AuthService {
     }
 
     const newHash = await PasswordService.hashPassword(newPassword);
-    await db.update(users)
+    await db
+      .update(users)
       .set({
         passwordHash: newHash,
         passwordChangedAt: new Date(),

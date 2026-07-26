@@ -5,10 +5,20 @@
 import { FundService } from "@/server/services/fund.service";
 import { Money } from "@/server/domain/money";
 import { createFundSchema, updateFundSchema } from "@/server/domain/validation";
-import { requireAuth, wrapError, jsonResponse, errorResponse, requirePermission } from "@/server/api/middleware";
+import {
+  requireAuth,
+  wrapError,
+  jsonResponse,
+  errorResponse,
+  requirePermission,
+} from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 
-function route(method: "GET" | "POST" | "PUT", path: string, handler: RouteDefinition["handler"]): RouteDefinition {
+function route(
+  method: "GET" | "POST" | "PUT",
+  path: string,
+  handler: RouteDefinition["handler"],
+): RouteDefinition {
   return { method, path, handler };
 }
 

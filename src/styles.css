@@ -68,7 +68,7 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 0.25rem; /* Editorial: sharp corners, not pills */
   /* Emil Kowalski custom easings */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -175,40 +175,38 @@
 }
 
 @utility glass-card {
-  background: color-mix(in oklab, var(--color-card) 85%, transparent);
-  backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
-  box-shadow: 0 8px 32px -8px color-mix(in oklab, var(--color-primary) 12%, transparent);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: none;
 }
 
 @utility glass-topbar {
-  background: color-mix(in oklab, var(--color-background) 80%, transparent);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
 }
 
 @utility shadow-craft {
-  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.04), 0 10px 40px -12px color-mix(in oklab, var(--color-primary) 15%, transparent);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
 }
 
 @utility shadow-elegant {
-  box-shadow: 0 10px 40px -12px color-mix(in oklab, var(--color-primary) 25%, transparent);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 4px 12px -2px rgb(0 0 0 / 0.04);
 }
 
-/* Micro-interaction helpers */
+/* Micro-interaction helpers — functional, not decorative */
 .active-press {
-  transition: transform 160ms var(--ease-out), background-color 160ms ease, box-shadow 160ms ease;
+  transition: transform 120ms var(--ease-out), background-color 120ms ease;
 }
 .active-press:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .hover-lift {
-    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+    transition: background-color 120ms ease;
   }
   .hover-lift:hover {
-    transform: translateY(-1.5px);
+    background-color: var(--color-muted);
   }
 }
 

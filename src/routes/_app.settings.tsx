@@ -71,7 +71,8 @@ function SettingsPage() {
 
   // Category CRUD
   const createCat = useMutation({
-    mutationFn: (v: { name: string; color: string }) => createOfferingCategory(v, user!),
+    mutationFn: (v: { name: string; color: string; icon?: string }) =>
+      createOfferingCategory({ name: v.name, color: v.color, icon: v.icon ?? "Circle" }, user!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["offering-categories"] });
       toast.success("เพิ่มหมวดหมู่แล้ว");
@@ -153,7 +154,7 @@ function SettingsPage() {
       <PageHeader title="ตั้งค่า" description="ตั้งค่าระบบและจัดการหมวดหมู่" />
 
       {/* ── ข้อมูลระบบ ── */}
-      <Card className="rounded-3xl max-w-2xl">
+      <Card className=" max-w-2xl">
         <CardHeader>
           <CardTitle>ข้อมูลระบบ</CardTitle>
         </CardHeader>
@@ -163,7 +164,7 @@ function SettingsPage() {
           </p>
           <Button
             variant="outline"
-            className="rounded-2xl"
+            className=""
             onClick={() => {
               resetDb();
               qc.invalidateQueries();
@@ -176,16 +177,16 @@ function SettingsPage() {
       </Card>
 
       {/* ── จัดการหมวดหมู่เงินถวาย ── */}
-      <Card className="rounded-3xl max-w-2xl mt-6">
+      <Card className=" max-w-2xl mt-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>จัดการหมวดหมู่เงินถวาย</CardTitle>
           <Dialog open={newCatOpen} onOpenChange={setNewCatOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="rounded-2xl">
+              <Button size="sm" className="">
                 <Plus className="h-4 w-4 mr-1" /> เพิ่มหมวดหมู่
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-3xl">
+            <DialogContent className="">
               <DialogHeader>
                 <DialogTitle>เพิ่มหมวดหมู่ใหม่</DialogTitle>
               </DialogHeader>
@@ -380,7 +381,7 @@ function SettingsPage() {
                                   <Plus className="h-3.5 w-3.5 mr-1" /> เพิ่มประเภทย่อย
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className="rounded-3xl">
+                              <DialogContent className="">
                                 <DialogHeader>
                                   <DialogTitle>เพิ่มประเภทย่อยใน "{cat.name}"</DialogTitle>
                                 </DialogHeader>
@@ -433,7 +434,7 @@ function SettingsPage() {
           if (!v) setEditingCat(null);
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>แก้ไขหมวดหมู่</DialogTitle>
           </DialogHeader>
@@ -493,7 +494,7 @@ function SettingsPage() {
           if (!v) setEditingSub(null);
         }}
       >
-        <DialogContent className="rounded-3xl">
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>แก้ไขประเภทย่อย</DialogTitle>
           </DialogHeader>
@@ -533,7 +534,7 @@ function SettingsPage() {
           if (!v) setDeleteCatId(null);
         }}
       >
-        <AlertDialogContent className="rounded-3xl">
+        <AlertDialogContent className="">
           <AlertDialogHeader>
             <AlertDialogTitle>ลบหมวดหมู่?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -562,7 +563,7 @@ function SettingsPage() {
           if (!v) setDeleteSubId(null);
         }}
       >
-        <AlertDialogContent className="rounded-3xl">
+        <AlertDialogContent className="">
           <AlertDialogHeader>
             <AlertDialogTitle>ลบประเภทย่อย?</AlertDialogTitle>
             <AlertDialogDescription>

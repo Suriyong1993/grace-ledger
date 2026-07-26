@@ -1,12 +1,26 @@
 import { db } from "@/server/infrastructure/db";
 import { offeringCountSheets, journalEntries } from "@/db/schema";
-import { createCountSheetSchema, submitCountSchema, lockCountSheetSchema } from "@/server/domain/validation";
-import { requireAuth, wrapError, jsonResponse, errorResponse, requirePermission } from "@/server/api/middleware";
+import {
+  createCountSheetSchema,
+  submitCountSchema,
+  lockCountSheetSchema,
+} from "@/server/domain/validation";
+import {
+  requireAuth,
+  wrapError,
+  jsonResponse,
+  errorResponse,
+  requirePermission,
+} from "@/server/api/middleware";
 import { Money } from "@/server/domain/money";
 import type { RouteDefinition } from "@/server/api/routes";
 import { eq, and } from "drizzle-orm";
 
-function route(method: "GET" | "POST", path: string, handler: RouteDefinition["handler"]): RouteDefinition {
+function route(
+  method: "GET" | "POST",
+  path: string,
+  handler: RouteDefinition["handler"],
+): RouteDefinition {
   return { method, path, handler };
 }
 
@@ -18,7 +32,10 @@ export const offeringRoutes: RouteDefinition[] = [
       const date = query.get("date");
       const conditions = [eq(offeringCountSheets.churchId, ctx.session.churchId)];
       if (date) conditions.push(eq(offeringCountSheets.date, date));
-      const sheets = await db.select().from(offeringCountSheets).where(and(...conditions));
+      const sheets = await db
+        .select()
+        .from(offeringCountSheets)
+        .where(and(...conditions));
       return jsonResponse(sheets);
     });
   }),
@@ -29,13 +46,16 @@ export const offeringRoutes: RouteDefinition[] = [
       requirePermission(ctx.session, "offering.count");
       const body = await request.json();
       const input = createCountSheetSchema.parse(body);
-      const [sheet] = await db.insert(offeringCountSheets).values({
-        churchId: ctx.session.churchId,
-        date: input.date,
-        counter1Id: ctx.session.userId,
-        counter2Id: input.counter2Id,
-        counter3Id: input.counter3Id ?? null,
-      }).returning();
+      const [sheet] = await db
+        .insert(offeringCountSheets)
+        .values({
+          churchId: ctx.session.churchId,
+          date: input.date,
+          counter1Id: ctx.session.userId,
+          counter2Id: input.counter2Id,
+          counter3Id: input.counter3Id ?? null,
+        })
+        .returning();
       return jsonResponse(sheet, 201);
     });
   }),
@@ -47,7 +67,10 @@ export const offeringRoutes: RouteDefinition[] = [
       const body = await request.json();
       const input = submitCountSchema.parse(body);
       const sheet = await db.query.offeringCountSheets.findFirst({
-        where: and(eq(offeringCountSheets.id, params.sheetId), eq(offeringCountSheets.churchId, ctx.session.churchId)),
+        where: and(
+          eq(offeringCountSheets.id, params.sheetId),
+          eq(offeringCountSheets.churchId, ctx.session.churchId),
+        ),
       });
       if (!sheet) return errorResponse(404, "NOT_FOUND", "Count sheet not found");
 
@@ -72,7 +95,7 @@ export const offeringRoutes: RouteDefinition[] = [
       ].filter(Boolean);
 
       if (allAmounts.length >= 2) {
-        const amounts = allAmounts.filter(a => a !== null) as string[];
+        const amounts = allAmounts.filter((a) => a !== null) as string[];
         if (new Set(amounts).size > 1) {
           updates.status = "discrepancy";
         } else if (allAmounts.length >= 2) {
@@ -80,7 +103,9 @@ export const offeringRoutes: RouteDefinition[] = [
         }
       }
 
-      await db.update(offeringCountSheets).set(updates)
+      await db
+        .update(offeringCountSheets)
+        .set(updates)
         .where(eq(offeringCountSheets.id, params.sheetId));
 
       const updated = await db.query.offeringCountSheets.findFirst({
@@ -97,20 +122,30 @@ export const offeringRoutes: RouteDefinition[] = [
       const body = await request.json();
       const input = lockCountSheetSchema.parse(body);
       const sheet = await db.query.offeringCountSheets.findFirst({
-        where: and(eq(offeringCountSheets.id, params.sheetId), eq(offeringCountSheets.churchId, ctx.session.churchId)),
+        where: and(
+          eq(offeringCountSheets.id, params.sheetId),
+          eq(offeringCountSheets.churchId, ctx.session.churchId),
+        ),
       });
       if (!sheet) return errorResponse(404, "NOT_FOUND", "Count sheet not found");
-      if (sheet.status === "locked") return errorResponse(400, "ALREADY_LOCKED", "Sheet already locked");
+      if (sheet.status === "locked")
+        return errorResponse(400, "ALREADY_LOCKED", "Sheet already locked");
 
-      await db.update(offeringCountSheets).set({
-        reconciledAmount: Money.fromBaht(input.reconciledAmount).toSqlDecimal(),
-        status: "locked",
-        lockedBy: ctx.session.userId,
-        lockedAt: new Date(),
-        updatedAt: new Date(),
-      }).where(eq(offeringCountSheets.id, params.sheetId));
+      await db
+        .update(offeringCountSheets)
+        .set({
+          reconciledAmount: Money.fromBaht(input.reconciledAmount).toSqlDecimal(),
+          status: "locked",
+          lockedBy: ctx.session.userId,
+          lockedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(offeringCountSheets.id, params.sheetId));
 
-      return jsonResponse({ success: true, note: "Count sheet locked. Create a journal entry separately to record the offering." });
+      return jsonResponse({
+        success: true,
+        note: "Count sheet locked. Create a journal entry separately to record the offering.",
+      });
     });
   }),
 ];

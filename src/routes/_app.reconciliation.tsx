@@ -210,11 +210,11 @@ function ReconciliationPage() {
         actions={
           <div className="flex items-center gap-2">
             <Select value={period} onValueChange={(v: Period) => setPeriod(v)}>
-              <SelectTrigger className="w-44 rounded-2xl">
+              <SelectTrigger className="w-44 ">
                 <CalendarDays className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="rounded-2xl">
+              <SelectContent className="">
                 {(["this_week", "this_month", "last_week", "last_month", "custom"] as Period[]).map(
                   (p) => (
                     <SelectItem key={p} value={p}>
@@ -247,13 +247,13 @@ function ReconciliationPage() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-48 rounded-3xl" />
-          <Skeleton className="h-64 rounded-3xl" />
+          <Skeleton className="h-48 " />
+          <Skeleton className="h-64 " />
         </div>
       ) : (
         <>
           {/* ============ SUMMARY STATEMENT ============ */}
-          <Card className="rounded-3xl overflow-hidden">
+          <Card className=" overflow-hidden">
             <CardHeader className="bg-primary/5 border-b">
               <CardTitle className="text-base flex items-center gap-2">
                 <FileBarChart2 className="h-5 w-5 text-primary" />
@@ -271,7 +271,7 @@ function ReconciliationPage() {
                       <p className="text-xs text-muted-foreground">ก่อนวันที่ {fmtDate(start)}</p>
                     </div>
                   </div>
-                  <MoneyText value={openingBalance} tone="primary" />
+                  <MoneyText value={openingBalance} tone="default" />
                 </div>
 
                 {/* Income */}
@@ -351,7 +351,7 @@ function ReconciliationPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
             {/* ============ CHANNEL BREAKDOWN ============ */}
-            <Card className="rounded-3xl">
+            <Card className="">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Landmark className="h-5 w-5 text-primary" />
@@ -400,7 +400,7 @@ function ReconciliationPage() {
             </Card>
 
             {/* ============ FUND BREAKDOWN ============ */}
-            <Card className="rounded-3xl">
+            <Card className="">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <PiggyBank className="h-5 w-5 text-primary" />
@@ -458,7 +458,7 @@ function ReconciliationPage() {
           </div>
 
           {/* ============ RECONCILIATION CHECK ============ */}
-          <Card className="rounded-3xl mt-4">
+          <Card className=" mt-4">
             <CardHeader className="border-b">
               <CardTitle className="text-base flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -473,13 +473,13 @@ function ReconciliationPage() {
                     ยอดในระบบ
                   </p>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center p-3 rounded-2xl bg-muted/50">
+                    <div className="flex justify-between items-center p-3  bg-muted/50">
                       <span className="text-sm">ยอดยกมาตั้งต้น (Opening Balance)</span>
                       <span className="font-semibold tabular-nums">
                         {thb(funds.reduce((s, f) => s + f.openingBalance, 0))}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center p-3 rounded-2xl bg-success/5">
+                    <div className="flex justify-between items-center p-3  bg-success/5">
                       <span className="text-sm">รายรับทั้งหมด (รวมเงินถวาย)</span>
                       <span className="font-semibold tabular-nums text-success">
                         {thb(
@@ -488,13 +488,13 @@ function ReconciliationPage() {
                         )}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center p-3 rounded-2xl bg-destructive/5">
+                    <div className="flex justify-between items-center p-3  bg-destructive/5">
                       <span className="text-sm">รายจ่ายทั้งหมด</span>
                       <span className="font-semibold tabular-nums text-destructive">
                         {thb(expenses.reduce((s, x) => s + x.amount, 0))}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center p-4 rounded-2xl bg-primary/10 border-2 border-primary/20">
+                    <div className="flex justify-between items-center p-4  bg-primary/10 border-2 border-primary/20">
                       <span className="text-sm font-bold">ยอดคงเหลือในระบบ</span>
                       <span className="text-lg font-bold tabular-nums text-primary">
                         {thb(currentBalance)}
@@ -514,7 +514,7 @@ function ReconciliationPage() {
                       <Input
                         type="number"
                         step="0.01"
-                        className="rounded-2xl mt-1.5 h-12 text-lg"
+                        className=" mt-1.5 h-12 text-lg"
                         placeholder="0.00"
                         value={actualCash}
                         onChange={(e) => setActualCash(e.target.value)}
@@ -525,7 +525,7 @@ function ReconciliationPage() {
                       <Input
                         type="number"
                         step="0.01"
-                        className="rounded-2xl mt-1.5 h-12 text-lg"
+                        className=" mt-1.5 h-12 text-lg"
                         placeholder="0.00"
                         value={actualBank}
                         onChange={(e) => setActualBank(e.target.value)}
@@ -536,7 +536,7 @@ function ReconciliationPage() {
                       <motion.div
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`p-4 rounded-2xl border-2 ${
+                        className={`p-4  border-2 ${
                           isBalanced
                             ? "bg-success/10 border-success/30"
                             : "bg-destructive/10 border-destructive/30"

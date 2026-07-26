@@ -33,6 +33,9 @@ export class AuditService {
    */
   static async log(input: AuditEntryInput): Promise<void> {
     const correlationId = input.correlationId ?? crypto.randomUUID();
+    // CRITICAL: Use a single timestamp for both hashing and storage
+    // so that verifyChain() can reproduce the exact same hash.
+    const now = new Date();
 
     // Get the last audit entry's hash for this church (CF-3: per-church chain)
     const lastEntry = await db.query.auditLog.findFirst({
@@ -43,7 +46,7 @@ export class AuditService {
 
     const previousHash = lastEntry?.currentHash ?? null;
 
-    // Build the payload for hashing
+    // Build the payload for hashing — timestamp MUST match the stored createdAt
     const payload = JSON.stringify({
       churchId: input.churchId,
       eventType: input.eventType,
@@ -56,7 +59,7 @@ export class AuditService {
       afterState: input.afterState,
       correlationId,
       previousHash,
-      timestamp: new Date().toISOString(),
+      timestamp: now.toISOString(),
     });
 
     const currentHash = createHash("sha256").update(payload).digest("hex");
@@ -76,6 +79,7 @@ export class AuditService {
       correlationId,
       previousHash,
       currentHash,
+      createdAt: now, // Use the same timestamp that was hashed
     });
   }
 

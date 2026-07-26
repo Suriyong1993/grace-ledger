@@ -19,6 +19,7 @@ import { Route as AppProjectsRouteImport } from './routes/_app.projects'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppOfferingRouteImport } from './routes/_app.offering'
 import { Route as AppMembersRouteImport } from './routes/_app.members'
+import { Route as AppLineSetupRouteImport } from './routes/_app.line-setup'
 import { Route as AppIncomeRouteImport } from './routes/_app.income'
 import { Route as AppFundsRouteImport } from './routes/_app.funds'
 import { Route as AppExpenseRouteImport } from './routes/_app.expense'
@@ -75,6 +76,11 @@ const AppMembersRoute = AppMembersRouteImport.update({
   path: '/members',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLineSetupRoute = AppLineSetupRouteImport.update({
+  id: '/line-setup',
+  path: '/line-setup',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppIncomeRoute = AppIncomeRouteImport.update({
   id: '/income',
   path: '/income',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/expense': typeof AppExpenseRoute
   '/funds': typeof AppFundsRoute
   '/income': typeof AppIncomeRoute
+  '/line-setup': typeof AppLineSetupRoute
   '/members': typeof AppMembersRoute
   '/offering': typeof AppOfferingRoute
   '/profile': typeof AppProfileRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/expense': typeof AppExpenseRoute
   '/funds': typeof AppFundsRoute
   '/income': typeof AppIncomeRoute
+  '/line-setup': typeof AppLineSetupRoute
   '/members': typeof AppMembersRoute
   '/offering': typeof AppOfferingRoute
   '/profile': typeof AppProfileRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/_app/expense': typeof AppExpenseRoute
   '/_app/funds': typeof AppFundsRoute
   '/_app/income': typeof AppIncomeRoute
+  '/_app/line-setup': typeof AppLineSetupRoute
   '/_app/members': typeof AppMembersRoute
   '/_app/offering': typeof AppOfferingRoute
   '/_app/profile': typeof AppProfileRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/expense'
     | '/funds'
     | '/income'
+    | '/line-setup'
     | '/members'
     | '/offering'
     | '/profile'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/expense'
     | '/funds'
     | '/income'
+    | '/line-setup'
     | '/members'
     | '/offering'
     | '/profile'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/_app/expense'
     | '/_app/funds'
     | '/_app/income'
+    | '/_app/line-setup'
     | '/_app/members'
     | '/_app/offering'
     | '/_app/profile'
@@ -292,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMembersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/line-setup': {
+      id: '/_app/line-setup'
+      path: '/line-setup'
+      fullPath: '/line-setup'
+      preLoaderRoute: typeof AppLineSetupRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/income': {
       id: '/_app/income'
       path: '/income'
@@ -344,6 +363,7 @@ interface AppRouteChildren {
   AppExpenseRoute: typeof AppExpenseRoute
   AppFundsRoute: typeof AppFundsRoute
   AppIncomeRoute: typeof AppIncomeRoute
+  AppLineSetupRoute: typeof AppLineSetupRoute
   AppMembersRoute: typeof AppMembersRoute
   AppOfferingRoute: typeof AppOfferingRoute
   AppProfileRoute: typeof AppProfileRoute
@@ -360,6 +380,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppExpenseRoute: AppExpenseRoute,
   AppFundsRoute: AppFundsRoute,
   AppIncomeRoute: AppIncomeRoute,
+  AppLineSetupRoute: AppLineSetupRoute,
   AppMembersRoute: AppMembersRoute,
   AppOfferingRoute: AppOfferingRoute,
   AppProfileRoute: AppProfileRoute,

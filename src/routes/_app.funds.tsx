@@ -35,7 +35,7 @@ function FundsPage() {
       {fundsQ.isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-56 rounded-3xl" />
+            <Skeleton key={i} className="h-56 " />
           ))}
         </div>
       ) : (
@@ -52,7 +52,7 @@ function FundsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="rounded-3xl overflow-hidden">
+                <Card className=" overflow-hidden">
                   <CardHeader className="flex flex-row items-start justify-between">
                     <div className="min-w-0">
                       <CardTitle className="text-lg truncate">{f.name}</CardTitle>
@@ -60,7 +60,7 @@ function FundsPage() {
                         ยอดตั้งต้น {thb(f.openingBalance)}
                       </p>
                     </div>
-                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+                    <div className="grid h-11 w-11 shrink-0 place-items-center  bg-primary/10 text-primary">
                       <Wallet className="h-5 w-5" />
                     </div>
                   </CardHeader>
@@ -70,7 +70,7 @@ function FundsPage() {
                     </p>
                     <p className="text-xs text-muted-foreground">ยอดคงเหลือปัจจุบัน</p>
                     <div className="grid grid-cols-2 gap-2 mt-4">
-                      <div className="rounded-2xl bg-success/10 p-3">
+                      <div className=" bg-success/10 p-3">
                         <div className="flex items-center gap-1 text-xs text-success">
                           <TrendingUp className="h-3 w-3" /> รายรับ
                         </div>
@@ -78,7 +78,7 @@ function FundsPage() {
                           {thb(income + offering)}
                         </p>
                       </div>
-                      <div className="rounded-2xl bg-destructive/10 p-3">
+                      <div className=" bg-destructive/10 p-3">
                         <div className="flex items-center gap-1 text-xs text-destructive">
                           <TrendingDown className="h-3 w-3" /> รายจ่าย
                         </div>

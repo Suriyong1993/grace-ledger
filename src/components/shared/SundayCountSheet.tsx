@@ -1,5 +1,16 @@
 import { useState, useMemo } from "react";
-import { Plus, Trash2, Printer, CheckCircle2, Calculator, Users, Coins, FileSpreadsheet, AlertTriangle, ShieldCheck } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Printer,
+  CheckCircle2,
+  Calculator,
+  Users,
+  Coins,
+  FileSpreadsheet,
+  AlertTriangle,
+  ShieldCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -64,7 +75,17 @@ export function SundayCountSheet() {
 
   // Tab 2: ใบนับธนบัตรและเหรียญ
   const [counts, setCounts] = useState<Record<number, number>>({
-    1000: 0, 500: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 2: 0, 1: 0, 0.5: 0, 0.25: 0,
+    1000: 0,
+    500: 0,
+    100: 0,
+    50: 0,
+    20: 0,
+    10: 0,
+    5: 0,
+    2: 0,
+    1: 0,
+    0.5: 0,
+    0.25: 0,
   });
 
   // Tab 3: รายจ่ายประจำวัน + ยอดออนไลน์แยก + ผู้นับเงิน
@@ -77,7 +98,18 @@ export function SundayCountSheet() {
   //  คำนวณสรุปยอด
   // =====================
   const categoryTotals = useMemo(() => {
-    const t = { tithe: 0, rent: 0, memorial: 0, mission: 0, special: 0, land: 0, party: 0, cash: 0, online: 0, total: 0 };
+    const t = {
+      tithe: 0,
+      rent: 0,
+      memorial: 0,
+      mission: 0,
+      special: 0,
+      land: 0,
+      party: 0,
+      cash: 0,
+      online: 0,
+      total: 0,
+    };
     for (const r of rows) {
       const s = rowSum(r);
       t.tithe += r.tithe;
@@ -94,9 +126,10 @@ export function SundayCountSheet() {
     return t;
   }, [rows]);
 
-  const countedCashTotal = useMemo(() =>
-    Object.entries(counts).reduce((s, [d, q]) => s + Number(d) * (q || 0), 0),
-  [counts]);
+  const countedCashTotal = useMemo(
+    () => Object.entries(counts).reduce((s, [d, q]) => s + Number(d) * (q || 0), 0),
+    [counts],
+  );
 
   const cashDiff = countedCashTotal - categoryTotals.cash;
 
@@ -107,27 +140,26 @@ export function SundayCountSheet() {
     const checks: { label: string; pass: boolean; detail: string }[] = [];
 
     // 1. ตรวจรายชื่อ: ต้องมีอย่างน้อย 1 แถวที่มียอด > 0 และมีชื่อ
-    const filledRows = rows.filter(r => rowSum(r) > 0);
-    const noNameRows = filledRows.filter(r => !r.name.trim());
+    const filledRows = rows.filter((r) => rowSum(r) > 0);
+    const noNameRows = filledRows.filter((r) => !r.name.trim());
     checks.push({
       label: "ไม่มีรายการตกหล่น (ชื่อผู้ถวาย)",
       pass: filledRows.length > 0 && noNameRows.length === 0,
-      detail: filledRows.length === 0
-        ? "ยังไม่มีรายการถวาย"
-        : noNameRows.length > 0
-          ? `มี ${noNameRows.length} แถวที่มียอดเงินแต่ยังไม่ได้ใส่ชื่อ`
-          : `${filledRows.length} รายการ — ครบถ้วน`,
+      detail:
+        filledRows.length === 0
+          ? "ยังไม่มีรายการถวาย"
+          : noNameRows.length > 0
+            ? `มี ${noNameRows.length} แถวที่มียอดเงินแต่ยังไม่ได้ใส่ชื่อ`
+            : `${filledRows.length} รายการ — ครบถ้วน`,
     });
 
     // 2. ไม่มีข้อมูลซ้ำ (ชื่อซ้ำ + ช่องทางเดียวกัน)
-    const keys = filledRows.map(r => `${r.name.trim().toLowerCase()}|${r.channel}`);
+    const keys = filledRows.map((r) => `${r.name.trim().toLowerCase()}|${r.channel}`);
     const dupes = keys.filter((k, i) => keys.indexOf(k) !== i);
     checks.push({
       label: "ไม่มีข้อมูลซ้ำ (ชื่อ + ช่องทาง)",
       pass: dupes.length === 0,
-      detail: dupes.length === 0
-        ? "ไม่พบรายการซ้ำ"
-        : `พบ ${dupes.length} รายการซ้ำ`,
+      detail: dupes.length === 0 ? "ไม่พบรายการซ้ำ" : `พบ ${dupes.length} รายการซ้ำ`,
     });
 
     // 3. เงินสดจากการนับธนบัตร = ยอดเงินสดจากใบถวาย
@@ -150,23 +182,24 @@ export function SundayCountSheet() {
     checks.push({
       label: "เงินสด + ออนไลน์ = รายรับรวม",
       pass: channelSum === categoryTotals.total,
-      detail: channelSum === categoryTotals.total
-        ? `${thb(categoryTotals.cash)} + ${thb(categoryTotals.online)} = ${thb(categoryTotals.total)}`
-        : `ผลรวมไม่ตรง: ${thb(channelSum)} ≠ ${thb(categoryTotals.total)}`,
+      detail:
+        channelSum === categoryTotals.total
+          ? `${thb(categoryTotals.cash)} + ${thb(categoryTotals.online)} = ${thb(categoryTotals.total)}`
+          : `ผลรวมไม่ตรง: ${thb(channelSum)} ≠ ${thb(categoryTotals.total)}`,
     });
 
     return checks;
   }, [rows, categoryTotals, countedCashTotal, cashDiff]);
 
-  const allPassed = validationChecks.every(c => c.pass);
+  const allPassed = validationChecks.every((c) => c.pass);
 
   // =====================
   //  จัดการแถว
   // =====================
-  const addRow = () => setRows(prev => [...prev, emptyRow()]);
-  const removeRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
+  const addRow = () => setRows((prev) => [...prev, emptyRow()]);
+  const removeRow = (id: string) => setRows((prev) => prev.filter((r) => r.id !== id));
   const updateRow = (id: string, field: keyof MemberOfferingRow, val: string | number) =>
-    setRows(prev => prev.map(r => (r.id === id ? { ...r, [field]: val } : r)));
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: val } : r)));
 
   // =====================
   //  บันทึกข้อมูล
@@ -227,7 +260,19 @@ export function SundayCountSheet() {
       toast.success("บันทึกข้อมูลประจำวันอาทิตย์และอัปเดตรายงานสำเร็จ!");
       // Reset form
       setRows([emptyRow()]);
-      setCounts({ 1000: 0, 500: 0, 100: 0, 50: 0, 20: 0, 10: 0, 5: 0, 2: 0, 1: 0, 0.5: 0, 0.25: 0 });
+      setCounts({
+        1000: 0,
+        500: 0,
+        100: 0,
+        50: 0,
+        20: 0,
+        10: 0,
+        5: 0,
+        2: 0,
+        1: 0,
+        0.5: 0,
+        0.25: 0,
+      });
       setWeeklyExpense(0);
     },
     onError: (err) => {
@@ -241,20 +286,24 @@ export function SundayCountSheet() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="rounded-3xl border-border/60 backdrop-blur-xl">
+      <Card className=" border-border/60 ">
         <CardHeader className="flex flex-row items-center justify-between gap-4 pb-4">
           <div>
-            <CardTitle className="text-xl font-bold tracking-tight">ใบนับเงิน & สรุปการถวายประจำวันอาทิตย์</CardTitle>
-            <CardDescription className="text-xs">บันทึกยอดถวายรายบุคคล → นับธนบัตร → ตรวจสอบ → บันทึก</CardDescription>
+            <CardTitle className="text-xl font-bold tracking-tight">
+              ใบนับเงิน & สรุปการถวายประจำวันอาทิตย์
+            </CardTitle>
+            <CardDescription className="text-xs">
+              บันทึกยอดถวายรายบุคคล → นับธนบัตร → ตรวจสอบ → บันทึก
+            </CardDescription>
           </div>
           <div className="flex items-center gap-3">
             <Input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-2xl w-40 font-mono text-sm"
+              className=" w-40 font-mono text-sm"
             />
-            <Button variant="outline" className="rounded-2xl active:scale-95" onClick={() => window.print()}>
+            <Button variant="outline" className=" active:scale-95" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-2" /> พิมพ์
             </Button>
           </div>
@@ -263,7 +312,7 @@ export function SundayCountSheet() {
 
       {/* Main Tabs */}
       <Tabs defaultValue="member-list" className="space-y-4">
-        <TabsList className="rounded-2xl p-1 bg-muted/60">
+        <TabsList className=" p-1 bg-muted/60">
           <TabsTrigger value="member-list" className="rounded-xl">
             <Users className="h-4 w-4 mr-2" /> 1. รายการถวายรายบุคคล
           </TabsTrigger>
@@ -280,11 +329,13 @@ export function SundayCountSheet() {
 
         {/* ========== Tab 1: Member Matrix ========== */}
         <TabsContent value="member-list">
-          <Card className="rounded-3xl">
+          <Card className="">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="text-base">1. บันทึกรายการถวายรายบุคคล</CardTitle>
-                <CardDescription className="text-xs">กรอกชื่อผู้ถวาย ใส่ยอดเงินแต่ละหมวด เลือกช่องทาง เงินสด/ออนไลน์</CardDescription>
+                <CardDescription className="text-xs">
+                  กรอกชื่อผู้ถวาย ใส่ยอดเงินแต่ละหมวด เลือกช่องทาง เงินสด/ออนไลน์
+                </CardDescription>
               </div>
               <Button size="sm" onClick={addRow} className="rounded-xl active:scale-95">
                 <Plus className="h-4 w-4 mr-1" /> เพิ่มรายชื่อ
@@ -312,7 +363,10 @@ export function SundayCountSheet() {
                     const s = rowSum(r);
                     const hasAmountNoName = s > 0 && !r.name.trim();
                     return (
-                      <tr key={r.id} className={`transition-colors ${hasAmountNoName ? "bg-destructive/5" : "hover:bg-muted/30"}`}>
+                      <tr
+                        key={r.id}
+                        className={`transition-colors ${hasAmountNoName ? "bg-destructive/5" : "hover:bg-muted/30"}`}
+                      >
                         <td className="p-2">
                           <Input
                             value={r.name}
@@ -321,7 +375,17 @@ export function SundayCountSheet() {
                             className={`h-8 rounded-lg text-xs ${hasAmountNoName ? "border-destructive/60" : ""}`}
                           />
                         </td>
-                        {(["tithe", "rent", "memorial", "mission", "special", "land", "party"] as const).map(field => (
+                        {(
+                          [
+                            "tithe",
+                            "rent",
+                            "memorial",
+                            "mission",
+                            "special",
+                            "land",
+                            "party",
+                          ] as const
+                        ).map((field) => (
                           <td key={field} className="p-2">
                             <Input
                               type="number"
@@ -331,11 +395,15 @@ export function SundayCountSheet() {
                             />
                           </td>
                         ))}
-                        <td className="p-2 text-right font-mono font-semibold text-primary">{thb(s)}</td>
+                        <td className="p-2 text-right font-mono font-semibold text-primary">
+                          {thb(s)}
+                        </td>
                         <td className="p-2 text-center">
                           <select
                             value={r.channel}
-                            onChange={(e) => updateRow(r.id, "channel", e.target.value as "cash" | "bank")}
+                            onChange={(e) =>
+                              updateRow(r.id, "channel", e.target.value as "cash" | "bank")
+                            }
                             className="h-8 rounded-lg border border-border/60 bg-background px-2 text-xs"
                           >
                             <option value="cash">เงินสด</option>
@@ -343,7 +411,12 @@ export function SundayCountSheet() {
                           </select>
                         </td>
                         <td className="p-2 text-center">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10 rounded-lg" onClick={() => removeRow(r.id)}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-destructive hover:bg-destructive/10 rounded-lg"
+                            onClick={() => removeRow(r.id)}
+                          >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </td>
@@ -353,7 +426,9 @@ export function SundayCountSheet() {
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-border/80 bg-muted/60 font-bold font-mono text-xs">
-                    <td className="p-3">ยอดรวม ({rows.filter(r => rowSum(r) > 0).length} รายการ)</td>
+                    <td className="p-3">
+                      ยอดรวม ({rows.filter((r) => rowSum(r) > 0).length} รายการ)
+                    </td>
                     <td className="p-3 text-right">{thb(categoryTotals.tithe)}</td>
                     <td className="p-3 text-right">{thb(categoryTotals.rent)}</td>
                     <td className="p-3 text-right">{thb(categoryTotals.memorial)}</td>
@@ -361,8 +436,13 @@ export function SundayCountSheet() {
                     <td className="p-3 text-right">{thb(categoryTotals.special)}</td>
                     <td className="p-3 text-right">{thb(categoryTotals.land)}</td>
                     <td className="p-3 text-right">{thb(categoryTotals.party)}</td>
-                    <td className="p-3 text-right text-primary text-sm">{thb(categoryTotals.total)}</td>
-                    <td colSpan={2} className="p-3 text-center text-[11px] text-muted-foreground font-normal">
+                    <td className="p-3 text-right text-primary text-sm">
+                      {thb(categoryTotals.total)}
+                    </td>
+                    <td
+                      colSpan={2}
+                      className="p-3 text-center text-[11px] text-muted-foreground font-normal"
+                    >
                       เงินสด: {thb(categoryTotals.cash)} | ออนไลน์: {thb(categoryTotals.online)}
                     </td>
                   </tr>
@@ -375,10 +455,14 @@ export function SundayCountSheet() {
         {/* ========== Tab 2: Cash Count ========== */}
         <TabsContent value="cash-count">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 rounded-3xl">
+            <Card className="lg:col-span-2 ">
               <CardHeader>
-                <CardTitle className="text-base">2. บันทึกข้อมูลการนับเงิน (ธนบัตรและเหรียญ)</CardTitle>
-                <CardDescription className="text-xs">ใส่จำนวนฉบับ/เหรียญที่นับได้จริง → ระบบคำนวณยอดเงินสดทั้งหมดให้อัตโนมัติ</CardDescription>
+                <CardTitle className="text-base">
+                  2. บันทึกข้อมูลการนับเงิน (ธนบัตรและเหรียญ)
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  ใส่จำนวนฉบับ/เหรียญที่นับได้จริง → ระบบคำนวณยอดเงินสดทั้งหมดให้อัตโนมัติ
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -386,7 +470,10 @@ export function SundayCountSheet() {
                     const count = counts[d.value] || 0;
                     const subtotal = d.value * count;
                     return (
-                      <div key={d.value} className="flex items-center justify-between p-3 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm">
+                      <div
+                        key={d.value}
+                        className="flex items-center justify-between p-3  border border-border/50 bg-card/60 "
+                      >
                         <span className="text-sm font-medium w-28">{d.label}</span>
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground font-mono">x</span>
@@ -394,11 +481,15 @@ export function SundayCountSheet() {
                             type="number"
                             min="0"
                             value={count || ""}
-                            onChange={(e) => setCounts(prev => ({ ...prev, [d.value]: Number(e.target.value) }))}
+                            onChange={(e) =>
+                              setCounts((prev) => ({ ...prev, [d.value]: Number(e.target.value) }))
+                            }
                             className="w-20 h-9 rounded-xl text-center font-mono font-semibold"
                           />
                         </div>
-                        <span className="font-mono font-bold text-sm text-primary w-24 text-right">{thb(subtotal)}</span>
+                        <span className="font-mono font-bold text-sm text-primary w-24 text-right">
+                          {thb(subtotal)}
+                        </span>
                       </div>
                     );
                   })}
@@ -408,14 +499,14 @@ export function SundayCountSheet() {
 
             {/* Cash Reconciliation */}
             <div className="space-y-4">
-              <Card className="rounded-3xl border-border/60 backdrop-blur-xl">
+              <Card className=" border-border/60 ">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-primary" /> ยอดเงินสดทั้งหมด
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm font-mono">
-                  <div className="flex justify-between p-3 rounded-2xl bg-primary/10 border border-primary/30 text-primary font-bold text-base">
+                  <div className="flex justify-between p-3  bg-primary/10 border border-primary/30 text-primary font-bold text-base">
                     <span>เงินสดที่นับได้:</span>
                     <span>{thb(countedCashTotal)}</span>
                   </div>
@@ -424,7 +515,7 @@ export function SundayCountSheet() {
                     <span className="font-bold text-foreground">{thb(categoryTotals.cash)}</span>
                   </div>
                   <div
-                    className={`flex justify-between p-3 rounded-2xl border font-bold ${
+                    className={`flex justify-between p-3  border font-bold ${
                       cashDiff === 0
                         ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
                         : "bg-destructive/15 border-destructive/40 text-destructive"
@@ -441,16 +532,20 @@ export function SundayCountSheet() {
 
         {/* ========== Tab 3: Summary ========== */}
         <TabsContent value="summary">
-          <Card className="rounded-3xl">
+          <Card className="">
             <CardHeader>
               <CardTitle className="text-base">3. บันทึกสรุปยอดประจำวัน & ผู้นับเงิน</CardTitle>
-              <CardDescription className="text-xs">แยกยอดตามประเภท + สรุปเงินสด/ออนไลน์/รายรับ/รายจ่าย/คงเหลือ</CardDescription>
+              <CardDescription className="text-xs">
+                แยกยอดตามประเภท + สรุปเงินสด/ออนไลน์/รายรับ/รายจ่าย/คงเหลือ
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Category Breakdown */}
                 <div className="space-y-3">
-                  <h4 className="text-sm font-semibold text-foreground border-b pb-1">สรุปยอดตามประเภท</h4>
+                  <h4 className="text-sm font-semibold text-foreground border-b pb-1">
+                    สรุปยอดตามประเภท
+                  </h4>
                   <div className="space-y-1.5 text-sm font-mono">
                     {[
                       { label: "สิบลด", val: categoryTotals.tithe },
@@ -462,9 +557,16 @@ export function SundayCountSheet() {
                       { label: "ปาร์ตี้", val: categoryTotals.party },
                       { label: "ออนไลน์", val: categoryTotals.online },
                     ].map(({ label, val }) => (
-                      <div key={label} className="flex justify-between py-1.5 px-2 border-b border-border/30 rounded-lg hover:bg-muted/30 transition-colors">
+                      <div
+                        key={label}
+                        className="flex justify-between py-1.5 px-2 border-b border-border/30 rounded-lg hover:bg-muted/30 transition-colors"
+                      >
                         <span>{label}:</span>
-                        <span className={`font-semibold ${val > 0 ? "text-foreground" : "text-muted-foreground"}`}>{thb(val)}</span>
+                        <span
+                          className={`font-semibold ${val > 0 ? "text-foreground" : "text-muted-foreground"}`}
+                        >
+                          {thb(val)}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -472,7 +574,9 @@ export function SundayCountSheet() {
 
                 {/* Channel + Income/Expense */}
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-foreground border-b pb-1">สรุปรายรับ / รายจ่าย</h4>
+                  <h4 className="text-sm font-semibold text-foreground border-b pb-1">
+                    สรุปรายรับ / รายจ่าย
+                  </h4>
                   <div className="space-y-2 text-sm font-mono">
                     <div className="flex justify-between p-2.5 rounded-xl bg-muted/40">
                       <span>เงินสด:</span>
@@ -488,7 +592,9 @@ export function SundayCountSheet() {
                     </div>
 
                     <div className="space-y-1.5 pt-2">
-                      <label className="text-xs font-sans font-medium text-muted-foreground">รายจ่ายรวม:</label>
+                      <label className="text-xs font-sans font-medium text-muted-foreground">
+                        รายจ่ายรวม:
+                      </label>
                       <Input
                         type="number"
                         value={weeklyExpense || ""}
@@ -498,11 +604,13 @@ export function SundayCountSheet() {
                       />
                     </div>
 
-                    <div className={`flex justify-between p-3 rounded-2xl border font-bold text-base ${
-                      categoryTotals.total - weeklyExpense >= 0
-                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
-                        : "bg-destructive/15 border-destructive/40 text-destructive"
-                    }`}>
+                    <div
+                      className={`flex justify-between p-3  border font-bold text-base ${
+                        categoryTotals.total - weeklyExpense >= 0
+                          ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
+                          : "bg-destructive/15 border-destructive/40 text-destructive"
+                      }`}
+                    >
                       <span>คงเหลือ:</span>
                       <span>{thb(categoryTotals.total - weeklyExpense)}</span>
                     </div>
@@ -520,8 +628,15 @@ export function SundayCountSheet() {
                     { label: "ผู้นับเงินคนที่ 3", val: counter3, set: setCounter3 },
                   ].map(({ label, val, set }) => (
                     <div key={label}>
-                      <label className="text-xs text-muted-foreground font-medium mb-1 block">{label}</label>
-                      <Input value={val} onChange={(e) => set(e.target.value)} placeholder="ชื่อ-นามสกุล..." className="rounded-xl text-xs" />
+                      <label className="text-xs text-muted-foreground font-medium mb-1 block">
+                        {label}
+                      </label>
+                      <Input
+                        value={val}
+                        onChange={(e) => set(e.target.value)}
+                        placeholder="ชื่อ-นามสกุล..."
+                        className="rounded-xl text-xs"
+                      />
                     </div>
                   ))}
                 </div>
@@ -532,12 +647,14 @@ export function SundayCountSheet() {
 
         {/* ========== Tab 4: Validation & Save ========== */}
         <TabsContent value="validation">
-          <Card className="rounded-3xl">
+          <Card className="">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-primary" /> 4. ตรวจสอบความถูกต้องก่อนบันทึก
               </CardTitle>
-              <CardDescription className="text-xs">ระบบจะตรวจสอบข้อมูลทั้งหมดก่อนอนุญาตให้บันทึก ต้องผ่านทุกข้อจึงจะกดบันทึกได้</CardDescription>
+              <CardDescription className="text-xs">
+                ระบบจะตรวจสอบข้อมูลทั้งหมดก่อนอนุญาตให้บันทึก ต้องผ่านทุกข้อจึงจะกดบันทึกได้
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Checklist */}
@@ -545,30 +662,36 @@ export function SundayCountSheet() {
                 {validationChecks.map((c, i) => (
                   <div
                     key={i}
-                    className={`flex items-start gap-3 p-4 rounded-2xl border transition-colors ${
+                    className={`flex items-start gap-3 p-4  border transition-colors ${
                       c.pass
                         ? "bg-emerald-500/10 border-emerald-500/30"
                         : "bg-amber-500/10 border-amber-500/30"
                     }`}
                   >
-                    <div className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      c.pass ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
-                    }`}>
+                    <div
+                      className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        c.pass ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
+                      }`}
+                    >
                       {c.pass ? "✓" : "!"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold">{c.label}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5 font-mono">{c.detail}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5 font-mono">
+                        {c.detail}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Quick Summary */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 rounded-2xl bg-muted/40 border border-border/40 font-mono text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4  bg-muted/40 border border-border/40 font-mono text-sm">
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-1">รายรับรวม</div>
-                  <div className="font-bold text-primary text-base">{thb(categoryTotals.total)}</div>
+                  <div className="font-bold text-primary text-base">
+                    {thb(categoryTotals.total)}
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-xs text-muted-foreground mb-1">เงินสด</div>
@@ -594,7 +717,7 @@ export function SundayCountSheet() {
                 )}
                 <Button
                   size="lg"
-                  className="rounded-2xl px-8 py-6 text-base active:scale-95 disabled:opacity-50"
+                  className=" px-8 py-6 text-base active:scale-95 disabled:opacity-50"
                   disabled={!allPassed || saveMutation.isPending}
                   onClick={() => saveMutation.mutate()}
                 >

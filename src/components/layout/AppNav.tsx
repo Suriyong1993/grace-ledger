@@ -13,6 +13,7 @@ import {
   Settings,
   UserCircle2,
   FileSpreadsheet,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,18 +23,25 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
+// Primary navigation — simplified for AI Expense Tracker UX
 export const NAV: NavItem[] = [
-  { to: "/dashboard", label: "ภาพรวม (แดชบอร์ด)", icon: LayoutDashboard },
-  { to: "/offering", label: "บันทึกเงินถวายวันอาทิตย์", icon: HandHeart },
-  { to: "/expense", label: "บันทึกรายจ่าย", icon: ArrowUpCircle },
-  { to: "/members", label: "รายชื่อสมาชิก", icon: Users },
-  { to: "/funds", label: "กองทุน & บัญชีธนาคาร", icon: Wallet },
-  { to: "/reports", label: "รายงานสรุปการเงิน", icon: FileBarChart2 },
-  { to: "/reconciliation", label: "กระทบยอดเงินสด", icon: FileSpreadsheet },
-  { to: "/settings", label: "ตั้งค่าระบบ", icon: Settings },
+  { to: "/dashboard", label: "หน้าแรก", icon: LayoutDashboard },
+  { to: "/expense", label: "รายจ่าย", icon: ArrowUpCircle },
+  { to: "/income", label: "รายรับ", icon: ArrowDownCircle },
+  { to: "/reports", label: "รายงาน", icon: FileBarChart2 },
+  { to: "/line-setup", label: "LINE", icon: MessageCircle },
+  { to: "/settings", label: "ตั้งค่า", icon: Settings },
 ];
 
-export const MOBILE_NAV: NavItem[] = [NAV[0], NAV[1], NAV[2], NAV[5]];
+// Secondary nav — still accessible via sidebar but not primary
+export const NAV_SECONDARY: NavItem[] = [
+  { to: "/offering", label: "เงินถวาย", icon: HandHeart },
+  { to: "/funds", label: "กองทุน", icon: Wallet },
+  { to: "/members", label: "สมาชิก", icon: Users },
+  { to: "/reconciliation", label: "กระทบยอด", icon: FileSpreadsheet },
+];
+
+export const MOBILE_NAV: NavItem[] = [NAV[0], NAV[1], NAV[2], NAV[3]];
 
 export function useCurrentPath() {
   return useRouterState({ select: (s) => s.location.pathname });

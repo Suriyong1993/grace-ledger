@@ -67,7 +67,10 @@ export class TransferService {
 
     // Get the COA equity accounts for both funds
     const fromAccount = await db.query.chartOfAccounts.findFirst({
-      where: and(eq(chartOfAccounts.id, fromFund.accountId), eq(chartOfAccounts.churchId, churchId)),
+      where: and(
+        eq(chartOfAccounts.id, fromFund.accountId),
+        eq(chartOfAccounts.churchId, churchId),
+      ),
     });
     const toAccount = await db.query.chartOfAccounts.findFirst({
       where: and(eq(chartOfAccounts.id, toFund.accountId), eq(chartOfAccounts.churchId, churchId)),

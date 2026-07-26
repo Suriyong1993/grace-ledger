@@ -79,11 +79,14 @@ export class SeedService {
     }
 
     // 1. Create church
-    const [church] = await db.insert(churches).values({
-      name: churchName,
-      fiscalYearStart,
-      currency,
-    }).returning();
+    const [church] = await db
+      .insert(churches)
+      .values({
+        name: churchName,
+        fiscalYearStart,
+        currency,
+      })
+      .returning();
 
     // 2. Seed chart of accounts
     for (const account of DEFAULT_CHART_OF_ACCOUNTS) {
@@ -116,9 +119,24 @@ export class SeedService {
 
     // 4. Create funds
     const defaultFunds = [
-      { code: "GEN", name: "กองทุนทั่วไป", accountCode: "3-3001", description: "กองทุนหลักของคริสตจักร" },
-      { code: "BLDG", name: "กองทุนอาคารและที่ดิน", accountCode: "3-3002", description: "กองทุนเพื่อที่ดินและสิ่งปลูกสร้าง" },
-      { code: "MISS", name: "กองทุนพันธกิจ", accountCode: "3-3003", description: "กองทุนเพื่อพันธกิจและมิชชั่น" },
+      {
+        code: "GEN",
+        name: "กองทุนทั่วไป",
+        accountCode: "3-3001",
+        description: "กองทุนหลักของคริสตจักร",
+      },
+      {
+        code: "BLDG",
+        name: "กองทุนอาคารและที่ดิน",
+        accountCode: "3-3002",
+        description: "กองทุนเพื่อที่ดินและสิ่งปลูกสร้าง",
+      },
+      {
+        code: "MISS",
+        name: "กองทุนพันธกิจ",
+        accountCode: "3-3003",
+        description: "กองทุนเพื่อพันธกิจและมิชชั่น",
+      },
     ];
 
     let fundsSeeded = 0;
@@ -141,13 +159,16 @@ export class SeedService {
 
     // 5. Create admin user
     const passwordHash = await PasswordService.hashPassword(adminPassword);
-    const [adminUser] = await db.insert(users).values({
-      churchId: church.id,
-      name: "ผู้ดูแลระบบ",
-      role: "super_admin",
-      passwordHash,
-      isActive: true,
-    }).returning();
+    const [adminUser] = await db
+      .insert(users)
+      .values({
+        churchId: church.id,
+        name: "ผู้ดูแลระบบ",
+        role: "super_admin",
+        passwordHash,
+        isActive: true,
+      })
+      .returning();
 
     // 6. Create app settings
     await db.insert(appSettings).values({

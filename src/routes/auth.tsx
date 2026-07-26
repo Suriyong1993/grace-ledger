@@ -1,257 +1,311 @@
-// src/routes/auth.tsx — Updated: Supabase Auth (email/password) replaces PIN 6 digits
-// Changes made:
-// 1. Removed PinPad component (was for insecure PIN login)
-// 2. Removed loadDb() + demoUsers (mock data — Supabase DB is now real)
-// 3. Added email/password form with validation
-// 4. Added "Forgot password?" link (Supabase handles password reset)
-// 5. Added "Don't have an account? Sign up" link
-// 6. Removed useAuth() for login only — useAuth() still provides signUp/signOut if needed
-// 7. Uses Supabase Auth signInWithPassword() — credentials go to Supabase (bcrypt + argon2 hashed)
-// 8. onSubmit: email + password → Supabase session → redirect to /dashboard
-// 9. If session exists → auto-redirect (same as before)
-//
-// Why this matters:
-// - PIN 6 digits stored in localStorage = no security (XSS steals it trivially)
-// - Email/password goes to Supabase Auth — server-side bcrypt hashing
-// - Supabase manages session in httpOnly cookies (not accessible to JS = safe from XSS)
-// - Supabase handles brute-force lockout, password reset, email verification automatically
+// src/routes/auth.tsx — Number pad (PIN) login
+// Users select their name from a list, then enter a 6-digit PIN.
+// The PIN is sent to Supabase Auth as the password.
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Church, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Church, Delete, ArrowLeft, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/auth";
+import { useAuth, fetchLoginUsers, type LoginUser } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "เข้าสู่ระบบ — ระบบจัดการการเงินคริสตจักร" },
-      { name: "description", content: "เข้าสู่ระบบด้วยอีเมลและรหัสผ่าน" },
+      { name: "description", content: "เข้าสู่ระบบด้วยรหัส PIN" },
     ],
   }),
   component: AuthPage,
 });
 
 function AuthPage() {
-  const { user: authUser } = useAuth();
+  const { user: authUser, signIn } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [loginUsers, setLoginUsers] = useState<LoginUser[]>([]);
+  const [selectedUser, setSelectedUser] = useState<LoginUser | null>(null);
+  const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shake, setShake] = useState(false);
 
-  // Redirect if already logged in (same as previous PIN-based logic)
-  if (authUser) {
-    navigate({ to: "/dashboard", replace: true });
-    return null;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    // Validate
-    if (!email.trim() || !password) {
-      setError("กรุณากรอกอีเมลและรหัสผ่าน");
-      setLoading(false);
-      return;
+  // Redirect if already logged in
+  useEffect(() => {
+    if (authUser) {
+      navigate({ to: "/dashboard", replace: true });
     }
+  }, [authUser, navigate]);
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setError("รูปแบบอีเมลไม่ถูกต้อง");
-      setLoading(false);
-      return;
-    }
+  // Fetch user list on mount
+  useEffect(() => {
+    fetchLoginUsers().then(setLoginUsers);
+  }, []);
 
-    // Password length check (Supabase default min 6)
-    if (password.length < 6) {
-      setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { signIn } = useAuth();
-      // NOTE: signIn is from useAuth() hook, which calls supabase.auth.signInWithPassword()
-      // This triggers Supabase Auth flow — password verified server-side (bcrypt/argon2)
-      // On success: Supabase sets httpOnly session cookie + returns session
-      // On failure: generic "Invalid credentials" (prevents user enumeration)
-      const result = await signIn(email.trim(), password);
-
-      if (result) {
-        toast.success(`ยินดีต้อนรับ ${result.name}`);
-        navigate({ to: "/dashboard", replace: true });
-      } else {
-        setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+  // Auto-submit when PIN reaches 6 digits
+  const handlePinComplete = useCallback(
+    async (fullPin: string, user: LoginUser) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await signIn(user.email, fullPin);
+        if (result) {
+          toast.success(`ยินดีต้อนรับ ${result.name}`);
+          navigate({ to: "/dashboard", replace: true });
+        } else {
+          setError("ไม่พบข้อมูลผู้ใช้ในระบบ");
+          setShake(true);
+          setTimeout(() => setShake(false), 500);
+          setPin("");
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("Invalid login") || msg.includes("Invalid credentials")) {
+          setError("รหัส PIN ไม่ถูกต้อง");
+        } else if (msg.includes("fetch") || msg.includes("network") || msg.includes("ENOTFOUND")) {
+          setError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+        } else {
+          setError(`เกิดข้อผิดพลาด: ${msg}`);
+        }
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+        setPin("");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      // Supabase returns generic error to prevent user enumeration
-      setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [signIn, navigate],
+  );
+
+  // Handle digit press
+  const handleDigit = useCallback(
+    (digit: string) => {
+      if (loading || pin.length >= 6) return;
+      const newPin = pin + digit;
+      setPin(newPin);
+      if (newPin.length === 6 && selectedUser) {
+        handlePinComplete(newPin, selectedUser);
+      }
+    },
+    [pin, loading, selectedUser, handlePinComplete],
+  );
+
+  // Handle backspace
+  const handleBackspace = useCallback(() => {
+    if (loading) return;
+    setPin((p) => p.slice(0, -1));
+    setError(null);
+  }, [loading]);
+
+  // Handle user selection
+  const handleSelectUser = useCallback((user: LoginUser) => {
+    setSelectedUser(user);
+    setPin("");
+    setError(null);
+  }, []);
+
+  // Handle back to user list
+  const handleBack = useCallback(() => {
+    setSelectedUser(null);
+    setPin("");
+    setError(null);
+  }, []);
 
   return (
     <div className="min-h-dvh grid lg:grid-cols-2 bg-background">
       {/* Left panel — branding */}
-      <div className="relative hidden lg:flex flex-col justify-between p-10 overflow-hidden bg-gradient-to-br from-primary via-primary/80 to-secondary text-primary-foreground">
-        <div className="absolute -top-32 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-accent/40 blur-3xl" />
+      <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden bg-primary text-primary-foreground">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,oklch(1_0_0/0.08),transparent_60%)]" />
         <div className="relative flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/15 backdrop-blur">
-            <Church className="h-6 w-6" />
+          <div className="grid h-11 w-11 place-items-center border border-white/20 bg-white/10 backdrop-blur-sm">
+            <Church className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-lg font-semibold">ระบบจัดการการเงินคริสตจักร</p>
-            <p className="text-sm opacity-80">Church Financial Management</p>
+            <p className="text-[15px] font-semibold tracking-tight">Grace Ledger</p>
+            <p className="text-xs text-white/60 tracking-wide uppercase">Church Finance</p>
           </div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="relative max-w-md"
-        >
-          <h1 className="text-4xl font-bold leading-tight">
+        <div className="relative max-w-md">
+          <h1 className="font-display text-[2rem] font-semibold leading-[1.15] tracking-tight">
             ดูแลการเงินคริสตจักร
             <br />
-            ด้วยความโปร่งใสและง่ายดาย
+            ด้วยความโปร่งใส
           </h1>
-          <p className="mt-4 text-white/85">
-            บันทึกรายรับ รายจ่าย เงินถวาย บริหารกองทุน งบประมาณ และออกรายงานได้ในที่เดียว
+          <p className="mt-5 text-sm leading-relaxed text-white/70">
+            บันทึกรายรับ รายจ่าย เงินถวาย บริหารกองทุน
+            <br />
+            งบประมาณ และออกรายงานได้ในที่เดียว
           </p>
-        </motion.div>
-        <p className="relative text-xs opacity-70">© {new Date().getFullYear()} Church Finance</p>
+        </div>
+        <p className="relative text-[11px] tracking-wide text-white/40">
+          © {new Date().getFullYear()} Grace Ledger
+        </p>
       </div>
 
-      {/* Right panel — login form */}
-      <div className="flex flex-col items-center justify-center p-6 md:p-10">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          className="w-full max-w-sm"
-        >
+      {/* Right panel — login */}
+      <div className="flex flex-col items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-[360px]">
           {/* Logo + title */}
-          <div className="text-center mb-8">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
-              <Church className="h-7 w-7" />
+          <div className="mb-8 text-center">
+            <div className="inline-flex h-11 w-11 items-center justify-center border border-primary/20 bg-primary/5 text-primary mb-4">
+              <Church className="h-5 w-5" />
             </div>
-            <h2 className="text-2xl font-semibold text-foreground">เข้าสู่ระบบ</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              กรอกอีเมลและรหัสผ่านของคุณ
+            <h2 className="font-display text-[22px] font-semibold tracking-tight text-foreground">
+              เข้าสู่ระบบ
+            </h2>
+            <p className="text-[13px] text-muted-foreground mt-1.5">
+              {selectedUser ? "กรอกรหัส PIN 6 หลัก" : "เลือกบัญชีของคุณ"}
             </p>
           </div>
 
-          {/* Error display */}
+          {/* Error message */}
           {error && (
-            <div className="mb-4 rounded-xl bg-destructive/10 border border-destructive/30 px-4 py-3 text-sm text-destructive">
+            <div className="mb-4 border border-destructive/25 bg-destructive/5 px-4 py-2.5 text-[13px] text-destructive text-center animate-[fadeUp_0.2s_ease_both]">
               {error}
             </div>
           )}
 
-          {/* Login form */}
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div className="space-y-2">
-              <Label htmlFor="email">อีเมล</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@church.org"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  autoComplete="email"
-                  autoFocus
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">รหัสผ่าน</Label>
-                <a
-                  href="/forgot-password"
-                  className="text-xs text-primary hover:underline"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toast.info("ลืมรหัสผ่าน? ติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน");
-                  }}
+          {/* Step 1: User selection */}
+          {!selectedUser && (
+            <div className="space-y-2 animate-[fadeUp_0.4s_ease_both]">
+              {loginUsers.length === 0 && (
+                <p className="text-center text-[13px] text-muted-foreground py-8">
+                  กำลังโหลดรายชื่อผู้ใช้…
+                </p>
+              )}
+              {loginUsers.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  onClick={() => handleSelectUser(u)}
+                  className="w-full flex items-center gap-3 border border-border bg-card hover:bg-muted hover:border-primary/30 px-4 py-3 transition-all duration-150 active:scale-[0.98] cursor-pointer text-left"
                 >
-                  ลืมรหัสผ่าน?
-                </a>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10"
-                  autoComplete="current-password"
-                  disabled={loading}
-                />
+                  <div className="grid h-10 w-10 shrink-0 place-items-center bg-primary/10 text-primary text-sm font-medium">
+                    {u.name[0]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{u.name}</p>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      <ShieldCheck className="h-3 w-3" />
+                      {ROLE_LABEL[u.role] || u.role}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Step 2: PIN entry */}
+          {selectedUser && (
+            <div className="animate-[fadeUp_0.3s_ease_both]">
+              {/* Selected user header */}
+              <div className="flex items-center gap-3 mb-6 p-3 border border-border bg-muted/30">
                 <button
                   type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  tabIndex={-1}
+                  onClick={handleBack}
+                  className="grid h-8 w-8 shrink-0 place-items-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label="ย้อนกลับ"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <div className="grid h-10 w-10 shrink-0 place-items-center bg-primary/10 text-primary text-sm font-medium">
+                  {selectedUser.name[0]}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {selectedUser.name}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {ROLE_LABEL[selectedUser.role] || selectedUser.role}
+                  </p>
+                </div>
+              </div>
+
+              {/* PIN dots */}
+              <div
+                className={`flex justify-center gap-3 mb-8 ${shake ? "animate-[shake_0.4s_ease]" : ""}`}
+              >
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-3.5 w-3.5 rounded-full border-2 transition-all duration-150 ${
+                      i < pin.length
+                        ? "bg-primary border-primary scale-110"
+                        : "border-border bg-transparent"
+                    } ${loading && i === pin.length - 1 ? "animate-pulse" : ""}`}
+                  />
+                ))}
+              </div>
+
+              {/* Number pad */}
+              <div className="grid grid-cols-3 gap-2.5 max-w-[280px] mx-auto">
+                {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => handleDigit(d)}
+                    disabled={loading || pin.length >= 6}
+                    className="h-16 flex items-center justify-center text-xl font-semibold border border-border bg-card hover:bg-muted active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {d}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleBackspace}
+                  disabled={loading || pin.length === 0}
+                  className="h-16 flex items-center justify-center border border-border bg-card hover:bg-muted active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="ลบ"
+                >
+                  <Delete className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDigit("0")}
+                  disabled={loading || pin.length >= 6}
+                  className="h-16 flex items-center justify-center text-xl font-semibold border border-border bg-card hover:bg-muted active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  0
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    selectedUser && pin.length === 6 && handlePinComplete(pin, selectedUser)
+                  }
+                  disabled={loading || pin.length !== 6}
+                  className="h-16 flex items-center justify-center text-xl font-semibold border border-primary bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="ยืนยัน"
+                >
+                  ✓
                 </button>
               </div>
-            </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  กำลังเข้าสู่ระบบ...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  เข้าสู่ระบบ
-                  <ArrowRight className="h-4 w-4" />
-                </span>
+              {/* Loading indicator */}
+              {loading && (
+                <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-muted-foreground">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                  กำลังเข้าสู่ระบบ…
+                </div>
               )}
-            </Button>
-          </form>
-
-          {/* Sign up link */}
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            ยังไม่มีบัญชี?{" "}
-            <a
-              href="/register"
-              className="text-primary font-medium hover:underline"
-              onClick={(e) => {
-                e.preventDefault();
-                toast.info("สมัครสมาชิก: กรุณาติดต่อผู้ดูแลระบบเพื่อขอบัญชีใหม่");
-              }}
-            >
-              สมัครสมาชิก
-            </a>
-          </div>
-        </motion.div>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-8px); }
+          40%, 80% { transform: translateX(8px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [class*="animate-"] { animation: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

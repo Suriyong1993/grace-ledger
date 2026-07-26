@@ -10,7 +10,6 @@ import { SessionService, SessionValidationError } from "@/server/auth/session";
 import type { Permission } from "@/server/auth/permissions";
 import { hasPermission } from "@/server/auth/permissions";
 import type { UserRole } from "@/server/domain/types";
-import { AuditService } from "@/server/services/audit.service";
 
 // ============================================================================
 // Request context
@@ -25,6 +24,7 @@ export interface RequestContext {
 /**
  * Extract session from request's Authorization header.
  * Returns null if no valid session.
+ * Also updates lastActivityAt for idle timeout enforcement.
  */
 export async function extractSession(request: Request): Promise<Session | null> {
   const authHeader = request.headers.get("authorization");
@@ -34,7 +34,11 @@ export async function extractSession(request: Request): Promise<Session | null> 
 
   const token = authHeader.slice(7);
   try {
-    return await SessionService.validateSession(token);
+    const session = await SessionService.validateSession(token);
+    // FIX: Update lastActivityAt for idle timeout enforcement
+    // Fire-and-forget — don't block the request on this
+    SessionService.touchSession(session.userId, token).catch(() => {});
+    return session;
   } catch (error) {
     if (error instanceof SessionValidationError) {
       return null;
@@ -59,11 +63,7 @@ export async function requireSession(request: Request): Promise<Session> {
  */
 export function requirePermission(session: Session, permission: Permission): void {
   if (!hasPermission(session.role, permission)) {
-    throw new ApiError(
-      403,
-      "FORBIDDEN",
-      `Permission '${permission}' is required`,
-    );
+    throw new ApiError(403, "FORBIDDEN", `Permission '${permission}' is required`);
   }
 }
 
@@ -119,7 +119,12 @@ export function jsonResponse(data: unknown, status = 200): Response {
   });
 }
 
-export function errorResponse(status: number, code: string, message: string, details?: unknown): Response {
+export function errorResponse(
+  status: number,
+  code: string,
+  message: string,
+  details?: unknown,
+): Response {
   return jsonResponse({ error: { code, message, details } }, status);
 }
 
@@ -156,10 +161,21 @@ export function wrapError(handler: () => Promise<Response>): Promise<Response> {
     }
     // Zod validation errors
     if (error && typeof error === "object" && "issues" in (error as any)) {
-      return errorResponse(400, "VALIDATION_ERROR", "Input validation failed", (error as any).issues);
+      return errorResponse(
+        400,
+        "VALIDATION_ERROR",
+        "Input validation failed",
+        (error as any).issues,
+      );
     }
     // Domain errors
-    if (error && typeof error === "object" && "code" in (error as any) && (error as any).code && !(error as any).status) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in (error as any) &&
+      (error as any).code &&
+      !(error as any).status
+    ) {
       return errorResponse(400, (error as any).code, (error as any).message);
     }
     console.error("Unhandled API error:", error);

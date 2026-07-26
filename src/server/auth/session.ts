@@ -1,9 +1,9 @@
 /**
  * Grace Ledger v2 — Session Management
- * 
+ *
  * CRITICAL FIX (MF-4): Token version (token_version) for instant session revocation.
  * CRITICAL FIX (MF-12): Force password change on first login after migration.
- * 
+ *
  * Uses httpOnly, Secure, SameSite=Strict cookies with JWT.
  */
 
@@ -14,7 +14,17 @@ import jwt from "jsonwebtoken";
 import { createHash } from "crypto";
 import type { UserRole } from "@/server/domain/types";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "grace-ledger-dev-secret-change-in-production";
+// SECURITY FIX: Fail fast if JWT_SECRET is not set.
+// Never fall back to a hardcoded secret in production.
+const _jwtSecret = process.env.JWT_SECRET;
+if (!_jwtSecret) {
+  throw new Error(
+    "FATAL: JWT_SECRET environment variable is not set. " +
+      "The server cannot start without a secure JWT signing key. " +
+      "Set JWT_SECRET to a random 64+ character string.",
+  );
+}
+const JWT_SECRET: string = _jwtSecret;
 const JWT_EXPIRY = "8h";
 
 export interface SessionPayload {
@@ -113,16 +123,16 @@ export class SessionService {
 
     // MF-4: Instantly revoke if token version changed (password change, admin action)
     if (user.tokenVersion !== payload.tokVer) {
-      throw new SessionValidationError("Session revoked — please log in again", "TOKEN_VERSION_MISMATCH");
+      throw new SessionValidationError(
+        "Session revoked — please log in again",
+        "TOKEN_VERSION_MISMATCH",
+      );
     }
 
     // Check session exists in database and hasn't expired
     const tokenHash = hashToken(token);
     const session = await db.query.userSessions.findFirst({
-      where: and(
-        eq(userSessions.tokenHash, tokenHash),
-        eq(userSessions.userId, payload.sub),
-      ),
+      where: and(eq(userSessions.tokenHash, tokenHash), eq(userSessions.userId, payload.sub)),
     });
 
     if (!session) {
@@ -154,7 +164,8 @@ export class SessionService {
    * Increments token_version to instantly revoke all JWTs (MF-4).
    */
   static async invalidateAllSessions(userId: string): Promise<void> {
-    await db.update(users)
+    await db
+      .update(users)
       .set({ tokenVersion: sql`${users.tokenVersion} + 1` })
       .where(eq(users.id, userId));
   }
@@ -164,29 +175,43 @@ export class SessionService {
    */
   static async invalidateSession(userId: string, token: string): Promise<void> {
     const tokenHash = hashToken(token);
-    await db.delete(userSessions)
-      .where(and(
-        eq(userSessions.userId, userId),
-        eq(userSessions.tokenHash, tokenHash),
-      ));
+    await db
+      .delete(userSessions)
+      .where(and(eq(userSessions.userId, userId), eq(userSessions.tokenHash, tokenHash)));
   }
 
   /** Update last activity timestamp */
   static async touchSession(userId: string, token: string): Promise<void> {
     const tokenHash = hashToken(token);
-    await db.update(userSessions)
+    await db
+      .update(userSessions)
       .set({ lastActivityAt: new Date() })
-      .where(and(
-        eq(userSessions.userId, userId),
-        eq(userSessions.tokenHash, tokenHash),
-      ));
+      .where(and(eq(userSessions.userId, userId), eq(userSessions.tokenHash, tokenHash)));
   }
 
   /** Clean up expired sessions */
   static async cleanupExpiredSessions(): Promise<number> {
-    const result = await db.delete(userSessions)
-      .where(lt(userSessions.expiresAt, new Date()));
+    const result = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date()));
     return result.rowCount ?? 0;
+  }
+
+  /**
+   * Start periodic cleanup of expired sessions.
+   * Call this once at server startup.
+   * Runs every hour to remove expired sessions from the database.
+   */
+  static startCleanupScheduler(intervalMs: number = 60 * 60 * 1000): NodeJS.Timeout {
+    console.log("[SessionService] Starting expired session cleanup scheduler (interval: 1h)");
+    return setInterval(async () => {
+      try {
+        const count = await SessionService.cleanupExpiredSessions();
+        if (count > 0) {
+          console.log(`[SessionService] Cleaned up ${count} expired sessions`);
+        }
+      } catch (error) {
+        console.error("[SessionService] Failed to cleanup expired sessions:", error);
+      }
+    }, intervalMs);
   }
 }
 
@@ -198,4 +223,19 @@ export class SessionValidationError extends Error {
     super(message);
     this.name = "SessionValidationError";
   }
+}
+
+// ============================================================================
+// Auto-start cleanup scheduler on module load (server-side only)
+// ============================================================================
+let cleanupSchedulerStarted = false;
+export function ensureCleanupScheduler(): void {
+  if (cleanupSchedulerStarted) return;
+  cleanupSchedulerStarted = true;
+  SessionService.startCleanupScheduler();
+}
+
+// Start scheduler when this module is imported on the server
+if (typeof process !== "undefined" && process.env.NODE_ENV !== "test") {
+  ensureCleanupScheduler();
 }

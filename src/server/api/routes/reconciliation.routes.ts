@@ -4,7 +4,11 @@ import { createReconciliationSchema } from "@/server/domain/validation";
 import { requireAuth, wrapError, jsonResponse, requirePermission } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 
-function route(method: "GET" | "POST", path: string, handler: RouteDefinition["handler"]): RouteDefinition {
+function route(
+  method: "GET" | "POST",
+  path: string,
+  handler: RouteDefinition["handler"],
+): RouteDefinition {
   return { method, path, handler };
 }
 

@@ -1,9 +1,7 @@
-// src/lib/auth.tsx — Updated for Supabase Auth
-// Changes from mock version:
-// 1. Uses Supabase Auth (email/password) instead of PIN 6 digits
-// 2. Session stored in Supabase httpOnly cookies (not localStorage)
-// 3. Auth state managed by Supabase Auth listener
-// 4. RLS enforces data access at DB level
+// src/lib/auth.tsx — PIN-based authentication with Supabase Auth
+// Users select their name, enter a 6-digit PIN on a number pad.
+// The PIN is used as the Supabase Auth password.
+// Session is managed by Supabase (httpOnly cookies).
 
 import {
   createContext,
@@ -13,52 +11,94 @@ import {
   useMemo,
   useState,
   type ReactNode,
-} from 'react';
-import { supabase } from '@/services/supabaseClient';
-import type { Role, User } from '@/lib/types';
+} from "react";
+import { supabase } from "@/services/supabaseClient";
+import type { Role, User } from "@/lib/types";
+
+export type Permission =
+  | "income.write"
+  | "income.approve"
+  | "expense.write"
+  | "expense.approve"
+  | "offering.write"
+  | "offering.approve"
+  | "fund.write"
+  | "budget.write"
+  | "project.write"
+  | "member.write"
+  | "settings.write"
+  | "audit.view";
+
+// Simplified: only super_admin and admin
+// super_admin: full access including settings
+// admin: everything except settings.write
+const PERMISSION_MATRIX: Record<Role, Permission[]> = {
+  super_admin: [
+    "income.write",
+    "income.approve",
+    "expense.write",
+    "expense.approve",
+    "offering.write",
+    "offering.approve",
+    "fund.write",
+    "budget.write",
+    "project.write",
+    "member.write",
+    "settings.write",
+    "audit.view",
+  ],
+  admin: [
+    "income.write",
+    "income.approve",
+    "expense.write",
+    "expense.approve",
+    "offering.write",
+    "offering.approve",
+    "fund.write",
+    "budget.write",
+    "project.write",
+    "member.write",
+    "audit.view",
+  ],
+};
+
+// User info for the login screen (fetched from public view)
+export interface LoginUser {
+  id: string;
+  name: string;
+  role: Role;
+  email: string;
+}
 
 interface AuthCtx {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<User | null>;
-  signUp: (email: string, password: string, name: string, churchId: string, role?: Role) => Promise<User | null>;
+  signIn: (email: string, pin: string) => Promise<User | null>;
+  signUp: (
+    email: string,
+    password: string,
+    name: string,
+    churchId: string,
+    role?: Role,
+  ) => Promise<User | null>;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
   can: (perm: Permission) => boolean;
   hasRole: (...roles: Role[]) => boolean;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
 
-export type Permission =
-  | 'income.write'
-  | 'income.approve'
-  | 'expense.write'
-  | 'expense.approve'
-  | 'offering.write'
-  | 'fund.write'
-  | 'budget.write'
-  | 'project.write'
-  | 'member.write'
-  | 'settings.write'
-  | 'audit.view';
+// Fetch the list of active users for the login screen
+export async function fetchLoginUsers(): Promise<LoginUser[]> {
+  const { data, error } = await supabase
+    .from("user_login_list")
+    .select("id, name, role, email")
+    .order("name");
 
-const PERMISSION_MATRIX: Record<Role, Permission[]> = {
-  super_admin: [
-    'income.write', 'income.approve',
-    'expense.write', 'expense.approve',
-    'offering.write', 'offering.approve',
-    'fund.write', 'budget.write', 'project.write',
-    'member.write', 'settings.write', 'audit.view',
-  ],
-  pastor: ['income.approve', 'expense.approve', 'audit.view'],
-  treasurer: [
-    'income.write', 'expense.write', 'offering.write',
-    'fund.write', 'budget.write', 'project.write', 'member.write',
-  ],
-  finance_staff: ['income.write', 'expense.write', 'offering.write', 'member.write'],
-  auditor: ['audit.view'],
-  viewer: [],
-};
+  if (error || !data) return [];
+  return data as LoginUser[];
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -67,9 +107,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch church user data when auth user changes
   const fetchUserRecord = useCallback(async (authUserId: string) => {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('auth_user_id', authUserId)
+      .from("users")
+      .select("*")
+      .eq("auth_user_id", authUserId)
       .single();
 
     if (error || !data) {
@@ -81,7 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
-    // Get current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         fetchUserRecord(session.user.id);
@@ -89,66 +128,73 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    // Listen for future auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session?.user) {
-          fetchUserRecord(session.user.id);
-        } else {
-          setUser(null);
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        fetchUserRecord(session.user.id);
+      } else {
+        setUser(null);
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, [fetchUserRecord]);
 
-  // FIX: Don't depend on `user` in signIn's return type — return the freshly fetched User instead
-  const signIn = useCallback(async (email: string, password: string): Promise<User | null> => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.toLowerCase().trim(),
-      password,
-    });
+  // PIN-based sign in: email + PIN (used as password) → Supabase Auth
+  const signIn = useCallback(
+    async (email: string, pin: string): Promise<User | null> => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase().trim(),
+        password: pin,
+      });
 
-    if (error) throw error;
-    if (!data.user) return null;
+      if (error) throw error;
+      if (!data.user) return null;
 
-    await fetchUserRecord(data.user.id);
-    // Fetch the updated user record after login and return it
-    // (we can't use `user` state here because it's stale in this closure)
-    const { data: updatedUser } = await supabase
-      .from('users')
-      .select('*')
-      .eq('auth_user_id', data.user.id)
-      .single();
+      await fetchUserRecord(data.user.id);
 
-    return (updatedUser as User) ?? null;
-  }, [fetchUserRecord]);
+      const { data: updatedUser } = await supabase
+        .from("users")
+        .select("*")
+        .eq("auth_user_id", data.user.id)
+        .single();
 
-  const signUp = useCallback(async (
-    email: string,
-    password: string,
-    name: string,
-    churchId: string,
-    role: Role = 'viewer'
-  ) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.toLowerCase().trim(),
-      password,
-      options: {
-        data: { name, church_id: churchId, role },
-      },
-    });
+      return (updatedUser as User) ?? null;
+    },
+    [fetchUserRecord],
+  );
 
-    if (error) throw error;
-    return data.user ? ({ id: 'temp', name, role } as User) : null;
-  }, []);
+  const signUp = useCallback(
+    async (
+      email: string,
+      password: string,
+      name: string,
+      churchId: string,
+      role: Role = "admin",
+    ) => {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.toLowerCase().trim(),
+        password,
+        options: {
+          data: { name, church_id: churchId, role },
+        },
+      });
+
+      if (error) throw error;
+      return data.user ? ({ id: "temp", name, role } as User) : null;
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     setUser(null);
   }, []);
+
+  // Alias for signOut (used by AppTopbar, ProfilePage)
+  const logout = signOut;
 
   const value = useMemo<AuthCtx>(
     () => ({
@@ -157,10 +203,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
-      can: (perm) => (user ? PERMISSION_MATRIX[user.role].includes(perm) : false),
+      logout,
+      can: (perm) => (user ? (PERMISSION_MATRIX[user.role]?.includes(perm) ?? false) : false),
       hasRole: (...roles) => (user ? roles.includes(user.role) : false),
     }),
-    [user, loading, signIn, signUp, signOut]
+    [user, loading, signIn, signUp, signOut, logout],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -168,6 +215,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const v = useContext(Ctx);
-  if (!v) throw new Error('useAuth must be used inside <AuthProvider>');
+  if (!v) throw new Error("useAuth must be used inside <AuthProvider>");
   return v;
 }

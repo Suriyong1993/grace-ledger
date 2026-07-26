@@ -5,12 +5,12 @@
 // 3. Auth is handled by Supabase Auth (httpOnly cookies)
 // 4. Token comes from Supabase session, not localStorage
 
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 
 // Supabase client handles all HTTP internally.
 // This file exists as a compatibility layer for code that
 // previously used axios directly.
 // New code should use supabaseClient.ts or church.ts instead.
 
-export const API_URL = ''; // Not used when using supabase-js directly
-export const http = null;  // No axios needed with Supabase
+export const API_URL = ""; // Not used when using supabase-js directly
+export const http = null; // No axios needed with Supabase

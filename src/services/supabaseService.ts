@@ -9,7 +9,7 @@
 // 4. Audit log is server-side (immutable)
 // 5. Optimistic locking via version column
 
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 import type {
   User,
   Income,
@@ -27,7 +27,7 @@ import type {
   OfferingSubcategory,
   AuditLog,
   Role,
-} from '@/lib/types';
+} from "@/lib/types";
 
 // ============================================================================
 // Auth helpers
@@ -42,7 +42,13 @@ export async function signIn(email: string, password: string) {
   return data;
 }
 
-export async function signUp(email: string, password: string, name: string, churchId: string, role: Role = 'viewer') {
+export async function signUp(
+  email: string,
+  password: string,
+  name: string,
+  churchId: string,
+  role: Role = "admin",
+) {
   const { data, error } = await supabase.auth.signUp({
     email: email.toLowerCase().trim(),
     password,
@@ -60,14 +66,16 @@ export async function signOut() {
 }
 
 export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return null;
 
   // Get our user record (church-scoped)
   const { data: userData, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_user_id', user.id)
+    .from("users")
+    .select("*")
+    .eq("auth_user_id", user.id)
     .single();
 
   if (error || !userData) return null;
@@ -80,11 +88,11 @@ export async function getCurrentUser() {
 
 export async function listUsers(churchId: string): Promise<User[]> {
   const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('church_id', churchId)
-    .eq('is_active', true)
-    .order('name');
+    .from("users")
+    .select("*")
+    .eq("church_id", churchId)
+    .eq("is_active", true)
+    .order("name");
 
   if (error) throw error;
   return (data || []) as User[];
@@ -96,10 +104,10 @@ export async function listUsers(churchId: string): Promise<User[]> {
 
 export async function listCategories(churchId: string): Promise<Category[]> {
   const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('church_id', churchId)
-    .order('sort_order');
+    .from("categories")
+    .select("*")
+    .eq("church_id", churchId)
+    .order("sort_order");
 
   if (error) throw error;
   return (data || []) as Category[];
@@ -111,19 +119,22 @@ export async function listCategories(churchId: string): Promise<Category[]> {
 
 export async function listFunds(churchId: string): Promise<Fund[]> {
   const { data, error } = await supabase
-    .from('funds')
-    .select('*')
-    .eq('church_id', churchId)
-    .eq('is_active', true)
-    .order('sort_order');
+    .from("funds")
+    .select("*")
+    .eq("church_id", churchId)
+    .eq("is_active", true)
+    .order("sort_order");
 
   if (error) throw error;
   return (data || []) as Fund[];
 }
 
-export async function createFund(input: Omit<Fund, 'id' | 'createdAt' | 'currentBalance'>, churchId: string) {
+export async function createFund(
+  input: Omit<Fund, "id" | "createdAt" | "currentBalance">,
+  churchId: string,
+) {
   const { data, error } = await supabase
-    .from('funds')
+    .from("funds")
     .insert({
       church_id: churchId,
       account_id: input.accountId,
@@ -147,37 +158,39 @@ export async function createFund(input: Omit<Fund, 'id' | 'createdAt' | 'current
 
 export async function listIncome(churchId: string): Promise<Income[]> {
   const { data, error } = await supabase
-    .from('incomes')
-    .select('*')
-    .eq('church_id', churchId)
-    .order('date', { ascending: false });
+    .from("incomes")
+    .select("*")
+    .eq("church_id", churchId)
+    .order("date", { ascending: false });
 
   if (error) throw error;
   return (data || []) as Income[];
 }
 
 export async function createIncome(
-  input: Omit<Income, 'id' | 'createdBy' | 'status' | 'createdAt'>,
-  churchId: string
+  input: Omit<Income, "id" | "createdBy" | "status" | "createdAt">,
+  churchId: string,
 ) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
   const { data, error } = await supabase
-    .from('incomes')
+    .from("incomes")
     .insert({
       church_id: churchId,
       date: input.date,
       category_id: input.categoryId,
       amount: input.amount,
       fund_id: input.fundId,
-      description: input.description ?? '',
+      description: input.description ?? "",
       attachment_name: input.attachmentName,
       attachment_data_url: input.attachmentDataUrl,
       attachment_type: input.attachmentType,
       attachment_size: input.attachmentSize,
       created_by: user.id,
-      status: input.status ?? 'pending',
+      status: "pending",
     })
     .select()
     .single();
@@ -187,43 +200,41 @@ export async function createIncome(
 }
 
 export async function deleteIncome(id: string, churchId: string) {
-  const { error } = await supabase
-    .from('incomes')
-    .delete()
-    .eq('id', id)
-    .eq('church_id', churchId);
+  const { error } = await supabase.from("incomes").delete().eq("id", id).eq("church_id", churchId);
 
   if (error) throw error;
 }
 
 export async function approveIncome(id: string, churchId: string) {
   // Get current user
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
   // Get the income record
   const { data: income, error: fetchError } = await supabase
-    .from('incomes')
-    .select('*')
-    .eq('id', id)
-    .eq('church_id', churchId)
+    .from("incomes")
+    .select("*")
+    .eq("id", id)
+    .eq("church_id", churchId)
     .single();
 
-  if (fetchError || !income) throw new Error('Income record not found');
+  if (fetchError || !income) throw new Error("Income record not found");
 
   // Self-approval prevention (CF-1)
   if (income.created_by === user.id) {
-    throw new Error('Cannot approve your own income record');
+    throw new Error("Cannot approve your own income record");
   }
 
   const { data, error } = await supabase
-    .from('incomes')
+    .from("incomes")
     .update({
-      status: 'approved',
+      status: "approved",
       approved_by: user.id,
     })
-    .eq('id', id)
-    .eq('church_id', churchId)
+    .eq("id", id)
+    .eq("church_id", churchId)
     .select()
     .single();
 
@@ -237,38 +248,40 @@ export async function approveIncome(id: string, churchId: string) {
 
 export async function listExpense(churchId: string): Promise<Expense[]> {
   const { data, error } = await supabase
-    .from('expenses')
-    .select('*')
-    .eq('church_id', churchId)
-    .order('date', { ascending: false });
+    .from("expenses")
+    .select("*")
+    .eq("church_id", churchId)
+    .order("date", { ascending: false });
 
   if (error) throw error;
   return (data || []) as Expense[];
 }
 
 export async function createExpense(
-  input: Omit<Expense, 'id' | 'createdBy' | 'status' | 'createdAt'>,
-  churchId: string
+  input: Omit<Expense, "id" | "createdBy" | "status" | "createdAt">,
+  churchId: string,
 ) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
   const { data, error } = await supabase
-    .from('expenses')
+    .from("expenses")
     .insert({
       church_id: churchId,
       date: input.date,
       category_id: input.categoryId,
       amount: input.amount,
       fund_id: input.fundId,
-      vendor: input.vendor ?? '',
-      description: input.description ?? '',
+      vendor: input.vendor ?? "",
+      description: input.description ?? "",
       attachment_name: input.attachmentName,
       attachment_data_url: input.attachmentDataUrl,
       attachment_type: input.attachmentType,
       attachment_size: input.attachmentSize,
       created_by: user.id,
-      status: input.status ?? 'pending',
+      status: "pending",
     })
     .select()
     .single();
@@ -278,41 +291,39 @@ export async function createExpense(
 }
 
 export async function deleteExpense(id: string, churchId: string) {
-  const { error } = await supabase
-    .from('expenses')
-    .delete()
-    .eq('id', id)
-    .eq('church_id', churchId);
+  const { error } = await supabase.from("expenses").delete().eq("id", id).eq("church_id", churchId);
 
   if (error) throw error;
 }
 
 export async function setExpenseStatus(id: string, status: TxStatus, churchId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
   // Self-approval prevention
-  if (status === 'approved') {
+  if (status === "approved") {
     const { data: expense } = await supabase
-      .from('expenses')
-      .select('created_by')
-      .eq('id', id)
-      .eq('church_id', churchId)
+      .from("expenses")
+      .select("created_by")
+      .eq("id", id)
+      .eq("church_id", churchId)
       .single();
 
     if (expense?.created_by === user.id) {
-      throw new Error('Cannot approve your own expense');
+      throw new Error("Cannot approve your own expense");
     }
   }
 
   const { data, error } = await supabase
-    .from('expenses')
+    .from("expenses")
     .update({
       status,
-      approved_by: status === 'approved' ? user.id : null,
+      approved_by: status === "approved" ? user.id : null,
     })
-    .eq('id', id)
-    .eq('church_id', churchId)
+    .eq("id", id)
+    .eq("church_id", churchId)
     .select()
     .single();
 
@@ -326,24 +337,26 @@ export async function setExpenseStatus(id: string, status: TxStatus, churchId: s
 
 export async function listOffering(churchId: string): Promise<Offering[]> {
   const { data, error } = await supabase
-    .from('offerings')
-    .select('*')
-    .eq('church_id', churchId)
-    .order('date', { ascending: false });
+    .from("offerings")
+    .select("*")
+    .eq("church_id", churchId)
+    .order("date", { ascending: false });
 
   if (error) throw error;
   return (data || []) as Offering[];
 }
 
 export async function createOffering(
-  input: Omit<Offering, 'id' | 'createdBy' | 'createdAt'>,
-  churchId: string
+  input: Omit<Offering, "id" | "createdBy" | "createdAt">,
+  churchId: string,
 ) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
   const { data, error } = await supabase
-    .from('offerings')
+    .from("offerings")
     .insert({
       church_id: churchId,
       date: input.date,
@@ -353,7 +366,7 @@ export async function createOffering(
       amount: input.amount,
       member_id: input.memberId ?? null,
       fund_id: input.fundId,
-      note: input.note ?? '',
+      note: input.note ?? "",
       created_by: user.id,
     })
     .select()
@@ -365,10 +378,10 @@ export async function createOffering(
 
 export async function deleteOffering(id: string, churchId: string) {
   const { error } = await supabase
-    .from('offerings')
+    .from("offerings")
     .delete()
-    .eq('id', id)
-    .eq('church_id', churchId);
+    .eq("id", id)
+    .eq("church_id", churchId);
 
   if (error) throw error;
 }
@@ -379,11 +392,11 @@ export async function deleteOffering(id: string, churchId: string) {
 
 export async function listOfferingCategories(churchId: string): Promise<OfferingCategory[]> {
   const { data, error } = await supabase
-    .from('offering_categories')
-    .select('*')
-    .eq('church_id', churchId)
-    .eq('is_active', true)
-    .order('sort_order');
+    .from("offering_categories")
+    .select("*")
+    .eq("church_id", churchId)
+    .eq("is_active", true)
+    .order("sort_order");
 
   if (error) throw error;
   return (data || []) as OfferingCategory[];
@@ -391,10 +404,10 @@ export async function listOfferingCategories(churchId: string): Promise<Offering
 
 export async function createOfferingCategory(
   input: { name: string; color: string; icon: string; description?: string },
-  churchId: string
+  churchId: string,
 ) {
   const { data, error } = await supabase
-    .from('offering_categories')
+    .from("offering_categories")
     .insert({
       church_id: churchId,
       ...input,
@@ -409,14 +422,24 @@ export async function createOfferingCategory(
 
 export async function updateOfferingCategory(
   id: string,
-  input: Partial<Pick<OfferingCategory, 'name' | 'color' | 'icon' | 'description' | 'sort_order' | 'is_active'>>,
-  churchId: string
+  input: Partial<
+    Pick<OfferingCategory, "name" | "color" | "icon" | "description" | "sortOrder" | "isActive">
+  >,
+  churchId: string,
 ) {
+  const updateData: Record<string, unknown> = {};
+  if (input.name !== undefined) updateData.name = input.name;
+  if (input.color !== undefined) updateData.color = input.color;
+  if (input.icon !== undefined) updateData.icon = input.icon;
+  if (input.description !== undefined) updateData.description = input.description;
+  if (input.sortOrder !== undefined) updateData.sort_order = input.sortOrder;
+  if (input.isActive !== undefined) updateData.is_active = input.isActive;
+
   const { data, error } = await supabase
-    .from('offering_categories')
-    .update(input)
-    .eq('id', id)
-    .eq('church_id', churchId)
+    .from("offering_categories")
+    .update(updateData)
+    .eq("id", id)
+    .eq("church_id", churchId)
     .select()
     .single();
 
@@ -426,10 +449,10 @@ export async function updateOfferingCategory(
 
 export async function deleteOfferingCategory(id: string, churchId: string) {
   const { error } = await supabase
-    .from('offering_categories')
+    .from("offering_categories")
     .delete()
-    .eq('id', id)
-    .eq('church_id', churchId);
+    .eq("id", id)
+    .eq("church_id", churchId);
 
   if (error) throw error;
 }
@@ -442,8 +465,8 @@ export async function reorderOfferingCategories(orderedIds: string[], churchId: 
     sort_order: index + 1,
   }));
 
-  const { error } = await supabase.rpc('reorder_entities', {
-    p_entity_type: 'offering_category',
+  const { error } = await supabase.rpc("reorder_entities", {
+    p_entity_type: "offering_category",
     p_entity_ids: updates,
     p_church_id: churchId,
   });
@@ -452,10 +475,10 @@ export async function reorderOfferingCategories(orderedIds: string[], churchId: 
   if (error) {
     for (const update of updates) {
       await supabase
-        .from('offering_categories')
+        .from("offering_categories")
         .update({ sort_order: update.sort_order })
-        .eq('id', update.id)
-        .eq('church_id', update.church_id);
+        .eq("id", update.id)
+        .eq("church_id", update.church_id);
     }
   }
 }
@@ -466,36 +489,34 @@ export async function reorderOfferingCategories(orderedIds: string[], churchId: 
 
 export async function listOfferingSubcategories(
   categoryId?: string,
-  churchId?: string
+  churchId?: string,
 ): Promise<OfferingSubcategory[]> {
-  let query = supabase
-    .from('offering_subcategories')
-    .select('*');
+  let query = supabase.from("offering_subcategories").select("*");
 
   if (categoryId) {
-    query = query.eq('category_id', categoryId);
+    query = query.eq("category_id", categoryId);
   }
 
   if (churchId) {
-    query = query.eq('church_id', churchId);
+    query = query.eq("church_id", churchId);
   }
 
-  const { data, error } = await query.order('sort_order');
+  const { data, error } = await query.order("sort_order");
   if (error) throw error;
   return (data || []) as OfferingSubcategory[];
 }
 
 export async function createOfferingSubcategory(
-  input: { category_id: string; name: string; description?: string },
-  churchId: string
+  input: { categoryId: string; name: string; description?: string },
+  churchId: string,
 ) {
   const { data, error } = await supabase
-    .from('offering_subcategories')
+    .from("offering_subcategories")
     .insert({
       church_id: churchId,
-      category_id: input.category_id,
+      category_id: input.categoryId,
       name: input.name,
-      description: input.description ?? '',
+      description: input.description ?? "",
       sort_order: 0,
     })
     .select()
@@ -507,14 +528,20 @@ export async function createOfferingSubcategory(
 
 export async function updateOfferingSubcategory(
   id: string,
-  input: Partial<Pick<OfferingSubcategory, 'name' | 'description' | 'sort_order' | 'is_active'>>,
-  churchId: string
+  input: Partial<Pick<OfferingSubcategory, "name" | "description" | "sortOrder" | "isActive">>,
+  churchId: string,
 ) {
+  const updateData: Record<string, unknown> = {};
+  if (input.name !== undefined) updateData.name = input.name;
+  if (input.description !== undefined) updateData.description = input.description;
+  if (input.sortOrder !== undefined) updateData.sort_order = input.sortOrder;
+  if (input.isActive !== undefined) updateData.is_active = input.isActive;
+
   const { data, error } = await supabase
-    .from('offering_subcategories')
-    .update(input)
-    .eq('id', id)
-    .eq('church_id', churchId)
+    .from("offering_subcategories")
+    .update(updateData)
+    .eq("id", id)
+    .eq("church_id", churchId)
     .select()
     .single();
 
@@ -524,10 +551,10 @@ export async function updateOfferingSubcategory(
 
 export async function deleteOfferingSubcategory(id: string, churchId: string) {
   const { error } = await supabase
-    .from('offering_subcategories')
+    .from("offering_subcategories")
     .delete()
-    .eq('id', id)
-    .eq('church_id', churchId);
+    .eq("id", id)
+    .eq("church_id", churchId);
 
   if (error) throw error;
 }
@@ -538,35 +565,35 @@ export async function deleteOfferingSubcategory(id: string, churchId: string) {
 
 export async function getSettings(churchId: string): Promise<Settings> {
   const { data, error } = await supabase
-    .from('church_settings')
-    .select('*')
-    .eq('church_id', churchId)
+    .from("church_settings")
+    .select("*")
+    .eq("church_id", churchId)
     .single();
 
-  if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+  if (error && error.code !== "PGRST116") throw error; // PGRST116 = no rows
 
   const defaults: Settings = {
-    churchName: '',
+    churchName: "",
     fiscalYearStart: 1,
     idleTimeoutMin: 15,
-    currency: 'THB',
+    currency: "THB",
   };
 
   if (!data) return defaults;
 
   return {
-    churchName: data.church_name ?? '',
-    address: data.address ?? '',
-    taxId: data.tax_id ?? '',
+    churchName: data.church_name ?? "",
+    address: data.address ?? "",
+    taxId: data.tax_id ?? "",
     fiscalYearStart: data.fiscal_year_start ?? 1,
     idleTimeoutMin: data.idle_timeout_min ?? 15,
-    currency: (data.currency ?? 'THB') as 'THB',
+    currency: (data.currency ?? "THB") as "THB",
   } as Settings;
 }
 
 export async function saveSettings(settings: Settings, churchId: string) {
   const { data } = await supabase
-    .from('church_settings')
+    .from("church_settings")
     .upsert({
       church_id: churchId,
       church_name: settings.churchName,
@@ -595,9 +622,11 @@ export async function logAudit(params: {
   details?: string;
   churchId: string;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { error } = await supabase.from('audit_log').insert({
+  const { error } = await supabase.from("audit_log").insert({
     church_id: params.churchId,
     user_id: params.userId,
     user_name: params.userName,
@@ -605,9 +634,9 @@ export async function logAudit(params: {
     entity: params.entity,
     entity_id: params.entityId,
     details: params.details,
-    ip_address: navigator?.ip || '',
-    user_agent: navigator?.userAgent || '',
+    ip_address: "",
+    user_agent: navigator?.userAgent || "",
   });
 
-  if (error) console.error('Audit log error:', error);
+  if (error) console.error("Audit log error:", error);
 }
