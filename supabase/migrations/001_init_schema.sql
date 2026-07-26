@@ -11,7 +11,7 @@ CREATE TYPE normal_balance AS ENUM ('debit', 'credit');
 CREATE TYPE entry_type AS ENUM ('offering', 'expense', 'income', 'transfer', 'opening', 'adjustment', 'void', 'closing');
 CREATE TYPE entry_status AS ENUM ('draft', 'pending', 'approved', 'rejected', 'voided');
 CREATE TYPE line_type AS ENUM ('debit', 'credit');
-CREATE TYPE user_role AS ENUM ('super_admin', 'pastor', 'treasurer', 'finance_staff', 'auditor', 'viewer');
+CREATE TYPE user_role AS ENUM ('super_admin', 'admin');
 CREATE TYPE period_status AS ENUM ('open', 'closed', 'reconciled');
 CREATE TYPE count_sheet_status AS ENUM ('counting', 'discrepancy', 'in_review', 'reconciled', 'locked');
 CREATE TYPE budget_period_type AS ENUM ('annual', 'monthly', 'department', 'project');
@@ -49,7 +49,8 @@ CREATE TABLE users (
   church_id UUID NOT NULL REFERENCES churches(id) ON DELETE CASCADE,
   auth_user_id UUID UNIQUE NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
-  role user_role NOT NULL DEFAULT 'viewer',
+  email VARCHAR(255),
+  role user_role NOT NULL DEFAULT 'admin',
   mfa_enabled BOOLEAN NOT NULL DEFAULT false,
   mfa_secret VARCHAR(64),
   avatar_color VARCHAR(7),
@@ -191,7 +192,6 @@ CREATE TABLE journal_entries (
   posted_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  UNIQUE(church_id, entry_number) WHERE entry_number IS NOT NULL,
   CHECK (total_debit = total_credit),
   CHECK (total_debit > 0 AND total_credit > 0),
   CHECK (approval_1_id IS NULL OR approval_1_id <> created_by),
@@ -206,6 +206,7 @@ CREATE INDEX idx_je_fund ON journal_entries(church_id, fund_id);
 CREATE INDEX idx_je_church_fiscal ON journal_entries(church_id, fiscal_year, fiscal_period);
 CREATE INDEX idx_je_entry_type ON journal_entries(church_id, entry_type);
 CREATE INDEX idx_je_approval_1 ON journal_entries(church_id, approval_1_id, posting_date);
+CREATE UNIQUE INDEX uq_je_entry_number ON journal_entries(church_id, entry_number) WHERE entry_number IS NOT NULL;
 
 -- ============================================================================
 -- Journal Entry Lines
@@ -566,10 +567,10 @@ CREATE POLICY income_read ON incomes
 CREATE POLICY expense_read ON expenses
   FOR SELECT USING (church_id = get_current_user_church_id());
 
--- Audit log: auditors + pastor + super_admin only
+-- Audit log: super_admin + admin only
 CREATE POLICY audit_read ON audit_log
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin', 'pastor', 'auditor'))
+    EXISTS (SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin', 'admin'))
   );
 
 -- ============================================================================
@@ -595,3 +596,19 @@ CREATE TRIGGER trg_je_updated_at BEFORE UPDATE ON journal_entries FOR EACH ROW E
 CREATE TRIGGER trg_ocs_updated_at BEFORE UPDATE ON offering_count_sheets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER trg_oc_updated_at BEFORE UPDATE ON offering_categories FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER trg_settings_updated_at BEFORE UPDATE ON church_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================================================
+-- User Login List View (for PIN-based login screen)
+-- Joins users table with auth.users to expose email for Supabase Auth
+-- ============================================================================
+
+CREATE OR REPLACE VIEW user_login_list AS
+SELECT
+  u.id,
+  u.name,
+  u.role,
+  au.email
+FROM users u
+JOIN auth.users au ON au.id = u.auth_user_id
+WHERE u.is_active = true
+ORDER BY u.name;

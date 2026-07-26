@@ -69,7 +69,7 @@ serve(async (req) => {
     }
 
     // Validate role
-    const validRoles = ['super_admin', 'pastor', 'treasurer', 'finance_staff', 'auditor', 'viewer'];
+    const validRoles = ['super_admin', 'admin'];
     if (role && !validRoles.includes(role)) {
       return new Response(
         JSON.stringify({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` }),
@@ -94,7 +94,7 @@ serve(async (req) => {
 
     // 2. Create user record in our users table
     const userId = authData.user!.id;
-    const finalRole = role || 'viewer';
+    const finalRole = role || 'admin';
 
     const { error: insertError } = await supabase.from('users').insert({
       id: crypto.randomUUID(),

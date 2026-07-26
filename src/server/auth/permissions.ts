@@ -1,15 +1,15 @@
 /**
  * Grace Ledger v2 — Authorization & Permissions
- * 
+ *
  * CRITICAL FIX (CF-1): Unified approval authority.
  * Treasurer CANNOT approve transactions (AUTHORIZATION_MODEL.md position).
  * Approval flows:
  *   < ฿5,000: Pastor only
  *   5,000–50,000: Pastor
  *   > 50,000: Pastor + Super Admin (dual)
- * 
+ *
  * CRITICAL FIX (CF-2): Dual approval via approval_1_id/approval_2_id.
- * 
+ *
  * All permission checks are server-side only. Client-side hiding is UX only.
  */
 
@@ -82,7 +82,7 @@ export type Permission = keyof typeof PERMISSIONS;
 // ============================================================================
 // Permission Matrix
 // ============================================================================
-// CF-1: treasurer does NOT have journal.approve, offering.approve, expense.approve, income.approve
+// Simplified: super_admin (full access), admin (operational access, no settings)
 
 const MATRIX: Record<UserRole, Set<Permission>> = {
   super_admin: new Set([
@@ -118,9 +118,9 @@ const MATRIX: Record<UserRole, Set<Permission>> = {
     "project.write",
   ]),
 
-  pastor: new Set([
+  admin: new Set([
     "journal.write",
-    "journal.approve", // CF-1: Pastor can approve single-approval amounts
+    "journal.approve",
     "journal.read",
     "offering.create",
     "offering.approve",
@@ -143,64 +143,6 @@ const MATRIX: Record<UserRole, Set<Permission>> = {
     "settings.read",
     "project.write",
   ]),
-
-  treasurer: new Set([
-    "journal.write", // Can create journal entries
-    // CF-1: treasurer CANNOT approve (no journal.approve, offering.approve, expense.approve, income.approve)
-    "journal.read",
-    "offering.create",
-    "offering.count", // Can count offerings
-    "expense.create",
-    "income.create",
-    "fund.read",
-    "fund.transfer", // Can initiate transfers (still goes through approval)
-    "audit.read",
-    "report.view",
-    "report.export",
-    "member.read",
-    "member.write",
-    "member.pii",
-    "budget.write",
-    "settings.read",
-    "project.write",
-  ]),
-
-  finance_staff: new Set([
-    "journal.write",
-    "journal.read",
-    "offering.create",
-    "offering.count",
-    "expense.create",
-    "income.create",
-    "fund.read",
-    "report.view",
-    "member.read",
-    "member.pii",
-    "budget.write",
-    "settings.read",
-  ]),
-
-  auditor: new Set([
-    "journal.read",
-    "fund.read",
-    "period.close",
-    "period.reopen", // Can reopen periods
-    "period.reconcile",
-    "audit.read",
-    "report.view",
-    "report.export",
-    "member.read",
-    // No member.pii for auditor — anonymized view only
-    "settings.read",
-  ]),
-
-  viewer: new Set([
-    "journal.read",
-    "fund.read",
-    "report.view",
-    "member.read",
-    "settings.read",
-  ]),
 };
 
 // ============================================================================
@@ -216,17 +158,17 @@ export interface ApprovalThreshold {
 export const APPROVAL_THRESHOLDS: ApprovalThreshold[] = [
   {
     maxAmount: 5000,
-    requiredApprovers: ["pastor"],
+    requiredApprovers: ["admin"],
     requiresDualApproval: false,
   },
   {
     maxAmount: 50000,
-    requiredApprovers: ["pastor"],
+    requiredApprovers: ["admin"],
     requiresDualApproval: false,
   },
   {
     maxAmount: Infinity,
-    requiredApprovers: ["pastor", "super_admin"],
+    requiredApprovers: ["super_admin"],
     requiresDualApproval: true,
   },
 ];
@@ -250,10 +192,10 @@ export function hasPermission(role: UserRole, permission: Permission): boolean {
   return MATRIX[role]?.has(permission) ?? false;
 }
 
-/** Check if a user can approve a given amount (CF-1 applied) */
+/** Check if a user can approve a given amount */
 export function canApproveAmount(role: UserRole, amountInBaht: number): boolean {
-  // CF-1: Only pastor and super_admin can approve
-  if (role !== "pastor" && role !== "super_admin") {
+  // Both super_admin and admin can approve
+  if (role !== "admin" && role !== "super_admin") {
     return false;
   }
 

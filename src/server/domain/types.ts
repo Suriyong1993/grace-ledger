@@ -5,10 +5,18 @@
 
 export type AccountType = "asset" | "liability" | "equity" | "income" | "expense";
 export type NormalBalance = "debit" | "credit";
-export type EntryType = "offering" | "expense" | "income" | "transfer" | "opening" | "adjustment" | "void" | "closing";
+export type EntryType =
+  | "offering"
+  | "expense"
+  | "income"
+  | "transfer"
+  | "opening"
+  | "adjustment"
+  | "void"
+  | "closing";
 export type EntryStatus = "draft" | "pending" | "approved" | "rejected" | "voided";
 export type LineType = "debit" | "credit";
-export type UserRole = "super_admin" | "pastor" | "treasurer" | "finance_staff" | "auditor" | "viewer";
+export type UserRole = "super_admin" | "admin";
 export type PeriodStatus = "open" | "closed" | "reconciled";
 export type CountSheetStatus = "counting" | "discrepancy" | "in_review" | "reconciled" | "locked";
 export type BudgetPeriodType = "annual" | "monthly" | "department" | "project";
