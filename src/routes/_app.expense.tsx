@@ -5,14 +5,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, CheckCircle2, XCircle, ArrowUpCircle } from "lucide-react";
+import {
+  Plus,
+  Download,
+  Trash2,
+  CheckCircle2,
+  XCircle,
+  ArrowUpCircle,
+  ArrowUpRight,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { StatCard } from "@/components/shared/StatCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -64,6 +74,7 @@ import {
   type AttachmentValue,
 } from "@/components/shared/AttachmentInput";
 import { Receipt } from "lucide-react";
+import { SmartReceiptScannerModal } from "@/components/receipts/SmartReceiptScannerModal";
 
 export const Route = createFileRoute("/_app/expense")({
   head: () => ({ meta: [{ title: "รายจ่าย — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -84,6 +95,7 @@ function ExpensePage() {
   const { user, can } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [aiScannerOpen, setAiScannerOpen] = useState(false);
   const [q, setQ] = useState("");
   const [receipt, setReceipt] = useState<AttachmentValue | undefined>();
 
@@ -163,6 +175,15 @@ function ExpensePage() {
   });
   const total = rows.reduce((s, r) => s + r.amount, 0);
 
+  // Summary figures for the stat row (derived from unfiltered data)
+  const allRows = expQ.data ?? [];
+  const totalAll = allRows.reduce((s, r) => s + r.amount, 0);
+  const pendingRows = allRows.filter((r) => r.status === "pending");
+  const pendingTotal = pendingRows.reduce((s, r) => s + r.amount, 0);
+  const approvedTotal = allRows
+    .filter((r) => r.status === "approved")
+    .reduce((s, r) => s + r.amount, 0);
+
   const exportCsv = () => {
     const csv = toCsv(
       rows.map((r) => ({
@@ -188,23 +209,31 @@ function ExpensePage() {
   };
 
   return (
-    <div>
+    <div className="space-y-6 md:space-y-8">
       <PageHeader
+        kicker="รายการเงิน"
         title="รายจ่าย"
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button variant="outline" className="" onClick={exportCsv}>
-              <Download className="h-4 w-4 mr-2" /> Export
+            <Button
+              variant="secondary"
+              className="h-8 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
+              onClick={() => setAiScannerOpen(true)}
+            >
+              <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI สแกนบิล/สลิป
+            </Button>
+            <Button variant="outline" className="h-8" onClick={exportCsv}>
+              <Download className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> Export
             </Button>
             {can("expense.write") && (
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <Button className="">
-                    <Plus className="h-4 w-4 mr-2" /> เพิ่มรายจ่าย
+                  <Button className="h-8">
+                    <Plus className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> เพิ่มรายจ่าย
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="">
+                <DialogContent className="sm:max-w-lg">
                   <DialogHeader>
                     <DialogTitle>บันทึกรายจ่าย</DialogTitle>
                   </DialogHeader>
@@ -213,7 +242,7 @@ function ExpensePage() {
                       onSubmit={form.handleSubmit((v) => create.mutate(v))}
                       className="space-y-4"
                     >
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <FormField
                           name="date"
                           control={form.control}
@@ -221,7 +250,11 @@ function ExpensePage() {
                             <FormItem>
                               <FormLabel>วันที่</FormLabel>
                               <FormControl>
-                                <Input type="date" className="rounded-xl" {...field} />
+                                <Input
+                                  type="date"
+                                  className="bg-card shadow-none"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -237,7 +270,7 @@ function ExpensePage() {
                                 <Input
                                   type="number"
                                   step="0.01"
-                                  className="rounded-xl"
+                                  className="num-display bg-card shadow-none"
                                   {...field}
                                 />
                               </FormControl>
@@ -254,7 +287,7 @@ function ExpensePage() {
                             <FormLabel>หมวดหมู่</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger className="rounded-xl h-11">
+                                <SelectTrigger className="bg-card shadow-none">
                                   <SelectValue placeholder="เลือกหมวดหมู่" />
                                 </SelectTrigger>
                               </FormControl>
@@ -278,7 +311,7 @@ function ExpensePage() {
                             <FormLabel>กองทุน</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger className="rounded-xl h-11">
+                                <SelectTrigger className="bg-card shadow-none">
                                   <SelectValue placeholder="เลือกกองทุน" />
                                 </SelectTrigger>
                               </FormControl>
@@ -301,7 +334,7 @@ function ExpensePage() {
                           <FormItem>
                             <FormLabel>ผู้ขาย / ผู้รับเงิน</FormLabel>
                             <FormControl>
-                              <Input className="rounded-xl" {...field} />
+                              <Input className="bg-card shadow-none" {...field} />
                             </FormControl>
                           </FormItem>
                         )}
@@ -313,14 +346,22 @@ function ExpensePage() {
                           <FormItem>
                             <FormLabel>รายละเอียด</FormLabel>
                             <FormControl>
-                              <Textarea className="rounded-xl" rows={3} {...field} />
+                              <Textarea
+                                rows={3}
+                                className="bg-card shadow-none"
+                                {...field}
+                              />
                             </FormControl>
                           </FormItem>
                         )}
                       />
                       <div>
                         <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                          <Receipt className="h-4 w-4" /> ใบเสร็จ / ใบกำกับภาษี
+                          <Receipt
+                            className="h-4 w-4 text-muted-foreground"
+                            strokeWidth={1.75}
+                          />
+                          ใบเสร็จ / ใบกำกับภาษี
                         </p>
                         <AttachmentInput
                           value={receipt}
@@ -346,104 +387,157 @@ function ExpensePage() {
         }
       />
 
+      {expQ.isLoading ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-[104px]" />
+          ))}
+        </div>
+      ) : (
+        <div className="stagger grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+          <StatCard
+            label="รายจ่ายทั้งหมด"
+            value={thb(totalAll)}
+            tone="danger"
+            icon={ArrowUpRight}
+            hint={`${allRows.length} รายการ`}
+          />
+          <StatCard
+            label="รออนุมัติ"
+            value={thb(pendingTotal)}
+            tone="primary"
+            icon={Clock}
+            hint={`${pendingRows.length} รายการ`}
+          />
+          <StatCard
+            label="อนุมัติแล้ว"
+            value={thb(approvedTotal)}
+            tone="secondary"
+            icon={CheckCircle2}
+            hint="ยอดที่อนุมัติแล้ว"
+          />
+        </div>
+      )}
+
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายจ่าย..." />
 
-      <Card className=" overflow-hidden">
-        <CardContent className="p-0">
-          {expQ.isLoading ? (
-            <div className="p-6 space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 rounded-xl" />
-              ))}
-            </div>
-          ) : rows.length === 0 ? (
-            <div className="p-6">
-              <EmptyState
-                icon={ArrowUpCircle}
-                title="ยังไม่มีรายจ่าย"
-                description="เริ่มบันทึกรายจ่ายแรก"
-              />
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>วันที่</TableHead>
-                  <TableHead>หมวดหมู่</TableHead>
-                  <TableHead>ผู้ขาย</TableHead>
-                  <TableHead>กองทุน</TableHead>
-                  <TableHead>ใบเสร็จ</TableHead>
-                  <TableHead>สถานะ</TableHead>
-                  <TableHead className="text-right">จำนวน</TableHead>
-                  <TableHead className="text-right">การจัดการ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="whitespace-nowrap">{fmtDate(r.date)}</TableCell>
-                    <TableCell>{catName(r.categoryId)}</TableCell>
-                    <TableCell className="max-w-xs truncate">{r.vendor}</TableCell>
-                    <TableCell>{fundName(r.fundId)}</TableCell>
-                    <TableCell>
-                      {r.attachmentDataUrl ? (
-                        <AttachmentPreview
-                          value={{
-                            name: r.attachmentName,
-                            url: r.attachmentDataUrl,
-                            type: r.attachmentType,
-                            size: r.attachmentSize,
-                          }}
-                        />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={r.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <MoneyText value={r.amount} tone="expense" />
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
+      <section className="card-ledger animate-fade-up">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+          <p className="kicker">รายการรายจ่าย</p>
+          <p className="num-display text-xs text-muted-foreground">{rows.length} รายการ</p>
+        </div>
+        {expQ.isLoading ? (
+          <div className="divide-y divide-border">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between gap-4 px-5 py-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="hidden h-4 w-32 sm:block" />
+                <Skeleton className="hidden h-4 w-20 md:block" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+        ) : rows.length === 0 ? (
+          <div className="p-4 md:p-5">
+            <EmptyState
+              icon={ArrowUpCircle}
+              title="ยังไม่มีรายจ่าย"
+              description="เริ่มบันทึกรายจ่ายแรก"
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="px-5">วันที่</TableHead>
+                <TableHead className="px-5">หมวดหมู่</TableHead>
+                <TableHead className="px-5">ผู้ขาย</TableHead>
+                <TableHead className="px-5">กองทุน</TableHead>
+                <TableHead className="px-5">ใบเสร็จ</TableHead>
+                <TableHead className="px-5">สถานะ</TableHead>
+                <TableHead className="px-5 text-right">จำนวน</TableHead>
+                <TableHead className="px-5 text-right">การจัดการ</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
+                    {fmtDate(r.date)}
+                  </TableCell>
+                  <TableCell className="px-5 py-3 font-medium">{catName(r.categoryId)}</TableCell>
+                  <TableCell className="max-w-xs truncate px-5 py-3 text-muted-foreground">
+                    {r.vendor || <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="px-5 py-3">{fundName(r.fundId)}</TableCell>
+                  <TableCell className="px-5 py-3">
+                    {r.attachmentDataUrl ? (
+                      <AttachmentPreview
+                        value={{
+                          name: r.attachmentName,
+                          url: r.attachmentDataUrl,
+                          type: r.attachmentType,
+                          size: r.attachmentSize,
+                        }}
+                      />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-5 py-3">
+                    <StatusBadge status={r.status} />
+                  </TableCell>
+                  <TableCell className="px-5 py-3 text-right">
+                    <MoneyText value={r.amount} tone="expense" />
+                  </TableCell>
+                  <TableCell className="px-5 py-3">
+                    <div className="flex items-center justify-end gap-1">
                       {can("expense.approve") && r.status === "pending" && (
                         <>
                           <Button
-                            size="sm"
+                            size="icon"
                             variant="ghost"
+                            className="h-8 w-8"
                             onClick={() => setStatus.mutate({ id: r.id, s: "approved" })}
                             aria-label="อนุมัติ"
                           >
-                            <CheckCircle2 className="h-4 w-4 text-success" />
+                            <CheckCircle2
+                              className="h-4 w-4 text-success"
+                              strokeWidth={1.75}
+                            />
                           </Button>
                           <Button
-                            size="sm"
+                            size="icon"
                             variant="ghost"
+                            className="h-8 w-8"
                             onClick={() => setStatus.mutate({ id: r.id, s: "rejected" })}
                             aria-label="ปฏิเสธ"
                           >
-                            <XCircle className="h-4 w-4 text-destructive" />
+                            <XCircle className="h-4 w-4 text-destructive" strokeWidth={1.75} />
                           </Button>
                         </>
                       )}
                       {can("expense.write") && (
                         <Button
-                          size="sm"
+                          size="icon"
                           variant="ghost"
+                          className="h-8 w-8"
                           onClick={() => remove.mutate(r.id)}
                           aria-label="ลบ"
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-4 w-4 text-destructive" strokeWidth={1.75} />
                         </Button>
                       )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </section>
+      <SmartReceiptScannerModal open={aiScannerOpen} onOpenChange={setAiScannerOpen} />
     </div>
   );
 }
+

@@ -4,11 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -154,77 +155,114 @@ export function FundTransferDialog({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {trigger ?? (
-            <Button className="rounded-2xl" variant="outline">
-              <ArrowLeftRight className="h-4 w-4 mr-2" /> โอนระหว่างกองทุน
+            <Button variant="outline" className="h-8">
+              <ArrowLeftRight className="mr-1.5 h-4 w-4" strokeWidth={1.75} />
+              โอนระหว่างกองทุน
             </Button>
           )}
         </DialogTrigger>
-        <DialogContent className="rounded-3xl max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-none border-border shadow-none">
           <DialogHeader>
-            <DialogTitle>โอนระหว่างกองทุน</DialogTitle>
+            <p className="kicker mb-1 flex items-center gap-2">
+              <span aria-hidden className="inline-block h-px w-5 bg-primary" />
+              กองทุน & งบประมาณ
+            </p>
+            <DialogTitle className="font-display text-xl">โอนระหว่างกองทุน</DialogTitle>
+            <DialogDescription>
+              ย้ายเงินจากกองทุนต้นทางไปยังกองทุนปลายทาง พร้อมแนบหลักฐานประกอบรายการ
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                name="fromId"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>กองทุนต้นทาง</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="rounded-xl h-11">
-                          <SelectValue placeholder="เลือกกองทุนต้นทาง" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {funds.map((f) => (
-                          <SelectItem key={f.id} value={f.id}>
-                            {f.name} · คงเหลือ {thb(balances[f.id] ?? 0)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="toId"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>กองทุนปลายทาง</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="rounded-xl h-11">
-                          <SelectValue placeholder="เลือกกองทุนปลายทาง" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {funds
-                          .filter((f) => f.id !== fromId)
-                          .map((f) => (
+              {/* From → To visual */}
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto_1fr]">
+                <FormField
+                  name="fromId"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="border border-border bg-muted/30 px-3.5 py-3">
+                      <FormLabel className="kicker">จาก · ต้นทาง</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="mt-2 h-9 w-full border-border bg-card shadow-none">
+                            <SelectValue placeholder="เลือกกองทุนต้นทาง" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {funds.map((f) => (
                             <SelectItem key={f.id} value={f.id}>
-                              {f.name}
+                              {f.name} · คงเหลือ {thb(balances[f.id] ?? 0)}
                             </SelectItem>
                           ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-2 gap-3">
+                        </SelectContent>
+                      </Select>
+                      {fromId && (
+                        <p className="num-display mt-2 text-xs text-muted-foreground">
+                          คงเหลือ {thb(fromBal)}
+                        </p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div aria-hidden className="flex items-center justify-center py-0.5 sm:pt-10">
+                  <ArrowDown
+                    className="h-4 w-4 text-muted-foreground sm:hidden"
+                    strokeWidth={1.75}
+                  />
+                  <ArrowRight
+                    className="hidden h-4 w-4 text-muted-foreground sm:block"
+                    strokeWidth={1.75}
+                  />
+                </div>
+                <FormField
+                  name="toId"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="border border-border bg-muted/30 px-3.5 py-3">
+                      <FormLabel className="kicker">ไป · ปลายทาง</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="mt-2 h-9 w-full border-border bg-card shadow-none">
+                            <SelectValue placeholder="เลือกกองทุนปลายทาง" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {funds
+                            .filter((f) => f.id !== fromId)
+                            .map((f) => (
+                              <SelectItem key={f.id} value={f.id}>
+                                {f.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <FormField
                   name="amount"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>จำนวนเงิน</FormLabel>
+                      <FormLabel>จำนวนเงิน (บาท)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" className="rounded-xl" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          className="num-display h-10 bg-card text-base font-semibold shadow-none"
+                          {...field}
+                        />
                       </FormControl>
+                      {!insufficient && fromId && amount > 0 && (
+                        <p className="num-display text-xs text-muted-foreground">
+                          ต้นทางคงเหลือหลังโอน {thb(fromBal - amount)}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -236,13 +274,18 @@ export function FundTransferDialog({
                     <FormItem>
                       <FormLabel>วันที่โอน</FormLabel>
                       <FormControl>
-                        <Input type="date" className="rounded-xl" {...field} />
+                        <Input
+                          type="date"
+                          className="num-display h-10 bg-card shadow-none"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
               <FormField
                 name="reference"
                 control={form.control}
@@ -250,7 +293,11 @@ export function FundTransferDialog({
                   <FormItem>
                     <FormLabel>เลขที่อ้างอิง</FormLabel>
                     <FormControl>
-                      <Input className="rounded-xl" placeholder="REF-2026-0001" {...field} />
+                      <Input
+                        className="num-display h-10 bg-card shadow-none"
+                        placeholder="REF-2026-0001"
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -262,34 +309,25 @@ export function FundTransferDialog({
                   <FormItem>
                     <FormLabel>คำอธิบาย</FormLabel>
                     <FormControl>
-                      <Textarea className="rounded-xl" rows={2} {...field} />
+                      <Textarea className="bg-card shadow-none" rows={2} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
               />
               <div>
-                <p className="text-sm font-medium mb-2">เอกสารแนบ (ไม่บังคับ)</p>
+                <p className="mb-2 text-sm font-medium">เอกสารแนบ (ไม่บังคับ)</p>
                 <AttachmentInput value={attachment} onChange={setAttachment} />
               </div>
               {insufficient && (
-                <p className="text-sm text-destructive">
+                <p className="num-display text-sm text-destructive">
                   ยอดกองทุนต้นทางไม่เพียงพอ (คงเหลือ {thb(fromBal)})
                 </p>
               )}
-              <DialogFooter className="gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="rounded-xl active:scale-[0.97]"
-                  onClick={() => setOpen(false)}
-                >
+              <DialogFooter className="gap-2 pt-2">
+                <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
                   ยกเลิก
                 </Button>
-                <Button
-                  type="submit"
-                  className="rounded-xl active:scale-[0.97]"
-                  disabled={mut.isPending || !!insufficient}
-                >
+                <Button type="submit" disabled={mut.isPending || !!insufficient}>
                   ตรวจสอบและโอน
                 </Button>
               </DialogFooter>
@@ -298,49 +336,70 @@ export function FundTransferDialog({
         </DialogContent>
       </Dialog>
 
+
       <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
-        <AlertDialogContent className="rounded-3xl border-border/60 backdrop-blur-xl">
+        <AlertDialogContent className="max-w-md rounded-none border-border shadow-none">
           <AlertDialogHeader>
-            <AlertDialogTitle>ยืนยันการโอนกองทุน</AlertDialogTitle>
+            <p className="kicker mb-1 flex items-center gap-2">
+              <span aria-hidden className="inline-block h-px w-5 bg-primary" />
+              ยืนยันรายการ
+            </p>
+            <AlertDialogTitle className="font-display text-xl">
+              ยืนยันการโอนกองทุน
+            </AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>ต้นทาง</span>
-                  <span className="font-medium">
-                    {funds.find((f) => f.id === confirm?.fromId)?.name}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>ปลายทาง</span>
-                  <span className="font-medium">
-                    {funds.find((f) => f.id === confirm?.toId)?.name}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>จำนวน</span>
-                  <span className="font-semibold font-mono tabular-nums text-primary">
-                    {thb(confirm?.amount ?? 0)}
-                  </span>
-                </div>
-                {confirm?.reference && (
-                  <div className="flex justify-between">
-                    <span>อ้างอิง</span>
-                    <span className="font-mono">{confirm.reference}</span>
+              <div className="pt-2">
+                {/* From → To summary */}
+                <div className="flex items-center justify-between gap-3 border border-border bg-muted/30 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="kicker">จาก</p>
+                    <p className="mt-1 truncate text-sm font-medium text-foreground">
+                      {funds.find((f) => f.id === confirm?.fromId)?.name}
+                    </p>
                   </div>
-                )}
-                <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t border-border/60">
-                  <span>คงเหลือหลังโอน</span>
-                  <span className="font-mono tabular-nums font-medium">
-                    {thb((balances[confirm?.fromId ?? ""] ?? 0) - (confirm?.amount ?? 0))}
-                  </span>
+                  <ArrowRight
+                    className="h-4 w-4 shrink-0 text-muted-foreground"
+                    strokeWidth={1.75}
+                  />
+                  <div className="min-w-0 text-right">
+                    <p className="kicker">ไป</p>
+                    <p className="mt-1 truncate text-sm font-medium text-foreground">
+                      {funds.find((f) => f.id === confirm?.toId)?.name}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Amount */}
+                <div className="mt-2 border border-border px-4 py-3.5 text-center">
+                  <p className="kicker">จำนวนเงิน</p>
+                  <p className="num-display mt-1.5 text-2xl font-semibold tracking-tight text-foreground">
+                    {thb(confirm?.amount ?? 0)}
+                  </p>
+                </div>
+
+                {/* Detail rows */}
+                <div className="mt-2 divide-y divide-border border border-border text-sm">
+                  {confirm?.reference && (
+                    <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+                      <span className="text-muted-foreground">เลขที่อ้างอิง</span>
+                      <span className="num-display font-medium text-foreground">
+                        {confirm.reference}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+                    <span className="text-muted-foreground">ต้นทางคงเหลือหลังโอน</span>
+                    <span className="num-display font-medium text-foreground">
+                      {thb((balances[confirm?.fromId ?? ""] ?? 0) - (confirm?.amount ?? 0))}
+                    </span>
+                  </div>
                 </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl active:scale-[0.97]">ยกเลิก</AlertDialogCancel>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-xl active:scale-[0.97]"
               disabled={mut.isPending}
               onClick={() => confirm && mut.mutate(confirm)}
             >
@@ -352,3 +411,4 @@ export function FundTransferDialog({
     </>
   );
 }
+

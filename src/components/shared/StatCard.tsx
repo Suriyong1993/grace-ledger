@@ -1,48 +1,81 @@
 import type { LucideIcon } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { cn } from "@/lib/utils";
+import { useGSAPAnimation } from "@/hooks/useGSAPAnimation";
+import { gsap } from "@/lib/gsap";
 
 interface Props {
   label: string;
   value: string | number;
   hint?: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   tone?: "primary" | "secondary" | "accent" | "success" | "danger";
   trend?: number;
+  /** decimal places when `value` is a number (animated ticker) */
+  decimals?: number;
 }
 
-const TONES: Record<NonNullable<Props["tone"]>, string> = {
-  primary: "text-primary border-l-primary",
-  secondary: "text-foreground border-l-foreground/20",
-  accent: "text-foreground border-l-accent-foreground/20",
-  success: "text-success border-l-success",
-  danger: "text-destructive border-l-destructive",
+const VALUE_TONE: Record<NonNullable<Props["tone"]>, string> = {
+  primary: "text-primary",
+  secondary: "text-foreground",
+  accent: "text-foreground",
+  success: "text-success",
+  danger: "text-destructive",
 };
 
-export function StatCard({ label, value, hint, icon: Icon, tone = "primary", trend }: Props) {
+
+export function StatCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+  tone = "secondary",
+  trend,
+  decimals = 0,
+}: Props) {
+  const cardRef = useGSAPAnimation<HTMLDivElement>((el) => {
+    gsap.fromTo(
+      el,
+      { opacity: 0, y: 15, scale: 0.98 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power2.out" }
+    );
+  });
+
   return (
-    <div
-      className={cn("relative border border-border border-l-2 bg-card px-4 py-3.5", TONES[tone])}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
-            {label}
-          </p>
-          <p className="mt-1.5 text-xl md:text-2xl font-semibold tracking-tight text-foreground font-mono tabular-nums">
-            {value}
-          </p>
-        </div>
-        <Icon className={cn("h-4 w-4 shrink-0 mt-0.5 opacity-60", TONES[tone].split(" ")[0])} />
+    <div ref={cardRef} className="card-ledger px-5 py-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="kicker">{label}</p>
+        {Icon && (
+          <Icon className="h-4 w-4 shrink-0 text-muted-foreground/50" strokeWidth={1.75} />
+        )}
       </div>
+      <p
+        className={cn(
+          "num-display mt-2 text-2xl md:text-[26px] font-semibold tracking-tight",
+          VALUE_TONE[tone],
+        )}
+      >
+        {typeof value === "number" ? (
+          <NumberTicker value={value} decimalPlaces={decimals} />
+        ) : (
+          value
+        )}
+      </p>
       {(hint || typeof trend === "number") && (
-        <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
           {typeof trend === "number" && (
             <span
               className={cn(
-                "font-medium font-mono",
+                "num-display inline-flex items-center gap-0.5 font-medium",
                 trend >= 0 ? "text-success" : "text-destructive",
               )}
             >
+              {trend >= 0 ? (
+                <TrendingUp className="h-3 w-3" strokeWidth={2} />
+              ) : (
+                <TrendingDown className="h-3 w-3" strokeWidth={2} />
+              )}
               {trend >= 0 ? "+" : ""}
               {trend.toFixed(1)}%
             </span>

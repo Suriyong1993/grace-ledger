@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,8 +12,6 @@ import { MoneyText } from "@/components/shared/MoneyText";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { SundayCountSheet } from "@/components/shared/SundayCountSheet";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -78,6 +76,10 @@ const schema = z.object({
   note: z.string().max(500).optional(),
 });
 type Values = z.infer<typeof schema>;
+
+/** Editorial tab trigger — flat, sharp corners, no shadow or bounce */
+const TAB_TRIGGER =
+  "rounded-none text-xs data-[state=active]:shadow-none active:scale-100";
 
 function OfferingPage() {
   const { user, can } = useAuth();
@@ -192,12 +194,13 @@ function OfferingPage() {
   return (
     <div>
       <PageHeader
+        kicker="รายการเงิน"
         title="เงินถวาย"
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button variant="outline" className="" onClick={exportCsv}>
-              <Download className="h-4 w-4 mr-2" /> Export
+            <Button variant="outline" className="h-8" onClick={exportCsv}>
+              <Download className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> ส่งออก CSV
             </Button>
             {can("offering.write") && (
               <Dialog
@@ -208,11 +211,11 @@ function OfferingPage() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button className="">
-                    <Plus className="h-4 w-4 mr-2" /> บันทึกเงินถวาย
+                  <Button className="h-8">
+                    <Plus className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> บันทึกเงินถวาย
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="">
+                <DialogContent>
                   <DialogHeader>
                     <DialogTitle>บันทึกเงินถวาย</DialogTitle>
                   </DialogHeader>
@@ -229,7 +232,7 @@ function OfferingPage() {
                             <FormItem>
                               <FormLabel>วันที่</FormLabel>
                               <FormControl>
-                                <Input type="date" className="rounded-xl" {...field} />
+                                <Input type="date" className="num-display" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -245,7 +248,7 @@ function OfferingPage() {
                                 <Input
                                   type="number"
                                   step="0.01"
-                                  className="rounded-xl"
+                                  className="num-display"
                                   {...field}
                                 />
                               </FormControl>
@@ -271,7 +274,7 @@ function OfferingPage() {
                               value={field.value}
                             >
                               <FormControl>
-                                <SelectTrigger className="rounded-xl h-11">
+                                <SelectTrigger>
                                   <SelectValue placeholder="เลือกหมวดหมู่" />
                                 </SelectTrigger>
                               </FormControl>
@@ -282,7 +285,7 @@ function OfferingPage() {
                                     <SelectItem key={c.id} value={c.id}>
                                       <span className="flex items-center gap-2">
                                         <span
-                                          className="inline-block w-2.5 h-2.5 rounded-full"
+                                          className="inline-block h-2 w-2 rounded-full"
                                           style={{ backgroundColor: c.color }}
                                         />
                                         {c.name}
@@ -306,7 +309,7 @@ function OfferingPage() {
                               <FormLabel>ประเภทย่อย</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value ?? ""}>
                                 <FormControl>
-                                  <SelectTrigger className="rounded-xl h-11">
+                                  <SelectTrigger>
                                     <SelectValue placeholder="เลือกประเภทย่อย (ไม่บังคับ)" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -335,7 +338,7 @@ function OfferingPage() {
                               <FormLabel>ช่องทาง</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="rounded-xl h-11">
+                                  <SelectTrigger>
                                     <SelectValue />
                                   </SelectTrigger>
                                 </FormControl>
@@ -359,7 +362,7 @@ function OfferingPage() {
                               <FormLabel>กองทุน</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger className="rounded-xl h-11">
+                                  <SelectTrigger>
                                     <SelectValue placeholder="เลือกกองทุน" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -385,7 +388,7 @@ function OfferingPage() {
                             <FormLabel>สมาชิก (ถ้ามี)</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value ?? ""}>
                               <FormControl>
-                                <SelectTrigger className="rounded-xl h-11">
+                                <SelectTrigger>
                                   <SelectValue placeholder="ไม่ระบุ" />
                                 </SelectTrigger>
                               </FormControl>
@@ -401,10 +404,15 @@ function OfferingPage() {
                         )}
                       />
                       <DialogFooter>
-                        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="h-8"
+                          onClick={() => setOpen(false)}
+                        >
                           ยกเลิก
                         </Button>
-                        <Button type="submit" disabled={create.isPending}>
+                        <Button type="submit" className="h-8" disabled={create.isPending}>
                           บันทึก
                         </Button>
                       </DialogFooter>
@@ -417,64 +425,70 @@ function OfferingPage() {
         }
       />
 
-      <Tabs defaultValue="sunday-sheet" className="space-y-6">
-        <TabsList className=" p-1 bg-muted/60 mb-2">
-          <TabsTrigger value="sunday-sheet" className="rounded-xl px-4 py-2 text-sm font-semibold">
-            ใบนับเงิน & ถวายรายบุคคล (ประจำวันอาทิตย์)
+      <Tabs defaultValue="sunday-sheet">
+        <TabsList className="flex h-auto w-full flex-wrap justify-start rounded-none">
+          <TabsTrigger value="sunday-sheet" className={TAB_TRIGGER}>
+            ใบนับเงิน &amp; ถวายรายบุคคล (วันอาทิตย์)
           </TabsTrigger>
-          <TabsTrigger value="all-records" className="rounded-xl px-4 py-2 text-sm font-semibold">
-            ตารางเงินถวายทั้งหมด ({rows.length})
+          <TabsTrigger value="all-records" className={TAB_TRIGGER}>
+            รายการเงินถวายทั้งหมด ({rows.length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="sunday-sheet">
+        <TabsContent value="sunday-sheet" className="mt-6">
           <SundayCountSheet />
         </TabsContent>
 
-        <TabsContent value="all-records" className="space-y-4">
+        <TabsContent value="all-records" className="mt-6 space-y-4">
           <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหาเงินถวาย..." />
 
-          <Card className=" overflow-hidden">
-            <CardContent className="p-0">
-              {offQ.isLoading ? (
-                <div className="p-6 space-y-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Skeleton key={i} className="h-12 rounded-xl" />
-                  ))}
-                </div>
-              ) : rows.length === 0 ? (
-                <div className="p-6">
-                  <EmptyState
-                    icon={HandHeart}
-                    title="ยังไม่มีเงินถวาย"
-                    description="เริ่มบันทึกเงินถวายวันอาทิตย์"
-                  />
-                </div>
-              ) : (
+          <section className="card-ledger animate-fade-up">
+            <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+              <p className="kicker">รายการเงินถวายทั้งหมด</p>
+              <p className="num-display text-xs text-muted-foreground">{rows.length} รายการ</p>
+            </div>
+            {offQ.isLoading ? (
+              <div className="space-y-3 px-5 py-5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10" />
+                ))}
+              </div>
+            ) : rows.length === 0 ? (
+              <div className="p-5">
+                <EmptyState
+                  icon={HandHeart}
+                  title="ยังไม่มีเงินถวาย"
+                  description="เริ่มบันทึกเงินถวายวันอาทิตย์"
+                />
+              </div>
+            ) : (
+              <>
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>วันที่</TableHead>
-                      <TableHead>หมวดหมู่</TableHead>
-                      <TableHead>ประเภทย่อย</TableHead>
-                      <TableHead>ช่องทาง</TableHead>
-                      <TableHead>กองทุน</TableHead>
-                      <TableHead>สมาชิก</TableHead>
-                      <TableHead className="text-right">จำนวน</TableHead>
-                      <TableHead className="text-right">การจัดการ</TableHead>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="h-10 pl-5">วันที่</TableHead>
+                      <TableHead className="h-10">หมวดหมู่</TableHead>
+                      <TableHead className="h-10">ประเภทย่อย</TableHead>
+                      <TableHead className="h-10">ช่องทาง</TableHead>
+                      <TableHead className="h-10">กองทุน</TableHead>
+                      <TableHead className="h-10">สมาชิก</TableHead>
+                      <TableHead className="h-10 text-right">จำนวน</TableHead>
+                      <TableHead className="h-10 pr-5 text-right">การจัดการ</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rows.map((r) => (
                       <TableRow key={r.id}>
-                        <TableCell className="whitespace-nowrap">{fmtDate(r.date)}</TableCell>
+                        <TableCell className="num-display whitespace-nowrap pl-5 text-muted-foreground">
+                          {fmtDate(r.date)}
+                        </TableCell>
                         <TableCell>
-                          <span className="flex items-center gap-1.5 font-medium">
+                          <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                             {(() => {
                               const c = categories.find((c) => c.id === r.categoryId);
                               return c ? (
                                 <span
-                                  className="inline-block w-2.5 h-2.5 rounded-full"
+                                  className="inline-block h-2 w-2 shrink-0 rounded-full"
                                   style={{ backgroundColor: c.color }}
                                 />
                               ) : null;
@@ -482,29 +496,37 @@ function OfferingPage() {
                             {catName(r.categoryId)}
                           </span>
                         </TableCell>
-                        <TableCell>{subName(r.subcategoryId)}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="rounded-full font-mono text-xs">
-                            {CHANNEL_LABEL[r.channel]}
-                          </Badge>
+                        <TableCell className="text-muted-foreground">
+                          {subName(r.subcategoryId)}
                         </TableCell>
-                        <TableCell>{fundName(r.fundId)}</TableCell>
+                        <TableCell>
+                          <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
+                            <span
+                              aria-hidden
+                              className="h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/40"
+                            />
+                            {CHANNEL_LABEL[r.channel]}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {fundName(r.fundId)}
+                        </TableCell>
                         <TableCell className="max-w-xs truncate">
                           {memberName(r.memberId) ?? (r.note ? r.note : "-")}
                         </TableCell>
-                        <TableCell className="text-right font-mono">
+                        <TableCell className="text-right">
                           <MoneyText value={r.amount} tone="income" />
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="pr-5 text-right">
                           {can("offering.write") && (
                             <Button
-                              size="sm"
+                              size="icon"
                               variant="ghost"
-                              className="rounded-xl hover:bg-destructive/10"
+                              className="h-7 w-7 hover:bg-destructive/10"
                               onClick={() => remove.mutate(r.id)}
                               aria-label="ลบ"
                             >
-                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <Trash2 className="h-3.5 w-3.5 text-destructive" strokeWidth={1.75} />
                             </Button>
                           )}
                         </TableCell>
@@ -512,9 +534,17 @@ function OfferingPage() {
                     ))}
                   </TableBody>
                 </Table>
-              )}
-            </CardContent>
-          </Card>
+                <div className="flex items-center justify-between border-t border-border bg-muted/40 px-5 py-3">
+                  <span className="text-xs text-muted-foreground">
+                    รวมทั้งหมด {rows.length} รายการ
+                  </span>
+                  <span className="num-display text-sm font-semibold tracking-tight text-foreground">
+                    {thb(total)}
+                  </span>
+                </div>
+              </>
+            )}
+          </section>
         </TabsContent>
       </Tabs>
     </div>

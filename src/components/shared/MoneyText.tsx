@@ -18,7 +18,7 @@ export function MoneyText({
         : "text-foreground";
   const prefix = tone === "income" ? "+" : tone === "expense" ? "−" : "";
   return (
-    <span className={cn("tabular-nums font-mono font-semibold tracking-tight", color, className)}>
+    <span className={cn("num-display font-semibold tracking-tight", color, className)}>
       {prefix}
       {thb(Math.abs(value))}
     </span>

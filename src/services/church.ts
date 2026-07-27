@@ -26,6 +26,7 @@ import type {
 
 // Helper to get current user's church_id (cached per session)
 let cachedChurchId: string | null = null;
+let cachedUserId: string | null = null;
 
 export async function getChurchId(): Promise<string> {
   if (cachedChurchId) return cachedChurchId;
@@ -47,8 +48,32 @@ export async function getChurchId(): Promise<string> {
   return id;
 }
 
+// Current user's public.users.id (NOT the auth.users id).
+// created_by/approved_by/user_id columns reference users(id), so the auth uid
+// must never be written to those columns.
+export async function getCurrentUserId(): Promise<string> {
+  if (cachedUserId) return cachedUserId;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data: userData } = await supabase
+    .from("users")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .single();
+
+  if (!userData) throw new Error("User not registered in any church");
+  const id: string = userData.id;
+  cachedUserId = id;
+  return id;
+}
+
 export function clearChurchIdCache() {
   cachedChurchId = null;
+  cachedUserId = null;
 }
 
 // ── Users ────────────────────────────────────────────────────────
@@ -168,9 +193,6 @@ export async function createIncome(
   by: User,
 ) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("incomes")
@@ -185,7 +207,7 @@ export async function createIncome(
       attachment_data_url: input.attachmentDataUrl,
       attachment_type: input.attachmentType,
       attachment_size: input.attachmentSize,
-      created_by: user?.id ?? by.id,
+      created_by: by.id,
       status: input.status ?? "pending",
     })
     .select()
@@ -208,9 +230,6 @@ export async function deleteIncome(id: string, by: User) {
 
 export async function approveIncome(id: string, by: User) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   // Self-approval prevention
   const { data: income } = await supabase
@@ -220,7 +239,7 @@ export async function approveIncome(id: string, by: User) {
     .eq("church_id", churchId)
     .single();
 
-  if (income?.created_by === (user?.id ?? by.id)) {
+  if (income?.created_by === by.id) {
     throw new Error("Cannot approve your own income record");
   }
 
@@ -228,7 +247,7 @@ export async function approveIncome(id: string, by: User) {
     .from("incomes")
     .update({
       status: "approved",
-      approved_by: user?.id ?? by.id,
+      approved_by: by.id,
     })
     .eq("id", id)
     .eq("church_id", churchId)
@@ -261,9 +280,6 @@ export async function createExpense(
   by: User,
 ) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("expenses")
@@ -279,7 +295,7 @@ export async function createExpense(
       attachment_data_url: input.attachmentDataUrl,
       attachment_type: input.attachmentType,
       attachment_size: input.attachmentSize,
-      created_by: user?.id ?? by.id,
+      created_by: by.id,
       status: input.status ?? "pending",
     })
     .select()
@@ -301,9 +317,6 @@ export async function deleteExpense(id: string, by: User) {
 
 export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   // Self-approval prevention
   if (status === "approved") {
@@ -314,7 +327,7 @@ export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
       .eq("church_id", churchId)
       .single();
 
-    if (expense?.created_by === (user?.id ?? by.id)) {
+    if (expense?.created_by === by.id) {
       throw new Error("Cannot approve your own expense");
     }
   }
@@ -323,7 +336,7 @@ export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
     .from("expenses")
     .update({
       status,
-      approved_by: status === "approved" ? (user?.id ?? by.id) : null,
+      approved_by: status === "approved" ? by.id : null,
     })
     .eq("id", id)
     .eq("church_id", churchId)
@@ -356,9 +369,6 @@ export async function createOffering(
   by: User,
 ) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("offerings")
@@ -372,7 +382,7 @@ export async function createOffering(
       member_id: input.memberId ?? null,
       fund_id: input.fundId,
       note: input.note ?? "",
-      created_by: user?.id ?? by.id,
+      created_by: by.id,
     })
     .select()
     .single();
@@ -738,9 +748,6 @@ async function logAudit(
   details?: string,
 ) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   await supabase.from("audit_log").insert({
     church_id: churchId,
@@ -759,9 +766,6 @@ async function logAudit(
 
 export async function linkLineUser(lineUserId: string, by: User) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("line_users")
@@ -769,7 +773,7 @@ export async function linkLineUser(lineUserId: string, by: User) {
       {
         church_id: churchId,
         line_user_id: lineUserId,
-        user_id: user?.id ?? by.id,
+        user_id: by.id,
         linked_at: new Date().toISOString(),
       },
       { onConflict: "line_user_id" },
@@ -784,33 +788,43 @@ export async function linkLineUser(lineUserId: string, by: User) {
 
 export async function unlinkLineUser(by: User) {
   const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { error } = await supabase
     .from("line_users")
     .delete()
     .eq("church_id", churchId)
-    .eq("user_id", user?.id ?? by.id);
+    .eq("user_id", by.id);
 
   if (error) throw error;
   await logAudit(by.id, by.name, "unlink", "line_user");
 }
 
 export async function getLineUserStatus(): Promise<{ linked: boolean; lineUserId?: string }> {
-  const churchId = await getChurchId();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { linked: false };
+  let churchId: string;
+  let userId: string;
+  try {
+    churchId = await getChurchId();
+    userId = await getCurrentUserId();
+  } catch {
+    return { linked: false };
+  }
 
   const { data } = await supabase
     .from("line_users")
     .select("line_user_id")
     .eq("church_id", churchId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
 
   return data ? { linked: true, lineUserId: data.line_user_id } : { linked: false };
+}
+
+export async function listLineUsers() {
+  const churchId = await getChurchId();
+  const { data, error } = await supabase
+    .from("line_users")
+    .select("*")
+    .eq("church_id", churchId);
+  if (error) return [];
+  return data || [];
 }

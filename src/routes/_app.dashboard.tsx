@@ -1,18 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Wallet, Plus, RefreshCw } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { ArrowDownLeft, ArrowUpRight, Plus, RefreshCw } from "lucide-react";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { StatCard } from "@/components/shared/StatCard";
 import { MoneyText } from "@/components/shared/MoneyText";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { listIncome, listExpense, listCategories } from "@/services/church";
 import { thb, fmtDate, dayjs } from "@/lib/format";
 import { useNavigate } from "@tanstack/react-router";
+import { PageTransition } from "@/components/shared/PageTransition";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -21,6 +29,12 @@ export const Route = createFileRoute("/_app/dashboard")({
 });
 
 type Period = "today" | "week" | "month";
+
+const PERIOD_LABELS: Record<Period, string> = {
+  today: "วันนี้",
+  week: "สัปดาห์นี้",
+  month: "เดือนนี้",
+};
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -33,27 +47,25 @@ function Dashboard() {
   const hasError = incomeQ.isError || expenseQ.isError;
   if (hasError && !incomeQ.data && !expenseQ.data) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>ไม่สามารถโหลดข้อมูลได้</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {(incomeQ.error as Error)?.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"}
-            </p>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => {
-                incomeQ.refetch();
-                expenseQ.refetch();
-              }}
-            >
-              <RefreshCw className="h-4 w-4 mr-2" /> ลองใหม่
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="flex h-64 items-center justify-center">
+        <div className="card-ledger max-w-md px-6 py-6 text-center">
+          <p className="font-display text-base font-medium text-foreground">
+            ไม่สามารถโหลดข้อมูลได้
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {(incomeQ.error as Error)?.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ"}
+          </p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => {
+              incomeQ.refetch();
+              expenseQ.refetch();
+            }}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองใหม่
+          </Button>
+        </div>
       </div>
     );
   }
@@ -111,120 +123,163 @@ function Dashboard() {
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 10);
 
-  const PERIOD_LABELS: Record<Period, string> = {
-    today: "วันนี้",
-    week: "สัปดาห์นี้",
-    month: "เดือนนี้",
-  };
-
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6 md:space-y-8">
       <PageHeader
+        kicker="Grace Ledger"
         title="แดชบอร์ด"
-        description="ภาพรวมการเงิน"
+        description="ภาพรวมการเงินของคริสตจักรแบบเรียลไทม์"
         actions={
-          <Button onClick={() => navigate({ to: "/expense" })}>
-            <Plus className="h-4 w-4 mr-2" /> บันทึกรายการ
-          </Button>
+          <>
+            {/* Period segmented control */}
+            <div className="flex gap-px border border-border bg-border">
+              {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPeriod(p)}
+                  className={cn(
+                    "h-8 cursor-pointer px-3 text-xs font-medium transition-colors duration-100",
+                    period === p
+                      ? "bg-foreground text-background"
+                      : "bg-card text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {PERIOD_LABELS[p]}
+                </button>
+              ))}
+            </div>
+            <Button className="h-8" onClick={() => navigate({ to: "/expense" })}>
+              <Plus className="mr-1.5 h-4 w-4" /> บันทึกรายการ
+            </Button>
+          </>
         }
       />
 
-      {/* Period toggle */}
-      <div className="flex gap-px border border-border bg-border w-fit">
-        {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className={cn(
-              "px-4 py-1.5 text-sm font-medium transition-colors",
-              period === p
-                ? "bg-primary text-primary-foreground"
-                : "bg-card text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {PERIOD_LABELS[p]}
-          </button>
-        ))}
-      </div>
+      {/* Ledger hero — balance + flow */}
+      {isLoading ? (
+        <Skeleton className="h-44 w-full" />
+      ) : (
+        <section className="card-ledger animate-fade-up">
+          <div className="grid divide-y divide-border md:grid-cols-[1.4fr_1fr_1fr] md:divide-x md:divide-y-0">
+            <div className="px-5 py-6 md:px-7">
+              <p className="kicker">คงเหลือ · {PERIOD_LABELS[period]}</p>
+              <p
+                className={cn(
+                  "num-display font-display mt-3 text-4xl font-semibold tracking-tight md:text-[42px]",
+                  balance >= 0 ? "text-foreground" : "text-destructive",
+                )}
+              >
+                ฿<NumberTicker value={Math.abs(balance)} decimalPlaces={2} />
+              </p>
+              <p className="mt-2.5 text-xs text-muted-foreground">
+                รายรับ − รายจ่าย{balance < 0 ? " · ติดลบ" : ""}
+              </p>
+            </div>
+            <div className="px-5 py-5 md:px-6">
+              <div className="flex items-center justify-between">
+                <p className="kicker">รายรับ</p>
+                <ArrowDownLeft className="h-4 w-4 text-success" strokeWidth={1.75} />
+              </div>
+              <p className="num-display mt-2.5 text-xl font-semibold text-success md:text-2xl">
+                +฿<NumberTicker value={totalIncome} decimalPlaces={2} />
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {filteredIncomes.length} รายการ
+              </p>
+            </div>
+            <div className="px-5 py-5 md:px-6">
+              <div className="flex items-center justify-between">
+                <p className="kicker">รายจ่าย</p>
+                <ArrowUpRight className="h-4 w-4 text-destructive" strokeWidth={1.75} />
+              </div>
+              <p className="num-display mt-2.5 text-xl font-semibold text-destructive md:text-2xl">
+                −฿<NumberTicker value={totalExpense} decimalPlaces={2} />
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {filteredExpenses.length} รายการ
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* 3 Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-border border border-border">
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 bg-card" />)
-        ) : (
-          <>
-            <StatCard
-              label="รายรับ"
-              value={thb(totalIncome)}
-              icon={ArrowDownCircle}
-              tone="success"
-              hint={PERIOD_LABELS[period]}
-            />
-            <StatCard
-              label="รายจ่าย"
-              value={thb(totalExpense)}
-              icon={ArrowUpCircle}
-              tone="danger"
-              hint={PERIOD_LABELS[period]}
-            />
-            <StatCard
-              label="คงเหลือ"
-              value={thb(balance)}
-              icon={Wallet}
-              tone={balance >= 0 ? "primary" : "danger"}
-              hint={PERIOD_LABELS[period]}
-            />
-          </>
-        )}
-      </div>
-
-      {/* Charts + Top Categories */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">แนวโน้มรายรับ / รายจ่าย 6 เดือน</CardTitle>
-          </CardHeader>
-          <CardContent className="h-64">
+      {/* Chart + Top categories */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+        <section className="card-ledger animate-fade-up lg:col-span-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-3.5">
+            <p className="kicker">แนวโน้ม 6 เดือน</p>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden className="h-2 w-2 bg-chart-2" /> รายรับ
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden className="h-2 w-2 bg-chart-5" /> รายจ่าย
+              </span>
+            </div>
+          </div>
+          <div className="h-64 px-3 py-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthly}>
-                <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
+              <LineChart data={monthly} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
+                <CartesianGrid
+                  vertical={false}
+                  stroke="var(--color-border)"
+                  strokeDasharray="2 4"
+                />
+                <XAxis
+                  dataKey="month"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  dy={6}
+                />
                 <YAxis
                   stroke="var(--color-muted-foreground)"
-                  fontSize={12}
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={40}
                   tickFormatter={(v) => (v / 1000).toFixed(0) + "k"}
                 />
                 <Tooltip
                   formatter={(v: number) => thb(v)}
-                  contentStyle={{ borderRadius: 2, border: "1px solid var(--color-border)" }}
+                  contentStyle={{
+                    borderRadius: 2,
+                    border: "1px solid var(--color-border)",
+                    background: "var(--color-card)",
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ color: "var(--color-muted-foreground)" }}
                 />
-                <Legend />
                 <Line
                   type="monotone"
                   dataKey="income"
                   name="รายรับ"
-                  stroke="#22C55E"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
+                  stroke="var(--color-chart-2)"
+                  strokeWidth={1.75}
+                  dot={false}
+                  activeDot={{ r: 3 }}
                 />
                 <Line
                   type="monotone"
                   dataKey="expense"
                   name="รายจ่าย"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
+                  stroke="var(--color-chart-5)"
+                  strokeWidth={1.75}
+                  dot={false}
+                  activeDot={{ r: 3 }}
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
-        {/* Top Categories */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">หมวดหมู่รายจ่ายสูงสุด</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <section className="card-ledger animate-fade-up lg:col-span-2">
+          <div className="border-b border-border px-5 py-3.5">
+            <p className="kicker">หมวดรายจ่ายสูงสุด</p>
+          </div>
+          <div className="space-y-4 px-5 py-4">
             {expenseByCat.length === 0 && (
               <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีข้อมูล</p>
             )}
@@ -233,51 +288,61 @@ function Dashboard() {
               const pct = Math.round((cat.amount / maxAmount) * 100);
               return (
                 <div key={i}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium">{cat.name}</span>
-                    <span className="text-muted-foreground">{thb(cat.amount)}</span>
+                  <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
+                    <span className="flex items-baseline gap-2 font-medium text-foreground">
+                      <span className="num-display text-[11px] text-muted-foreground/70">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {cat.name}
+                    </span>
+                    <span className="num-display text-muted-foreground">{thb(cat.amount)}</span>
                   </div>
-                  <div className="h-1.5 bg-muted overflow-hidden">
+                  <div className="h-1 bg-muted">
                     <div
                       style={{ width: `${pct}%` }}
-                      className="h-full bg-primary transition-all duration-300"
+                      className="h-full bg-primary transition-all duration-500"
                     />
                   </div>
                 </div>
               );
             })}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </div>
 
-      {/* Recent Transactions */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-medium">รายการล่าสุด</CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/expense" })}>
+      {/* Recent transactions */}
+      <section className="card-ledger animate-fade-up">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+          <p className="kicker">รายการล่าสุด</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs"
+            onClick={() => navigate({ to: "/expense" })}
+          >
             ดูทั้งหมด
           </Button>
-        </CardHeader>
-        <CardContent className="divide-y">
+        </div>
+        <div className="divide-y divide-border">
           {recent.map((tx) => (
-            <div key={tx.id} className="flex items-center justify-between py-3">
+            <div key={tx.id} className="flex items-center justify-between gap-4 px-5 py-3">
               <div className="min-w-0">
-                <p className="text-sm font-medium truncate">
+                <p className="truncate text-sm font-medium text-foreground">
                   {tx.description || (tx.kind === "income" ? "รายรับ" : "รายจ่าย")}
                 </p>
-                <p className="text-xs text-muted-foreground">{fmtDate(tx.date)}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{fmtDate(tx.date)}</p>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex shrink-0 items-center gap-4">
                 <StatusBadge status={tx.status} />
                 <MoneyText value={tx.amount} tone={tx.kind === "income" ? "income" : "expense"} />
               </div>
             </div>
           ))}
           {recent.length === 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">ยังไม่มีรายการ</p>
+            <p className="py-10 text-center text-sm text-muted-foreground">ยังไม่มีรายการ</p>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </section>
+    </PageTransition>
   );
 }

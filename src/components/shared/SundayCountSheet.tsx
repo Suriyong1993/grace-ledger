@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { thb } from "@/lib/format";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -63,6 +62,10 @@ const emptyRow = (): MemberOfferingRow => ({
 
 const rowSum = (r: MemberOfferingRow) =>
   r.tithe + r.rent + r.memorial + r.mission + r.special + r.land + r.party;
+
+/** Editorial tab trigger — flat, sharp corners, no shadow or bounce */
+const TAB_TRIGGER =
+  "rounded-none text-xs data-[state=active]:shadow-none active:scale-100";
 
 export function SundayCountSheet() {
   const { user } = useAuth();
@@ -125,7 +128,6 @@ export function SundayCountSheet() {
     }
     return t;
   }, [rows]);
-
   const countedCashTotal = useMemo(
     () => Object.entries(counts).reduce((s, [d, q]) => s + Number(d) * (q || 0), 0),
     [counts],
@@ -284,95 +286,99 @@ export function SundayCountSheet() {
   //  UI
   // =====================
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card className=" border-border/60 ">
-        <CardHeader className="flex flex-row items-center justify-between gap-4 pb-4">
-          <div>
-            <CardTitle className="text-xl font-bold tracking-tight">
-              ใบนับเงิน & สรุปการถวายประจำวันอาทิตย์
-            </CardTitle>
-            <CardDescription className="text-xs">
-              บันทึกยอดถวายรายบุคคล → นับธนบัตร → ตรวจสอบ → บันทึก
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-3">
-            <Input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className=" w-40 font-mono text-sm"
-            />
-            <Button variant="outline" className=" active:scale-95" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 mr-2" /> พิมพ์
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
+    <div className="space-y-5">
+      {/* Header — ledger sheet title band */}
+      <div className="flex animate-fade-up flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
+        <div className="min-w-0">
+          <p className="kicker">ประจำวันอาทิตย์</p>
+          <h2 className="font-display mt-1.5 text-lg font-semibold tracking-tight text-foreground">
+            ใบนับเงิน &amp; สรุปการถวาย
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            บันทึกยอดถวายรายบุคคล → นับธนบัตร → ตรวจสอบ → บันทึก
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="num-display h-8 w-40 text-sm"
+          />
+          <Button variant="outline" className="h-8" onClick={() => window.print()}>
+            <Printer className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> พิมพ์
+          </Button>
+        </div>
+      </div>
 
       {/* Main Tabs */}
-      <Tabs defaultValue="member-list" className="space-y-4">
-        <TabsList className=" p-1 bg-muted/60">
-          <TabsTrigger value="member-list" className="rounded-xl">
-            <Users className="h-4 w-4 mr-2" /> 1. รายการถวายรายบุคคล
+      <Tabs defaultValue="member-list">
+        <TabsList className="flex h-auto w-full flex-wrap justify-start rounded-none">
+          <TabsTrigger value="member-list" className={TAB_TRIGGER}>
+            <Users className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> 1. รายการถวายรายบุคคล
           </TabsTrigger>
-          <TabsTrigger value="cash-count" className="rounded-xl">
-            <Coins className="h-4 w-4 mr-2" /> 2. นับธนบัตรและเหรียญ
+          <TabsTrigger value="cash-count" className={TAB_TRIGGER}>
+            <Coins className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> 2. นับธนบัตรและเหรียญ
           </TabsTrigger>
-          <TabsTrigger value="summary" className="rounded-xl">
-            <FileSpreadsheet className="h-4 w-4 mr-2" /> 3. สรุปยอด & ผู้นับเงิน
+          <TabsTrigger value="summary" className={TAB_TRIGGER}>
+            <FileSpreadsheet className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> 3. สรุปยอด &amp;
+            ผู้นับเงิน
           </TabsTrigger>
-          <TabsTrigger value="validation" className="rounded-xl">
-            <ShieldCheck className="h-4 w-4 mr-2" /> 4. ตรวจสอบ & บันทึก
+          <TabsTrigger value="validation" className={TAB_TRIGGER}>
+            <ShieldCheck className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> 4. ตรวจสอบ &amp; บันทึก
           </TabsTrigger>
         </TabsList>
 
         {/* ========== Tab 1: Member Matrix ========== */}
-        <TabsContent value="member-list">
-          <Card className="">
-            <CardHeader className="flex flex-row items-center justify-between">
+        <TabsContent value="member-list" className="mt-5">
+          <section className="card-ledger animate-fade-up">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3.5">
               <div>
-                <CardTitle className="text-base">1. บันทึกรายการถวายรายบุคคล</CardTitle>
-                <CardDescription className="text-xs">
-                  กรอกชื่อผู้ถวาย ใส่ยอดเงินแต่ละหมวด เลือกช่องทาง เงินสด/ออนไลน์
-                </CardDescription>
+                <p className="kicker">ขั้นตอนที่ 1 · รายการถวายรายบุคคล</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  กรอกชื่อผู้ถวาย ยอดเงินแต่ละหมวด และเลือกช่องทางเงินสด/ออนไลน์
+                </p>
               </div>
-              <Button size="sm" onClick={addRow} className="rounded-xl active:scale-95">
-                <Plus className="h-4 w-4 mr-1" /> เพิ่มรายชื่อ
+              <Button size="sm" className="h-8" onClick={addRow}>
+                <Plus className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> เพิ่มรายชื่อ
               </Button>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border/60 bg-muted/40 text-xs font-semibold text-muted-foreground uppercase">
-                    <th className="p-2.5 text-left min-w-[160px]">ชื่อผู้ถวาย</th>
-                    <th className="p-2.5 text-right w-24">สิบลด</th>
-                    <th className="p-2.5 text-right w-24">ค่าเช่า</th>
-                    <th className="p-2.5 text-right w-24">อนุสรณ์</th>
-                    <th className="p-2.5 text-right w-24">พันธกิจ</th>
-                    <th className="p-2.5 text-right w-24">ถวายพิเศษ</th>
-                    <th className="p-2.5 text-right w-24">ที่ดิน</th>
-                    <th className="p-2.5 text-right w-24">ปาร์ตี้</th>
-                    <th className="p-2.5 text-right w-28">รวม</th>
-                    <th className="p-2.5 text-center w-28">ช่องทาง</th>
-                    <th className="p-2.5 text-center w-12"></th>
+                  <tr className="border-b border-border bg-muted/30 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    <th className="min-w-[160px] px-3 py-2.5 pl-5 text-left font-medium">
+                      ชื่อผู้ถวาย
+                    </th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">สิบลด</th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">ค่าเช่า</th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">อนุสรณ์</th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">พันธกิจ</th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">ถวายพิเศษ</th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">ที่ดิน</th>
+                    <th className="w-24 px-1.5 py-2.5 text-right font-medium">ปาร์ตี้</th>
+                    <th className="w-28 px-2 py-2.5 text-right font-medium">รวม</th>
+                    <th className="w-28 px-2 py-2.5 text-center font-medium">ช่องทาง</th>
+                    <th className="w-12 px-2 py-2.5 pr-5" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/40">
+                <tbody className="divide-y divide-border">
                   {rows.map((r) => {
                     const s = rowSum(r);
                     const hasAmountNoName = s > 0 && !r.name.trim();
                     return (
                       <tr
                         key={r.id}
-                        className={`transition-colors ${hasAmountNoName ? "bg-destructive/5" : "hover:bg-muted/30"}`}
+                        className={`transition-colors ${
+                          hasAmountNoName ? "bg-destructive/5" : "hover:bg-muted/30"
+                        }`}
                       >
-                        <td className="p-2">
+                        <td className="px-2 py-2 pl-3">
                           <Input
                             value={r.name}
                             onChange={(e) => updateRow(r.id, "name", e.target.value)}
                             placeholder="ชื่อผู้ถวาย..."
-                            className={`h-8 rounded-lg text-xs ${hasAmountNoName ? "border-destructive/60" : ""}`}
+                            className={`h-8 text-xs ${hasAmountNoName ? "border-destructive" : ""}`}
                           />
                         </td>
                         {(
@@ -386,38 +392,39 @@ export function SundayCountSheet() {
                             "party",
                           ] as const
                         ).map((field) => (
-                          <td key={field} className="p-2">
+                          <td key={field} className="px-1.5 py-2">
                             <Input
                               type="number"
                               value={r[field] || ""}
                               onChange={(e) => updateRow(r.id, field, Number(e.target.value))}
-                              className="h-8 rounded-lg text-right font-mono text-xs"
+                              className="num-display h-8 text-right text-xs"
                             />
                           </td>
                         ))}
-                        <td className="p-2 text-right font-mono font-semibold text-primary">
+                        <td className="num-display px-2 py-2 text-right text-xs font-semibold text-foreground">
                           {thb(s)}
                         </td>
-                        <td className="p-2 text-center">
+                        <td className="px-2 py-2 text-center">
                           <select
                             value={r.channel}
                             onChange={(e) =>
                               updateRow(r.id, "channel", e.target.value as "cash" | "bank")
                             }
-                            className="h-8 rounded-lg border border-border/60 bg-background px-2 text-xs"
+                            className="h-8 rounded-md border border-input bg-background px-2 text-xs"
                           >
                             <option value="cash">เงินสด</option>
                             <option value="bank">ออนไลน์</option>
                           </select>
                         </td>
-                        <td className="p-2 text-center">
+                        <td className="px-2 py-2 pr-3 text-center">
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-destructive hover:bg-destructive/10 rounded-lg"
+                            className="h-7 w-7 hover:bg-destructive/10"
                             onClick={() => removeRow(r.id)}
+                            aria-label="ลบแถว"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" strokeWidth={1.75} />
                           </Button>
                         </td>
                       </tr>
@@ -425,308 +432,364 @@ export function SundayCountSheet() {
                   })}
                 </tbody>
                 <tfoot>
-                  <tr className="border-t-2 border-border/80 bg-muted/60 font-bold font-mono text-xs">
-                    <td className="p-3">
+                  <tr className="num-display border-t border-border bg-muted/40 text-xs">
+                    <td className="px-3 py-3 pl-5 font-medium text-muted-foreground">
                       ยอดรวม ({rows.filter((r) => rowSum(r) > 0).length} รายการ)
                     </td>
-                    <td className="p-3 text-right">{thb(categoryTotals.tithe)}</td>
-                    <td className="p-3 text-right">{thb(categoryTotals.rent)}</td>
-                    <td className="p-3 text-right">{thb(categoryTotals.memorial)}</td>
-                    <td className="p-3 text-right">{thb(categoryTotals.mission)}</td>
-                    <td className="p-3 text-right">{thb(categoryTotals.special)}</td>
-                    <td className="p-3 text-right">{thb(categoryTotals.land)}</td>
-                    <td className="p-3 text-right">{thb(categoryTotals.party)}</td>
-                    <td className="p-3 text-right text-primary text-sm">
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.tithe)}
+                    </td>
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.rent)}
+                    </td>
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.memorial)}
+                    </td>
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.mission)}
+                    </td>
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.special)}
+                    </td>
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.land)}
+                    </td>
+                    <td className="px-1.5 py-3 text-right font-semibold">
+                      {thb(categoryTotals.party)}
+                    </td>
+                    <td className="px-2 py-3 text-right text-sm font-semibold text-foreground">
                       {thb(categoryTotals.total)}
                     </td>
                     <td
                       colSpan={2}
-                      className="p-3 text-center text-[11px] text-muted-foreground font-normal"
+                      className="px-3 py-3 pr-5 text-center text-[11px] font-normal text-muted-foreground"
                     >
-                      เงินสด: {thb(categoryTotals.cash)} | ออนไลน์: {thb(categoryTotals.online)}
+                      เงินสด {thb(categoryTotals.cash)} · ออนไลน์ {thb(categoryTotals.online)}
                     </td>
                   </tr>
                 </tfoot>
               </table>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
         </TabsContent>
 
         {/* ========== Tab 2: Cash Count ========== */}
-        <TabsContent value="cash-count">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 ">
-              <CardHeader>
-                <CardTitle className="text-base">
-                  2. บันทึกข้อมูลการนับเงิน (ธนบัตรและเหรียญ)
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  ใส่จำนวนฉบับ/เหรียญที่นับได้จริง → ระบบคำนวณยอดเงินสดทั้งหมดให้อัตโนมัติ
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {DENOMINATIONS.map((d) => {
-                    const count = counts[d.value] || 0;
-                    const subtotal = d.value * count;
-                    return (
-                      <div
-                        key={d.value}
-                        className="flex items-center justify-between p-3  border border-border/50 bg-card/60 "
-                      >
-                        <span className="text-sm font-medium w-28">{d.label}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground font-mono">x</span>
-                          <Input
-                            type="number"
-                            min="0"
-                            value={count || ""}
-                            onChange={(e) =>
-                              setCounts((prev) => ({ ...prev, [d.value]: Number(e.target.value) }))
-                            }
-                            className="w-20 h-9 rounded-xl text-center font-mono font-semibold"
-                          />
-                        </div>
-                        <span className="font-mono font-bold text-sm text-primary w-24 text-right">
-                          {thb(subtotal)}
+        <TabsContent value="cash-count" className="mt-5">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <section className="card-ledger animate-fade-up lg:col-span-2">
+              <div className="border-b border-border px-5 py-3.5">
+                <p className="kicker">ขั้นตอนที่ 2 · ใบนับธนบัตรและเหรียญ</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  ใส่จำนวนฉบับ/เหรียญที่นับได้จริง ระบบคำนวณยอดเงินสดให้อัตโนมัติ
+                </p>
+              </div>
+              {/* Ledger column headings */}
+              <div className="flex items-center gap-3 border-b border-border bg-muted/30 px-5 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="w-28">ชนิดราคา</span>
+                <span className="flex-1 text-center">จำนวน</span>
+                <span className="w-28 text-right">เป็นเงิน</span>
+              </div>
+              <div className="divide-y divide-border">
+                {DENOMINATIONS.map((d) => {
+                  const count = counts[d.value] || 0;
+                  const subtotal = d.value * count;
+                  return (
+                    <div key={d.value} className="flex items-center gap-3 px-5 py-2.5">
+                      <span className="num-display w-28 shrink-0 text-sm font-medium text-foreground">
+                        {d.label}
+                      </span>
+                      <div className="flex flex-1 items-center justify-center gap-2.5">
+                        <span aria-hidden className="text-xs text-muted-foreground">
+                          ×
+                        </span>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={count || ""}
+                          onChange={(e) =>
+                            setCounts((prev) => ({ ...prev, [d.value]: Number(e.target.value) }))
+                          }
+                          className="num-display h-8 w-20 text-center text-sm"
+                        />
+                        <span aria-hidden className="text-xs text-muted-foreground">
+                          =
                         </span>
                       </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+                      <span
+                        className={`num-display w-28 shrink-0 text-right text-sm font-semibold ${
+                          subtotal > 0 ? "text-foreground" : "text-muted-foreground/50"
+                        }`}
+                      >
+                        {thb(subtotal)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Sheet running total */}
+              <div className="flex items-center justify-between border-t border-border bg-muted/40 px-5 py-3.5">
+                <span className="kicker">รวมเงินสดที่นับได้</span>
+                <span className="num-display text-lg font-semibold tracking-tight text-foreground">
+                  {thb(countedCashTotal)}
+                </span>
+              </div>
+            </section>
 
             {/* Cash Reconciliation */}
-            <div className="space-y-4">
-              <Card className=" border-border/60 ">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Calculator className="h-5 w-5 text-primary" /> ยอดเงินสดทั้งหมด
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm font-mono">
-                  <div className="flex justify-between p-3  bg-primary/10 border border-primary/30 text-primary font-bold text-base">
-                    <span>เงินสดที่นับได้:</span>
-                    <span>{thb(countedCashTotal)}</span>
-                  </div>
-                  <div className="flex justify-between p-2.5 rounded-xl bg-muted/40">
-                    <span className="text-muted-foreground">เงินสดจากใบถวาย:</span>
-                    <span className="font-bold text-foreground">{thb(categoryTotals.cash)}</span>
-                  </div>
-                  <div
-                    className={`flex justify-between p-3  border font-bold ${
-                      cashDiff === 0
-                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
-                        : "bg-destructive/15 border-destructive/40 text-destructive"
+            <section className="card-ledger animate-fade-up self-start">
+              <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+                <p className="kicker">กระทบยอดเงินสด</p>
+                <Calculator className="h-4 w-4 text-muted-foreground/50" strokeWidth={1.75} />
+              </div>
+              <div className="px-5 py-5">
+                <p className="kicker">เงินสดที่นับได้</p>
+                <p className="num-display font-display mt-2 text-3xl font-semibold tracking-tight text-foreground">
+                  {thb(countedCashTotal)}
+                </p>
+              </div>
+              <div className="divide-y divide-border border-t border-border">
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-muted-foreground">เงินสดจากใบถวาย</span>
+                  <span className="num-display font-semibold text-foreground">
+                    {thb(categoryTotals.cash)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-5 py-3 text-sm">
+                  <span className="text-muted-foreground">ผลต่าง</span>
+                  <span
+                    className={`num-display font-semibold ${
+                      cashDiff === 0 ? "text-success" : "text-destructive"
                     }`}
                   >
-                    <span>กระทบยอด:</span>
-                    <span>{cashDiff === 0 ? "✓ ตรงกันพอดี" : `ผลต่าง ${thb(cashDiff)}`}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                    {cashDiff === 0 ? "ตรงกันพอดี" : thb(cashDiff)}
+                  </span>
+                </div>
+              </div>
+              <div
+                className={`border-t border-border px-5 py-3.5 ${
+                  cashDiff === 0 ? "bg-muted/40" : "bg-destructive/5"
+                }`}
+              >
+                <p
+                  className={`flex items-center gap-2 text-xs font-medium ${
+                    cashDiff === 0 ? "text-success" : "text-destructive"
+                  }`}
+                >
+                  {cashDiff === 0 ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  )}
+                  {cashDiff === 0
+                    ? "ยอดเงินสดตรงกัน พร้อมบันทึก"
+                    : "ยอดเงินสดไม่ตรง กรุณานับใหม่อีกครั้ง"}
+                </p>
+              </div>
+            </section>
           </div>
         </TabsContent>
 
         {/* ========== Tab 3: Summary ========== */}
-        <TabsContent value="summary">
-          <Card className="">
-            <CardHeader>
-              <CardTitle className="text-base">3. บันทึกสรุปยอดประจำวัน & ผู้นับเงิน</CardTitle>
-              <CardDescription className="text-xs">
-                แยกยอดตามประเภท + สรุปเงินสด/ออนไลน์/รายรับ/รายจ่าย/คงเหลือ
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Category Breakdown */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-semibold text-foreground border-b pb-1">
-                    สรุปยอดตามประเภท
-                  </h4>
-                  <div className="space-y-1.5 text-sm font-mono">
-                    {[
-                      { label: "สิบลด", val: categoryTotals.tithe },
-                      { label: "ค่าเช่า", val: categoryTotals.rent },
-                      { label: "อนุสรณ์", val: categoryTotals.memorial },
-                      { label: "พันธกิจ", val: categoryTotals.mission },
-                      { label: "ถวายพิเศษ", val: categoryTotals.special },
-                      { label: "ที่ดิน", val: categoryTotals.land },
-                      { label: "ปาร์ตี้", val: categoryTotals.party },
-                      { label: "ออนไลน์", val: categoryTotals.online },
-                    ].map(({ label, val }) => (
-                      <div
-                        key={label}
-                        className="flex justify-between py-1.5 px-2 border-b border-border/30 rounded-lg hover:bg-muted/30 transition-colors"
-                      >
-                        <span>{label}:</span>
-                        <span
-                          className={`font-semibold ${val > 0 ? "text-foreground" : "text-muted-foreground"}`}
-                        >
-                          {thb(val)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Channel + Income/Expense */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-foreground border-b pb-1">
-                    สรุปรายรับ / รายจ่าย
-                  </h4>
-                  <div className="space-y-2 text-sm font-mono">
-                    <div className="flex justify-between p-2.5 rounded-xl bg-muted/40">
-                      <span>เงินสด:</span>
-                      <span className="font-bold">{thb(categoryTotals.cash)}</span>
-                    </div>
-                    <div className="flex justify-between p-2.5 rounded-xl bg-muted/40">
-                      <span>ออนไลน์:</span>
-                      <span className="font-bold">{thb(categoryTotals.online)}</span>
-                    </div>
-                    <div className="flex justify-between p-2.5 rounded-xl bg-primary/10 border border-primary/20 font-bold text-primary">
-                      <span>รายรับรวม:</span>
-                      <span>{thb(categoryTotals.total)}</span>
-                    </div>
-
-                    <div className="space-y-1.5 pt-2">
-                      <label className="text-xs font-sans font-medium text-muted-foreground">
-                        รายจ่ายรวม:
-                      </label>
-                      <Input
-                        type="number"
-                        value={weeklyExpense || ""}
-                        onChange={(e) => setWeeklyExpense(Number(e.target.value))}
-                        placeholder="0"
-                        className="rounded-xl font-mono text-sm"
-                      />
-                    </div>
-
-                    <div
-                      className={`flex justify-between p-3  border font-bold text-base ${
-                        categoryTotals.total - weeklyExpense >= 0
-                          ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
-                          : "bg-destructive/15 border-destructive/40 text-destructive"
-                      }`}
-                    >
-                      <span>คงเหลือ:</span>
-                      <span>{thb(categoryTotals.total - weeklyExpense)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Counter Signatures */}
-              <div className="pt-4 border-t border-border/60">
-                <h4 className="text-sm font-semibold text-foreground mb-3">ผู้นับเงิน (3 ท่าน)</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <TabsContent value="summary" className="mt-5">
+          <section className="card-ledger animate-fade-up">
+            <div className="border-b border-border px-5 py-3.5">
+              <p className="kicker">ขั้นตอนที่ 3 · สรุปยอดประจำวัน &amp; ผู้นับเงิน</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                แยกยอดตามประเภท พร้อมสรุปเงินสด/ออนไลน์/รายจ่าย/คงเหลือ
+              </p>
+            </div>
+            <div className="grid grid-cols-1 divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0">
+              {/* Category Breakdown */}
+              <div>
+                <p className="kicker border-b border-border bg-muted/30 px-5 py-2.5">
+                  สรุปยอดตามประเภท
+                </p>
+                <div className="divide-y divide-border">
                   {[
-                    { label: "ผู้นับเงินคนที่ 1", val: counter1, set: setCounter1 },
-                    { label: "ผู้นับเงินคนที่ 2", val: counter2, set: setCounter2 },
-                    { label: "ผู้นับเงินคนที่ 3", val: counter3, set: setCounter3 },
-                  ].map(({ label, val, set }) => (
-                    <div key={label}>
-                      <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                        {label}
-                      </label>
-                      <Input
-                        value={val}
-                        onChange={(e) => set(e.target.value)}
-                        placeholder="ชื่อ-นามสกุล..."
-                        className="rounded-xl text-xs"
-                      />
+                    { label: "สิบลด", val: categoryTotals.tithe },
+                    { label: "ค่าเช่า", val: categoryTotals.rent },
+                    { label: "อนุสรณ์", val: categoryTotals.memorial },
+                    { label: "พันธกิจ", val: categoryTotals.mission },
+                    { label: "ถวายพิเศษ", val: categoryTotals.special },
+                    { label: "ที่ดิน", val: categoryTotals.land },
+                    { label: "ปาร์ตี้", val: categoryTotals.party },
+                    { label: "ออนไลน์", val: categoryTotals.online },
+                  ].map(({ label, val }) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between px-5 py-2.5 text-sm"
+                    >
+                      <span className="text-muted-foreground">{label}</span>
+                      <span
+                        className={`num-display font-semibold ${
+                          val > 0 ? "text-foreground" : "text-muted-foreground/50"
+                        }`}
+                      >
+                        {thb(val)}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        {/* ========== Tab 4: Validation & Save ========== */}
-        <TabsContent value="validation">
-          <Card className="">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-primary" /> 4. ตรวจสอบความถูกต้องก่อนบันทึก
-              </CardTitle>
-              <CardDescription className="text-xs">
-                ระบบจะตรวจสอบข้อมูลทั้งหมดก่อนอนุญาตให้บันทึก ต้องผ่านทุกข้อจึงจะกดบันทึกได้
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Checklist */}
-              <div className="space-y-3">
-                {validationChecks.map((c, i) => (
-                  <div
-                    key={i}
-                    className={`flex items-start gap-3 p-4  border transition-colors ${
-                      c.pass
-                        ? "bg-emerald-500/10 border-emerald-500/30"
-                        : "bg-amber-500/10 border-amber-500/30"
+              {/* Channel + Income/Expense */}
+              <div>
+                <p className="kicker border-b border-border bg-muted/30 px-5 py-2.5">
+                  สรุปรายรับ / รายจ่าย
+                </p>
+                <div className="divide-y divide-border">
+                  <div className="flex items-center justify-between px-5 py-3 text-sm">
+                    <span className="text-muted-foreground">เงินสด</span>
+                    <span className="num-display font-semibold text-foreground">
+                      {thb(categoryTotals.cash)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between px-5 py-3 text-sm">
+                    <span className="text-muted-foreground">ออนไลน์</span>
+                    <span className="num-display font-semibold text-foreground">
+                      {thb(categoryTotals.online)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between px-5 py-3 text-sm">
+                    <span className="font-medium text-foreground">รายรับรวม</span>
+                    <span className="num-display font-semibold text-primary">
+                      {thb(categoryTotals.total)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                    <span className="text-muted-foreground">รายจ่ายรวม</span>
+                    <Input
+                      type="number"
+                      value={weeklyExpense || ""}
+                      onChange={(e) => setWeeklyExpense(Number(e.target.value))}
+                      placeholder="0"
+                      className="num-display h-8 w-32 text-right text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t border-border bg-muted/40 px-5 py-3.5">
+                  <span className="kicker">คงเหลือ</span>
+                  <span
+                    className={`num-display text-lg font-semibold tracking-tight ${
+                      categoryTotals.total - weeklyExpense >= 0
+                        ? "text-success"
+                        : "text-destructive"
                     }`}
                   >
-                    <div
-                      className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                        c.pass ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
-                      }`}
-                    >
-                      {c.pass ? "✓" : "!"}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold">{c.label}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5 font-mono">
-                        {c.detail}
-                      </div>
-                    </div>
+                    {thb(categoryTotals.total - weeklyExpense)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Counter Signatures */}
+            <div className="border-t border-border">
+              <p className="kicker border-b border-border bg-muted/30 px-5 py-2.5">
+                ผู้นับเงิน (3 ท่าน)
+              </p>
+              <div className="grid grid-cols-1 gap-3 px-5 py-4 md:grid-cols-3">
+                {[
+                  { label: "ผู้นับเงินคนที่ 1", val: counter1, set: setCounter1 },
+                  { label: "ผู้นับเงินคนที่ 2", val: counter2, set: setCounter2 },
+                  { label: "ผู้นับเงินคนที่ 3", val: counter3, set: setCounter3 },
+                ].map(({ label, val, set }) => (
+                  <div key={label}>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                      {label}
+                    </label>
+                    <Input
+                      value={val}
+                      onChange={(e) => set(e.target.value)}
+                      placeholder="ชื่อ-นามสกุล..."
+                      className="h-9 text-sm"
+                    />
                   </div>
                 ))}
               </div>
+            </div>
+          </section>
+        </TabsContent>
 
-              {/* Quick Summary */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4  bg-muted/40 border border-border/40 font-mono text-sm">
-                <div className="text-center">
-                  <div className="text-xs text-muted-foreground mb-1">รายรับรวม</div>
-                  <div className="font-bold text-primary text-base">
-                    {thb(categoryTotals.total)}
+        {/* ========== Tab 4: Validation & Save ========== */}
+        <TabsContent value="validation" className="mt-5">
+          <section className="card-ledger animate-fade-up">
+            <div className="border-b border-border px-5 py-3.5">
+              <p className="kicker">ขั้นตอนที่ 4 · ตรวจสอบความถูกต้องก่อนบันทึก</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                ระบบตรวจสอบข้อมูลทั้งหมดก่อนบันทึก — ต้องผ่านทุกข้อจึงจะบันทึกได้
+              </p>
+            </div>
+            {/* Checklist */}
+            <div className="divide-y divide-border">
+              {validationChecks.map((c, i) => (
+                <div key={i} className="flex items-center gap-3 px-5 py-3.5">
+                  {c.pass ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-success" strokeWidth={1.75} />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-warning" strokeWidth={1.75} />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">{c.label}</p>
+                    <p className="num-display mt-0.5 text-xs text-muted-foreground">{c.detail}</p>
                   </div>
+                  <span
+                    className={`shrink-0 text-xs font-medium ${
+                      c.pass ? "text-success" : "text-warning"
+                    }`}
+                  >
+                    {c.pass ? "ผ่าน" : "ต้องแก้ไข"}
+                  </span>
                 </div>
-                <div className="text-center">
-                  <div className="text-xs text-muted-foreground mb-1">เงินสด</div>
-                  <div className="font-bold">{thb(categoryTotals.cash)}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs text-muted-foreground mb-1">ออนไลน์</div>
-                  <div className="font-bold">{thb(categoryTotals.online)}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs text-muted-foreground mb-1">รายจ่าย</div>
-                  <div className="font-bold text-destructive">{thb(weeklyExpense)}</div>
-                </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Save Button */}
-              <div className="flex flex-col items-center gap-3 pt-2">
-                {!allPassed && (
-                  <div className="flex items-center gap-2 text-amber-600 text-sm font-medium">
-                    <AlertTriangle className="h-4 w-4" />
-                    กรุณาแก้ไขรายการที่ยังไม่ผ่านก่อนบันทึก
-                  </div>
-                )}
-                <Button
-                  size="lg"
-                  className=" px-8 py-6 text-base active:scale-95 disabled:opacity-50"
-                  disabled={!allPassed || saveMutation.isPending}
-                  onClick={() => saveMutation.mutate()}
-                >
-                  <CheckCircle2 className="h-5 w-5 mr-2" />
-                  {saveMutation.isPending ? "กำลังบันทึก..." : "ตรวจสอบผ่าน — บันทึกเข้าสู่ระบบ"}
-                </Button>
+            {/* Quick Summary — stat band with hairline dividers */}
+            <div className="grid grid-cols-2 gap-px border-t border-border bg-border md:grid-cols-4">
+              <div className="bg-card px-5 py-4">
+                <p className="kicker">รายรับรวม</p>
+                <p className="num-display mt-1.5 text-base font-semibold tracking-tight text-primary">
+                  {thb(categoryTotals.total)}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-card px-5 py-4">
+                <p className="kicker">เงินสด</p>
+                <p className="num-display mt-1.5 text-base font-semibold tracking-tight text-foreground">
+                  {thb(categoryTotals.cash)}
+                </p>
+              </div>
+              <div className="bg-card px-5 py-4">
+                <p className="kicker">ออนไลน์</p>
+                <p className="num-display mt-1.5 text-base font-semibold tracking-tight text-foreground">
+                  {thb(categoryTotals.online)}
+                </p>
+              </div>
+              <div className="bg-card px-5 py-4">
+                <p className="kicker">รายจ่าย</p>
+                <p className="num-display mt-1.5 text-base font-semibold tracking-tight text-destructive">
+                  {thb(weeklyExpense)}
+                </p>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex flex-col items-center gap-3 border-t border-border px-5 py-6">
+              {!allPassed && (
+                <p className="flex items-center gap-2 text-sm font-medium text-warning">
+                  <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
+                  กรุณาแก้ไขรายการที่ยังไม่ผ่านก่อนบันทึก
+                </p>
+              )}
+              <Button
+                size="lg"
+                className="h-10 px-8"
+                disabled={!allPassed || saveMutation.isPending}
+                onClick={() => saveMutation.mutate()}
+              >
+                <CheckCircle2 className="mr-1.5 h-4 w-4" strokeWidth={1.75} />
+                {saveMutation.isPending ? "กำลังบันทึก..." : "ตรวจสอบผ่าน — บันทึกเข้าสู่ระบบ"}
+              </Button>
+            </div>
+          </section>
         </TabsContent>
       </Tabs>
     </div>

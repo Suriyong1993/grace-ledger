@@ -1,196 +1,234 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Download, FileBarChart2, Printer, FileSpreadsheet, FileText } from "lucide-react";
+import { useState } from "react";
+import {
+  FileBarChart2,
+  Download,
+  Printer,
+  TrendingUp,
+  TrendingDown,
+  PieChart as PieIcon,
+  Calendar,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { StatCard } from "@/components/shared/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { listExpense, listIncome, listOffering, getSettings } from "@/services/church";
-import { thb, fmtMonth, dayjs } from "@/lib/format";
-import {
-  exportCSV,
-  exportExcel,
-  exportPDF,
-  exportGoogleSheets,
-  exportGoogleDrive,
-  printReport,
-  type ExportColumn,
-} from "@/lib/exporters";
-import { useAuth } from "@/lib/auth";
-import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { listIncome, listExpense, listOffering } from "@/services/church";
+import { thb } from "@/lib/format";
+import { PageTransition } from "@/components/shared/PageTransition";
 
 export const Route = createFileRoute("/_app/reports")({
-  head: () => ({ meta: [{ title: "รายงาน" }] }),
+  head: () => ({ meta: [{ title: "รายงานการเงิน — Grace Ledger" }] }),
   component: ReportsPage,
 });
 
 function ReportsPage() {
-  const { user } = useAuth();
-  const inQ = useQuery({ queryKey: ["income"], queryFn: listIncome });
-  const exQ = useQuery({ queryKey: ["expense"], queryFn: listExpense });
-  const offQ = useQuery({ queryKey: ["offering"], queryFn: listOffering });
-  const setQ = useQuery({ queryKey: ["settings"], queryFn: getSettings });
-  const inc = inQ.data ?? [];
-  const exp = exQ.data ?? [];
-  const off = offQ.data ?? [];
-  const months = Array.from({ length: 6 }).map((_, i) => {
-    const d = dayjs().subtract(5 - i, "month");
-    const key = d.format("YYYY-MM");
-    const income = inc.filter((x) => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0);
-    const offering = off.filter((x) => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0);
-    const expense = exp.filter((x) => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0);
-    return {
-      label: fmtMonth(d.toDate()),
-      income,
-      offering,
-      expense,
-      net: income + offering - expense,
-    };
-  });
-  const totals = {
-    income: inc.reduce((s, x) => s + x.amount, 0),
-    offering: off.reduce((s, x) => s + x.amount, 0),
-    expense: exp.reduce((s, x) => s + x.amount, 0),
+  const [period, setPeriod] = useState<"month" | "quarter" | "year">("month");
+
+  const incomeQ = useQuery({ queryKey: ["incomes"], queryFn: listIncome });
+  const expenseQ = useQuery({ queryKey: ["expenses"], queryFn: listExpense });
+  const offeringQ = useQuery({ queryKey: ["offerings"], queryFn: listOffering });
+
+  const incomes = incomeQ.data ?? [];
+  const expenses = expenseQ.data ?? [];
+  const offerings = offeringQ.data ?? [];
+
+  const totalIncome = incomes.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const totalExpense = expenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const netBalance = totalIncome - totalExpense;
+  const totalOffering = offerings.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+
+  const handlePrint = () => {
+    window.print();
   };
 
-  const cols: ExportColumn<(typeof months)[number]>[] = [
-    { key: "label", label: "เดือน" },
-    { key: "income", label: "รายรับ", align: "right", format: (r) => r.income.toFixed(2) },
-    { key: "offering", label: "เงินถวาย", align: "right", format: (r) => r.offering.toFixed(2) },
-    { key: "expense", label: "รายจ่าย", align: "right", format: (r) => r.expense.toFixed(2) },
-    { key: "net", label: "สุทธิ", align: "right", format: (r) => r.net.toFixed(2) },
-  ];
-  const meta = {
-    title: "รายงานสรุปรายเดือน",
-    subtitle: `${months[0]?.label} - ${months[months.length - 1]?.label}`,
-    churchName: setQ.data?.churchName ?? "",
-    generatedBy: user?.name,
-    fileBase: "Monthly_Report",
+  const handleExportCSV = () => {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      "ประเภท,รายการ,จำนวนเงิน (บาท),วันที่\n" +
+      incomes.map((i) => `รายรับ,${i.description || 'รายรับ'},${i.amount},${i.date}`).join("\n") +
+      "\n" +
+      expenses.map((e) => `รายจ่าย,${e.description || 'รายจ่าย'},${e.amount},${e.date}`).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `financial_report_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
-  const doExport = async (fmt: "csv" | "excel" | "pdf" | "gsheets" | "gdrive") => {
-    try {
-      if (fmt === "csv") exportCSV(months, cols, meta);
-      if (fmt === "excel") await exportExcel(months, cols, meta);
-      if (fmt === "pdf") await exportPDF(months, cols, meta);
-      if (fmt === "gsheets") {
-        const sheetId = prompt("กรอก Google Sheet ID:");
-        if (!sheetId) return;
-        await exportGoogleSheets(months, cols, meta, sheetId);
-      }
-      if (fmt === "gdrive") {
-        await exportGoogleDrive(months, cols, meta);
-      }
-      toast.success("ส่งออกรายงานสำเร็จ");
-    } catch (e) {
-      toast.error("ส่งออกไม่สำเร็จ");
-      console.error(e);
-    }
-  };
+
   return (
-    <div>
+    <PageTransition className="space-y-6">
       <PageHeader
-        title="รายงาน"
-        description="สรุปรายงานการเงิน"
+        kicker="องค์กร"
+        title="รายงานการเงิน"
+        description="รายงานสรุปรายรับ-รายจ่าย สรุปงบประมาณ และรายงานเงินถวายประจำคริสตจักร"
         actions={
-          <>
-            <Button variant="outline" className="" onClick={printReport}>
-              <Printer className="h-4 w-4 mr-2" /> พิมพ์
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handlePrint}>
+              <Printer className="mr-2 h-4 w-4" />
+              พิมพ์รายงาน
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="">
-                  <Download className="h-4 w-4 mr-2" /> ส่งออก
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="">
-                <DropdownMenuItem onClick={() => doExport("pdf")}>
-                  <FileText className="h-4 w-4 mr-2 text-destructive" /> PDF
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => doExport("excel")}>
-                  <FileSpreadsheet className="h-4 w-4 mr-2 text-success" /> Excel
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => doExport("csv")}>
-                  <Download className="h-4 w-4 mr-2" /> CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => doExport("gsheets")}>
-                  <FileSpreadsheet className="h-4 w-4 mr-2 text-[#0F9D58]" /> Google Sheets
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => doExport("gdrive")}>
-                  <Download className="h-4 w-4 mr-2 text-[#4285F4]" /> Google Drive
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+            <Button size="sm" onClick={handleExportCSV}>
+              <Download className="mr-2 h-4 w-4" />
+              ส่งออก CSV
+            </Button>
+          </div>
         }
       />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="">
-          <CardContent className="p-5">
-            <p className="text-sm text-muted-foreground">รายรับสะสม</p>
-            <p className="mt-2 text-3xl font-bold text-success tabular-nums">
-              {thb(totals.income)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="">
-          <CardContent className="p-5">
-            <p className="text-sm text-muted-foreground">เงินถวายสะสม</p>
-            <p className="mt-2 text-3xl font-bold text-primary tabular-nums">
-              {thb(totals.offering)}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="">
-          <CardContent className="p-5">
-            <p className="text-sm text-muted-foreground">รายจ่ายสะสม</p>
-            <p className="mt-2 text-3xl font-bold text-destructive tabular-nums">
-              {thb(totals.expense)}
-            </p>
-          </CardContent>
-        </Card>
+
+      {/* Overview Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard
+          label="รายรับรวม"
+          value={thb(totalIncome)}
+          hint={`${incomes.length} รายการ`}
+          icon={TrendingUp}
+        />
+        <StatCard
+          label="รายจ่ายรวม"
+          value={thb(totalExpense)}
+          hint={`${expenses.length} รายการ`}
+          icon={TrendingDown}
+        />
+        <StatCard
+          label="เงินถวายรวม"
+          value={thb(totalOffering)}
+          hint={`${offerings.length} สัปดาห์`}
+          icon={PieIcon}
+        />
+        <StatCard
+          label="ยอดคงเหลือสุทธิ"
+          value={thb(netBalance)}
+          hint={netBalance >= 0 ? "เกินงบ / ดุลบวก" : "ติดลบ / ดุลลบ"}
+          icon={FileBarChart2}
+        />
       </div>
-      <Card className="">
-        <CardHeader className="flex flex-row items-center gap-2">
-          <FileBarChart2 className="h-5 w-5 text-primary" />
-          <CardTitle>รายงานรายเดือน (6 เดือน)</CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-muted-foreground border-b">
-                <th className="py-2">เดือน</th>
-                <th className="text-right py-2">รายรับ</th>
-                <th className="text-right py-2">เงินถวาย</th>
-                <th className="text-right py-2">รายจ่าย</th>
-                <th className="text-right py-2">สุทธิ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {months.map((m) => (
-                <tr key={m.label}>
-                  <td className="py-3 font-medium">{m.label}</td>
-                  <td className="text-right tabular-nums text-success">{thb(m.income)}</td>
-                  <td className="text-right tabular-nums text-primary">{thb(m.offering)}</td>
-                  <td className="text-right tabular-nums text-destructive">{thb(m.expense)}</td>
-                  <td
-                    className={
-                      "text-right tabular-nums font-semibold " +
-                      (m.net >= 0 ? "text-success" : "text-destructive")
-                    }
-                  >
-                    {thb(m.net)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-    </div>
+
+      {/* Tabs for Detailed Reports */}
+      <Tabs defaultValue="statement" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsTrigger value="statement">งบรายรับ-รายจ่าย</TabsTrigger>
+          <TabsTrigger value="offering">รายงานเงินถวาย</TabsTrigger>
+          <TabsTrigger value="category">แยกตามหมวดหมู่</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="statement" className="mt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-medium">งบสรุปรายรับ-รายจ่ายประจำคริสตจักร</CardTitle>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>ข้อมูลอัปเดตล่าสุดเรียลไทม์</span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-emerald-600 dark:text-emerald-400">
+                    รายการรายรับ ({incomes.length} รายการ)
+                  </h4>
+                  {incomes.length === 0 ? (
+                    <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
+                  ) : (
+                    <div className="border border-border divide-y divide-border rounded-md text-xs">
+                      {incomes.map((inc) => (
+                        <div key={inc.id} className="flex justify-between p-3">
+                          <div>
+                            <p className="font-medium text-foreground">{inc.description || "รายรับ"}</p>
+                            <p className="text-[11px] text-muted-foreground">{inc.date}</p>
+                          </div>
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                            +{thb(inc.amount)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-rose-600 dark:text-rose-400">
+                    รายการรายจ่าย ({expenses.length} รายการ)
+                  </h4>
+                  {expenses.length === 0 ? (
+                    <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายจ่าย</p>
+                  ) : (
+                    <div className="border border-border divide-y divide-border rounded-md text-xs">
+                      {expenses.map((exp) => (
+                        <div key={exp.id} className="flex justify-between p-3">
+                          <div>
+                            <p className="font-medium text-foreground">{exp.description || "รายจ่าย"}</p>
+                            <p className="text-[11px] text-muted-foreground">{exp.date} · หมวดหมู่ {exp.categoryId}</p>
+                          </div>
+                          <span className="font-semibold text-rose-600 dark:text-rose-400">
+                            -{thb(exp.amount)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="offering" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base font-medium">รายงานสรุปเงินถวายสัปดาห์</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {offerings.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-4 text-center">ยังไม่มีบันทึกสรุปเงินถวาย</p>
+              ) : (
+                <div className="border border-border divide-y divide-border rounded-md text-xs">
+                  {offerings.map((off) => (
+                    <div key={off.id} className="flex justify-between p-3">
+                      <div>
+                        <p className="font-medium text-foreground">เงินถวายประจำวันที่ {off.date}</p>
+                        <p className="text-[11px] text-muted-foreground">บันทึกโดย {off.createdBy}</p>
+                      </div>
+                      <span className="font-semibold text-foreground">
+                        {thb(off.amount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="category" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base font-medium">สรุปค่าใช้จ่ายแยกตามหมวดหมู่</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Object.entries(
+                  expenses.reduce((acc, curr) => {
+                    const cat = curr.categoryId || "อื่นๆ";
+                    acc[cat] = (acc[cat] || 0) + (curr.amount || 0);
+                    return acc;
+                  }, {} as Record<string, number>)
+                ).map(([category, amount]) => (
+                  <div key={category} className="flex items-center justify-between border-b border-border pb-2 text-xs">
+                    <span className="font-medium">{category}</span>
+                    <span className="font-semibold">{thb(amount)}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </PageTransition>
   );
 }

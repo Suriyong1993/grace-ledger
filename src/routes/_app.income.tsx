@@ -5,15 +5,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, CheckCircle2, ArrowDownCircle, HandHeart } from "lucide-react";
+import {
+  Plus,
+  Download,
+  ArrowDownCircle,
+  ArrowDownLeft,
+  HandHeart,
+  Wallet,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { StatCard } from "@/components/shared/StatCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -188,6 +194,7 @@ function IncomePage() {
   const totalIncome = incomes.reduce((s, r) => s + r.amount, 0);
   const totalOffering = offerings.reduce((s, r) => s + r.amount, 0);
   const totalAll = totalIncome + totalOffering;
+  const isLoading = incomeQ.isLoading || offeringQ.isLoading;
 
   const exportCsv = () => {
     const csv = toCsv(
@@ -214,23 +221,24 @@ function IncomePage() {
   };
 
   return (
-    <div>
+    <div className="space-y-6 md:space-y-8">
       <PageHeader
-        title="รายรับทั้งหมด"
-        description={`รายรับ ${thb(totalIncome)} + เงินถวาย ${thb(totalOffering)} = ${thb(totalAll)} จาก ${rows.length} รายการ`}
+        kicker="รายการเงิน"
+        title="รายรับ"
+        description={`บันทึกรายรับและเงินถวายของคริสตจักร · แสดง ${rows.length} รายการ`}
         actions={
           <>
-            <Button variant="outline" className="" onClick={exportCsv}>
-              <Download className="h-4 w-4 mr-2" /> Export
+            <Button variant="outline" className="h-8" onClick={exportCsv}>
+              <Download className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> Export
             </Button>
             {can("income.write") && (
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <Button className="">
-                    <Plus className="h-4 w-4 mr-2" /> เพิ่มรายรับ
+                  <Button className="h-8">
+                    <Plus className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> เพิ่มรายรับ
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="">
+                <DialogContent className="sm:max-w-lg">
                   <DialogHeader>
                     <DialogTitle>บันทึกรายรับ</DialogTitle>
                   </DialogHeader>
@@ -239,7 +247,7 @@ function IncomePage() {
                       onSubmit={form.handleSubmit((v) => create.mutate(v))}
                       className="space-y-4"
                     >
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <FormField
                           name="date"
                           control={form.control}
@@ -247,7 +255,11 @@ function IncomePage() {
                             <FormItem>
                               <FormLabel>วันที่</FormLabel>
                               <FormControl>
-                                <Input type="date" className="rounded-xl" {...field} />
+                                <Input
+                                  type="date"
+                                  className="bg-card shadow-none"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -263,7 +275,7 @@ function IncomePage() {
                                 <Input
                                   type="number"
                                   step="0.01"
-                                  className="rounded-xl"
+                                  className="num-display bg-card shadow-none"
                                   {...field}
                                 />
                               </FormControl>
@@ -280,7 +292,7 @@ function IncomePage() {
                             <FormLabel>หมวดหมู่</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger className="rounded-xl h-11">
+                                <SelectTrigger className="bg-card shadow-none">
                                   <SelectValue placeholder="เลือกหมวดหมู่" />
                                 </SelectTrigger>
                               </FormControl>
@@ -304,7 +316,7 @@ function IncomePage() {
                             <FormLabel>กองทุน</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger className="rounded-xl h-11">
+                                <SelectTrigger className="bg-card shadow-none">
                                   <SelectValue placeholder="เลือกกองทุน" />
                                 </SelectTrigger>
                               </FormControl>
@@ -327,7 +339,11 @@ function IncomePage() {
                           <FormItem>
                             <FormLabel>รายละเอียด</FormLabel>
                             <FormControl>
-                              <Textarea className="rounded-xl" rows={3} {...field} />
+                              <Textarea
+                                rows={3}
+                                className="bg-card shadow-none"
+                                {...field}
+                              />
                             </FormControl>
                           </FormItem>
                         )}
@@ -353,78 +369,122 @@ function IncomePage() {
         }
       />
 
-      <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายรับทั้งหมด..." />
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-[104px]" />
+          ))}
+        </div>
+      ) : (
+        <div className="stagger grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+          <StatCard
+            label="รายรับ"
+            value={thb(totalIncome)}
+            tone="success"
+            icon={ArrowDownLeft}
+            hint={`${incomes.length} รายการ`}
+          />
+          <StatCard
+            label="เงินถวาย"
+            value={thb(totalOffering)}
+            tone="primary"
+            icon={HandHeart}
+            hint={`${offerings.length} รายการ`}
+          />
+          <StatCard
+            label="รวมทั้งหมด"
+            value={thb(totalAll)}
+            tone="secondary"
+            icon={Wallet}
+            hint={`รวม ${combined.length} รายการ`}
+          />
+        </div>
+      )}
 
-      <Card className=" overflow-hidden">
-        <CardContent className="p-0">
-          {incomeQ.isLoading || offeringQ.isLoading ? (
-            <div className="p-6 space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 rounded-xl" />
-              ))}
-            </div>
-          ) : rows.length === 0 ? (
-            <div className="p-6">
-              <EmptyState
-                icon={ArrowDownCircle}
-                title="ยังไม่มีรายการ"
-                description="เริ่มบันทึกรายรับหรือเงินถวายเพื่อดูข้อมูลที่นี่"
-              />
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>วันที่</TableHead>
-                  <TableHead>ประเภท</TableHead>
-                  <TableHead>หมวดหมู่</TableHead>
-                  <TableHead>ช่องทาง</TableHead>
-                  <TableHead>กองทุน</TableHead>
-                  <TableHead>รายละเอียด</TableHead>
-                  <TableHead>สถานะ</TableHead>
-                  <TableHead className="text-right">จำนวน</TableHead>
+      <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายรับหรือเงินถวาย..." />
+
+      <section className="card-ledger animate-fade-up">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+          <p className="kicker">รายการทั้งหมด</p>
+          <p className="num-display text-xs text-muted-foreground">{rows.length} รายการ</p>
+        </div>
+        {isLoading ? (
+          <div className="divide-y divide-border">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between gap-4 px-5 py-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="hidden h-4 w-32 sm:block" />
+                <Skeleton className="hidden h-4 w-20 md:block" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+        ) : rows.length === 0 ? (
+          <div className="p-4 md:p-5">
+            <EmptyState
+              icon={ArrowDownCircle}
+              title="ยังไม่มีรายการ"
+              description="เริ่มบันทึกรายรับหรือเงินถวายเพื่อดูข้อมูลที่นี่"
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="px-5">วันที่</TableHead>
+                <TableHead className="px-5">ประเภท</TableHead>
+                <TableHead className="px-5">หมวดหมู่</TableHead>
+                <TableHead className="px-5">ช่องทาง</TableHead>
+                <TableHead className="px-5">กองทุน</TableHead>
+                <TableHead className="px-5">รายละเอียด</TableHead>
+                <TableHead className="px-5">สถานะ</TableHead>
+                <TableHead className="px-5 text-right">จำนวน</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
+                    {fmtDate(r.date)}
+                  </TableCell>
+                  <TableCell className="px-5 py-3">
+                    {r.isOffering ? (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                        <HandHeart className="h-3.5 w-3.5 text-primary" strokeWidth={1.75} />
+                        เงินถวาย
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                        <ArrowDownLeft className="h-3.5 w-3.5 text-success" strokeWidth={1.75} />
+                        รายรับ
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-5 py-3 font-medium">{r.category}</TableCell>
+                  <TableCell className="px-5 py-3 text-muted-foreground">
+                    {r.channel ?? <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="px-5 py-3">{r.fund}</TableCell>
+                  <TableCell className="max-w-xs truncate px-5 py-3 text-muted-foreground">
+                    {r.description || <span className="text-xs text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="px-5 py-3">
+                    {r.isOffering ? (
+                      <StatusBadge status="approved" />
+                    ) : (
+                      <StatusBadge status={r.status} />
+                    )}
+                  </TableCell>
+                  <TableCell className="px-5 py-3 text-right">
+                    <MoneyText value={r.amount} tone="income" />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((r) => (
-                  <TableRow key={r.id} className={r.isOffering ? "bg-primary/[0.02]" : ""}>
-                    <TableCell className="whitespace-nowrap">{fmtDate(r.date)}</TableCell>
-                    <TableCell>
-                      {r.isOffering ? (
-                        <Badge variant="secondary" className="rounded-full text-[10px] gap-1">
-                          <HandHeart className="h-3 w-3" /> เงินถวาย
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="rounded-full text-[10px]">
-                          <ArrowDownCircle className="h-3 w-3 mr-0.5" /> รายรับ
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>{r.category}</TableCell>
-                    <TableCell>
-                      {r.channel ?? <span className="text-xs text-muted-foreground">—</span>}
-                    </TableCell>
-                    <TableCell>{r.fund}</TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {r.description || <span className="text-xs text-muted-foreground">—</span>}
-                    </TableCell>
-                    <TableCell>
-                      {r.isOffering ? (
-                        <StatusBadge status="approved" />
-                      ) : (
-                        <StatusBadge status={r.status} />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <MoneyText value={r.amount} tone="income" />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </section>
     </div>
   );
 }
+

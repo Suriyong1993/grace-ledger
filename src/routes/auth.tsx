@@ -4,10 +4,11 @@
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
-import { Church, Delete, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Delete, ArrowLeft, ShieldCheck, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth, fetchLoginUsers, type LoginUser } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -19,6 +20,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+const FEATURES = [
+  "บันทึกรายรับ รายจ่าย และเงินถวายในที่เดียว",
+  "บริหารกองทุน โครงการ และงบประมาณอย่างเป็นระบบ",
+  "รายงานพร้อมตรวจสอบ — โปร่งใสต่อคณะกรรมการ",
+];
+
+const PAD_BUTTON =
+  "flex h-14 cursor-pointer items-center justify-center border border-border bg-card text-lg font-medium num-display transition-all duration-100 hover:bg-muted active:scale-95 disabled:cursor-not-allowed disabled:opacity-40";
+
 function AuthPage() {
   const { user: authUser, signIn } = useAuth();
   const navigate = useNavigate();
@@ -29,19 +39,16 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (authUser) {
       navigate({ to: "/dashboard", replace: true });
     }
   }, [authUser, navigate]);
 
-  // Fetch user list on mount
   useEffect(() => {
     fetchLoginUsers().then(setLoginUsers);
   }, []);
 
-  // Auto-submit when PIN reaches 6 digits
   const handlePinComplete = useCallback(
     async (fullPin: string, user: LoginUser) => {
       setLoading(true);
@@ -76,7 +83,6 @@ function AuthPage() {
     [signIn, navigate],
   );
 
-  // Handle digit press
   const handleDigit = useCallback(
     (digit: string) => {
       if (loading || pin.length >= 6) return;
@@ -89,21 +95,18 @@ function AuthPage() {
     [pin, loading, selectedUser, handlePinComplete],
   );
 
-  // Handle backspace
   const handleBackspace = useCallback(() => {
     if (loading) return;
     setPin((p) => p.slice(0, -1));
     setError(null);
   }, [loading]);
 
-  // Handle user selection
   const handleSelectUser = useCallback((user: LoginUser) => {
     setSelectedUser(user);
     setPin("");
     setError(null);
   }, []);
 
-  // Handle back to user list
   const handleBack = useCallback(() => {
     setSelectedUser(null);
     setPin("");
@@ -111,84 +114,115 @@ function AuthPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh grid lg:grid-cols-2 bg-background">
-      {/* Left panel — branding */}
-      <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden bg-primary text-primary-foreground">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,oklch(1_0_0/0.08),transparent_60%)]" />
+    <div className="grid min-h-dvh bg-background lg:grid-cols-[1.05fr_1fr]">
+      {/* Brand panel — ledger paper motif */}
+      <aside className="relative hidden flex-col justify-between overflow-hidden bg-foreground p-12 text-background lg:flex">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent, transparent 35px, currentColor 35px, currentColor 36px)",
+          }}
+        />
         <div className="relative flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center border border-white/20 bg-white/10 backdrop-blur-sm">
-            <Church className="h-5 w-5" />
+          <div className="grid h-9 w-9 place-items-center bg-primary text-primary-foreground">
+            <span className="text-sm font-bold">✦</span>
           </div>
           <div>
-            <p className="text-[15px] font-semibold tracking-tight">Grace Ledger</p>
-            <p className="text-xs text-white/60 tracking-wide uppercase">Church Finance</p>
+            <p className="font-display text-[15px] font-semibold tracking-tight">Grace Ledger</p>
+            <p className="text-xs text-background/50">Church Finance</p>
           </div>
         </div>
         <div className="relative max-w-md">
-          <h1 className="font-display text-[2rem] font-semibold leading-[1.15] tracking-tight">
-            ดูแลการเงินคริสตจักร
+          <p className="kicker text-background/40">สมุดบัญชีคริสตจักร</p>
+          <h1 className="font-display mt-4 text-[2rem] font-semibold leading-[1.2] tracking-tight">
+            การเงินที่โปร่งใส
             <br />
-            ด้วยความโปร่งใส
+            เริ่มจากบันทึกที่เรียบง่าย
           </h1>
-          <p className="mt-5 text-sm leading-relaxed text-white/70">
-            บันทึกรายรับ รายจ่าย เงินถวาย บริหารกองทุน
-            <br />
-            งบประมาณ และออกรายงานได้ในที่เดียว
-          </p>
+          <ul className="mt-8 space-y-3.5 text-sm text-background/65">
+            {FEATURES.map((f) => (
+              <li key={f} className="flex items-start gap-3">
+                <span aria-hidden className="mt-[9px] h-px w-5 shrink-0 bg-primary" />
+                {f}
+              </li>
+            ))}
+          </ul>
         </div>
-        <p className="relative text-[11px] tracking-wide text-white/40">
+        <p className="relative text-[11px] tracking-wide text-background/35">
           © {new Date().getFullYear()} Grace Ledger
         </p>
-      </div>
+      </aside>
 
-      {/* Right panel — login */}
-      <div className="flex flex-col items-center justify-center p-6 md:p-12">
+      {/* Login panel */}
+      <main className="flex min-h-dvh flex-col items-center justify-center px-5 py-10 lg:min-h-0">
         <div className="w-full max-w-[360px]">
-          {/* Logo + title */}
-          <div className="mb-8 text-center">
-            <div className="inline-flex h-11 w-11 items-center justify-center border border-primary/20 bg-primary/5 text-primary mb-4">
-              <Church className="h-5 w-5" />
+          {/* Mobile brand */}
+          <div className="mb-8 flex items-center gap-3 lg:hidden">
+            <div className="grid h-9 w-9 shrink-0 place-items-center bg-primary text-primary-foreground">
+              <span className="text-sm font-bold">✦</span>
             </div>
-            <h2 className="font-display text-[22px] font-semibold tracking-tight text-foreground">
-              เข้าสู่ระบบ
-            </h2>
-            <p className="text-[13px] text-muted-foreground mt-1.5">
-              {selectedUser ? "กรอกรหัส PIN 6 หลัก" : "เลือกบัญชีของคุณ"}
-            </p>
+            <div>
+              <p className="font-display text-[15px] font-semibold tracking-tight text-foreground">
+                Grace Ledger
+              </p>
+              <p className="text-[11px] text-muted-foreground">การเงินคริสตจักร</p>
+            </div>
           </div>
+
+          <p className="kicker flex items-center gap-2">
+            <span aria-hidden className="h-px w-6 bg-primary" />
+            เข้าสู่ระบบ
+          </p>
+          <h2 className="font-display mt-2 text-[22px] font-semibold tracking-tight text-foreground">
+            {selectedUser ? "กรอกรหัส PIN" : "เลือกบัญชีของคุณ"}
+          </h2>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            {selectedUser
+              ? "รหัส PIN 6 หลักของคุณ"
+              : "เลือกชื่อ แล้วยืนยันตัวตนด้วยรหัส PIN 6 หลัก"}
+          </p>
 
           {/* Error message */}
           {error && (
-            <div className="mb-4 border border-destructive/25 bg-destructive/5 px-4 py-2.5 text-[13px] text-destructive text-center animate-[fadeUp_0.2s_ease_both]">
+            <div className="animate-fade-up mt-5 border border-destructive/30 bg-destructive/5 px-4 py-2.5 text-center text-[13px] text-destructive">
               {error}
             </div>
           )}
 
           {/* Step 1: User selection */}
           {!selectedUser && (
-            <div className="space-y-2 animate-[fadeUp_0.4s_ease_both]">
-              {loginUsers.length === 0 && (
-                <p className="text-center text-[13px] text-muted-foreground py-8">
-                  กำลังโหลดรายชื่อผู้ใช้…
-                </p>
-              )}
+            <div className="animate-fade-up mt-6 divide-y divide-border border border-border bg-card">
+              {loginUsers.length === 0 &&
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-4 py-3">
+                    <div className="h-9 w-9 shrink-0 animate-pulse bg-muted" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 w-2/5 animate-pulse bg-muted" />
+                      <div className="h-2.5 w-1/4 animate-pulse bg-muted" />
+                    </div>
+                  </div>
+                ))}
               {loginUsers.map((u) => (
                 <button
                   key={u.id}
                   type="button"
                   onClick={() => handleSelectUser(u)}
-                  className="w-full flex items-center gap-3 border border-border bg-card hover:bg-muted hover:border-primary/30 px-4 py-3 transition-all duration-150 active:scale-[0.98] cursor-pointer text-left"
+                  className="group flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors duration-100 hover:bg-muted"
                 >
-                  <div className="grid h-10 w-10 shrink-0 place-items-center bg-primary/10 text-primary text-sm font-medium">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center bg-primary/10 text-[13px] font-semibold text-primary">
                     {u.name[0]}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground truncate">{u.name}</p>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                      <ShieldCheck className="h-3 w-3" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-foreground">
+                      {u.name}
+                    </span>
+                    <span className="block text-[11px] text-muted-foreground">
                       {ROLE_LABEL[u.role] || u.role}
-                    </p>
-                  </div>
+                    </span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 transition-transform duration-100 group-hover:translate-x-0.5 group-hover:text-foreground" />
                 </button>
               ))}
             </div>
@@ -196,22 +230,22 @@ function AuthPage() {
 
           {/* Step 2: PIN entry */}
           {selectedUser && (
-            <div className="animate-[fadeUp_0.3s_ease_both]">
+            <div className="animate-fade-up mt-6">
               {/* Selected user header */}
-              <div className="flex items-center gap-3 mb-6 p-3 border border-border bg-muted/30">
+              <div className="mb-8 flex items-center gap-3 border border-border bg-card p-3">
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="grid h-8 w-8 shrink-0 place-items-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="ย้อนกลับ"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
-                <div className="grid h-10 w-10 shrink-0 place-items-center bg-primary/10 text-primary text-sm font-medium">
+                <span className="grid h-9 w-9 shrink-0 place-items-center bg-primary/10 text-[13px] font-semibold text-primary">
                   {selectedUser.name[0]}
-                </div>
+                </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">
+                  <p className="truncate text-sm font-medium text-foreground">
                     {selectedUser.name}
                   </p>
                   <p className="text-[11px] text-muted-foreground">
@@ -220,31 +254,31 @@ function AuthPage() {
                 </div>
               </div>
 
-              {/* PIN dots */}
-              <div
-                className={`flex justify-center gap-3 mb-8 ${shake ? "animate-[shake_0.4s_ease]" : ""}`}
-              >
+              {/* PIN dots — square, ledger-like */}
+              <div className={cn("mb-8 flex justify-center gap-3", shake && "animate-shake")}>
                 {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <div
+                  <span
                     key={i}
-                    className={`h-3.5 w-3.5 rounded-full border-2 transition-all duration-150 ${
+                    className={cn(
+                      "h-3 w-3 border transition-all duration-150",
                       i < pin.length
-                        ? "bg-primary border-primary scale-110"
-                        : "border-border bg-transparent"
-                    } ${loading && i === pin.length - 1 ? "animate-pulse" : ""}`}
+                        ? "scale-110 border-primary bg-primary"
+                        : "border-border bg-transparent",
+                      loading && i === pin.length - 1 ? "animate-pulse" : "",
+                    )}
                   />
                 ))}
               </div>
 
               {/* Number pad */}
-              <div className="grid grid-cols-3 gap-2.5 max-w-[280px] mx-auto">
+              <div className="mx-auto grid max-w-[264px] grid-cols-3 gap-2">
                 {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
                   <button
                     key={d}
                     type="button"
                     onClick={() => handleDigit(d)}
                     disabled={loading || pin.length >= 6}
-                    className="h-16 flex items-center justify-center text-xl font-semibold border border-border bg-card hover:bg-muted active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className={PAD_BUTTON}
                   >
                     {d}
                   </button>
@@ -253,7 +287,7 @@ function AuthPage() {
                   type="button"
                   onClick={handleBackspace}
                   disabled={loading || pin.length === 0}
-                  className="h-16 flex items-center justify-center border border-border bg-card hover:bg-muted active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className={PAD_BUTTON}
                   aria-label="ลบ"
                 >
                   <Delete className="h-5 w-5" />
@@ -262,7 +296,7 @@ function AuthPage() {
                   type="button"
                   onClick={() => handleDigit("0")}
                   disabled={loading || pin.length >= 6}
-                  className="h-16 flex items-center justify-center text-xl font-semibold border border-border bg-card hover:bg-muted active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className={PAD_BUTTON}
                 >
                   0
                 </button>
@@ -272,14 +306,13 @@ function AuthPage() {
                     selectedUser && pin.length === 6 && handlePinComplete(pin, selectedUser)
                   }
                   disabled={loading || pin.length !== 6}
-                  className="h-16 flex items-center justify-center text-xl font-semibold border border-primary bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex h-14 cursor-pointer items-center justify-center border border-primary bg-primary text-lg font-semibold text-primary-foreground transition-all duration-100 hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
                   aria-label="ยืนยัน"
                 >
                   ✓
                 </button>
               </div>
 
-              {/* Loading indicator */}
               {loading && (
                 <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-muted-foreground">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
@@ -288,24 +321,13 @@ function AuthPage() {
               )}
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Keyframes */}
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          20%, 60% { transform: translateX(-8px); }
-          40%, 80% { transform: translateX(8px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          [class*="animate-"] { animation: none !important; }
-        }
-      `}</style>
+          <p className="mt-8 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            เข้าสู่ระบบปลอดภัยด้วยรหัส PIN ส่วนตัว
+          </p>
+        </div>
+      </main>
     </div>
   );
 }

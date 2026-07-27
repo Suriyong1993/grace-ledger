@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatCard } from "@/components/shared/StatCard";
+import { MoneyText } from "@/components/shared/MoneyText";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listExpense, listFunds, listIncome, listOffering } from "@/services/church";
 import { thb } from "@/lib/format";
 import { FundTransferDialog } from "@/components/shared/FundTransferDialog";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/funds")({
   head: () => ({ meta: [{ title: "กองทุน — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -25,73 +27,131 @@ function FundsPage() {
   const inc = inQ.data ?? [];
   const exp = exQ.data ?? [];
   const off = offQ.data ?? [];
+
+  const rows = funds.map((f) => {
+    const income = inc.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
+    const offering = off.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
+    const expense = exp.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
+    return {
+      fund: f,
+      income,
+      offering,
+      expense,
+      balance: f.openingBalance + income + offering - expense,
+    };
+  });
+
+  const totalBalance = rows.reduce((s, r) => s + r.balance, 0);
+  const totalIn = rows.reduce((s, r) => s + r.income + r.offering, 0);
+  const totalExp = rows.reduce((s, r) => s + r.expense, 0);
+
   return (
-    <div>
+    <div className="space-y-6 md:space-y-8">
       <PageHeader
+        kicker="กองทุน & งบประมาณ"
         title="กองทุน"
-        description="บริหารกองทุนและติดตามยอดคงเหลือ"
+        description="บริหารกองทุนและติดตามยอดคงเหลือแยกตามกองทุน"
         actions={can("fund.write") ? <FundTransferDialog /> : null}
       />
+
       {fundsQ.isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-56 " />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-28" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-60" />
+            ))}
+          </div>
+        </>
+      ) : rows.length === 0 ? (
+        <EmptyState
+          icon={Wallet}
+          title="ยังไม่มีกองทุน"
+          description="เมื่อมีการสร้างกองทุน ยอดคงเหลือและการเคลื่อนไหวจะแสดงที่นี่"
+        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {funds.map((f, i) => {
-            const income = inc.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
-            const offering = off.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
-            const expense = exp.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
-            const balance = f.openingBalance + income + offering - expense;
-            return (
-              <motion.div
-                key={f.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <Card className=" overflow-hidden">
-                  <CardHeader className="flex flex-row items-start justify-between">
-                    <div className="min-w-0">
-                      <CardTitle className="text-lg truncate">{f.name}</CardTitle>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        ยอดตั้งต้น {thb(f.openingBalance)}
-                      </p>
-                    </div>
-                    <div className="grid h-11 w-11 shrink-0 place-items-center  bg-primary/10 text-primary">
-                      <Wallet className="h-5 w-5" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold tracking-tight text-foreground">
-                      {thb(balance)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">ยอดคงเหลือปัจจุบัน</p>
-                    <div className="grid grid-cols-2 gap-2 mt-4">
-                      <div className=" bg-success/10 p-3">
-                        <div className="flex items-center gap-1 text-xs text-success">
-                          <TrendingUp className="h-3 w-3" /> รายรับ
-                        </div>
-                        <p className="mt-1 font-semibold text-foreground text-sm">
-                          {thb(income + offering)}
-                        </p>
-                      </div>
-                      <div className=" bg-destructive/10 p-3">
-                        <div className="flex items-center gap-1 text-xs text-destructive">
-                          <TrendingDown className="h-3 w-3" /> รายจ่าย
-                        </div>
-                        <p className="mt-1 font-semibold text-foreground text-sm">{thb(expense)}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </div>
+        <>
+          {/* Page-level stats */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatCard
+              label="ยอดคงเหลือรวม"
+              value={thb(totalBalance)}
+              icon={Wallet}
+              hint={`${rows.length} กองทุน`}
+            />
+            <StatCard
+              label="รายรับรวม"
+              value={thb(totalIn)}
+              icon={TrendingUp}
+              tone="success"
+              hint="รวมรายรับและรายทำนุ"
+            />
+            <StatCard
+              label="รายจ่ายรวม"
+              value={thb(totalExp)}
+              icon={TrendingDown}
+              tone="danger"
+              hint="รวมรายจ่ายทุกกองทุน"
+            />
+          </div>
+          {/* Fund ledger cards */}
+          <div className="stagger grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {rows.map(({ fund: f, income, offering, expense, balance }, i) => (
+              <article key={f.id} className="card-ledger flex flex-col">
+                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
+                  <p className="truncate text-sm font-medium text-foreground">{f.name}</p>
+                  <span
+                    aria-hidden
+                    className="num-display shrink-0 text-[11px] text-muted-foreground/70"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+
+                <div className="px-5 py-4">
+                  <p className="kicker">ยอดคงเหลือปัจจุบัน</p>
+                  <p
+                    className={cn(
+                      "num-display mt-2 text-[28px] font-semibold tracking-tight",
+                      balance >= 0 ? "text-foreground" : "text-destructive",
+                    )}
+                  >
+                    {thb(balance)}
+                  </p>
+                </div>
+
+                <div className="mt-auto divide-y divide-border border-t border-border">
+                  <div className="flex items-center justify-between gap-3 px-5 py-2.5">
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <TrendingUp className="h-3.5 w-3.5 text-success" strokeWidth={1.75} />
+                      รายรับ
+                    </span>
+                    <MoneyText value={income + offering} tone="income" className="text-sm" />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 px-5 py-2.5">
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <TrendingDown className="h-3.5 w-3.5 text-destructive" strokeWidth={1.75} />
+                      รายจ่าย
+                    </span>
+                    <MoneyText value={expense} tone="expense" className="text-sm" />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 px-5 py-2.5">
+                    <span className="text-xs text-muted-foreground">ยอดตั้งต้น</span>
+                    <span className="num-display text-sm text-muted-foreground">
+                      {thb(f.openingBalance)}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
 }
+

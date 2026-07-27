@@ -1,35 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import {
-  CalendarDays,
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Landmark,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  ArrowRight,
-  Download,
-  FileBarChart2,
-  PiggyBank,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { MoneyText } from "@/components/shared/MoneyText";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -42,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { listFunds, listIncome, listExpense, listOffering } from "@/services/church";
 import { thb, dayjs, fmtDate } from "@/lib/format";
 import { CHANNEL_LABEL } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/reconciliation")({
   head: () => ({ meta: [{ title: "สรุปยอด — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -203,39 +180,45 @@ function ReconciliationPage() {
   const periodLabel = `${fmtDate(start)} — ${fmtDate(end)}`;
 
   return (
-    <div>
+    <div className="space-y-6 md:space-y-8">
       <PageHeader
-        title="สรุปยอด Reconciliation"
+        kicker="องค์กร"
+        title="สรุปและกระทบยอด"
         description={periodLabel}
         actions={
-          <div className="flex items-center gap-2">
-            <Select value={period} onValueChange={(v: Period) => setPeriod(v)}>
-              <SelectTrigger className="w-44 ">
-                <CalendarDays className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="">
-                {(["this_week", "this_month", "last_week", "last_month", "custom"] as Period[]).map(
-                  (p) => (
-                    <SelectItem key={p} value={p}>
-                      {PERIOD_LABEL[p]}
-                    </SelectItem>
-                  ),
-                )}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap gap-px border border-border bg-border">
+              {(Object.keys(PERIOD_LABEL) as Period[]).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPeriod(p)}
+                  className={cn(
+                    "h-8 cursor-pointer px-3 text-xs font-medium whitespace-nowrap transition-colors duration-100",
+                    period === p
+                      ? "bg-foreground text-background"
+                      : "bg-card text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {PERIOD_LABEL[p]}
+                </button>
+              ))}
+            </div>
             {period === "custom" && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Input
                   type="date"
-                  className="rounded-xl w-36"
+                  className="h-8 w-36 bg-card text-xs"
                   value={customStart}
                   onChange={(e) => setCustomStart(e.target.value)}
                 />
-                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <ArrowRight
+                  className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
+                  strokeWidth={1.75}
+                />
                 <Input
                   type="date"
-                  className="rounded-xl w-36"
+                  className="h-8 w-36 bg-card text-xs"
                   value={customEnd}
                   onChange={(e) => setCustomEnd(e.target.value)}
                 />
@@ -247,338 +230,283 @@ function ReconciliationPage() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-48 " />
-          <Skeleton className="h-64 " />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-64 w-full" />
         </div>
       ) : (
         <>
           {/* ============ SUMMARY STATEMENT ============ */}
-          <Card className=" overflow-hidden">
-            <CardHeader className="bg-primary/5 border-b">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileBarChart2 className="h-5 w-5 text-primary" />
-                งบแสดงฐานะการเงิน
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y">
-                {/* Opening */}
-                <div className="flex items-center justify-between px-6 py-4 bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    <Wallet className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">ยอดยกมา (Opening Balance)</p>
-                      <p className="text-xs text-muted-foreground">ก่อนวันที่ {fmtDate(start)}</p>
-                    </div>
-                  </div>
-                  <MoneyText value={openingBalance} tone="default" />
-                </div>
-
-                {/* Income */}
-                <motion.div
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="flex items-center justify-between px-6 py-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="h-5 w-5 text-success" />
-                    <div>
-                      <p className="text-sm font-medium">รายรับ + เงินถวาย</p>
-                      <p className="text-xs text-muted-foreground">
-                        รายรับ {thb(totalIncome)} + เงินถวาย {thb(totalOffering)}
-                      </p>
-                    </div>
-                  </div>
-                  <MoneyText value={totalIncome + totalOffering} tone="income" />
-                </motion.div>
-
-                {/* Expense */}
-                <motion.div
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex items-center justify-between px-6 py-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <TrendingDown className="h-5 w-5 text-destructive" />
-                    <div>
-                      <p className="text-sm font-medium">รายจ่าย</p>
-                      <p className="text-xs text-muted-foreground">{expenseThis.length} รายการ</p>
-                    </div>
-                  </div>
-                  <MoneyText value={totalExpense} tone="expense" />
-                </motion.div>
-
-                {/* Separator */}
-                <div className="border-t-2 border-dashed" />
-
-                {/* Net change */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex items-center justify-between px-6 py-4 bg-primary/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <ArrowRight className="h-5 w-5 text-primary" />
-                    <p className="text-sm font-semibold">ผลต่างสุทธิ (Net Change)</p>
-                  </div>
-                  <MoneyText value={netChange} tone={netChange >= 0 ? "income" : "expense"} />
-                </motion.div>
-
-                {/* Closing */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="flex items-center justify-between px-6 py-5 bg-primary/10"
-                >
-                  <div className="flex items-center gap-3">
-                    <PiggyBank className="h-6 w-6 text-primary" />
-                    <div>
-                      <p className="text-base font-bold">ยอดยกไป (Closing Balance)</p>
-                      <p className="text-xs text-muted-foreground">ณ วันที่ {fmtDate(end)}</p>
-                    </div>
-                  </div>
-                  <p className="text-2xl font-bold text-primary tabular-nums">
-                    {thb(closingBalance)}
+          <section className="card-ledger animate-fade-up">
+            <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+              <p className="kicker">งบแสดงฐานะการเงิน</p>
+              <span className="num-display text-xs text-muted-foreground">
+                {PERIOD_LABEL[period]}
+              </span>
+            </div>
+            <div className="divide-y divide-border">
+              {/* Opening */}
+              <div className="flex items-center justify-between gap-4 px-5 py-3.5">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">ยอดยกมา</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    ก่อนวันที่ {fmtDate(start)}
                   </p>
-                </motion.div>
+                </div>
+                <MoneyText value={openingBalance} tone="default" />
               </div>
-            </CardContent>
-          </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+              {/* Income + Offering */}
+              <div className="flex items-center justify-between gap-4 px-5 py-3.5">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">รายรับ + เงินถวาย</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    รายรับ {thb(totalIncome)} · เงินถวาย {thb(totalOffering)}
+                  </p>
+                </div>
+                <MoneyText value={totalIncome + totalOffering} tone="income" />
+              </div>
+
+              {/* Expense */}
+              <div className="flex items-center justify-between gap-4 px-5 py-3.5">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">รายจ่าย</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {expenseThis.length} รายการ
+                  </p>
+                </div>
+                <MoneyText value={totalExpense} tone="expense" />
+              </div>
+
+              {/* Net change */}
+              <div className="flex items-center justify-between gap-4 px-5 py-3.5">
+                <p className="text-sm font-semibold text-foreground">ผลต่างสุทธิ</p>
+                <MoneyText value={netChange} tone={netChange >= 0 ? "income" : "expense"} />
+              </div>
+            </div>
+
+            {/* Closing */}
+            <div className="flex items-center justify-between gap-4 border-t border-border bg-muted/30 px-5 py-4">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">ยอดยกไป</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">ณ วันที่ {fmtDate(end)}</p>
+              </div>
+              <p className="num-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+                {thb(closingBalance)}
+              </p>
+            </div>
+          </section>
+
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* ============ CHANNEL BREAKDOWN ============ */}
-            <Card className="">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Landmark className="h-5 w-5 text-primary" />
-                  เงินถวายแยกตามช่องทาง
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {["cash", "bank", "qr"].map((ch) => {
+            <section className="card-ledger animate-fade-up">
+              <div className="border-b border-border px-5 py-3.5">
+                <p className="kicker">เงินถวายแยกตามช่องทาง</p>
+              </div>
+              <div className="space-y-4 px-5 py-4">
+                {(["cash", "bank", "qr"] as const).map((ch) => {
                   const amount = channelBreakdown[ch] ?? 0;
+                  const pct =
+                    totalOffering > 0
+                      ? Math.min(100, Math.round((amount / totalOffering) * 100))
+                      : 0;
                   return (
-                    <div
-                      key={ch}
-                      className="flex items-center justify-between py-2 border-b last:border-0"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`grid h-8 w-8 place-items-center rounded-xl ${
-                            ch === "cash"
-                              ? "bg-success/10 text-success"
-                              : ch === "bank"
-                                ? "bg-primary/10 text-primary"
-                                : "bg-accent/10 text-accent"
-                          }`}
-                        >
-                          {ch === "cash" ? (
-                            <DollarSign className="h-4 w-4" />
-                          ) : ch === "bank" ? (
-                            <Landmark className="h-4 w-4" />
-                          ) : (
-                            <Wallet className="h-4 w-4" />
-                          )}
-                        </div>
-                        <span className="text-sm font-medium">
-                          {CHANNEL_LABEL[ch as keyof typeof CHANNEL_LABEL]}
-                        </span>
+                    <div key={ch}>
+                      <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
+                        <span className="font-medium text-foreground">{CHANNEL_LABEL[ch]}</span>
+                        <span className="num-display text-muted-foreground">{thb(amount)}</span>
                       </div>
-                      <MoneyText value={amount} tone="income" />
+                      <div className="h-1 bg-muted">
+                        <div
+                          style={{ width: `${pct}%` }}
+                          className="h-full bg-primary transition-all duration-500"
+                        />
+                      </div>
                     </div>
                   );
                 })}
-                <div className="flex items-center justify-between pt-2 border-t-2">
-                  <span className="text-sm font-bold">รวมเงินถวาย</span>
-                  <MoneyText value={totalOffering} tone="income" />
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="flex items-center justify-between border-t border-border px-5 py-3.5">
+                <span className="text-sm font-semibold text-foreground">รวมเงินถวาย</span>
+                <MoneyText value={totalOffering} tone="income" />
+              </div>
+            </section>
 
             {/* ============ FUND BREAKDOWN ============ */}
-            <Card className="">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <PiggyBank className="h-5 w-5 text-primary" />
-                  ยอดคงเหลือแยกตามกองทุน
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>กองทุน</TableHead>
-                      <TableHead className="text-right">ยอดตั้งต้น</TableHead>
-                      <TableHead className="text-right">รายรับ</TableHead>
-                      <TableHead className="text-right">รายจ่าย</TableHead>
-                      <TableHead className="text-right">คงเหลือ</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {fundRows.map((f) => (
-                      <TableRow key={f.name}>
-                        <TableCell className="font-medium">{f.name}</TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {thb(f.openingBalance)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-success">
-                          {thb(f.income)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-destructive">
-                          {thb(f.expense)}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums font-semibold">
-                          {thb(f.balance)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    <TableRow className="bg-muted/30">
-                      <TableCell className="font-bold">รวม</TableCell>
-                      <TableCell className="text-right tabular-nums font-semibold">
-                        {thb(fundRows.reduce((s, f) => s + f.openingBalance, 0))}
+            <section className="card-ledger animate-fade-up">
+              <div className="border-b border-border px-5 py-3.5">
+                <p className="kicker">ยอดคงเหลือแยกตามกองทุน</p>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead>กองทุน</TableHead>
+                    <TableHead className="text-right">ยอดตั้งต้น</TableHead>
+                    <TableHead className="text-right">รายรับ</TableHead>
+                    <TableHead className="text-right">รายจ่าย</TableHead>
+                    <TableHead className="text-right">คงเหลือ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {fundRows.map((f) => (
+                    <TableRow key={f.name}>
+                      <TableCell className="font-medium text-foreground">{f.name}</TableCell>
+                      <TableCell className="num-display text-right text-muted-foreground">
+                        {thb(f.openingBalance)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-semibold text-success">
-                        {thb(fundRows.reduce((s, f) => s + f.income, 0))}
+                      <TableCell className="num-display text-right text-success">
+                        {thb(f.income)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-semibold text-destructive">
-                        {thb(fundRows.reduce((s, f) => s + f.expense, 0))}
+                      <TableCell className="num-display text-right text-destructive">
+                        {thb(f.expense)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-bold">
-                        {thb(fundRows.reduce((s, f) => s + f.balance, 0))}
+                      <TableCell className="num-display text-right font-semibold text-foreground">
+                        {thb(f.balance)}
                       </TableCell>
                     </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                  ))}
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableCell className="font-semibold text-foreground">รวม</TableCell>
+                    <TableCell className="num-display text-right font-semibold">
+                      {thb(fundRows.reduce((s, f) => s + f.openingBalance, 0))}
+                    </TableCell>
+                    <TableCell className="num-display text-right font-semibold text-success">
+                      {thb(fundRows.reduce((s, f) => s + f.income, 0))}
+                    </TableCell>
+                    <TableCell className="num-display text-right font-semibold text-destructive">
+                      {thb(fundRows.reduce((s, f) => s + f.expense, 0))}
+                    </TableCell>
+                    <TableCell className="num-display text-right font-semibold">
+                      {thb(fundRows.reduce((s, f) => s + f.balance, 0))}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </section>
           </div>
 
+
           {/* ============ RECONCILIATION CHECK ============ */}
-          <Card className=" mt-4">
-            <CardHeader className="border-b">
-              <CardTitle className="text-base flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-primary" />
-                ตรวจสอบยอด (Reconciliation)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* System balance */}
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    ยอดในระบบ
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center p-3  bg-muted/50">
-                      <span className="text-sm">ยอดยกมาตั้งต้น (Opening Balance)</span>
-                      <span className="font-semibold tabular-nums">
-                        {thb(funds.reduce((s, f) => s + f.openingBalance, 0))}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-3  bg-success/5">
-                      <span className="text-sm">รายรับทั้งหมด (รวมเงินถวาย)</span>
-                      <span className="font-semibold tabular-nums text-success">
-                        {thb(
-                          incomes.reduce((s, x) => s + x.amount, 0) +
-                            offerings.reduce((s, x) => s + x.amount, 0),
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-3  bg-destructive/5">
-                      <span className="text-sm">รายจ่ายทั้งหมด</span>
-                      <span className="font-semibold tabular-nums text-destructive">
-                        {thb(expenses.reduce((s, x) => s + x.amount, 0))}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-4  bg-primary/10 border-2 border-primary/20">
-                      <span className="text-sm font-bold">ยอดคงเหลือในระบบ</span>
-                      <span className="text-lg font-bold tabular-nums text-primary">
-                        {thb(currentBalance)}
-                      </span>
-                    </div>
+          <section className="card-ledger animate-fade-up">
+            <div className="border-b border-border px-5 py-3.5">
+              <p className="kicker">ตรวจสอบยอด (Reconciliation)</p>
+            </div>
+            <div className="grid divide-y divide-border lg:grid-cols-2 lg:divide-x lg:divide-y-0">
+              {/* System ledger column */}
+              <div className="px-5 py-4">
+                <p className="kicker">ยอดในระบบ</p>
+                <div className="mt-3 space-y-2.5 text-sm">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-muted-foreground">ยอดยกมาตั้งต้น</span>
+                    <span className="num-display text-foreground">
+                      {thb(funds.reduce((s, f) => s + f.openingBalance, 0))}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-muted-foreground">รายรับทั้งหมด (รวมเงินถวาย)</span>
+                    <span className="num-display text-success">
+                      {thb(
+                        incomes.reduce((s, x) => s + x.amount, 0) +
+                          offerings.reduce((s, x) => s + x.amount, 0),
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-muted-foreground">รายจ่ายทั้งหมด</span>
+                    <span className="num-display text-destructive">
+                      {thb(expenses.reduce((s, x) => s + x.amount, 0))}
+                    </span>
                   </div>
                 </div>
-
-                {/* Actual input */}
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                    ยอดเงินจริง
-                  </p>
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-sm">เงินสดในมือ (Cash on Hand)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        className=" mt-1.5 h-12 text-lg"
-                        placeholder="0.00"
-                        value={actualCash}
-                        onChange={(e) => setActualCash(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm">เงินในบัญชี (Bank Balance)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        className=" mt-1.5 h-12 text-lg"
-                        placeholder="0.00"
-                        value={actualBank}
-                        onChange={(e) => setActualBank(e.target.value)}
-                      />
-                    </div>
-
-                    {hasActual && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`p-4  border-2 ${
-                          isBalanced
-                            ? "bg-success/10 border-success/30"
-                            : "bg-destructive/10 border-destructive/30"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium">ยอดเงินจริงรวม</span>
-                          <span className="font-bold tabular-nums">{thb(actualTotal)}</span>
-                        </div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium">ผลต่างจากระบบ</span>
-                          <span
-                            className={`font-bold tabular-nums ${Math.abs(diff) < 0.01 ? "text-success" : Math.abs(diff) < 1000 ? "text-warning" : "text-destructive"}`}
-                          >
-                            {diff >= 0 ? "+" : ""}
-                            {thb(diff)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-3">
-                          {isBalanced ? (
-                            <>
-                              <CheckCircle2 className="h-5 w-5 text-success" />
-                              <span className="text-sm font-medium text-success">ยอดตรงกัน ✅</span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertTriangle className="h-5 w-5 text-destructive" />
-                              <span className="text-sm font-medium text-destructive">
-                                ยอดไม่ตรงกัน (ต่าง {thb(Math.abs(diff))})
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
+                <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
+                  <span className="text-sm font-semibold text-foreground">ยอดคงเหลือในระบบ</span>
+                  <span className="num-display text-lg font-semibold text-foreground">
+                    {thb(currentBalance)}
+                  </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Actual ledger column */}
+              <div className="px-5 py-4">
+                <p className="kicker">ยอดเงินจริง</p>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="actual-cash" className="text-xs font-normal text-muted-foreground">
+                      เงินสดในมือ (Cash on Hand)
+                    </Label>
+                    <Input
+                      id="actual-cash"
+                      type="number"
+                      step="0.01"
+                      className="num-display mt-1.5 h-9 bg-card"
+                      placeholder="0.00"
+                      value={actualCash}
+                      onChange={(e) => setActualCash(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="actual-bank" className="text-xs font-normal text-muted-foreground">
+                      เงินในบัญชี (Bank Balance)
+                    </Label>
+                    <Input
+                      id="actual-bank"
+                      type="number"
+                      step="0.01"
+                      className="num-display mt-1.5 h-9 bg-card"
+                      placeholder="0.00"
+                      value={actualBank}
+                      onChange={(e) => setActualBank(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {hasActual ? (
+                  <div className="mt-4 border-t border-border pt-3">
+                    <div className="flex items-baseline justify-between gap-3 text-sm">
+                      <span className="text-muted-foreground">ยอดเงินจริงรวม</span>
+                      <span className="num-display font-medium text-foreground">
+                        {thb(actualTotal)}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex items-baseline justify-between gap-3 text-sm">
+                      <span className="text-muted-foreground">ผลต่างจากระบบ</span>
+                      <span
+                        className={cn(
+                          "num-display font-semibold",
+                          isBalanced ? "text-success" : "text-destructive",
+                        )}
+                      >
+                        {diff >= 0 ? "+" : ""}
+                        {thb(diff)}
+                      </span>
+                    </div>
+                    <p
+                      className={cn(
+                        "mt-3 flex items-center gap-1.5 text-xs font-medium",
+                        isBalanced ? "text-success" : "text-destructive",
+                      )}
+                    >
+                      {isBalanced ? (
+                        <CheckCircle2 className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                      ) : (
+                        <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                      )}
+                      {isBalanced
+                        ? "ยอดตรงกัน"
+                        : `ยอดไม่ตรงกัน (ต่าง ${thb(Math.abs(diff))})`}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+                    กรอกยอดเงินจริงเพื่อเปรียบเทียบกับยอดในระบบ
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
         </>
       )}
     </div>
   );
 }
+

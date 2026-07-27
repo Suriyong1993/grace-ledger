@@ -23,25 +23,62 @@ export interface NavItem {
   icon: LucideIcon;
 }
 
-// Primary navigation — simplified for AI Expense Tracker UX
-export const NAV: NavItem[] = [
-  { to: "/dashboard", label: "หน้าแรก", icon: LayoutDashboard },
-  { to: "/expense", label: "รายจ่าย", icon: ArrowUpCircle },
-  { to: "/income", label: "รายรับ", icon: ArrowDownCircle },
-  { to: "/reports", label: "รายงาน", icon: FileBarChart2 },
+export interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+// Grouped primary navigation — mirrors how the church actually works
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "ภาพรวม",
+    items: [{ to: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard }],
+  },
+  {
+    label: "รายการเงิน",
+    items: [
+      { to: "/income", label: "รายรับ", icon: ArrowDownCircle },
+      { to: "/expense", label: "รายจ่าย", icon: ArrowUpCircle },
+      { to: "/offering", label: "เงินถวาย", icon: HandHeart },
+    ],
+  },
+  {
+    label: "กองทุน & งบประมาณ",
+    items: [
+      { to: "/funds", label: "กองทุน", icon: Wallet },
+      { to: "/projects", label: "โครงการ", icon: Briefcase },
+      { to: "/budget", label: "งบประมาณ", icon: PiggyBank },
+    ],
+  },
+  {
+    label: "องค์กร",
+    items: [
+      { to: "/members", label: "สมาชิก", icon: Users },
+      { to: "/reports", label: "รายงาน", icon: FileBarChart2 },
+      { to: "/reconciliation", label: "กระทบยอด", icon: FileSpreadsheet },
+      { to: "/audit", label: "บันทึกตรวจสอบ", icon: ScrollText },
+    ],
+  },
+];
+
+export const NAV_SYSTEM: NavItem[] = [
   { to: "/line-setup", label: "LINE", icon: MessageCircle },
   { to: "/settings", label: "ตั้งค่า", icon: Settings },
+  { to: "/profile", label: "โปรไฟล์", icon: UserCircle2 },
 ];
 
-// Secondary nav — still accessible via sidebar but not primary
-export const NAV_SECONDARY: NavItem[] = [
-  { to: "/offering", label: "เงินถวาย", icon: HandHeart },
-  { to: "/funds", label: "กองทุน", icon: Wallet },
-  { to: "/members", label: "สมาชิก", icon: Users },
-  { to: "/reconciliation", label: "กระทบยอด", icon: FileSpreadsheet },
-];
+// Flat list — used by mobile sheet & command palette
+export const NAV: NavItem[] = [...NAV_GROUPS.flatMap((g) => g.items), ...NAV_SYSTEM];
 
-export const MOBILE_NAV: NavItem[] = [NAV[0], NAV[1], NAV[2], NAV[3]];
+// Legacy export kept for compatibility
+export const NAV_SECONDARY: NavItem[] = [];
+
+export const MOBILE_NAV: NavItem[] = [
+  NAV_GROUPS[0].items[0], // แดชบอร์ด
+  NAV_GROUPS[1].items[0], // รายรับ
+  NAV_GROUPS[1].items[1], // รายจ่าย
+  NAV_GROUPS[3].items[1], // รายงาน
+];
 
 export function useCurrentPath() {
   return useRouterState({ select: (s) => s.location.pathname });

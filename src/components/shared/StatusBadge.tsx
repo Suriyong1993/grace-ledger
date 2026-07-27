@@ -1,21 +1,31 @@
-import { Badge } from "@/components/ui/badge";
 import { STATUS_LABEL, type TxStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function StatusBadge({ status }: { status: TxStatus }) {
-  const map: Record<TxStatus, string> = {
-    draft: "bg-muted text-muted-foreground",
-    pending: "bg-warning/20 text-warning-foreground border-warning/40",
-    approved: "bg-success/15 text-success border-success/30",
-    rejected: "bg-destructive/15 text-destructive border-destructive/30",
-    voided: "bg-muted/50 text-muted-foreground/60 line-through",
-  };
+/**
+ * Editorial status indicator — a small colored dot + ink label.
+ * Color lives only in the dot; text stays readable on ivory.
+ */
+const MAP: Record<TxStatus, { dot: string; muted?: boolean; strike?: boolean }> = {
+  draft: { dot: "bg-muted-foreground/50", muted: true },
+  pending: { dot: "bg-warning" },
+  approved: { dot: "bg-success" },
+  rejected: { dot: "bg-destructive" },
+  voided: { dot: "bg-muted-foreground/40", muted: true, strike: true },
+};
+
+export function StatusBadge({ status, className }: { status: TxStatus; className?: string }) {
+  const s = MAP[status] ?? MAP.draft;
   return (
-    <Badge
-      variant="outline"
-      className={cn("rounded-full px-3 py-0.5 text-xs font-medium", map[status])}
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium",
+        s.muted ? "text-muted-foreground" : "text-foreground",
+        s.strike && "line-through",
+        className,
+      )}
     >
+      <span aria-hidden className={cn("h-1.5 w-1.5 shrink-0 rounded-full", s.dot)} />
       {STATUS_LABEL[status]}
-    </Badge>
+    </span>
   );
 }
