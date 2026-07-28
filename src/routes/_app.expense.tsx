@@ -76,6 +76,9 @@ import {
 import { Receipt } from "lucide-react";
 import { SmartReceiptScannerModal } from "@/components/receipts/SmartReceiptScannerModal";
 
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { type ExpenseRecord } from "@/lib/types";
+
 export const Route = createFileRoute("/_app/expense")({
   head: () => ({ meta: [{ title: "รายจ่าย — ระบบจัดการการเงินคริสตจักร" }] }),
   component: ExpensePage,
@@ -98,6 +101,7 @@ function ExpensePage() {
   const [aiScannerOpen, setAiScannerOpen] = useState(false);
   const [q, setQ] = useState("");
   const [receipt, setReceipt] = useState<AttachmentValue | undefined>();
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseRecord | null>(null);
 
   const expQ = useQuery({ queryKey: ["expense"], queryFn: listExpense });
   const catsQ = useQuery({ queryKey: ["categories"], queryFn: listCategories });
@@ -461,16 +465,22 @@ function ExpensePage() {
             </TableHeader>
             <TableBody>
               {rows.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow
+                  key={r.id}
+                  onClick={() => setSelectedExpense(r)}
+                  className="cursor-pointer hover:bg-muted/40 transition-colors group"
+                >
                   <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
                     {fmtDate(r.date)}
                   </TableCell>
-                  <TableCell className="px-5 py-3 font-medium">{catName(r.categoryId)}</TableCell>
+                  <TableCell className="px-5 py-3 font-medium group-hover:text-primary transition-colors">
+                    {catName(r.categoryId)}
+                  </TableCell>
                   <TableCell className="max-w-xs truncate px-5 py-3 text-muted-foreground">
                     {r.vendor || <span className="text-xs text-muted-foreground">—</span>}
                   </TableCell>
                   <TableCell className="px-5 py-3">{fundName(r.fundId)}</TableCell>
-                  <TableCell className="px-5 py-3">
+                  <TableCell className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
                     {r.attachmentDataUrl ? (
                       <AttachmentPreview
                         value={{
@@ -490,14 +500,14 @@ function ExpensePage() {
                   <TableCell className="px-5 py-3 text-right">
                     <MoneyText value={r.amount} tone="expense" />
                   </TableCell>
-                  <TableCell className="px-5 py-3">
+                  <TableCell className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
                       {can("expense.approve") && r.status === "pending" && (
                         <>
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
+                            className="h-8 w-8 active-press"
                             onClick={() => setStatus.mutate({ id: r.id, s: "approved" })}
                             aria-label="อนุมัติ"
                           >
@@ -509,7 +519,7 @@ function ExpensePage() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
+                            className="h-8 w-8 active-press"
                             onClick={() => setStatus.mutate({ id: r.id, s: "rejected" })}
                             aria-label="ปฏิเสธ"
                           >
@@ -521,7 +531,7 @@ function ExpensePage() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-8 w-8"
+                          className="h-8 w-8 active-press"
                           onClick={() => remove.mutate(r.id)}
                           aria-label="ลบ"
                         >
@@ -536,6 +546,133 @@ function ExpensePage() {
           </Table>
         )}
       </section>
+
+      {/* Voucher Inspector Slide-over Drawer */}
+      <Sheet open={!!selectedExpense} onOpenChange={(v) => !v && setSelectedExpense(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col">
+          <SheetHeader className="p-6 border-b border-border text-left">
+            <div className="flex items-center justify-between">
+              <span className="kicker">ใบสำคัญจ่าย (Voucher Inspector)</span>
+              <StatusBadge status={selectedExpense?.status || "pending"} />
+            </div>
+            <SheetTitle className="text-xl font-semibold font-display mt-2">
+              {selectedExpense?.vendor || selectedExpense?.description || "รายการรายจ่าย"}
+            </SheetTitle>
+            <SheetDescription className="text-xs text-muted-foreground">
+              รหัสสำคัญจ่าย: {selectedExpense?.id}
+            </SheetDescription>
+          </SheetHeader>
+
+          {selectedExpense && (
+            <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+              {/* Approval Pipeline Stepper */}
+              <div className="card-ledger p-4 rounded-md bg-muted/20">
+                <span className="kicker block mb-3">ขั้นตอนการอนุมัติ (Approval Stepper)</span>
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="h-6 w-6 rounded-full bg-success text-success-foreground grid place-items-center text-[10px] font-bold">1</span>
+                    <span className="font-medium text-foreground">สร้างใบเบิก</span>
+                  </div>
+                  <div className="h-px flex-1 bg-border mx-2" />
+                  <div className="flex flex-col items-center gap-1">
+                    <span className={cn(
+                      "h-6 w-6 rounded-full grid place-items-center text-[10px] font-bold",
+                      selectedExpense.status === "pending" ? "bg-warning text-warning-foreground" : "bg-success text-success-foreground"
+                    )}>2</span>
+                    <span className="font-medium text-foreground">พิจารณาอนุมัติ</span>
+                  </div>
+                  <div className="h-px flex-1 bg-border mx-2" />
+                  <div className="flex flex-col items-center gap-1">
+                    <span className={cn(
+                      "h-6 w-6 rounded-full grid place-items-center text-[10px] font-bold",
+                      selectedExpense.status === "approved" ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"
+                    )}>3</span>
+                    <span className="text-muted-foreground">เบิกจ่ายเรียบร้อย</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Amount Display Card */}
+              <div className="card-ledger p-5 rounded-md text-center">
+                <span className="kicker">จำนวนเงินเบิกจ่าย</span>
+                <p className="num-display font-display text-3xl font-bold text-destructive mt-1">
+                  −฿{selectedExpense.amount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              {/* Attachment Receipt Preview */}
+              {selectedExpense.attachmentDataUrl && (
+                <div className="space-y-2">
+                  <span className="kicker">หลักฐานสลิป / ใบเสร็จแนบ</span>
+                  <div className="card-ledger p-2 rounded-md overflow-hidden bg-black/5 dark:bg-black/40">
+                    <img
+                      src={selectedExpense.attachmentDataUrl}
+                      alt="Receipt Slip"
+                      className="max-h-72 w-full object-contain rounded-xs"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Details Data Grid */}
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between py-2 border-b border-border/50">
+                  <span className="text-muted-foreground">วันที่เบิกจ่าย</span>
+                  <span className="font-medium text-foreground">{fmtDate(selectedExpense.date)}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-border/50">
+                  <span className="text-muted-foreground">หมวดหมู่งบประมาณ</span>
+                  <span className="font-medium text-foreground">{catName(selectedExpense.categoryId)}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-border/50">
+                  <span className="text-muted-foreground">เบิกจ่ายจากกองทุน</span>
+                  <span className="font-medium text-foreground">{fundName(selectedExpense.fundId)}</span>
+                </div>
+                {selectedExpense.vendor && (
+                  <div className="flex justify-between py-2 border-b border-border/50">
+                    <span className="text-muted-foreground">ร้านค้า / ผู้รับเงิน</span>
+                    <span className="font-medium text-foreground">{selectedExpense.vendor}</span>
+                  </div>
+                )}
+                {selectedExpense.description && (
+                  <div className="py-2 border-b border-border/50">
+                    <span className="text-muted-foreground block mb-1">รายละเอียดโครงการ/วัตถุประสงค์</span>
+                    <p className="text-foreground leading-relaxed">{selectedExpense.description}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Approver Action Bar */}
+              {can("expense.approve") && selectedExpense.status === "pending" && (
+                <div className="pt-4 border-t border-border grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    className="h-10 border-destructive/40 text-destructive hover:bg-destructive/10 active-press cursor-pointer"
+                    onClick={() => {
+                      setStatus.mutate({ id: selectedExpense.id, s: "rejected" });
+                      setSelectedExpense(null);
+                    }}
+                  >
+                    <XCircle className="mr-1.5 h-4 w-4" />
+                    <span>ปฏิเสธคำขอ</span>
+                  </Button>
+                  <Button
+                    className="h-10 bg-success text-success-foreground hover:bg-success/90 active-press cursor-pointer"
+                    onClick={() => {
+                      setStatus.mutate({ id: selectedExpense.id, s: "approved" });
+                      setSelectedExpense(null);
+                    }}
+                  >
+                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                    <span>อนุมัติจ่าย (Cmd+Shift+A)</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
       <SmartReceiptScannerModal open={aiScannerOpen} onOpenChange={setAiScannerOpen} />
     </div>
   );

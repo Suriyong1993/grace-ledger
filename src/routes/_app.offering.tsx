@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, HandHeart } from "lucide-react";
+import { Plus, Download, Trash2, HandHeart, Sparkles } from "lucide-react";
+import { ChurchHandwrittenFormScannerModal } from "@/components/church/ChurchHandwrittenFormScannerModal";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
 import { MoneyText } from "@/components/shared/MoneyText";
@@ -85,6 +86,7 @@ function OfferingPage() {
   const { user, can } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [handwrittenScanOpen, setHandwrittenScanOpen] = useState(false);
   const [q, setQ] = useState("");
 
   const offQ = useQuery({ queryKey: ["offering"], queryFn: listOffering });
@@ -199,6 +201,13 @@ function OfferingPage() {
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
+            <Button
+              variant="secondary"
+              className="h-8 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
+              onClick={() => setHandwrittenScanOpen(true)}
+            >
+              <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI สแกนใบตรวจนับเงินเขียนมือ
+            </Button>
             <Button variant="outline" className="h-8" onClick={exportCsv}>
               <Download className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> ส่งออก CSV
             </Button>
@@ -547,6 +556,7 @@ function OfferingPage() {
           </section>
         </TabsContent>
       </Tabs>
+      <ChurchHandwrittenFormScannerModal open={handwrittenScanOpen} onOpenChange={setHandwrittenScanOpen} />
     </div>
   );
 }

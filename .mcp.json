@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "appflowy": {
+      "command": "node",
+      "args": [
+        "C:\\tmp\\appflowy-mcp\\dist\\index.js"
+      ]
+    },
+    "omniroute": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "omniroute",
+        "mcp"
+      ]
+    },
+    "skills": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/skills-mcp"
+      ]
+    }
+  }
+}

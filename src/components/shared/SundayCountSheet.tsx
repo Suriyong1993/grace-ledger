@@ -490,7 +490,7 @@ export function SundayCountSheet() {
                 <span className="w-28 text-right">เป็นเงิน</span>
               </div>
               <div className="divide-y divide-border">
-                {DENOMINATIONS.map((d) => {
+                {DENOMINATIONS.map((d, index) => {
                   const count = counts[d.value] || 0;
                   const subtotal = d.value * count;
                   return (
@@ -505,11 +505,36 @@ export function SundayCountSheet() {
                         <Input
                           type="number"
                           min="0"
+                          id={`denom-input-${index}`}
                           value={count || ""}
                           onChange={(e) =>
                             setCounts((prev) => ({ ...prev, [d.value]: Number(e.target.value) }))
                           }
-                          className="num-display h-8 w-20 text-center text-sm"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              const nextInput = document.getElementById(`denom-input-${index + 1}`);
+                              if (nextInput) {
+                                (nextInput as HTMLInputElement).focus();
+                                (nextInput as HTMLInputElement).select();
+                              }
+                            } else if (e.key === "ArrowUp") {
+                              e.preventDefault();
+                              const prevInput = document.getElementById(`denom-input-${index - 1}`);
+                              if (prevInput) {
+                                (prevInput as HTMLInputElement).focus();
+                                (prevInput as HTMLInputElement).select();
+                              }
+                            } else if (e.key === "ArrowDown") {
+                              e.preventDefault();
+                              const nextInput = document.getElementById(`denom-input-${index + 1}`);
+                              if (nextInput) {
+                                (nextInput as HTMLInputElement).focus();
+                                (nextInput as HTMLInputElement).select();
+                              }
+                            }
+                          }}
+                          className="num-display h-8 w-20 text-center text-sm focus:ring-2 focus:ring-primary/50"
                         />
                         <span aria-hidden className="text-xs text-muted-foreground">
                           =
@@ -582,7 +607,15 @@ export function SundayCountSheet() {
                   )}
                   {cashDiff === 0
                     ? "ยอดเงินสดตรงกัน พร้อมบันทึก"
-                    : "ยอดเงินสดไม่ตรง กรุณานับใหม่อีกครั้ง"}
+                    : `ยอดต่าง ${thb(Math.abs(cashDiff))} — ${
+                        Math.abs(cashDiff) % 1000 === 0
+                          ? `สงสัยธนบัตร 1,000฿ ขาด/เกิน ${Math.abs(cashDiff) / 1000} ฉบับ`
+                          : Math.abs(cashDiff) % 500 === 0
+                            ? `สงสัยธนบัตร 500฿ ขาด/เกิน ${Math.abs(cashDiff) / 500} ฉบับ`
+                            : Math.abs(cashDiff) % 100 === 0
+                              ? `สงสัยธนบัตร 100฿ ขาด/เกิน ${Math.abs(cashDiff) / 100} ฉบับ`
+                              : "กรุณาทวนนับจำนวนธนบัตรอีกครั้ง"
+                      }`}
                 </p>
               </div>
             </section>
