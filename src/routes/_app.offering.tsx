@@ -79,8 +79,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 /** Editorial tab trigger — flat, sharp corners, no shadow or bounce */
-const TAB_TRIGGER =
-  "rounded-none text-xs data-[state=active]:shadow-none active:scale-100";
+const TAB_TRIGGER = "rounded-none text-xs data-[state=active]:shadow-none active:scale-100";
 
 function OfferingPage() {
   const { user, can } = useAuth();
@@ -206,7 +205,8 @@ function OfferingPage() {
               className="h-8 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
               onClick={() => setHandwrittenScanOpen(true)}
             >
-              <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI สแกนใบตรวจนับเงินเขียนมือ
+              <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI
+              สแกนใบตรวจนับเงินเขียนมือ
             </Button>
             <Button variant="outline" className="h-8" onClick={exportCsv}>
               <Download className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> ส่งออก CSV
@@ -556,7 +556,10 @@ function OfferingPage() {
           </section>
         </TabsContent>
       </Tabs>
-      <ChurchHandwrittenFormScannerModal open={handwrittenScanOpen} onOpenChange={setHandwrittenScanOpen} />
+      <ChurchHandwrittenFormScannerModal
+        open={handwrittenScanOpen}
+        onOpenChange={setHandwrittenScanOpen}
+      />
     </div>
   );
 }

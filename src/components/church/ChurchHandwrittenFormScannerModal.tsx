@@ -73,7 +73,8 @@ export function ChurchHandwrittenFormScannerModal({
             AI สแกนอ่านเอกสารลายมือคริสตจักร (คริสตจักรชีวิตสุขสันต์กาฬสินธุ์)
           </DialogTitle>
           <DialogDescription className="text-xs">
-            สแกนอ่านภาพถ่าย "ใบตรวจนับเงินแยกรายการ" หรือ "ใบเบิกเงิน คริสตจักร" เขียนมือ ถ่ายรูปแล้ว AI บันทึกให้อัตโนมัติ
+            สแกนอ่านภาพถ่าย "ใบตรวจนับเงินแยกรายการ" หรือ "ใบเบิกเงิน คริสตจักร" เขียนมือ
+            ถ่ายรูปแล้ว AI บันทึกให้อัตโนมัติ
           </DialogDescription>
         </DialogHeader>
 
@@ -84,7 +85,9 @@ export function ChurchHandwrittenFormScannerModal({
               <FileSpreadsheet className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium">อัปโหลดภาพถ่ายใบตรวจนับเงินถวาย หรือใบเบิกเงินคริสตจักร</p>
+              <p className="text-sm font-medium">
+                อัปโหลดภาพถ่ายใบตรวจนับเงินถวาย หรือใบเบิกเงินคริสตจักร
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
                 รองรับไฟล์ภาพถ่ายเขียนมือจากมือถือ (JPG, PNG, WEBP, HEIC)
               </p>
@@ -113,9 +116,12 @@ export function ChurchHandwrittenFormScannerModal({
               <RefreshCw className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium">AI กำลังแกะลายมือคริสตจักรชีวิตสุขสันต์กาฬสินธุ์...</p>
+              <p className="text-sm font-medium">
+                AI กำลังแกะลายมือคริสตจักรชีวิตสุขสันต์กาฬสินธุ์...
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
-                อ่านรายชื่อสมาชิก, ถวายสิบลด, พันธกิจ, ถวายพิเศษ, และคำนวนผลรวมรายคอลัมน์ให้อัตโนมัติ
+                อ่านรายชื่อสมาชิก, ถวายสิบลด, พันธกิจ, ถวายพิเศษ,
+                และคำนวนผลรวมรายคอลัมน์ให้อัตโนมัติ
               </p>
             </div>
           </div>
@@ -127,11 +133,16 @@ export function ChurchHandwrittenFormScannerModal({
             {/* Header info */}
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400">
+                <Badge
+                  variant="outline"
+                  className="bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400"
+                >
                   {result.churchName}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  {result.docType === "offering_worksheet" ? "📋 ใบตรวจนับเงินแยกรายการ" : "🧾 ใบเบิกเงิน คริสตจักร"}
+                  {result.docType === "offering_worksheet"
+                    ? "📋 ใบตรวจนับเงินแยกรายการ"
+                    : "🧾 ใบเบิกเงิน คริสตจักร"}
                 </Badge>
               </div>
               <span className="text-xs text-muted-foreground">วันที่: {result.date}</span>
@@ -179,7 +190,9 @@ export function ChurchHandwrittenFormScannerModal({
                     </tbody>
                     <tfoot className="bg-emerald-500/10 font-bold border-t border-border text-emerald-800 dark:text-emerald-300">
                       <tr>
-                        <td colSpan={2} className="p-2">ผลรวมตรวจสอบสุทธิ</td>
+                        <td colSpan={2} className="p-2">
+                          ผลรวมตรวจสอบสุทธิ
+                        </td>
                         <td className="p-2 text-right">{thb(result.totals.titheTotal)}</td>
                         <td className="p-2 text-right">{thb(result.totals.missionTotal)}</td>
                         <td className="p-2 text-right">{thb(result.totals.specialTotal)}</td>
@@ -203,11 +216,15 @@ export function ChurchHandwrittenFormScannerModal({
 
                 <div className="space-y-2">
                   {result.vouchers.map((v, i) => (
-                    <div key={i} className="border border-border p-3 rounded-lg flex items-center justify-between text-xs bg-card">
+                    <div
+                      key={i}
+                      className="border border-border p-3 rounded-lg flex items-center justify-between text-xs bg-card"
+                    >
                       <div>
                         <p className="font-semibold text-foreground">{v.purpose}</p>
                         <p className="text-[11px] text-muted-foreground">
-                          ผู้เบิก/รับเงิน: <span className="font-medium">{v.applicant}</span> · หมวดหมู่: {v.category}
+                          ผู้เบิก/รับเงิน: <span className="font-medium">{v.applicant}</span> ·
+                          หมวดหมู่: {v.category}
                         </p>
                       </div>
                       <span className="font-bold text-amber-600 dark:text-amber-400 text-sm">
@@ -224,7 +241,11 @@ export function ChurchHandwrittenFormScannerModal({
               <Button variant="ghost" size="sm" onClick={() => setResult(null)} className="text-xs">
                 ถ่ายภาพใหม่
               </Button>
-              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs" onClick={handleConfirmAutoKey}>
+              <Button
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                onClick={handleConfirmAutoKey}
+              >
                 <FileCheck className="mr-1.5 h-4 w-4" />
                 บันทึก Auto-Key เข้า Grace Ledger
               </Button>

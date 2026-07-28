@@ -5,7 +5,13 @@ import { Users, FileText, Download, HandHeart, Phone, Mail, ChevronRight } from 
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -65,7 +71,11 @@ export function MembersPage() {
         title="สมาชิก"
         description={`รายชื่อสมาชิกทั้งหมด ${rows.length} คน · สามารถคลิกเพื่อดูประวัติการถวายและพิมพ์ใบอนุโมทนาบัตร`}
       />
-      <DataToolbar query={query} onQueryChange={setQuery} placeholder="ค้นหาสมาชิกด้วยชื่อ, ครอบครัว, หรือเบอร์โทร..." />
+      <DataToolbar
+        query={query}
+        onQueryChange={setQuery}
+        placeholder="ค้นหาสมาชิกด้วยชื่อ, ครอบครัว, หรือเบอร์โทร..."
+      />
 
       {rows.length === 0 ? (
         <EmptyState
@@ -140,9 +150,12 @@ export function MembersPage() {
                 {selectedMember?.name[0]}
               </div>
               <div>
-                <SheetTitle className="text-lg font-semibold font-display">{selectedMember?.name}</SheetTitle>
+                <SheetTitle className="text-lg font-semibold font-display">
+                  {selectedMember?.name}
+                </SheetTitle>
                 <SheetDescription className="text-xs text-muted-foreground">
-                  ครอบครัว {selectedMember?.family || "—"} • แผนก {selectedMember?.department || "—"}
+                  ครอบครัว {selectedMember?.family || "—"} • แผนก{" "}
+                  {selectedMember?.department || "—"}
                 </SheetDescription>
               </div>
             </div>
@@ -173,18 +186,26 @@ export function MembersPage() {
 
               {/* Giving History Stream */}
               <div className="space-y-3">
-                <span className="kicker block">ประวัติการถวาย ({getMemberOfferings(selectedMember.id).length} รายการ)</span>
+                <span className="kicker block">
+                  ประวัติการถวาย ({getMemberOfferings(selectedMember.id).length} รายการ)
+                </span>
                 <div className="divide-y divide-border/60 border border-border rounded-md overflow-hidden bg-card text-xs">
                   {getMemberOfferings(selectedMember.id).length === 0 ? (
-                    <div className="py-6 text-center text-muted-foreground">ยังไม่มีประวัติการถวายระบุชื่อ</div>
+                    <div className="py-6 text-center text-muted-foreground">
+                      ยังไม่มีประวัติการถวายระบุชื่อ
+                    </div>
                   ) : (
                     getMemberOfferings(selectedMember.id).map((o) => (
                       <div key={o.id} className="flex items-center justify-between p-3">
                         <div>
                           <p className="font-medium text-foreground">{fmtDate(o.date)}</p>
-                          <p className="text-muted-foreground text-[11px]">{o.note || "เงินถวายทั่วไป"}</p>
+                          <p className="text-muted-foreground text-[11px]">
+                            {o.note || "เงินถวายทั่วไป"}
+                          </p>
                         </div>
-                        <span className="num-display font-semibold text-success">{thb(o.amount)}</span>
+                        <span className="num-display font-semibold text-success">
+                          {thb(o.amount)}
+                        </span>
                       </div>
                     ))
                   )}

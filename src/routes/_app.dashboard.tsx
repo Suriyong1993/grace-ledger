@@ -32,7 +32,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { NumberTicker } from "@/components/ui/number-ticker";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { listIncome, listExpense, listCategories, listFunds } from "@/services/church";
 import { thb, fmtDate, dayjs } from "@/lib/format";
 import { type TxStatus } from "@/lib/types";
@@ -167,12 +173,14 @@ export function Dashboard() {
     ...filteredExpenses.map((e) => ({ ...e, kind: "expense" as const })),
   ].sort((a, b) => b.date.localeCompare(a.date));
 
-  const displayTx = allTx.filter((t) => {
-    if (txFilter === "income") return t.kind === "income";
-    if (txFilter === "expense") return t.kind === "expense";
-    if (txFilter === "pending") return t.status === "pending";
-    return true;
-  }).slice(0, 12);
+  const displayTx = allTx
+    .filter((t) => {
+      if (txFilter === "income") return t.kind === "income";
+      if (txFilter === "expense") return t.kind === "expense";
+      if (txFilter === "pending") return t.status === "pending";
+      return true;
+    })
+    .slice(0, 12);
 
   return (
     <PageTransition className="space-y-6 md:space-y-8">
@@ -220,8 +228,12 @@ export function Dashboard() {
           <div className="flex items-center gap-2.5">
             <Clock className="h-4 w-4 text-warning shrink-0" />
             <span className="font-medium text-foreground">
-              มีรายการเบิกจ่ายรออนุมัติ <span className="font-bold text-warning">{pendingExpenses.length} รายการ</span> รวมเป็นเงิน{" "}
-              <span className="num-display font-semibold">฿{pendingExpenses.reduce((s, e) => s + e.amount, 0).toLocaleString("th-TH")}</span>
+              มีรายการเบิกจ่ายรออนุมัติ{" "}
+              <span className="font-bold text-warning">{pendingExpenses.length} รายการ</span>{" "}
+              รวมเป็นเงิน{" "}
+              <span className="num-display font-semibold">
+                ฿{pendingExpenses.reduce((s, e) => s + e.amount, 0).toLocaleString("th-TH")}
+              </span>
             </span>
           </div>
           <Button
@@ -261,8 +273,14 @@ export function Dashboard() {
             </div>
             <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2">
               <span>กระแสเงินสุทธิ</span>
-              <span className={cn("font-medium num-display", balance >= 0 ? "text-success" : "text-destructive")}>
-                {balance >= 0 ? "+฿" : "-฿"}{Math.abs(balance).toLocaleString("th-TH")}
+              <span
+                className={cn(
+                  "font-medium num-display",
+                  balance >= 0 ? "text-success" : "text-destructive",
+                )}
+              >
+                {balance >= 0 ? "+฿" : "-฿"}
+                {Math.abs(balance).toLocaleString("th-TH")}
               </span>
             </div>
           </div>
@@ -275,12 +293,15 @@ export function Dashboard() {
                 <ArrowDownLeft className="h-4 w-4 text-success" />
               </div>
               <p className="num-display font-display mt-2 text-2xl font-semibold text-success">
-                +฿<NumberTicker value={totalIncome} decimalPlaces={2} />
+                +฿
+                <NumberTicker value={totalIncome} decimalPlaces={2} />
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2">
               <span>จำนวนรายการ</span>
-              <span className="font-medium text-foreground num-display">{filteredIncomes.length} รายการ</span>
+              <span className="font-medium text-foreground num-display">
+                {filteredIncomes.length} รายการ
+              </span>
             </div>
           </div>
 
@@ -292,12 +313,15 @@ export function Dashboard() {
                 <ArrowUpRight className="h-4 w-4 text-destructive" />
               </div>
               <p className="num-display font-display mt-2 text-2xl font-semibold text-destructive">
-                −฿<NumberTicker value={totalExpense} decimalPlaces={2} />
+                −฿
+                <NumberTicker value={totalExpense} decimalPlaces={2} />
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2">
               <span>จำนวนรายการ</span>
-              <span className="font-medium text-foreground num-display">{filteredExpenses.length} รายการ</span>
+              <span className="font-medium text-foreground num-display">
+                {filteredExpenses.length} รายการ
+              </span>
             </div>
           </div>
 
@@ -309,7 +333,8 @@ export function Dashboard() {
                 <Clock className="h-4 w-4 text-warning" />
               </div>
               <p className="num-display font-display mt-2 text-2xl font-semibold text-warning">
-                {pendingExpenses.length} <span className="text-xs font-normal text-muted-foreground">รายการ</span>
+                {pendingExpenses.length}{" "}
+                <span className="text-xs font-normal text-muted-foreground">รายการ</span>
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between text-xs border-t border-border/40 pt-2">
@@ -329,7 +354,9 @@ export function Dashboard() {
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-3.5">
             <div>
               <p className="kicker">แนวโน้มกระแสเงินสด 6 เดือน</p>
-              <p className="text-xs text-muted-foreground mt-0.5">การเปรียบเทียบรายรับและรายจ่ายสะสม</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                การเปรียบเทียบรายรับและรายจ่ายสะสม
+              </p>
             </div>
             <div className="flex items-center gap-4 text-xs font-medium">
               <span className="flex items-center gap-1.5">
@@ -354,7 +381,11 @@ export function Dashboard() {
                     <stop offset="95%" stopColor="var(--color-destructive)" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="var(--color-border)" strokeDasharray="3 3" />
+                <CartesianGrid
+                  vertical={false}
+                  stroke="var(--color-border)"
+                  strokeDasharray="3 3"
+                />
                 <XAxis
                   dataKey="month"
                   stroke="var(--color-muted-foreground)"
@@ -380,7 +411,11 @@ export function Dashboard() {
                     fontSize: "12px",
                     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   }}
-                  labelStyle={{ color: "var(--color-foreground)", fontWeight: 600, marginBottom: "4px" }}
+                  labelStyle={{
+                    color: "var(--color-foreground)",
+                    fontWeight: 600,
+                    marginBottom: "4px",
+                  }}
                 />
                 <Area
                   type="monotone"
@@ -409,7 +444,9 @@ export function Dashboard() {
         <section className="card-ledger rounded-md shadow-craft lg:col-span-2 flex flex-col">
           <div className="border-b border-border px-5 py-3.5">
             <p className="kicker">หมวดหมู่รายจ่ายสูงสุด</p>
-            <p className="text-xs text-muted-foreground mt-0.5">การกระจายตัวของค่าใช้จ่ายสัดส่วนสูงสุด</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              การกระจายตัวของค่าใช้จ่ายสัดส่วนสูงสุด
+            </p>
           </div>
 
           <div className="p-5 space-y-4 flex-1">
@@ -431,7 +468,9 @@ export function Dashboard() {
                         </span>
                         <span>{cat.name}</span>
                       </span>
-                      <span className="num-display font-medium text-foreground">{thb(cat.amount)}</span>
+                      <span className="num-display font-medium text-foreground">
+                        {thb(cat.amount)}
+                      </span>
                     </div>
                     <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
                       <div
@@ -520,7 +559,9 @@ export function Dashboard() {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                      {tx.description || tx.vendor || (tx.kind === "income" ? "รายรับทั่วไป" : "รายจ่ายทั่วไป")}
+                      {tx.description ||
+                        tx.vendor ||
+                        (tx.kind === "income" ? "รายรับทั่วไป" : "รายจ่ายทั่วไป")}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                       <span>{fmtDate(tx.date)}</span>
@@ -572,7 +613,8 @@ export function Dashboard() {
                     selectedTx.kind === "income" ? "text-success" : "text-destructive",
                   )}
                 >
-                  {selectedTx.kind === "income" ? "+" : "−"}฿{selectedTx.amount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                  {selectedTx.kind === "income" ? "+" : "−"}฿
+                  {selectedTx.amount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                 </p>
               </div>
 
@@ -588,7 +630,9 @@ export function Dashboard() {
                 </div>
                 <div className="flex justify-between py-2 border-b border-border/50">
                   <span className="text-muted-foreground">หมวดหมู่</span>
-                  <span className="font-medium text-foreground">{catName(selectedTx.categoryId)}</span>
+                  <span className="font-medium text-foreground">
+                    {catName(selectedTx.categoryId)}
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-border/50">
                   <span className="text-muted-foreground">กองทุน</span>

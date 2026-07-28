@@ -76,7 +76,13 @@ import {
 import { Receipt } from "lucide-react";
 import { SmartReceiptScannerModal } from "@/components/receipts/SmartReceiptScannerModal";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { type ExpenseRecord } from "@/lib/types";
 
 export const Route = createFileRoute("/_app/expense")({
@@ -254,11 +260,7 @@ function ExpensePage() {
                             <FormItem>
                               <FormLabel>วันที่</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="date"
-                                  className="bg-card shadow-none"
-                                  {...field}
-                                />
+                                <Input type="date" className="bg-card shadow-none" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -350,21 +352,14 @@ function ExpensePage() {
                           <FormItem>
                             <FormLabel>รายละเอียด</FormLabel>
                             <FormControl>
-                              <Textarea
-                                rows={3}
-                                className="bg-card shadow-none"
-                                {...field}
-                              />
+                              <Textarea rows={3} className="bg-card shadow-none" {...field} />
                             </FormControl>
                           </FormItem>
                         )}
                       />
                       <div>
                         <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                          <Receipt
-                            className="h-4 w-4 text-muted-foreground"
-                            strokeWidth={1.75}
-                          />
+                          <Receipt className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
                           ใบเสร็จ / ใบกำกับภาษี
                         </p>
                         <AttachmentInput
@@ -511,10 +506,7 @@ function ExpensePage() {
                             onClick={() => setStatus.mutate({ id: r.id, s: "approved" })}
                             aria-label="อนุมัติ"
                           >
-                            <CheckCircle2
-                              className="h-4 w-4 text-success"
-                              strokeWidth={1.75}
-                            />
+                            <CheckCircle2 className="h-4 w-4 text-success" strokeWidth={1.75} />
                           </Button>
                           <Button
                             size="icon"
@@ -570,23 +562,37 @@ function ExpensePage() {
                 <span className="kicker block mb-3">ขั้นตอนการอนุมัติ (Approval Stepper)</span>
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex flex-col items-center gap-1">
-                    <span className="h-6 w-6 rounded-full bg-success text-success-foreground grid place-items-center text-[10px] font-bold">1</span>
+                    <span className="h-6 w-6 rounded-full bg-success text-success-foreground grid place-items-center text-[10px] font-bold">
+                      1
+                    </span>
                     <span className="font-medium text-foreground">สร้างใบเบิก</span>
                   </div>
                   <div className="h-px flex-1 bg-border mx-2" />
                   <div className="flex flex-col items-center gap-1">
-                    <span className={cn(
-                      "h-6 w-6 rounded-full grid place-items-center text-[10px] font-bold",
-                      selectedExpense.status === "pending" ? "bg-warning text-warning-foreground" : "bg-success text-success-foreground"
-                    )}>2</span>
+                    <span
+                      className={cn(
+                        "h-6 w-6 rounded-full grid place-items-center text-[10px] font-bold",
+                        selectedExpense.status === "pending"
+                          ? "bg-warning text-warning-foreground"
+                          : "bg-success text-success-foreground",
+                      )}
+                    >
+                      2
+                    </span>
                     <span className="font-medium text-foreground">พิจารณาอนุมัติ</span>
                   </div>
                   <div className="h-px flex-1 bg-border mx-2" />
                   <div className="flex flex-col items-center gap-1">
-                    <span className={cn(
-                      "h-6 w-6 rounded-full grid place-items-center text-[10px] font-bold",
-                      selectedExpense.status === "approved" ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"
-                    )}>3</span>
+                    <span
+                      className={cn(
+                        "h-6 w-6 rounded-full grid place-items-center text-[10px] font-bold",
+                        selectedExpense.status === "approved"
+                          ? "bg-success text-success-foreground"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      3
+                    </span>
                     <span className="text-muted-foreground">เบิกจ่ายเรียบร้อย</span>
                   </div>
                 </div>
@@ -618,15 +624,21 @@ function ExpensePage() {
               <div className="space-y-3 text-xs">
                 <div className="flex justify-between py-2 border-b border-border/50">
                   <span className="text-muted-foreground">วันที่เบิกจ่าย</span>
-                  <span className="font-medium text-foreground">{fmtDate(selectedExpense.date)}</span>
+                  <span className="font-medium text-foreground">
+                    {fmtDate(selectedExpense.date)}
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-border/50">
                   <span className="text-muted-foreground">หมวดหมู่งบประมาณ</span>
-                  <span className="font-medium text-foreground">{catName(selectedExpense.categoryId)}</span>
+                  <span className="font-medium text-foreground">
+                    {catName(selectedExpense.categoryId)}
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-border/50">
                   <span className="text-muted-foreground">เบิกจ่ายจากกองทุน</span>
-                  <span className="font-medium text-foreground">{fundName(selectedExpense.fundId)}</span>
+                  <span className="font-medium text-foreground">
+                    {fundName(selectedExpense.fundId)}
+                  </span>
                 </div>
                 {selectedExpense.vendor && (
                   <div className="flex justify-between py-2 border-b border-border/50">
@@ -636,7 +648,9 @@ function ExpensePage() {
                 )}
                 {selectedExpense.description && (
                   <div className="py-2 border-b border-border/50">
-                    <span className="text-muted-foreground block mb-1">รายละเอียดโครงการ/วัตถุประสงค์</span>
+                    <span className="text-muted-foreground block mb-1">
+                      รายละเอียดโครงการ/วัตถุประสงค์
+                    </span>
                     <p className="text-foreground leading-relaxed">{selectedExpense.description}</p>
                   </div>
                 )}
@@ -677,4 +691,3 @@ function ExpensePage() {
     </div>
   );
 }
-

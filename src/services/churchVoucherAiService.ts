@@ -126,21 +126,21 @@ If it is a "ใบเบิกเงิน คริสตจักร" (Disburs
           body: JSON.stringify({
             contents: [
               {
-                parts: [
-                  { inlineData: { mimeType, data: base64Data } },
-                  { text: prompt },
-                ],
+                parts: [{ inlineData: { mimeType, data: base64Data } }, { text: prompt }],
               },
             ],
             generationConfig: { temperature: 0.1, maxOutputTokens: 1200 },
           }),
-        }
+        },
       );
 
       if (res.ok) {
         const json = await res.json();
         const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-        const cleanJson = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+        const cleanJson = rawText
+          .replace(/```json/g, "")
+          .replace(/```/g, "")
+          .trim();
         return JSON.parse(cleanJson) as ChurchDocParsedResult;
       }
     } catch (err) {
@@ -149,7 +149,8 @@ If it is a "ใบเบิกเงิน คริสตจักร" (Disburs
   }
 
   // Fallback Demonstration Data matching exact uploaded images from user
-  const isVoucher = file.name.toLowerCase().includes("voucher") || file.name.toLowerCase().includes("เบิก");
+  const isVoucher =
+    file.name.toLowerCase().includes("voucher") || file.name.toLowerCase().includes("เบิก");
 
   if (isVoucher) {
     return {

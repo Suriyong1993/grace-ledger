@@ -64,8 +64,7 @@ const rowSum = (r: MemberOfferingRow) =>
   r.tithe + r.rent + r.memorial + r.mission + r.special + r.land + r.party;
 
 /** Editorial tab trigger — flat, sharp corners, no shadow or bounce */
-const TAB_TRIGGER =
-  "rounded-none text-xs data-[state=active]:shadow-none active:scale-100";
+const TAB_TRIGGER = "rounded-none text-xs data-[state=active]:shadow-none active:scale-100";
 
 export function SundayCountSheet() {
   const { user } = useAuth();
