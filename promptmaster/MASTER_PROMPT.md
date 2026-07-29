@@ -46,6 +46,7 @@ Before making edits, inspect the relevant architectural reference files in this 
 | **Audit Trail Chain** | `src/server/services/audit.service.ts` | Per-church SHA-256 hash chaining for tamper prevention |
 | **AI Vision OCR Proxy** | `src/server/api/routes/ai-proxy.routes.ts` | Server proxy for Fireworks AI (Kimi-K3) & Gemini slip parsing |
 | **Embedded Test Engine** | `src/server/infrastructure/db.ts` | In-memory PGlite WebAssembly Postgres engine for instant test execution |
+| **Production Deployment** | `promptmaster/DEPLOYMENT_GUIDE.md` | Vercel production URL, GitHub repo, Docker & environment variables |
 
 ---
 
