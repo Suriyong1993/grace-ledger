@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -60,6 +60,7 @@ import {
 import {
   createExpense,
   deleteExpense,
+  getChurchId,
   listCategories,
   listExpense,
   listFunds,
@@ -83,7 +84,8 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { type ExpenseRecord } from "@/lib/types";
+import { type Expense } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/expense")({
   head: () => ({ meta: [{ title: "รายจ่าย — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -103,11 +105,17 @@ type Values = z.infer<typeof schema>;
 function ExpensePage() {
   const { user, can } = useAuth();
   const qc = useQueryClient();
+  const [churchId, setChurchId] = useState<string>();
   const [open, setOpen] = useState(false);
   const [aiScannerOpen, setAiScannerOpen] = useState(false);
   const [q, setQ] = useState("");
   const [receipt, setReceipt] = useState<AttachmentValue | undefined>();
-  const [selectedExpense, setSelectedExpense] = useState<ExpenseRecord | null>(null);
+
+  // Load churchId for attachment uploads
+  useEffect(() => {
+    getChurchId().then(setChurchId);
+  }, []);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   const expQ = useQuery({ queryKey: ["expense"], queryFn: listExpense });
   const catsQ = useQuery({ queryKey: ["categories"], queryFn: listCategories });
@@ -120,6 +128,7 @@ function ExpensePage() {
           ...v,
           attachmentName: receipt?.name,
           attachmentDataUrl: receipt?.url,
+          attachmentStoragePath: receipt?.storagePath,
           attachmentType: receipt?.type,
           attachmentSize: receipt?.size,
         },
@@ -367,6 +376,7 @@ function ExpensePage() {
                           onChange={setReceipt}
                           label="ถ่ายรูปหรือแนบไฟล์ (JPG, PNG, PDF ไม่เกิน 10MB)"
                           capture
+                          churchId={churchId}
                         />
                       </div>
                       <DialogFooter>
@@ -420,10 +430,12 @@ function ExpensePage() {
 
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายจ่าย..." />
 
-      <section className="card-ledger animate-fade-up">
-        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-          <p className="kicker">รายการรายจ่าย</p>
-          <p className="num-display text-xs text-muted-foreground">{rows.length} รายการ</p>
+      <section className="rounded-xl border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+        <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
+          <p className="kicker font-medium text-muted-foreground/80">รายการรายจ่าย</p>
+          <p className="num-display text-xs font-semibold text-muted-foreground">
+            {rows.length} รายการ
+          </p>
         </div>
         {expQ.isLoading ? (
           <div className="divide-y divide-border">

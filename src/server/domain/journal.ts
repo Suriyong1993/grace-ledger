@@ -9,7 +9,7 @@
  */
 
 import { eq, and, isNull, sql, desc } from "drizzle-orm";
-import { db } from "@/server/infrastructure/db";
+import { db, type Transaction } from "@/server/infrastructure/db";
 import {
   journalEntries,
   journalEntryLines,
@@ -34,7 +34,7 @@ export class DomainError extends Error {
     message: string,
     public readonly details?: Record<string, unknown>,
   ) {
-    super(message);
+    super(`${code}: ${message}`);
     this.name = "DomainError";
   }
 }
@@ -207,7 +207,7 @@ export class JournalService {
       throw new DomainError("FUTURE_DATE", "Posting date cannot be in the future");
     }
 
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async (tx: Transaction) => {
       // Check fiscal period is open
       const period = await tx
         .select()
@@ -334,7 +334,7 @@ export class JournalService {
     approverRole: UserRole,
     churchId: string,
   ): Promise<JournalEntryView> {
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async (tx: Transaction) => {
       // Lock entry row (CF-2)
       const rows = await tx
         .select()
@@ -420,7 +420,7 @@ export class JournalService {
       throw new DomainError("REASON_REQUIRED", "Rejection reason must be at least 10 characters");
     }
     // RACE CONDITION FIX: Use transaction with FOR UPDATE to prevent concurrent modifications
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: Transaction) => {
       const rows = await tx
         .select()
         .from(journalEntries)
@@ -440,7 +440,7 @@ export class JournalService {
   /** Submit draft for approval */
   static async submitForApproval(entryId: string, userId: string, churchId: string): Promise<void> {
     // RACE CONDITION FIX: Use transaction with FOR UPDATE to prevent concurrent modifications
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: Transaction) => {
       const rows = await tx
         .select()
         .from(journalEntries)
@@ -484,16 +484,18 @@ export class JournalService {
       .from(journalEntryLines)
       .where(eq(journalEntryLines.journalEntryId, entryId));
 
-    const reversedLines: CreateLineInput[] = originalLines.map((l) => ({
-      accountId: l.accountId,
-      lineType: (l.lineType === "debit" ? "credit" : "debit") as LineType,
-      amount: Money.fromSqlDecimal(l.amount),
-      fundId: l.fundId,
-      memberId: l.memberId ?? undefined,
-      departmentId: l.departmentId ?? undefined,
-      projectId: l.projectId ?? undefined,
-      description: `[VOID] ${l.description ?? ""} — ${reason}`,
-    }));
+    const reversedLines: CreateLineInput[] = originalLines.map(
+      (l: typeof journalEntryLines.$inferSelect) => ({
+        accountId: l.accountId,
+        lineType: (l.lineType === "debit" ? "credit" : "debit") as LineType,
+        amount: Money.fromSqlDecimal(l.amount),
+        fundId: l.fundId,
+        memberId: l.memberId ?? undefined,
+        departmentId: l.departmentId ?? undefined,
+        projectId: l.projectId ?? undefined,
+        description: `[VOID] ${l.description ?? ""} — ${reason}`,
+      }),
+    );
 
     // FIX: Create reversal entry first, then auto-submit for approval
     // This ensures the reversal is in the approval queue and books will balance once approved

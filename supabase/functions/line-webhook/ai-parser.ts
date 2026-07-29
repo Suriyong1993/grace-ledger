@@ -3,7 +3,7 @@
 // Uses AI Vision API with regex fallback for common Thai formats.
 
 export interface ParsedTransaction {
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   amount: number;
   category: string;
   description: string;
@@ -12,20 +12,20 @@ export interface ParsedTransaction {
   confidence: number;
 }
 
-const AI_API_KEY = Deno.env.get('AI_API_KEY') ?? '';
-const AI_MODEL = Deno.env.get('AI_MODEL') ?? 'gemini-2.0-flash';
+const AI_API_KEY = Deno.env.get("AI_API_KEY") ?? "";
+const AI_MODEL = Deno.env.get("AI_MODEL") ?? "gemini-2.0-flash";
 
 // Category keywords mapping
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  'อาหาร': ['ข้าว', 'อาหาร', 'กิน', 'ร้านอาหาร', 'กาแฟ', 'น้ำ', 'ขนม'],
-  'เดินทาง': ['น้ำมัน', 'รถ', 'แท็กซี่', 'grab', 'เดินทาง', 'ทางด่วน', 'จอดรถ'],
-  'สำนักงาน': ['กระดาษ', 'ปากกา', 'อุปกรณ์', 'สำนักงาน', 'ปริ้น'],
-  'สาธารณูปโภค': ['ค่าไฟ', 'ค่าน้ำ', 'ค่าเน็ต', 'อินเทอร์เน็ต', 'โทรศัพท์', 'ไฟฟ้า'],
-  'การตลาด': ['โฆษณา', 'โปรโมท', 'marketing', 'facebook', 'google ads'],
-  'เงินเดือน': ['เงินเดือน', 'ค่าแรง', 'salary', 'โบนัส'],
-  'บริจาค': ['บริจาค', 'ทำบุญ', 'donation', 'ถวาย'],
-  'ค่าเช่า': ['ค่าเช่า', 'เช่า', 'rent'],
-  'อื่นๆ': [],
+  อาหาร: ["ข้าว", "อาหาร", "กิน", "ร้านอาหาร", "กาแฟ", "น้ำ", "ขนม"],
+  เดินทาง: ["น้ำมัน", "รถ", "แท็กซี่", "grab", "เดินทาง", "ทางด่วน", "จอดรถ"],
+  สำนักงาน: ["กระดาษ", "ปากกา", "อุปกรณ์", "สำนักงาน", "ปริ้น"],
+  สาธารณูปโภค: ["ค่าไฟ", "ค่าน้ำ", "ค่าเน็ต", "อินเทอร์เน็ต", "โทรศัพท์", "ไฟฟ้า"],
+  การตลาด: ["โฆษณา", "โปรโมท", "marketing", "facebook", "google ads"],
+  เงินเดือน: ["เงินเดือน", "ค่าแรง", "salary", "โบนัส"],
+  บริจาค: ["บริจาค", "ทำบุญ", "donation", "ถวาย"],
+  ค่าเช่า: ["ค่าเช่า", "เช่า", "rent"],
+  อื่นๆ: [],
 };
 
 function guessCategory(text: string): string {
@@ -33,7 +33,7 @@ function guessCategory(text: string): string {
   for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
     if (keywords.some((kw) => lower.includes(kw))) return cat;
   }
-  return 'อื่นๆ';
+  return "อื่นๆ";
 }
 
 // Regex fallback parser for common Thai formats
@@ -42,25 +42,29 @@ function regexParse(text: string): ParsedTransaction | null {
   const amountMatch = text.match(/(\d[\d,]*\.?\d*)/);
   if (!amountMatch) return null;
 
-  const amount = parseFloat(amountMatch[1].replace(/,/g, ''));
+  const amount = parseFloat(amountMatch[1].replace(/,/g, ""));
   if (isNaN(amount) || amount <= 0) return null;
 
   const lower = text.toLowerCase();
   const isIncome = /รับ|รายรับ|income|รับเงิน|ขายได้/.test(lower);
   const isExpense = /จ่าย|รายจ่าย|expense|ซื้อ|ค่า/.test(lower);
 
-  const type = isIncome && !isExpense ? 'income' : 'expense';
+  const type = isIncome && !isExpense ? "income" : "expense";
   const category = guessCategory(text);
 
   // Remove amount from text for description
-  const description = text.replace(amountMatch[0], '').replace(/^[จ่ายรับซื้อค่า]+\s*/, '').trim() || category;
+  const description =
+    text
+      .replace(amountMatch[0], "")
+      .replace(/^[จ่ายรับซื้อค่า]+\s*/, "")
+      .trim() || category;
 
   return {
     type,
     amount,
     category,
     description,
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     confidence: 0.75, // regex is less confident
   };
 }
@@ -82,9 +86,9 @@ If today's date is unknown, use today. Confidence should reflect how certain you
 
     if (imageBase64) {
       parts.push({
-        inlineData: { mimeType: 'image/jpeg', data: imageBase64 },
+        inlineData: { mimeType: "image/jpeg", data: imageBase64 },
       });
-      parts.push({ text: 'Extract transaction from this receipt image. ' + systemPrompt });
+      parts.push({ text: "Extract transaction from this receipt image. " + systemPrompt });
     } else {
       parts.push({ text: `${systemPrompt}\n\nUser input: "${text}"` });
     }
@@ -92,8 +96,8 @@ If today's date is unknown, use today. Confidence should reflect how certain you
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${AI_API_KEY}`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts }],
           generationConfig: { temperature: 0.1, maxOutputTokens: 300 },
@@ -102,12 +106,12 @@ If today's date is unknown, use today. Confidence should reflect how certain you
     );
 
     if (!res.ok) {
-      console.error('Gemini API error:', res.status, await res.text());
+      console.error("Gemini API error:", res.status, await res.text());
       return null;
     }
 
     const data = await res.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
     // Extract JSON from response
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -115,22 +119,25 @@ If today's date is unknown, use today. Confidence should reflect how certain you
 
     const parsed = JSON.parse(jsonMatch[0]);
     return {
-      type: parsed.type === 'income' ? 'income' : 'expense',
+      type: parsed.type === "income" ? "income" : "expense",
       amount: Number(parsed.amount) || 0,
-      category: parsed.category || 'อื่นๆ',
-      description: parsed.description || '',
+      category: parsed.category || "อื่นๆ",
+      description: parsed.description || "",
       merchant: parsed.merchant || undefined,
-      date: parsed.date || new Date().toISOString().split('T')[0],
+      date: parsed.date || new Date().toISOString().split("T")[0],
       confidence: Number(parsed.confidence) || 0.5,
     };
   } catch (err) {
-    console.error('AI parse error:', err);
+    console.error("AI parse error:", err);
     return null;
   }
 }
 
 // Main entry point
-export async function parseTransaction(text: string, imageBase64?: string): Promise<ParsedTransaction> {
+export async function parseTransaction(
+  text: string,
+  imageBase64?: string,
+): Promise<ParsedTransaction> {
   // Try AI first (handles images + complex text)
   const aiResult = await aiParse(text, imageBase64);
   if (aiResult && aiResult.amount > 0) return aiResult;
@@ -141,11 +148,11 @@ export async function parseTransaction(text: string, imageBase64?: string): Prom
 
   // Last resort: unknown
   return {
-    type: 'expense',
+    type: "expense",
     amount: 0,
-    category: 'อื่นๆ',
+    category: "อื่นๆ",
     description: text,
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     confidence: 0.1,
   };
 }

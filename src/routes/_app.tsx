@@ -5,6 +5,8 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppTopbar } from "@/components/layout/AppTopbar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { useAuth } from "@/lib/auth";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { DashboardSkeleton } from "@/components/shared/Skeleton";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -12,7 +14,7 @@ export const Route = createFileRoute("/_app")({
 
 function AppLayout() {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <DashboardSkeleton />;
   if (!user) return <Navigate to="/auth" replace />;
 
   return (
@@ -21,14 +23,16 @@ function AppLayout() {
         <AppSidebar />
         <SidebarInset className="min-w-0">
           <AppTopbar />
-          <motion.main
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="flex-1 px-4 md:px-8 py-6 pb-24 md:pb-10"
-          >
-            <Outlet />
-          </motion.main>
+          <ErrorBoundary>
+            <motion.main
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex-1 px-4 md:px-8 py-6 pb-24 md:pb-10"
+            >
+              <Outlet />
+            </motion.main>
+          </ErrorBoundary>
           <BottomNav />
         </SidebarInset>
       </div>

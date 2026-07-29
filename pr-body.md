@@ -6,20 +6,20 @@ This PR fixes the top 7 priority issues identified in the comprehensive code aud
 
 ### Security (5 fixes)
 
-| # | Issue | Fix |
-|---|-------|-----|
-| 1 | auth-login — missing `is_active` in SELECT caused 403 on every login | Added `is_active` to column list |
-| 2 | get-church — `select('*, churches(*)')` with SERVICE_ROLE leaked `password_hash` | Replaced with explicit safe column selection |
-| 3 | auth-register — endpoint was public, no auth required | Now requires Bearer token + super_admin role validation; church_id mismatch rejection |
-| 4 | seed endpoint — POST /api/seed had no auth guard | Added `requireSession()` middleware |
-| 5 | CORS — wildcard `*` on all edge functions | Restricted to APP_URL + localhost origins via dynamic resolver |
+| #   | Issue                                                                            | Fix                                                                                   |
+| --- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 1   | auth-login — missing `is_active` in SELECT caused 403 on every login             | Added `is_active` to column list                                                      |
+| 2   | get-church — `select('*, churches(*)')` with SERVICE_ROLE leaked `password_hash` | Replaced with explicit safe column selection                                          |
+| 3   | auth-register — endpoint was public, no auth required                            | Now requires Bearer token + super_admin role validation; church_id mismatch rejection |
+| 4   | seed endpoint — POST /api/seed had no auth guard                                 | Added `requireSession()` middleware                                                   |
+| 5   | CORS — wildcard `*` on all edge functions                                        | Restricted to APP_URL + localhost origins via dynamic resolver                        |
 
 ### Data Persistence (2 fixes)
 
-| # | Issue | Fix |
-|---|-------|-----|
-| 6 | mock-db — `saveDb()` stored all financial data in localStorage as JSON | Now only persists metadata subset (session, settings, users); removed `pin` from seed data |
-| 7 | dashboard realtime — `churchId=""` caused subscriptions to silently skip | Added `churchId` state fetched from `users` table via `useEffect` |
+| #   | Issue                                                                    | Fix                                                                                        |
+| --- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| 6   | mock-db — `saveDb()` stored all financial data in localStorage as JSON   | Now only persists metadata subset (session, settings, users); removed `pin` from seed data |
+| 7   | dashboard realtime — `churchId=""` caused subscriptions to silently skip | Added `churchId` state fetched from `users` table via `useEffect`                          |
 
 ### Type Alignment (bonus)
 

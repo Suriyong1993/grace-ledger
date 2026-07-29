@@ -33,7 +33,7 @@ function LineSetupPage() {
   const [channelId, setChannelId] = useState("2009943836");
   const [channelSecret, setChannelSecret] = useState("2fa148fad814ec46c11ee545d8ba4809");
   const [accessToken, setAccessToken] = useState(
-    "dtelrzp98fvoBx3shZ/SE3GuCK4Btt9Rb2k6zdvhgRrtqXmCzlH3jyti/w7uC6i4tea5RKEIuL8uFEXRYZiw+nEEZk4kHoUBPkscwSGfpjtwAyxJm8GQ43igMJI/VpQOxP5rJTW0ECU6kM5x96yklgdB04t89/1O/w1cDnyilFU="
+    "dtelrzp98fvoBx3shZ/SE3GuCK4Btt9Rb2k6zdvhgRrtqXmCzlH3jyti/w7uC6i4tea5RKEIuL8uFEXRYZiw+nEEZk4kHoUBPkscwSGfpjtwAyxJm8GQ43igMJI/VpQOxP5rJTW0ECU6kM5x96yklgdB04t89/1O/w1cDnyilFU=",
   );
   const [webhookUrl] = useState("https://grace-ledger.app/api/line/webhook");
   const [isTesting, setIsTesting] = useState(false);
@@ -88,7 +88,9 @@ function LineSetupPage() {
               <MessageCircle className="h-5 w-5 text-success" />
               <CardTitle className="text-base font-medium">สถานะการเชื่อมต่อ</CardTitle>
             </div>
-            <CardDescription className="text-xs">LINE OA: ชวดลวด (Channel ID: 2009943836)</CardDescription>
+            <CardDescription className="text-xs">
+              LINE OA: ชวดลวด (Channel ID: 2009943836)
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -104,9 +106,12 @@ function LineSetupPage() {
             </div>
 
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <span className="text-xs font-medium text-muted-foreground">สมาชิกที่ผูกบัญชี LINE</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                สมาชิกที่ผูกบัญชี LINE
+              </span>
               <span className="num-display text-xs font-semibold text-foreground">
-                {lineUsers.length} คน {members.length > 0 ? `(จากสมาชิกทั้งหมด ${members.length} คน)` : ""}
+                {lineUsers.length} คน{" "}
+                {members.length > 0 ? `(จากสมาชิกทั้งหมด ${members.length} คน)` : ""}
               </span>
             </div>
 
@@ -129,7 +134,9 @@ function LineSetupPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Key className="h-5 w-5 text-primary" />
-              <CardTitle className="text-base font-medium">LINE Developers API Credentials</CardTitle>
+              <CardTitle className="text-base font-medium">
+                LINE Developers API Credentials
+              </CardTitle>
             </div>
             <CardDescription className="text-xs">
               ข้อมูล Channel Credentials สำหรับแชนแนล 2009943836 (ชวดลวด)
@@ -140,7 +147,12 @@ function LineSetupPage() {
               <Label className="text-xs">Webhook URL</Label>
               <div className="flex gap-2">
                 <Input value={webhookUrl} readOnly className="font-mono text-xs bg-muted/20" />
-                <Button variant="outline" size="icon" onClick={handleCopyWebhook} title="คัดลอก Webhook URL">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleCopyWebhook}
+                  title="คัดลอก Webhook URL"
+                >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -152,7 +164,11 @@ function LineSetupPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs">Channel ID</Label>
-                <Input value={channelId} onChange={(e) => setChannelId(e.target.value)} className="font-mono text-xs" />
+                <Input
+                  value={channelId}
+                  onChange={(e) => setChannelId(e.target.value)}
+                  className="font-mono text-xs"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs">Channel Secret</Label>
@@ -177,9 +193,15 @@ function LineSetupPage() {
 
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-success" /> ข้อมูลทั้งหมดถูกเข้ารหัสด้วย AES-256
+                <ShieldCheck className="h-4 w-4 text-success" /> ข้อมูลทั้งหมดถูกเข้ารหัสด้วย
+                AES-256
               </div>
-              <Button variant="outline" size="sm" onClick={handleTestConnection} disabled={isTesting}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleTestConnection}
+                disabled={isTesting}
+              >
                 {isTesting ? (
                   <>
                     <RefreshCw className="mr-2 h-3.5 w-3.5 animate-spin" /> กำลังทดสอบ...
@@ -200,7 +222,9 @@ function LineSetupPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Smartphone className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base font-medium">ฟีเจอร์การแจ้งเตือนอัตโนมัติผ่าน LINE</CardTitle>
+            <CardTitle className="text-base font-medium">
+              ฟีเจอร์การแจ้งเตือนอัตโนมัติผ่าน LINE
+            </CardTitle>
           </div>
           <CardDescription className="text-xs">
             เลือกเปิด-ปิดฟีเจอร์โต้ตอบอัตโนมัติของบอทคริสตจักร
@@ -219,7 +243,9 @@ function LineSetupPage() {
 
           <div className="flex items-center justify-between border-b border-border pb-4">
             <div>
-              <p className="text-sm font-medium text-foreground">ระบบอ่านสลิปอัตโนมัติ (Slip OCR Reader)</p>
+              <p className="text-sm font-medium text-foreground">
+                ระบบอ่านสลิปอัตโนมัติ (Slip OCR Reader)
+              </p>
               <p className="text-xs text-muted-foreground">
                 ให้สมาชิกส่งรูปสลิปใน LINE แล้วบอทจะอ่านยอดเงิน วันที่ และผู้โอนอัตโนมัติ
               </p>

@@ -296,7 +296,6 @@ function ReconciliationPage() {
             </div>
           </section>
 
-
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* ============ CHANNEL BREAKDOWN ============ */}
             <section className="card-ledger animate-fade-up">
@@ -385,7 +384,6 @@ function ReconciliationPage() {
             </section>
           </div>
 
-
           {/* ============ RECONCILIATION CHECK ============ */}
           <section className="card-ledger animate-fade-up">
             <div className="border-b border-border px-5 py-3.5">
@@ -431,7 +429,10 @@ function ReconciliationPage() {
                 <p className="kicker">ยอดเงินจริง</p>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="actual-cash" className="text-xs font-normal text-muted-foreground">
+                    <Label
+                      htmlFor="actual-cash"
+                      className="text-xs font-normal text-muted-foreground"
+                    >
                       เงินสดในมือ (Cash on Hand)
                     </Label>
                     <Input
@@ -445,7 +446,10 @@ function ReconciliationPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="actual-bank" className="text-xs font-normal text-muted-foreground">
+                    <Label
+                      htmlFor="actual-bank"
+                      className="text-xs font-normal text-muted-foreground"
+                    >
                       เงินในบัญชี (Bank Balance)
                     </Label>
                     <Input
@@ -491,9 +495,7 @@ function ReconciliationPage() {
                       ) : (
                         <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
                       )}
-                      {isBalanced
-                        ? "ยอดตรงกัน"
-                        : `ยอดไม่ตรงกัน (ต่าง ${thb(Math.abs(diff))})`}
+                      {isBalanced ? "ยอดตรงกัน" : `ยอดไม่ตรงกัน (ต่าง ${thb(Math.abs(diff))})`}
                     </p>
                   </div>
                 ) : (
@@ -509,4 +511,3 @@ function ReconciliationPage() {
     </div>
   );
 }
-

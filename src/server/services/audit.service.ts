@@ -10,7 +10,7 @@
 import { createHash } from "crypto";
 import { db } from "@/server/infrastructure/db";
 import { auditLog } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 export interface AuditEntryInput {
   churchId: string;
@@ -51,12 +51,12 @@ export class AuditService {
       churchId: input.churchId,
       eventType: input.eventType,
       entityType: input.entityType,
-      entityId: input.entityId,
-      userId: input.userId,
+      entityId: input.entityId ?? null,
+      userId: input.userId ?? null,
       userName: input.userName,
       action: input.action,
-      beforeState: input.beforeState,
-      afterState: input.afterState,
+      beforeState: input.beforeState ?? null,
+      afterState: input.afterState ?? null,
       correlationId,
       previousHash,
       timestamp: now.toISOString(),
@@ -228,24 +228,32 @@ export class AuditService {
     });
 
     let entriesChecked = 0;
+    let legacySkipped = 0;
     // Check from oldest to newest
     const sorted = [...entries].reverse();
 
     for (const entry of sorted) {
+      // Skip legacy entries that predate hash chaining (current_hash IS NULL)
+      // Legacy entries are still read-only but cannot be verified by hash.
+      if (entry.currentHash === null) {
+        legacySkipped++;
+        continue;
+      }
+
       entriesChecked++;
 
       const payload = JSON.stringify({
         churchId: entry.churchId,
         eventType: entry.eventType,
         entityType: entry.entityType,
-        entityId: entry.entityId,
-        userId: entry.userId,
+        entityId: entry.entityId ?? null,
+        userId: entry.userId ?? null,
         userName: entry.userName,
         action: entry.action,
         beforeState: entry.beforeState ? JSON.parse(entry.beforeState) : null,
         afterState: entry.afterState ? JSON.parse(entry.afterState) : null,
         correlationId: entry.correlationId,
-        previousHash: entry.previousHash,
+        previousHash: entry.previousHash ?? null,
         timestamp: entry.createdAt.toISOString(),
       });
 
@@ -279,16 +287,15 @@ export class AuditService {
     const limit = params.limit ?? 50;
     const offset = params.offset ?? 0;
 
+    const conditions = [eq(auditLog.churchId, params.churchId)];
+    if (params.entityType) conditions.push(eq(auditLog.entityType, params.entityType));
+    if (params.entityId) conditions.push(eq(auditLog.entityId, params.entityId));
+    if (params.userId) conditions.push(eq(auditLog.userId, params.userId));
+    if (params.eventType) conditions.push(eq(auditLog.eventType, params.eventType));
+    if (params.action) conditions.push(eq(auditLog.action, params.action));
+
     return db.query.auditLog.findMany({
-      where: (fields, { eq, and }) => {
-        const conditions = [eq(fields.churchId, params.churchId)];
-        if (params.entityType) conditions.push(eq(fields.entityType, params.entityType));
-        if (params.entityId) conditions.push(eq(fields.entityId, params.entityId));
-        if (params.userId) conditions.push(eq(fields.userId, params.userId));
-        if (params.eventType) conditions.push(eq(fields.eventType, params.eventType));
-        if (params.action) conditions.push(eq(fields.action, params.action));
-        return and(...conditions);
-      },
+      where: and(...conditions),
       orderBy: [desc(auditLog.createdAt)],
       limit,
       offset,

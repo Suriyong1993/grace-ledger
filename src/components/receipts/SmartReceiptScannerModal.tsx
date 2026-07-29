@@ -22,10 +22,7 @@ import {
   Share2,
   ExternalLink,
 } from "lucide-react";
-import {
-  parseDocumentWithAI,
-  type ParsedDocumentResult,
-} from "@/services/aiReceiptService";
+import { parseDocumentWithAI, type ParsedDocumentResult } from "@/services/aiReceiptService";
 import { exportToPEAKCSV, syncToPEAKAPI } from "@/services/peakIntegrationService";
 import { thb } from "@/lib/format";
 
@@ -123,7 +120,8 @@ export function SmartReceiptScannerModal({
             AI Smart Multi-Document OCR Scanner
           </DialogTitle>
           <DialogDescription className="text-xs">
-            สแกนอ่านใบกำกับภาษี, ใบเสร็จ, สลิปโอนเงิน, บิลเขียนมือ หรือภาพหน้าจอ Shopee/Lazada ด้วย AI อัจฉริยะ
+            สแกนอ่านใบกำกับภาษี, ใบเสร็จ, สลิปโอนเงิน, บิลเขียนมือ หรือภาพหน้าจอ Shopee/Lazada ด้วย
+            AI อัจฉริยะ
           </DialogDescription>
         </DialogHeader>
 
@@ -136,7 +134,8 @@ export function SmartReceiptScannerModal({
             <div>
               <p className="text-sm font-medium">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่ออัปโหลด</p>
               <p className="text-xs text-muted-foreground mt-1">
-                รองรับไฟล์ภาพ JPG, PNG, WEBP หรือ PDF (ใบกำกับภาษี, สลิปโอนเงิน, บิลเขียนมือ, ภาพคำสั่งซื้อ)
+                รองรับไฟล์ภาพ JPG, PNG, WEBP หรือ PDF (ใบกำกับภาษี, สลิปโอนเงิน, บิลเขียนมือ,
+                ภาพคำสั่งซื้อ)
               </p>
             </div>
             <Input
@@ -211,12 +210,20 @@ export function SmartReceiptScannerModal({
                     </span>
                   )}
                 </Label>
-                <Input value={parsedResult.taxId || "ไม่มีข้อมูล Tax ID"} readOnly className="mt-1 text-xs" />
+                <Input
+                  value={parsedResult.taxId || "ไม่มีข้อมูล Tax ID"}
+                  readOnly
+                  className="mt-1 text-xs"
+                />
               </div>
 
               <div>
                 <Label className="text-xs font-medium">ยอดเงินรวมสุทธิ</Label>
-                <Input value={thb(parsedResult.amount)} readOnly className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400" />
+                <Input
+                  value={thb(parsedResult.amount)}
+                  readOnly
+                  className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400"
+                />
               </div>
 
               <div>

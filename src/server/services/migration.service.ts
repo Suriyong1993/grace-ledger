@@ -96,7 +96,9 @@ export class MigrationService {
     let migratedUsers = 0;
     for (const v1User of v1Users) {
       // Hash the 6-digit PIN as initial password
-      const tempPassword = await PasswordService.hashPassword((v1User as { pin?: string }).pin ?? "");
+      const tempPassword = await PasswordService.hashPassword(
+        (v1User as { pin?: string }).pin ?? "",
+      );
 
       await db.insert(users).values({
         churchId,

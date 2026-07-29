@@ -87,12 +87,8 @@
           "name": "app_settings_church_id_churches_id_fk",
           "tableFrom": "app_settings",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -100,12 +96,8 @@
           "name": "app_settings_updated_by_users_id_fk",
           "tableFrom": "app_settings",
           "tableTo": "users",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -224,12 +216,8 @@
           "name": "attachments_church_id_churches_id_fk",
           "tableFrom": "attachments",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -237,12 +225,8 @@
           "name": "attachments_uploaded_by_users_id_fk",
           "tableFrom": "attachments",
           "tableTo": "users",
-          "columnsFrom": [
-            "uploaded_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -455,12 +439,8 @@
           "name": "audit_log_church_id_churches_id_fk",
           "tableFrom": "audit_log",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -468,12 +448,8 @@
           "name": "audit_log_user_id_users_id_fk",
           "tableFrom": "audit_log",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -669,12 +645,8 @@
           "name": "budgets_church_id_churches_id_fk",
           "tableFrom": "budgets",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -682,12 +654,8 @@
           "name": "budgets_account_id_chart_of_accounts_id_fk",
           "tableFrom": "budgets",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -695,12 +663,8 @@
           "name": "budgets_fund_id_funds_id_fk",
           "tableFrom": "budgets",
           "tableTo": "funds",
-          "columnsFrom": [
-            "fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -708,12 +672,8 @@
           "name": "budgets_approved_by_users_id_fk",
           "tableFrom": "budgets",
           "tableTo": "users",
-          "columnsFrom": [
-            "approved_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["approved_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -721,12 +681,8 @@
           "name": "budgets_created_by_users_id_fk",
           "tableFrom": "budgets",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -924,12 +880,8 @@
           "name": "chart_of_accounts_church_id_churches_id_fk",
           "tableFrom": "chart_of_accounts",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1070,12 +1022,8 @@
           "name": "departments_church_id_churches_id_fk",
           "tableFrom": "departments",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1230,12 +1178,8 @@
           "name": "fiscal_periods_church_id_churches_id_fk",
           "tableFrom": "fiscal_periods",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1243,12 +1187,8 @@
           "name": "fiscal_periods_closed_by_users_id_fk",
           "tableFrom": "fiscal_periods",
           "tableTo": "users",
-          "columnsFrom": [
-            "closed_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["closed_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1256,12 +1196,8 @@
           "name": "fiscal_periods_reopened_by_users_id_fk",
           "tableFrom": "fiscal_periods",
           "tableTo": "users",
-          "columnsFrom": [
-            "reopened_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reopened_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1422,12 +1358,8 @@
           "name": "funds_church_id_churches_id_fk",
           "tableFrom": "funds",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1435,12 +1367,8 @@
           "name": "funds_account_id_chart_of_accounts_id_fk",
           "tableFrom": "funds",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1656,12 +1584,8 @@
           "name": "general_ledger_church_id_churches_id_fk",
           "tableFrom": "general_ledger",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1669,12 +1593,8 @@
           "name": "general_ledger_account_id_chart_of_accounts_id_fk",
           "tableFrom": "general_ledger",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1682,12 +1602,8 @@
           "name": "general_ledger_journal_entry_id_journal_entries_id_fk",
           "tableFrom": "general_ledger",
           "tableTo": "journal_entries",
-          "columnsFrom": [
-            "journal_entry_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["journal_entry_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1695,12 +1611,8 @@
           "name": "general_ledger_journal_line_id_journal_entry_lines_id_fk",
           "tableFrom": "general_ledger",
           "tableTo": "journal_entry_lines",
-          "columnsFrom": [
-            "journal_line_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["journal_line_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1708,12 +1620,8 @@
           "name": "general_ledger_fund_id_funds_id_fk",
           "tableFrom": "general_ledger",
           "tableTo": "funds",
-          "columnsFrom": [
-            "fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1799,12 +1707,8 @@
           "name": "inter_fund_loans_church_id_churches_id_fk",
           "tableFrom": "inter_fund_loans",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1812,12 +1716,8 @@
           "name": "inter_fund_loans_journal_entry_id_journal_entries_id_fk",
           "tableFrom": "inter_fund_loans",
           "tableTo": "journal_entries",
-          "columnsFrom": [
-            "journal_entry_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["journal_entry_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1825,12 +1725,8 @@
           "name": "inter_fund_loans_from_fund_id_funds_id_fk",
           "tableFrom": "inter_fund_loans",
           "tableTo": "funds",
-          "columnsFrom": [
-            "from_fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["from_fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1838,12 +1734,8 @@
           "name": "inter_fund_loans_to_fund_id_funds_id_fk",
           "tableFrom": "inter_fund_loans",
           "tableTo": "funds",
-          "columnsFrom": [
-            "to_fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["to_fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2158,12 +2050,8 @@
           "name": "journal_entries_church_id_churches_id_fk",
           "tableFrom": "journal_entries",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2171,12 +2059,8 @@
           "name": "journal_entries_created_by_users_id_fk",
           "tableFrom": "journal_entries",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2184,12 +2068,8 @@
           "name": "journal_entries_approval_1_id_users_id_fk",
           "tableFrom": "journal_entries",
           "tableTo": "users",
-          "columnsFrom": [
-            "approval_1_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["approval_1_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2197,12 +2077,8 @@
           "name": "journal_entries_approval_2_id_users_id_fk",
           "tableFrom": "journal_entries",
           "tableTo": "users",
-          "columnsFrom": [
-            "approval_2_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["approval_2_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2210,12 +2086,8 @@
           "name": "journal_entries_fund_id_funds_id_fk",
           "tableFrom": "journal_entries",
           "tableTo": "funds",
-          "columnsFrom": [
-            "fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2440,12 +2312,8 @@
           "name": "journal_entry_lines_journal_entry_id_journal_entries_id_fk",
           "tableFrom": "journal_entry_lines",
           "tableTo": "journal_entries",
-          "columnsFrom": [
-            "journal_entry_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["journal_entry_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2453,12 +2321,8 @@
           "name": "journal_entry_lines_church_id_churches_id_fk",
           "tableFrom": "journal_entry_lines",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2466,12 +2330,8 @@
           "name": "journal_entry_lines_account_id_chart_of_accounts_id_fk",
           "tableFrom": "journal_entry_lines",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2479,12 +2339,8 @@
           "name": "journal_entry_lines_fund_id_funds_id_fk",
           "tableFrom": "journal_entry_lines",
           "tableTo": "funds",
-          "columnsFrom": [
-            "fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2668,12 +2524,8 @@
           "name": "members_church_id_churches_id_fk",
           "tableFrom": "members",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2790,12 +2642,8 @@
           "name": "offering_categories_church_id_churches_id_fk",
           "tableFrom": "offering_categories",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2803,12 +2651,8 @@
           "name": "offering_categories_account_id_chart_of_accounts_id_fk",
           "tableFrom": "offering_categories",
           "tableTo": "chart_of_accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2977,12 +2821,8 @@
           "name": "offering_count_sheets_church_id_churches_id_fk",
           "tableFrom": "offering_count_sheets",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2990,12 +2830,8 @@
           "name": "offering_count_sheets_counter_1_id_users_id_fk",
           "tableFrom": "offering_count_sheets",
           "tableTo": "users",
-          "columnsFrom": [
-            "counter_1_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["counter_1_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3003,12 +2839,8 @@
           "name": "offering_count_sheets_counter_2_id_users_id_fk",
           "tableFrom": "offering_count_sheets",
           "tableTo": "users",
-          "columnsFrom": [
-            "counter_2_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["counter_2_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3016,12 +2848,8 @@
           "name": "offering_count_sheets_counter_3_id_users_id_fk",
           "tableFrom": "offering_count_sheets",
           "tableTo": "users",
-          "columnsFrom": [
-            "counter_3_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["counter_3_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3029,12 +2857,8 @@
           "name": "offering_count_sheets_locked_by_users_id_fk",
           "tableFrom": "offering_count_sheets",
           "tableTo": "users",
-          "columnsFrom": [
-            "locked_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["locked_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3174,12 +2998,8 @@
           "name": "projects_church_id_churches_id_fk",
           "tableFrom": "projects",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3187,12 +3007,8 @@
           "name": "projects_department_id_departments_id_fk",
           "tableFrom": "projects",
           "tableTo": "departments",
-          "columnsFrom": [
-            "department_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["department_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3200,12 +3016,8 @@
           "name": "projects_owner_id_users_id_fk",
           "tableFrom": "projects",
           "tableTo": "users",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3373,12 +3185,8 @@
           "name": "reconciliations_church_id_churches_id_fk",
           "tableFrom": "reconciliations",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3386,12 +3194,8 @@
           "name": "reconciliations_period_id_fiscal_periods_id_fk",
           "tableFrom": "reconciliations",
           "tableTo": "fiscal_periods",
-          "columnsFrom": [
-            "period_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["period_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3399,12 +3203,8 @@
           "name": "reconciliations_fund_id_funds_id_fk",
           "tableFrom": "reconciliations",
           "tableTo": "funds",
-          "columnsFrom": [
-            "fund_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["fund_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3412,12 +3212,8 @@
           "name": "reconciliations_reconciled_by_users_id_fk",
           "tableFrom": "reconciliations",
           "tableTo": "users",
-          "columnsFrom": [
-            "reconciled_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reconciled_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3542,12 +3338,8 @@
           "name": "user_sessions_user_id_users_id_fk",
           "tableFrom": "user_sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3555,12 +3347,8 @@
           "name": "user_sessions_church_id_churches_id_fk",
           "tableFrom": "user_sessions",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3711,12 +3499,8 @@
           "name": "users_church_id_churches_id_fk",
           "tableFrom": "users",
           "tableTo": "churches",
-          "columnsFrom": [
-            "church_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["church_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3732,55 +3516,27 @@
     "public.account_type": {
       "name": "account_type",
       "schema": "public",
-      "values": [
-        "asset",
-        "liability",
-        "equity",
-        "income",
-        "expense"
-      ]
+      "values": ["asset", "liability", "equity", "income", "expense"]
     },
     "public.budget_period_type": {
       "name": "budget_period_type",
       "schema": "public",
-      "values": [
-        "annual",
-        "monthly",
-        "department",
-        "project"
-      ]
+      "values": ["annual", "monthly", "department", "project"]
     },
     "public.budget_status": {
       "name": "budget_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "pending",
-        "approved",
-        "rejected"
-      ]
+      "values": ["draft", "pending", "approved", "rejected"]
     },
     "public.count_sheet_status": {
       "name": "count_sheet_status",
       "schema": "public",
-      "values": [
-        "counting",
-        "discrepancy",
-        "in_review",
-        "reconciled",
-        "locked"
-      ]
+      "values": ["counting", "discrepancy", "in_review", "reconciled", "locked"]
     },
     "public.entry_status": {
       "name": "entry_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "pending",
-        "approved",
-        "rejected",
-        "voided"
-      ]
+      "values": ["draft", "pending", "approved", "rejected", "voided"]
     },
     "public.entry_type": {
       "name": "entry_type",
@@ -3799,57 +3555,32 @@
     "public.line_type": {
       "name": "line_type",
       "schema": "public",
-      "values": [
-        "debit",
-        "credit"
-      ]
+      "values": ["debit", "credit"]
     },
     "public.member_status": {
       "name": "member_status",
       "schema": "public",
-      "values": [
-        "active",
-        "inactive"
-      ]
+      "values": ["active", "inactive"]
     },
     "public.normal_balance": {
       "name": "normal_balance",
       "schema": "public",
-      "values": [
-        "debit",
-        "credit"
-      ]
+      "values": ["debit", "credit"]
     },
     "public.period_status": {
       "name": "period_status",
       "schema": "public",
-      "values": [
-        "open",
-        "closed",
-        "reconciled"
-      ]
+      "values": ["open", "closed", "reconciled"]
     },
     "public.project_status": {
       "name": "project_status",
       "schema": "public",
-      "values": [
-        "planning",
-        "active",
-        "paused",
-        "completed"
-      ]
+      "values": ["planning", "active", "paused", "completed"]
     },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "super_admin",
-        "pastor",
-        "treasurer",
-        "finance_staff",
-        "auditor",
-        "viewer"
-      ]
+      "values": ["super_admin", "pastor", "treasurer", "finance_staff", "auditor", "viewer"]
     }
   },
   "schemas": {},

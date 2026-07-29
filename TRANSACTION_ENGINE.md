@@ -35,14 +35,14 @@ REJECTED ──softDelete()──→ (SOFT_DELETED)
 
 ### 1.2 State Definitions
 
-| State | Description | Can Edit? | Can Delete? | Next States |
-|-------|-------------|-----------|-------------|-------------|
-| `draft` | In-progress entry, not yet submitted | Yes (creator only) | Yes (soft delete) | `pending`, `deleted` |
-| `pending` | Submitted for approval | No | No | `approved`, `rejected` |
-| `approved` | Approved and posted to GL | No | No | `voided` |
-| `rejected` | Declined by approver | No | Yes (soft delete) | `draft` (resubmit) |
-| `voided` | Reversed — terminal state | No | No | None (terminal) |
-| `deleted` | Soft-deleted — recoverable for 30 days | No | No | None (can be restored) |
+| State      | Description                            | Can Edit?          | Can Delete?       | Next States            |
+| ---------- | -------------------------------------- | ------------------ | ----------------- | ---------------------- |
+| `draft`    | In-progress entry, not yet submitted   | Yes (creator only) | Yes (soft delete) | `pending`, `deleted`   |
+| `pending`  | Submitted for approval                 | No                 | No                | `approved`, `rejected` |
+| `approved` | Approved and posted to GL              | No                 | No                | `voided`               |
+| `rejected` | Declined by approver                   | No                 | Yes (soft delete) | `draft` (resubmit)     |
+| `voided`   | Reversed — terminal state              | No                 | No                | None (terminal)        |
+| `deleted`  | Soft-deleted — recoverable for 30 days | No                 | No                | None (can be restored) |
 
 ---
 
@@ -53,14 +53,14 @@ REJECTED ──softDelete()──→ (SOFT_DELETED)
 ```typescript
 // src/server/services/transaction-state-machine.ts
 
-export type TransactionState = 'draft' | 'pending' | 'approved' | 'rejected' | 'voided';
+export type TransactionState = "draft" | "pending" | "approved" | "rejected" | "voided";
 export type TransactionEvent =
-  | 'submit'
-  | 'approve'
-  | 'reject'
-  | 'resubmit'
-  | 'void'
-  | 'soft_delete';
+  | "submit"
+  | "approve"
+  | "reject"
+  | "resubmit"
+  | "void"
+  | "soft_delete";
 
 interface StateTransition {
   from: TransactionState | TransactionState[];
@@ -74,13 +74,13 @@ export class TransactionStateMachine {
   private readonly transitions: StateTransition[] = [
     // Submit: draft → pending
     {
-      from: 'draft',
-      to: 'pending',
-      event: 'submit',
+      from: "draft",
+      to: "pending",
+      event: "submit",
       guard: async (entry, actor) => {
         // Creator must be the one submitting
         if (entry.createdBy !== actor.id) {
-          throw new ForbiddenError('Only the creator can submit this entry');
+          throw new ForbiddenError("Only the creator can submit this entry");
         }
         // Period must be open
         await this.periodService.assertPeriodOpen(entry.fiscalYear, entry.fiscalPeriod);
@@ -89,37 +89,37 @@ export class TransactionStateMachine {
 
     // Approve: pending → approved
     {
-      from: 'pending',
-      to: 'approved',
-      event: 'approve',
+      from: "pending",
+      to: "approved",
+      event: "approve",
       guard: async (entry, actor) => {
         // No self-approval
         if (entry.createdBy === actor.id) {
-          throw new SelfApprovalError('Cannot approve own transaction');
+          throw new SelfApprovalError("Cannot approve own transaction");
         }
         // Actor must have approval permission
-        await this.authService.assertPermission(actor.id, 'journal.approve');
+        await this.authService.assertPermission(actor.id, "journal.approve");
         // Dual approval check is handled in ApprovalService, not here
       },
       action: async (entry, actor) => {
-        await this.journalRepo.updateStatus(entry.id, 'approved', actor.id);
+        await this.journalRepo.updateStatus(entry.id, "approved", actor.id);
         await this.auditService.recordApproval(entry, actor);
       },
     },
 
     // Reject: pending → rejected
     {
-      from: 'pending',
-      to: 'rejected',
-      event: 'reject',
+      from: "pending",
+      to: "rejected",
+      event: "reject",
       guard: async (entry, actor) => {
-        await this.authService.assertPermission(actor.id, 'journal.approve');
+        await this.authService.assertPermission(actor.id, "journal.approve");
       },
       action: async (entry, actor, reason) => {
         if (!reason || reason.trim().length < 10) {
-          throw new ValidationError('Rejection reason must be at least 10 characters');
+          throw new ValidationError("Rejection reason must be at least 10 characters");
         }
-        await this.journalRepo.updateStatus(entry.id, 'rejected');
+        await this.journalRepo.updateStatus(entry.id, "rejected");
         await this.journalRepo.setRejectionReason(entry.id, reason);
         await this.auditService.recordRejection(entry, actor, reason);
       },
@@ -127,27 +127,27 @@ export class TransactionStateMachine {
 
     // Resubmit: rejected → draft
     {
-      from: 'rejected',
-      to: 'draft',
-      event: 'resubmit',
+      from: "rejected",
+      to: "draft",
+      event: "resubmit",
       guard: async (entry, actor) => {
         if (entry.createdBy !== actor.id) {
-          throw new ForbiddenError('Only the creator can resubmit');
+          throw new ForbiddenError("Only the creator can resubmit");
         }
       },
     },
 
     // Void: approved → voided (creates reversing entry)
     {
-      from: 'approved',
-      to: 'voided',
-      event: 'void',
+      from: "approved",
+      to: "voided",
+      event: "void",
       guard: async (entry, actor) => {
-        await this.authService.assertPermission(actor.id, 'journal.void');
+        await this.authService.assertPermission(actor.id, "journal.void");
       },
       action: async (entry, actor, reason) => {
         if (!reason || reason.trim().length < 10) {
-          throw new ValidationError('Void reason must be at least 10 characters');
+          throw new ValidationError("Void reason must be at least 10 characters");
         }
         // Create reversing entry — handled by JournalService.voidEntry()
         await this.journalService.voidEntry(entry.id, reason, actor.id);
@@ -157,12 +157,12 @@ export class TransactionStateMachine {
 
     // Soft delete: draft|rejected → deleted
     {
-      from: ['draft', 'rejected'],
-      to: 'deleted',
-      event: 'soft_delete',
+      from: ["draft", "rejected"],
+      to: "deleted",
+      event: "soft_delete",
       guard: async (entry, actor) => {
         if (entry.createdBy !== actor.id) {
-          throw new ForbiddenError('Only the creator can delete this entry');
+          throw new ForbiddenError("Only the creator can delete this entry");
         }
       },
       action: async (entry, actor) => {
@@ -179,7 +179,7 @@ export class TransactionStateMachine {
     reason?: string,
   ): Promise<JournalEntry> {
     const validTransition = this.transitions.find(
-      t =>
+      (t) =>
         (Array.isArray(t.from) ? t.from.includes(entry.status) : t.from === entry.status) &&
         t.event === event,
     );
@@ -187,7 +187,7 @@ export class TransactionStateMachine {
     if (!validTransition) {
       throw new InvalidTransitionError(
         `Cannot '${event}' from state '${entry.status}'. ` +
-        `Valid events from '${entry.status}': ${this.getValidEvents(entry.status).join(', ')}`,
+          `Valid events from '${entry.status}': ${this.getValidEvents(entry.status).join(", ")}`,
       );
     }
 
@@ -207,18 +207,14 @@ export class TransactionStateMachine {
 
   getValidEvents(state: TransactionState): TransactionEvent[] {
     return this.transitions
-      .filter(t =>
-        Array.isArray(t.from) ? t.from.includes(state) : t.from === state,
-      )
-      .map(t => t.event);
+      .filter((t) => (Array.isArray(t.from) ? t.from.includes(state) : t.from === state))
+      .map((t) => t.event);
   }
 
   getValidNextStates(state: TransactionState): TransactionState[] {
     return this.transitions
-      .filter(t =>
-        Array.isArray(t.from) ? t.from.includes(state) : t.from === state,
-      )
-      .map(t => t.to);
+      .filter((t) => (Array.isArray(t.from) ? t.from.includes(state) : t.from === state))
+      .map((t) => t.to);
   }
 }
 ```
@@ -228,17 +224,17 @@ export class TransactionStateMachine {
 ```typescript
 // Each server function checks the state machine before mutating
 export const approveEntry = createServerFn(
-  'POST',
-  '/api/v1/journal/:id/approve',
+  "POST",
+  "/api/v1/journal/:id/approve",
   async (params) => {
     const session = await validateSession();
-    const user = await authorize(session.userId, 'journal.approve');
+    const user = await authorize(session.userId, "journal.approve");
 
     const entry = await journalRepo.findById(params.id);
-    if (!entry) throw new NotFoundError('Journal entry not found');
+    if (!entry) throw new NotFoundError("Journal entry not found");
 
     // State machine transition
-    const updated = await stateMachine.transition(entry, 'approve', user);
+    const updated = await stateMachine.transition(entry, "approve", user);
 
     return { data: updated };
   },
@@ -254,17 +250,17 @@ export const approveEntry = createServerFn(
 ```typescript
 // src/server/services/approval.service.ts
 export class ApprovalService {
-  private readonly TIER_1_THRESHOLD = 5000;    // ฿5,000
-  private readonly TIER_2_THRESHOLD = 50000;   // ฿50,000
+  private readonly TIER_1_THRESHOLD = 5000; // ฿5,000
+  private readonly TIER_2_THRESHOLD = 50000; // ฿50,000
 
   /**
    * Determines the required approval tier for a given amount.
    */
-  getApprovalTier(amount: Money): 'tier1' | 'tier2' | 'tier3' {
+  getApprovalTier(amount: Money): "tier1" | "tier2" | "tier3" {
     const baht = amount.toNumber();
-    if (baht < this.TIER_1_THRESHOLD) return 'tier1';
-    if (baht < this.TIER_2_THRESHOLD) return 'tier2';
-    return 'tier3';
+    if (baht < this.TIER_1_THRESHOLD) return "tier1";
+    if (baht < this.TIER_2_THRESHOLD) return "tier2";
+    return "tier3";
   }
 
   /**
@@ -274,15 +270,15 @@ export class ApprovalService {
     const tier = this.getApprovalTier(amount);
 
     switch (tier) {
-      case 'tier1': // < ฿5,000
-        return ['super_admin', 'pastor', 'treasurer'].includes(user.role);
+      case "tier1": // < ฿5,000
+        return ["super_admin", "pastor", "treasurer"].includes(user.role);
 
-      case 'tier2': // ฿5,000 – ฿50,000
-        return ['super_admin', 'pastor'].includes(user.role);
+      case "tier2": // ฿5,000 – ฿50,000
+        return ["super_admin", "pastor"].includes(user.role);
 
-      case 'tier3': // > ฿50,000
+      case "tier3": // > ฿50,000
         // Requires super_admin involvement (either alone or as co-approver)
-        return user.role === 'super_admin';
+        return user.role === "super_admin";
     }
   }
 
@@ -294,13 +290,13 @@ export class ApprovalService {
     const approver = await this.userRepo.findById(approverId);
 
     // 1. State check
-    if (entry.status !== 'pending') {
-      throw new InvalidTransitionError('Entry is not pending approval');
+    if (entry.status !== "pending") {
+      throw new InvalidTransitionError("Entry is not pending approval");
     }
 
     // 2. Self-approval check
     if (entry.createdBy === approverId) {
-      throw new SelfApprovalError('Cannot approve own transaction');
+      throw new SelfApprovalError("Cannot approve own transaction");
     }
 
     // 3. Permission check
@@ -311,7 +307,7 @@ export class ApprovalService {
     }
 
     // 4. Tier 3: dual approval logic
-    if (this.getApprovalTier(entry.totalDebit) === 'tier3') {
+    if (this.getApprovalTier(entry.totalDebit) === "tier3") {
       return this.handleTier3Approval(entry, approver);
     }
 
@@ -319,20 +315,17 @@ export class ApprovalService {
     return this.completeApproval(entry, approver);
   }
 
-  private async handleTier3Approval(
-    entry: JournalEntry,
-    approver: User,
-  ): Promise<JournalEntry> {
+  private async handleTier3Approval(entry: JournalEntry, approver: User): Promise<JournalEntry> {
     // Tier 3 requires two approvers
     // First approver must be pastor; second must be super_admin
     // OR super_admin alone can do single approval
 
-    if (approver.role === 'super_admin') {
+    if (approver.role === "super_admin") {
       // Super admin can approve tier 3 alone
       return this.completeApproval(entry, approver);
     }
 
-    if (approver.role === 'pastor') {
+    if (approver.role === "pastor") {
       // Pastor is first approver — record and keep pending
       await this.journalRepo.recordFirstApproval(entry.id, approver.id);
       const updated = await this.journalRepo.findById(entry.id);
@@ -343,15 +336,12 @@ export class ApprovalService {
       return updated; // Still pending
     }
 
-    throw new ForbiddenError('Only pastor or super_admin can approve tier 3 transactions');
+    throw new ForbiddenError("Only pastor or super_admin can approve tier 3 transactions");
   }
 
-  private async completeApproval(
-    entry: JournalEntry,
-    approver: User,
-  ): Promise<JournalEntry> {
+  private async completeApproval(entry: JournalEntry, approver: User): Promise<JournalEntry> {
     return await this.db.transaction(async (tx) => {
-      await this.journalRepo.updateStatus(tx, entry.id, 'approved', approver.id);
+      await this.journalRepo.updateStatus(tx, entry.id, "approved", approver.id);
       await this.auditService.recordApproval(tx, entry, approver);
       return this.journalRepo.findById(tx, entry.id);
     });
@@ -370,7 +360,7 @@ export class ApprovalNotificationService {
     for (const approver of approvers) {
       await this.createNotification({
         userId: approver.id,
-        type: 'approval_required',
+        type: "approval_required",
         title: `รายการรออนุมัติ: ${entry.description}`,
         body: `จำนวน ${entry.totalDebit.format()} — ${entry.entryNumber}`,
         actionUrl: `/journal/${entry.id}`,
@@ -381,21 +371,17 @@ export class ApprovalNotificationService {
   async notifyApprovalComplete(entry: JournalEntry, creatorId: string): Promise<void> {
     await this.createNotification({
       userId: creatorId,
-      type: 'approved',
+      type: "approved",
       title: `รายการอนุมัติแล้ว: ${entry.description}`,
       body: `รายการ ${entry.entryNumber} จำนวน ${entry.totalDebit.format()}`,
       actionUrl: `/journal/${entry.id}`,
     });
   }
 
-  async notifyRejected(
-    entry: JournalEntry,
-    creatorId: string,
-    reason: string,
-  ): Promise<void> {
+  async notifyRejected(entry: JournalEntry, creatorId: string, reason: string): Promise<void> {
     await this.createNotification({
       userId: creatorId,
-      type: 'rejected',
+      type: "rejected",
       title: `รายการถูกปฏิเสธ: ${entry.description}`,
       body: `เหตุผล: ${reason}`,
       actionUrl: `/journal/${entry.id}`,
@@ -426,7 +412,7 @@ export class PostgresJournalRepository {
       .set({
         status: newStatus,
         approvedBy: approvedById ?? null,
-        approvedAt: newStatus === 'approved' ? new Date() : null,
+        approvedAt: newStatus === "approved" ? new Date() : null,
         updatedAt: new Date(),
         version: sql`version + 1`,
       })
@@ -439,7 +425,7 @@ export class PostgresJournalRepository {
 
     if (result.rowCount === 0) {
       throw new ConcurrencyConflictError(
-        'This record was modified by another user. Please refresh and try again.',
+        "This record was modified by another user. Please refresh and try again.",
       );
     }
   }
@@ -450,19 +436,16 @@ export class PostgresJournalRepository {
 
 ```typescript
 // Client-side conflict handling
-export function useOptimisticMutation<T>(
-  mutationFn: (input: T) => Promise<T>,
-) {
+export function useOptimisticMutation<T>(mutationFn: (input: T) => Promise<T>) {
   const toast = useToast();
 
   return useMutation({
     mutationFn,
     onError: (error: APIError) => {
-      if (error.code === 'CONFLICT') {
-        toast.error(
-          'มีผู้อื่นแก้ไขข้อมูลนี้ในเวลาเดียวกัน กรุณารีเฟรชและลองอีกครั้ง',
-          { duration: 8000 },
-        );
+      if (error.code === "CONFLICT") {
+        toast.error("มีผู้อื่นแก้ไขข้อมูลนี้ในเวลาเดียวกัน กรุณารีเฟรชและลองอีกครั้ง", {
+          duration: 8000,
+        });
         // Invalidate queries to get fresh data
         queryClient.invalidateQueries();
       }
@@ -514,18 +497,15 @@ export class SequenceService {
    * Generates the next sequential number for a given prefix and year.
    * Uses a PostgreSQL sequence to guarantee no gaps.
    */
-  async nextEntryNumber(
-    entryType: EntryType,
-    fiscalYear: number,
-  ): Promise<string> {
+  async nextEntryNumber(entryType: EntryType, fiscalYear: number): Promise<string> {
     const prefix = {
-      'offering': 'OFF',
-      'expense': 'EXP',
-      'income': 'INC',
-      'transfer': 'TRF',
-      'opening': 'OPN',
-      'adjustment': 'ADJ',
-      'void': 'VOID',
+      offering: "OFF",
+      expense: "EXP",
+      income: "INC",
+      transfer: "TRF",
+      opening: "OPN",
+      adjustment: "ADJ",
+      void: "VOID",
     }[entryType];
 
     const sequenceName = `seq_${prefix}_${fiscalYear}`;
@@ -539,7 +519,7 @@ export class SequenceService {
     );
 
     const sequence = result.rows[0].nextval;
-    return `${prefix}-${fiscalYear}-${String(sequence).padStart(4, '0')}`;
+    return `${prefix}-${fiscalYear}-${String(sequence).padStart(4, "0")}`;
   }
 
   private async ensureSequence(
@@ -563,15 +543,12 @@ export class SequenceService {
   /**
    * Detects gaps in the sequence — audit tool, not runtime check.
    */
-  async detectGaps(
-    entryType: EntryType,
-    fiscalYear: number,
-  ): Promise<number[]> {
+  async detectGaps(entryType: EntryType, fiscalYear: number): Promise<number[]> {
     const prefix = {
-      'offering': 'OFF',
-      'expense': 'EXP',
-      'income': 'INC',
-      'transfer': 'TRF',
+      offering: "OFF",
+      expense: "EXP",
+      income: "INC",
+      transfer: "TRF",
     }[entryType];
 
     const result = await this.db.execute<{ entry_number: string }>(
@@ -584,7 +561,7 @@ export class SequenceService {
 
     // Parse sequence numbers and find gaps
     const numbers = result.rows
-      .map(r => parseInt(r.entry_number.split('-')[2], 10))
+      .map((r) => parseInt(r.entry_number.split("-")[2], 10))
       .sort((a, b) => a - b);
 
     const gaps: number[] = [];
@@ -616,55 +593,58 @@ export class BatchTransactionService {
     offeringRows: CountSheetRow[],
     userId: string,
   ): Promise<JournalEntry[]> {
-    return await this.db.transaction(async (tx) => {
-      const entries: JournalEntry[] = [];
+    return await this.db.transaction(
+      async (tx) => {
+        const entries: JournalEntry[] = [];
 
-      for (const row of offeringRows) {
-        const category = await this.offeringCategoryRepo.findById(row.categoryId);
-        const assetAccount = row.channel === 'cash' ? '1-1001' : '1-1002';
+        for (const row of offeringRows) {
+          const category = await this.offeringCategoryRepo.findById(row.categoryId);
+          const assetAccount = row.channel === "cash" ? "1-1001" : "1-1002";
 
-        const entry = await this.journalService.createEntryWithinTransaction(
-          tx,
-          {
-            entryType: 'offering',
-            postingDate: countSheet.date,
-            description: `เงินถวายวันที่ ${countSheet.date}: ${category.name}`,
-            fundId: row.fundId,
-            fiscalYear: this.getFiscalYear(countSheet.date),
-            fiscalPeriod: this.getFiscalPeriod(countSheet.date),
-            lines: [
-              {
-                accountId: assetAccount,
-                lineType: 'debit',
-                amount: row.amount,
-                fundId: row.fundId,
-                memberId: row.memberId,
-                description: row.note,
-              },
-              {
-                accountId: category.accountId,
-                lineType: 'credit',
-                amount: row.amount,
-                fundId: row.fundId,
-                memberId: row.memberId,
-                description: category.name,
-              },
-            ],
-          },
-          userId,
-          { skipApproval: false },
-        );
+          const entry = await this.journalService.createEntryWithinTransaction(
+            tx,
+            {
+              entryType: "offering",
+              postingDate: countSheet.date,
+              description: `เงินถวายวันที่ ${countSheet.date}: ${category.name}`,
+              fundId: row.fundId,
+              fiscalYear: this.getFiscalYear(countSheet.date),
+              fiscalPeriod: this.getFiscalPeriod(countSheet.date),
+              lines: [
+                {
+                  accountId: assetAccount,
+                  lineType: "debit",
+                  amount: row.amount,
+                  fundId: row.fundId,
+                  memberId: row.memberId,
+                  description: row.note,
+                },
+                {
+                  accountId: category.accountId,
+                  lineType: "credit",
+                  amount: row.amount,
+                  fundId: row.fundId,
+                  memberId: row.memberId,
+                  description: category.name,
+                },
+              ],
+            },
+            userId,
+            { skipApproval: false },
+          );
 
-        entries.push(entry);
-      }
+          entries.push(entry);
+        }
 
-      // Lock the count sheet after all entries are created
-      await this.countSheetRepo.lock(tx, countSheet.id, userId);
+        // Lock the count sheet after all entries are created
+        await this.countSheetRepo.lock(tx, countSheet.id, userId);
 
-      return entries;
-    }, {
-      isolationLevel: 'serializable',
-    });
+        return entries;
+      },
+      {
+        isolationLevel: "serializable",
+      },
+    );
   }
 }
 ```
@@ -709,13 +689,13 @@ export async function idempotencyMiddleware(
   ctx: ServerFnContext,
   next: () => Promise<unknown>,
 ): Promise<unknown> {
-  const key = ctx.headers.get('x-idempotency-key');
+  const key = ctx.headers.get("x-idempotency-key");
   if (!key) return next();
 
   // Check if this key was already processed
   const cached = await idempotencyRepo.findResponse(key);
   if (cached) {
-    logger.info({ event: 'idempotency_cache_hit', key });
+    logger.info({ event: "idempotency_cache_hit", key });
     return cached.response;
   }
 
@@ -749,7 +729,7 @@ try {
   return result;
 } catch (error) {
   logger.error({
-    event: 'transaction_rollback',
+    event: "transaction_rollback",
     error: error.message,
     correlationId: ctx.correlationId,
   });
@@ -759,4 +739,4 @@ try {
 
 ---
 
-*The transaction engine enforces the state machine, approval workflow, and concurrency control for every financial operation in Grace Ledger v2. No transaction can bypass these controls.*
+_The transaction engine enforces the state machine, approval workflow, and concurrency control for every financial operation in Grace Ledger v2. No transaction can bypass these controls._

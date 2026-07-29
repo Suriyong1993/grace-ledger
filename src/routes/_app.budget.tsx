@@ -27,9 +27,7 @@ function BudgetPage() {
 
   const totalAmount = budgets.reduce((s, b) => s + b.amount, 0);
   const totalUsed = budgets.reduce((s, b) => s + b.used, 0);
-  const nearFull = budgets.filter(
-    (b) => Math.round((b.used / b.amount) * 100) >= 90,
-  ).length;
+  const nearFull = budgets.filter((b) => Math.round((b.used / b.amount) * 100) >= 90).length;
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -118,9 +116,7 @@ function BudgetPage() {
                       <span className="text-xs text-muted-foreground">ใช้ไป</span>
                       <span className="num-display text-sm font-semibold text-foreground">
                         {thb(b.used)}{" "}
-                        <span className="font-normal text-muted-foreground">
-                          / {thb(b.amount)}
-                        </span>
+                        <span className="font-normal text-muted-foreground">/ {thb(b.amount)}</span>
                       </span>
                     </div>
                     <div className="h-1 bg-muted">
@@ -155,4 +151,3 @@ function BudgetPage() {
     </div>
   );
 }
-

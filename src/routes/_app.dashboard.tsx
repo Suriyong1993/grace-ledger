@@ -224,14 +224,18 @@ export function Dashboard() {
 
       {/* Operational Attention Engine Banner */}
       {pendingExpenses.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-warning/30 bg-warning/10 px-4 py-3 text-xs animate-fade-up">
-          <div className="flex items-center gap-2.5">
-            <Clock className="h-4 w-4 text-warning shrink-0" />
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3.5 text-xs shadow-2xs animate-fade-up">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400">
+              <Clock className="h-4 w-4 shrink-0" />
+            </div>
             <span className="font-medium text-foreground">
               มีรายการเบิกจ่ายรออนุมัติ{" "}
-              <span className="font-bold text-warning">{pendingExpenses.length} รายการ</span>{" "}
+              <span className="font-bold text-amber-600 dark:text-amber-400">
+                {pendingExpenses.length} รายการ
+              </span>{" "}
               รวมเป็นเงิน{" "}
-              <span className="num-display font-semibold">
+              <span className="num-display font-bold text-foreground">
                 ฿{pendingExpenses.reduce((s, e) => s + e.amount, 0).toLocaleString("th-TH")}
               </span>
             </span>
@@ -239,43 +243,47 @@ export function Dashboard() {
           <Button
             size="sm"
             variant="outline"
-            className="h-7 text-xs border-warning/40 text-foreground hover:bg-warning/20 active-press cursor-pointer"
+            className="h-8 rounded-lg border-amber-500/40 text-xs font-semibold text-foreground hover:bg-amber-500/20 active-press cursor-pointer shadow-2xs"
             onClick={() => {
               setTxFilter("pending");
             }}
           >
             <span>ตรวจสอบและอนุมัติทันที</span>
-            <ChevronRight className="h-3 w-3 ml-1" />
+            <ChevronRight className="h-3.5 w-3.5 ml-1" />
           </Button>
         </div>
       )}
 
       {/* Executive Stat Strip */}
       {isLoading ? (
-        <Skeleton className="h-40 w-full rounded-md" />
+        <Skeleton className="h-40 w-full rounded-xl" />
       ) : (
-        <section className="card-ledger rounded-md shadow-craft divide-y divide-border md:divide-y-0 md:divide-x grid grid-cols-1 md:grid-cols-4">
+        <section className="rounded-xl border border-border/80 bg-card shadow-2xs divide-y divide-border/60 md:divide-y-0 md:divide-x grid grid-cols-1 md:grid-cols-4 overflow-hidden">
           {/* Net Balance */}
-          <div className="p-5 flex flex-col justify-between">
+          <div className="p-5 flex flex-col justify-between hover:bg-muted/30 transition-colors">
             <div>
               <div className="flex items-center justify-between">
-                <span className="kicker">ยอดคงเหลือสุทธิ · {PERIOD_LABELS[period]}</span>
-                <TrendingUp className="h-4 w-4 text-primary" />
+                <span className="kicker font-medium text-muted-foreground/80">
+                  ยอดคงเหลือสุทธิ · {PERIOD_LABELS[period]}
+                </span>
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+                  <TrendingUp className="h-3.5 w-3.5" strokeWidth={2} />
+                </div>
               </div>
               <p
                 className={cn(
-                  "num-display font-display mt-2 text-3xl md:text-3xl font-semibold tracking-tight",
+                  "num-display font-display mt-3 text-3xl font-bold tracking-tight",
                   balance >= 0 ? "text-foreground" : "text-destructive",
                 )}
               >
                 ฿<NumberTicker value={Math.abs(balance)} decimalPlaces={2} />
               </p>
             </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2">
-              <span>กระแสเงินสุทธิ</span>
+            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2.5">
+              <span className="font-normal text-muted-foreground/80">กระแสเงินสุทธิ</span>
               <span
                 className={cn(
-                  "font-medium num-display",
+                  "font-semibold num-display",
                   balance >= 0 ? "text-success" : "text-destructive",
                 )}
               >
@@ -286,38 +294,42 @@ export function Dashboard() {
           </div>
 
           {/* Income Flow */}
-          <div className="p-5 flex flex-col justify-between">
+          <div className="p-5 flex flex-col justify-between hover:bg-muted/30 transition-colors">
             <div>
               <div className="flex items-center justify-between">
-                <span className="kicker">รายรับรวม</span>
-                <ArrowDownLeft className="h-4 w-4 text-success" />
+                <span className="kicker font-medium text-muted-foreground/80">รายรับรวม</span>
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-success/10 text-success">
+                  <ArrowDownLeft className="h-3.5 w-3.5" strokeWidth={2} />
+                </div>
               </div>
-              <p className="num-display font-display mt-2 text-2xl font-semibold text-success">
+              <p className="num-display font-display mt-3 text-2xl md:text-[26px] font-bold text-success">
                 +฿
                 <NumberTicker value={totalIncome} decimalPlaces={2} />
               </p>
             </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2">
-              <span>จำนวนรายการ</span>
-              <span className="font-medium text-foreground num-display">
+            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2.5">
+              <span className="font-normal text-muted-foreground/80">จำนวนรายการ</span>
+              <span className="font-semibold text-foreground num-display">
                 {filteredIncomes.length} รายการ
               </span>
             </div>
           </div>
 
           {/* Expense Velocity */}
-          <div className="p-5 flex flex-col justify-between">
+          <div className="p-5 flex flex-col justify-between hover:bg-muted/30 transition-colors">
             <div>
               <div className="flex items-center justify-between">
-                <span className="kicker">รายจ่ายรวม</span>
-                <ArrowUpRight className="h-4 w-4 text-destructive" />
+                <span className="kicker font-medium text-muted-foreground/80">รายจ่ายรวม</span>
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-destructive/10 text-destructive">
+                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
+                </div>
               </div>
-              <p className="num-display font-display mt-2 text-2xl font-semibold text-destructive">
+              <p className="num-display font-display mt-3 text-2xl md:text-[26px] font-bold text-destructive">
                 −฿
                 <NumberTicker value={totalExpense} decimalPlaces={2} />
               </p>
             </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2">
+            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-2.5">
               <span>จำนวนรายการ</span>
               <span className="font-medium text-foreground num-display">
                 {filteredExpenses.length} รายการ

@@ -33,11 +33,13 @@ Assets = Liabilities + Equity
 ```
 
 Expanded:
+
 ```
 Assets = Liabilities + Equity + (Income - Expenses)
 ```
 
 In double-entry terms:
+
 ```
 Σ Debits = Σ Credits  (for every journal entry)
 ```
@@ -45,12 +47,12 @@ In double-entry terms:
 ### 1.2 Normal Balances by Account Type
 
 | Account Type | Normal Balance | To Increase | To Decrease |
-|-------------|----------------|-------------|-------------|
-| Asset | Debit | Debit | Credit |
-| Liability | Credit | Credit | Debit |
-| Equity | Credit | Credit | Debit |
-| Income | Credit | Credit | Debit |
-| Expense | Debit | Debit | Credit |
+| ------------ | -------------- | ----------- | ----------- |
+| Asset        | Debit          | Debit       | Credit      |
+| Liability    | Credit         | Credit      | Debit       |
+| Equity       | Credit         | Credit      | Debit       |
+| Income       | Credit         | Credit      | Debit       |
+| Expense      | Debit          | Debit       | Credit      |
 
 ### 1.3 Money Type
 
@@ -60,7 +62,7 @@ All monetary values use a precise `Money` value object:
 // src/server/domain/money.ts
 export class Money {
   private constructor(
-    private readonly amountInSatang: bigint,  // Stored in satang (1/100 of THB) for exact precision
+    private readonly amountInSatang: bigint, // Stored in satang (1/100 of THB) for exact precision
   ) {}
 
   static fromBaht(baht: number): Money {
@@ -110,10 +112,10 @@ export class Money {
     return Number(this.amountInSatang) / 100;
   }
 
-  format(locale: string = 'th-TH'): string {
+  format(locale: string = "th-TH"): string {
     return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: 'THB',
+      style: "currency",
+      currency: "THB",
       minimumFractionDigits: 2,
     }).format(this.toNumber());
   }
@@ -138,74 +140,396 @@ export class Money {
 ```
 
 | Prefix | Account Type | Normal Balance |
-|--------|-------------|----------------|
-| 1xxx | Asset | Debit |
-| 2xxx | Liability | Credit |
-| 3xxx | Equity | Credit |
-| 4xxx | Income | Credit |
-| 5xxx | Expense | Debit |
+| ------ | ------------ | -------------- |
+| 1xxx   | Asset        | Debit          |
+| 2xxx   | Liability    | Credit         |
+| 3xxx   | Equity       | Credit         |
+| 4xxx   | Income       | Credit         |
+| 5xxx   | Expense      | Debit          |
 
 ### 2.2 Account Domain Model
 
 ```typescript
 // src/server/domain/chart-of-accounts.ts
-export type AccountType = 'asset' | 'liability' | 'equity' | 'income' | 'expense';
-export type NormalBalance = 'debit' | 'credit';
+export type AccountType = "asset" | "liability" | "equity" | "income" | "expense";
+export type NormalBalance = "debit" | "credit";
 
 export interface Account {
   id: string;
-  accountCode: string;           // e.g., '1-1001'
-  accountName: string;           // e.g., 'เงินสด'
+  accountCode: string; // e.g., '1-1001'
+  accountName: string; // e.g., 'เงินสด'
   accountType: AccountType;
-  parentId: string | null;       // For hierarchical accounts
+  parentId: string | null; // For hierarchical accounts
   isActive: boolean;
-  isContra: boolean;             // Contra accounts (e.g., accumulated depreciation)
+  isContra: boolean; // Contra accounts (e.g., accumulated depreciation)
   normalBalance: NormalBalance;
   description: string | null;
   sortOrder: number;
-  tfrsCode: string | null;       // Thai Financial Reporting Standards mapping
+  tfrsCode: string | null; // Thai Financial Reporting Standards mapping
 }
 
 // Default Thai Church Chart of Accounts
-export const DEFAULT_CHART_OF_ACCOUNTS: Omit<Account, 'id' | 'createdAt' | 'updatedAt' | 'version'>[] = [
+export const DEFAULT_CHART_OF_ACCOUNTS: Omit<
+  Account,
+  "id" | "createdAt" | "updatedAt" | "version"
+>[] = [
   // ============ 1xxx ASSETS ============
-  { accountCode: '1-1001', accountName: 'เงินสด', accountType: 'asset', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'เงินสดในมือ', sortOrder: 1, tfrsCode: 'A100' },
-  { accountCode: '1-1002', accountName: 'เงินฝากธนาคาร', accountType: 'asset', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'เงินฝากธนาคารทุกบัญชี', sortOrder: 2, tfrsCode: 'A110' },
-  { accountCode: '1-1003', accountName: 'ลูกหนี้', accountType: 'asset', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ลูกหนี้เงินยืม/อื่น ๆ', sortOrder: 3, tfrsCode: 'A120' },
-  { accountCode: '1-1004', accountName: 'ที่ดิน', accountType: 'asset', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ที่ดินของคริสตจักร', sortOrder: 4, tfrsCode: 'A200' },
-  { accountCode: '1-1005', accountName: 'อาคาร', accountType: 'asset', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'อาคารและสิ่งปลูกสร้าง', sortOrder: 5, tfrsCode: 'A210' },
-  { accountCode: '1-1006', accountName: 'อุปกรณ์', accountType: 'asset', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'อุปกรณ์สำนักงานและอื่น ๆ', sortOrder: 6, tfrsCode: 'A220' },
-  { accountCode: '1-1007', accountName: 'ค่าเสื่อมราคาสะสม', accountType: 'asset', parentId: null, isActive: true, isContra: true, normalBalance: 'credit', description: 'ค่าเสื่อมราคาสะสม-อาคารและอุปกรณ์', sortOrder: 7, tfrsCode: 'A299' },
+  {
+    accountCode: "1-1001",
+    accountName: "เงินสด",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "เงินสดในมือ",
+    sortOrder: 1,
+    tfrsCode: "A100",
+  },
+  {
+    accountCode: "1-1002",
+    accountName: "เงินฝากธนาคาร",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "เงินฝากธนาคารทุกบัญชี",
+    sortOrder: 2,
+    tfrsCode: "A110",
+  },
+  {
+    accountCode: "1-1003",
+    accountName: "ลูกหนี้",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ลูกหนี้เงินยืม/อื่น ๆ",
+    sortOrder: 3,
+    tfrsCode: "A120",
+  },
+  {
+    accountCode: "1-1004",
+    accountName: "ที่ดิน",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ที่ดินของคริสตจักร",
+    sortOrder: 4,
+    tfrsCode: "A200",
+  },
+  {
+    accountCode: "1-1005",
+    accountName: "อาคาร",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "อาคารและสิ่งปลูกสร้าง",
+    sortOrder: 5,
+    tfrsCode: "A210",
+  },
+  {
+    accountCode: "1-1006",
+    accountName: "อุปกรณ์",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "อุปกรณ์สำนักงานและอื่น ๆ",
+    sortOrder: 6,
+    tfrsCode: "A220",
+  },
+  {
+    accountCode: "1-1007",
+    accountName: "ค่าเสื่อมราคาสะสม",
+    accountType: "asset",
+    parentId: null,
+    isActive: true,
+    isContra: true,
+    normalBalance: "credit",
+    description: "ค่าเสื่อมราคาสะสม-อาคารและอุปกรณ์",
+    sortOrder: 7,
+    tfrsCode: "A299",
+  },
 
   // ============ 2xxx LIABILITIES ============
-  { accountCode: '2-2001', accountName: 'เจ้าหนี้การค้า', accountType: 'liability', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'เจ้าหนี้ค่าสินค้า/บริการ', sortOrder: 8, tfrsCode: 'L100' },
-  { accountCode: '2-2002', accountName: 'เงินกู้ยืม', accountType: 'liability', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'เงินกู้ยืมจากสถาบันการเงิน', sortOrder: 9, tfrsCode: 'L200' },
-  { accountCode: '2-2003', accountName: 'ภาษีหัก ณ ที่จ่ายค้างจ่าย', accountType: 'liability', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'ภ.ง.ด.3, ภ.ง.ด.53 ค้างจ่าย', sortOrder: 10, tfrsCode: 'L300' },
-  { accountCode: '2-2004', accountName: 'เงินประกันสังคมค้างจ่าย', accountType: 'liability', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'ประกันสังคมค้างจ่าย', sortOrder: 11, tfrsCode: 'L310' },
+  {
+    accountCode: "2-2001",
+    accountName: "เจ้าหนี้การค้า",
+    accountType: "liability",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "เจ้าหนี้ค่าสินค้า/บริการ",
+    sortOrder: 8,
+    tfrsCode: "L100",
+  },
+  {
+    accountCode: "2-2002",
+    accountName: "เงินกู้ยืม",
+    accountType: "liability",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "เงินกู้ยืมจากสถาบันการเงิน",
+    sortOrder: 9,
+    tfrsCode: "L200",
+  },
+  {
+    accountCode: "2-2003",
+    accountName: "ภาษีหัก ณ ที่จ่ายค้างจ่าย",
+    accountType: "liability",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "ภ.ง.ด.3, ภ.ง.ด.53 ค้างจ่าย",
+    sortOrder: 10,
+    tfrsCode: "L300",
+  },
+  {
+    accountCode: "2-2004",
+    accountName: "เงินประกันสังคมค้างจ่าย",
+    accountType: "liability",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "ประกันสังคมค้างจ่าย",
+    sortOrder: 11,
+    tfrsCode: "L310",
+  },
 
   // ============ 3xxx EQUITY ============
-  { accountCode: '3-3001', accountName: 'กองทุนทั่วไป', accountType: 'equity', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'กองทุนทั่วไปของคริสตจักร', sortOrder: 12, tfrsCode: 'E100' },
-  { accountCode: '3-3002', accountName: 'กองทุนอาคารและที่ดิน', accountType: 'equity', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'กองทุนที่ดินและสิ่งปลูกสร้าง', sortOrder: 13, tfrsCode: 'E110' },
-  { accountCode: '3-3003', accountName: 'กองทุนพันธกิจ', accountType: 'equity', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'กองทุนเพื่อพันธกิจและมิชชั่น', sortOrder: 14, tfrsCode: 'E120' },
-  { accountCode: '3-3004', accountName: 'กำไรสะสม', accountType: 'equity', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'กำไรสะสมยกมา', sortOrder: 15, tfrsCode: 'E200' },
+  {
+    accountCode: "3-3001",
+    accountName: "กองทุนทั่วไป",
+    accountType: "equity",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "กองทุนทั่วไปของคริสตจักร",
+    sortOrder: 12,
+    tfrsCode: "E100",
+  },
+  {
+    accountCode: "3-3002",
+    accountName: "กองทุนอาคารและที่ดิน",
+    accountType: "equity",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "กองทุนที่ดินและสิ่งปลูกสร้าง",
+    sortOrder: 13,
+    tfrsCode: "E110",
+  },
+  {
+    accountCode: "3-3003",
+    accountName: "กองทุนพันธกิจ",
+    accountType: "equity",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "กองทุนเพื่อพันธกิจและมิชชั่น",
+    sortOrder: 14,
+    tfrsCode: "E120",
+  },
+  {
+    accountCode: "3-3004",
+    accountName: "กำไรสะสม",
+    accountType: "equity",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "กำไรสะสมยกมา",
+    sortOrder: 15,
+    tfrsCode: "E200",
+  },
 
   // ============ 4xxx INCOME ============
-  { accountCode: '4-4001', accountName: 'เงินถวายสิบลด', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'รายได้จากสิบลด', sortOrder: 16, tfrsCode: 'I100' },
-  { accountCode: '4-4002', accountName: 'เงินถวายพิเศษ', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'รายได้จากถวายพิเศษ', sortOrder: 17, tfrsCode: 'I110' },
-  { accountCode: '4-4003', accountName: 'เงินถวายพันธกิจ', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'รายได้จากถวายพันธกิจ', sortOrder: 18, tfrsCode: 'I120' },
-  { accountCode: '4-4004', accountName: 'เงินบริจาค', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'เงินบริจาคทั่วไป', sortOrder: 19, tfrsCode: 'I130' },
-  { accountCode: '4-4005', accountName: 'ดอกเบี้ยรับ', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'ดอกเบี้ยเงินฝากธนาคาร', sortOrder: 20, tfrsCode: 'I200' },
-  { accountCode: '4-4006', accountName: 'รายได้ค่าเช่า', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'รายได้จากการให้เช่าทรัพย์สิน', sortOrder: 21, tfrsCode: 'I210' },
-  { accountCode: '4-4007', accountName: 'รายรับอื่น ๆ', accountType: 'income', parentId: null, isActive: true, isContra: false, normalBalance: 'credit', description: 'รายรับอื่น ๆ ที่ไม่ได้จัดประเภท', sortOrder: 22, tfrsCode: 'I999' },
+  {
+    accountCode: "4-4001",
+    accountName: "เงินถวายสิบลด",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "รายได้จากสิบลด",
+    sortOrder: 16,
+    tfrsCode: "I100",
+  },
+  {
+    accountCode: "4-4002",
+    accountName: "เงินถวายพิเศษ",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "รายได้จากถวายพิเศษ",
+    sortOrder: 17,
+    tfrsCode: "I110",
+  },
+  {
+    accountCode: "4-4003",
+    accountName: "เงินถวายพันธกิจ",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "รายได้จากถวายพันธกิจ",
+    sortOrder: 18,
+    tfrsCode: "I120",
+  },
+  {
+    accountCode: "4-4004",
+    accountName: "เงินบริจาค",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "เงินบริจาคทั่วไป",
+    sortOrder: 19,
+    tfrsCode: "I130",
+  },
+  {
+    accountCode: "4-4005",
+    accountName: "ดอกเบี้ยรับ",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "ดอกเบี้ยเงินฝากธนาคาร",
+    sortOrder: 20,
+    tfrsCode: "I200",
+  },
+  {
+    accountCode: "4-4006",
+    accountName: "รายได้ค่าเช่า",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "รายได้จากการให้เช่าทรัพย์สิน",
+    sortOrder: 21,
+    tfrsCode: "I210",
+  },
+  {
+    accountCode: "4-4007",
+    accountName: "รายรับอื่น ๆ",
+    accountType: "income",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "credit",
+    description: "รายรับอื่น ๆ ที่ไม่ได้จัดประเภท",
+    sortOrder: 22,
+    tfrsCode: "I999",
+  },
 
   // ============ 5xxx EXPENSES ============
-  { accountCode: '5-5001', accountName: 'เงินเดือนบุคลากร', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'เงินเดือนและค่าจ้างบุคลากร', sortOrder: 23, tfrsCode: 'E100' },
-  { accountCode: '5-5002', accountName: 'ค่าสาธารณูปโภค', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ค่าไฟฟ้า น้ำประปา โทรศัพท์ อินเทอร์เน็ต', sortOrder: 24, tfrsCode: 'E200' },
-  { accountCode: '5-5003', accountName: 'ค่าซ่อมบำรุง', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ค่าซ่อมแซมและบำรุงรักษา', sortOrder: 25, tfrsCode: 'E210' },
-  { accountCode: '5-5004', accountName: 'ค่าพันธกิจ', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ค่าใช้จ่ายด้านพันธกิจและมิชชั่น', sortOrder: 26, tfrsCode: 'E300' },
-  { accountCode: '5-5005', accountName: 'ค่าวัสดุอุปกรณ์', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ค่าวัสดุสำนักงานและอุปกรณ์', sortOrder: 27, tfrsCode: 'E310' },
-  { accountCode: '5-5006', accountName: 'ค่าเดินทาง', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ค่าเดินทางและที่พัก', sortOrder: 28, tfrsCode: 'E320' },
-  { accountCode: '5-5007', accountName: 'ค่าใช้จ่ายอื่น ๆ', accountType: 'expense', parentId: null, isActive: true, isContra: false, normalBalance: 'debit', description: 'ค่าใช้จ่ายเบ็ดเตล็ด', sortOrder: 29, tfrsCode: 'E999' },
+  {
+    accountCode: "5-5001",
+    accountName: "เงินเดือนบุคลากร",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "เงินเดือนและค่าจ้างบุคลากร",
+    sortOrder: 23,
+    tfrsCode: "E100",
+  },
+  {
+    accountCode: "5-5002",
+    accountName: "ค่าสาธารณูปโภค",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ค่าไฟฟ้า น้ำประปา โทรศัพท์ อินเทอร์เน็ต",
+    sortOrder: 24,
+    tfrsCode: "E200",
+  },
+  {
+    accountCode: "5-5003",
+    accountName: "ค่าซ่อมบำรุง",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ค่าซ่อมแซมและบำรุงรักษา",
+    sortOrder: 25,
+    tfrsCode: "E210",
+  },
+  {
+    accountCode: "5-5004",
+    accountName: "ค่าพันธกิจ",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ค่าใช้จ่ายด้านพันธกิจและมิชชั่น",
+    sortOrder: 26,
+    tfrsCode: "E300",
+  },
+  {
+    accountCode: "5-5005",
+    accountName: "ค่าวัสดุอุปกรณ์",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ค่าวัสดุสำนักงานและอุปกรณ์",
+    sortOrder: 27,
+    tfrsCode: "E310",
+  },
+  {
+    accountCode: "5-5006",
+    accountName: "ค่าเดินทาง",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ค่าเดินทางและที่พัก",
+    sortOrder: 28,
+    tfrsCode: "E320",
+  },
+  {
+    accountCode: "5-5007",
+    accountName: "ค่าใช้จ่ายอื่น ๆ",
+    accountType: "expense",
+    parentId: null,
+    isActive: true,
+    isContra: false,
+    normalBalance: "debit",
+    description: "ค่าใช้จ่ายเบ็ดเตล็ด",
+    sortOrder: 29,
+    tfrsCode: "E999",
+  },
 ];
 ```
 
@@ -218,13 +542,20 @@ export const DEFAULT_CHART_OF_ACCOUNTS: Omit<Account, 'id' | 'createdAt' | 'upda
 ```typescript
 // src/server/domain/journal.ts
 
-export type EntryType = 'offering' | 'expense' | 'income' | 'transfer' | 'opening' | 'adjustment' | 'void';
-export type EntryStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'voided';
-export type LineType = 'debit' | 'credit';
+export type EntryType =
+  | "offering"
+  | "expense"
+  | "income"
+  | "transfer"
+  | "opening"
+  | "adjustment"
+  | "void";
+export type EntryStatus = "draft" | "pending" | "approved" | "rejected" | "voided";
+export type LineType = "debit" | "credit";
 
 export interface JournalEntryLine {
   id: string;
-  accountId: string;           // References chart_of_accounts.id
+  accountId: string; // References chart_of_accounts.id
   lineType: LineType;
   amount: Money;
   fundId: string;
@@ -236,22 +567,22 @@ export interface JournalEntryLine {
 
 export interface JournalEntry {
   id: string;
-  entryNumber: string;         // e.g., 'OFF-2026-0042'
+  entryNumber: string; // e.g., 'OFF-2026-0042'
   entryType: EntryType;
   postingDate: Date;
   description: string;
   status: EntryStatus;
-  lines: JournalEntryLine[];   // Minimum 2 lines (at least 1 debit + 1 credit)
+  lines: JournalEntryLine[]; // Minimum 2 lines (at least 1 debit + 1 credit)
   totalDebit: Money;
   totalCredit: Money;
   fundId: string;
-  createdBy: string;           // User ID
+  createdBy: string; // User ID
   approvedBy?: string;
   rejectionReason?: string;
-  voidParentId?: string;       // If this is a void entry, references the original
+  voidParentId?: string; // If this is a void entry, references the original
   referenceDocument?: string;
   fiscalYear: number;
-  fiscalPeriod: number;        // 1-12
+  fiscalPeriod: number; // 1-12
   version: number;
   createdAt: Date;
   postedAt?: Date;
@@ -268,10 +599,7 @@ export class JournalService {
    * Creates a journal entry with validation and posting.
    * This is the ONLY entry point for financial transactions.
    */
-  async createEntry(
-    input: CreateJournalEntryInput,
-    userId: string,
-  ): Promise<JournalEntry> {
+  async createEntry(input: CreateJournalEntryInput, userId: string): Promise<JournalEntry> {
     // 1. Validate the entry balances
     this.validateBalance(input.lines);
 
@@ -288,8 +616,8 @@ export class JournalService {
     const entryNumber = await this.generateEntryNumber(input.entryType, input.fiscalYear);
 
     // 6. Calculate totals
-    const totalDebit = this.sumByType(input.lines, 'debit');
-    const totalCredit = this.sumByType(input.lines, 'credit');
+    const totalDebit = this.sumByType(input.lines, "debit");
+    const totalCredit = this.sumByType(input.lines, "credit");
 
     // 7. Create entry within a database transaction
     return await this.db.transaction(async (tx) => {
@@ -298,7 +626,7 @@ export class JournalService {
         entryNumber,
         totalDebit,
         totalCredit,
-        status: 'draft',
+        status: "draft",
         createdBy: userId,
       });
 
@@ -310,11 +638,11 @@ export class JournalService {
 
       // 10. Create audit record
       await this.auditRepo.record(tx, {
-        eventType: 'journal_entry_created',
-        entityType: 'journal_entry',
+        eventType: "journal_entry_created",
+        entityType: "journal_entry",
         entityId: entry.id,
         userId,
-        action: 'create',
+        action: "create",
         afterState: entry,
       });
 
@@ -327,8 +655,8 @@ export class JournalService {
    * Throws UnbalancedEntryError if not balanced.
    */
   private validateBalance(lines: CreateLineInput[]): void {
-    const totalDebit = this.sumByType(lines, 'debit');
-    const totalCredit = this.sumByType(lines, 'credit');
+    const totalDebit = this.sumByType(lines, "debit");
+    const totalCredit = this.sumByType(lines, "credit");
 
     if (!totalDebit.equals(totalCredit)) {
       throw new UnbalancedEntryError(
@@ -339,13 +667,13 @@ export class JournalService {
     }
 
     if (totalDebit.isZero()) {
-      throw new EmptyEntryError('Journal entry cannot have zero amounts');
+      throw new EmptyEntryError("Journal entry cannot have zero amounts");
     }
   }
 
   private sumByType(lines: CreateLineInput[], type: LineType): Money {
     return lines
-      .filter(l => l.lineType === type)
+      .filter((l) => l.lineType === type)
       .reduce((sum, l) => sum.add(l.amount), Money.zero());
   }
 }
@@ -413,7 +741,7 @@ export class GeneralLedgerPostingEngine {
       // Verify balance doesn't violate constraints
       // For equity/fund accounts: balance should not go negative without authorization
       // (This is the fund overdraft check)
-      if (account.accountType === 'equity' && newBalance.isNegative()) {
+      if (account.accountType === "equity" && newBalance.isNegative()) {
         throw new InsufficientFundsError(
           line.fundId,
           account.accountName,
@@ -429,8 +757,8 @@ export class GeneralLedgerPostingEngine {
         journalEntryId: entry.id,
         journalLineId: line.id,
         fundId: line.fundId,
-        debitAmount: line.lineType === 'debit' ? line.amount : Money.zero(),
-        creditAmount: line.lineType === 'credit' ? line.amount : Money.zero(),
+        debitAmount: line.lineType === "debit" ? line.amount : Money.zero(),
+        creditAmount: line.lineType === "credit" ? line.amount : Money.zero(),
         runningBalance: newBalance,
         fiscalYear: entry.fiscalYear,
         fiscalPeriod: entry.fiscalPeriod,
@@ -446,21 +774,23 @@ export class GeneralLedgerPostingEngine {
   ): Money {
     // Contra accounts behave opposite to their type
     const effectiveNormal = isContra
-      ? (normalBalance === 'debit' ? 'credit' : 'debit')
+      ? normalBalance === "debit"
+        ? "credit"
+        : "debit"
       : normalBalance;
 
     // For normal-balance = debit accounts:
     //   Debit increases, Credit decreases
     // For normal-balance = credit accounts:
     //   Credit increases, Debit decreases
-    if (effectiveNormal === 'debit') {
-      if (line.lineType === 'debit') {
+    if (effectiveNormal === "debit") {
+      if (line.lineType === "debit") {
         return currentBalance.add(line.amount);
       } else {
         return currentBalance.subtract(line.amount);
       }
     } else {
-      if (line.lineType === 'credit') {
+      if (line.lineType === "credit") {
         return currentBalance.add(line.amount);
       } else {
         return currentBalance.subtract(line.amount);
@@ -531,10 +861,7 @@ export class FundAccountingService {
    * Validate that a fund has sufficient balance for an expense.
    * Throws InsufficientFundsError if balance is too low.
    */
-  async validateSufficientBalance(
-    fundId: string,
-    amount: Money,
-  ): Promise<void> {
+  async validateSufficientBalance(fundId: string, amount: Money): Promise<void> {
     const balance = await this.getFundBalance(fundId);
     if (balance.isLessThan(amount)) {
       const fund = await this.fundRepo.findById(fundId);
@@ -563,10 +890,7 @@ export class FundAccountingService {
    * Compute the fund balance by summing the relevant GL entries.
    * This is the verification check — it should always match the stored balance.
    */
-  private async computeFundBalanceFromLedger(
-    tx: Transaction,
-    fundId: string,
-  ): Promise<Money> {
+  private async computeFundBalanceFromLedger(tx: Transaction, fundId: string): Promise<Money> {
     const fund = await this.fundRepo.findById(fundId);
     const entries = await this.ledgerRepo.findByAccount(tx, fund.accountId);
 
@@ -685,11 +1009,7 @@ export class TrialBalanceService {
     const lines: TrialBalanceLine[] = [];
 
     for (const account of accounts) {
-      const balance = await this.ledgerRepo.getBalance(
-        account.id,
-        fundId,
-        asOfDate,
-      );
+      const balance = await this.ledgerRepo.getBalance(account.id, fundId, asOfDate);
 
       // Classify balance as debit or credit based on account type
       const line = this.classifyBalance(account, balance);
@@ -714,7 +1034,7 @@ export class TrialBalanceService {
 
     // For normal-debit accounts: positive balance = debit
     // For normal-credit accounts: positive balance = credit
-    if (account.normalBalance === 'debit') {
+    if (account.normalBalance === "debit") {
       if (balance.isGreaterThan(Money.zero())) {
         debitBalance = balance;
       } else {
@@ -751,10 +1071,10 @@ Every church financial operation maps to a balanced journal entry. This section 
 
 **Journal entry:**
 
-| Account | Debit | Credit |
-|---------|-------|--------|
-| 1-1001 เงินสด (Cash) | ฿1,000 | — |
-| 4-4001 เงินถวายสิบลด (Tithes) | — | ฿1,000 |
+| Account                       | Debit  | Credit |
+| ----------------------------- | ------ | ------ |
+| 1-1001 เงินสด (Cash)          | ฿1,000 | —      |
+| 4-4001 เงินถวายสิบลด (Tithes) | —      | ฿1,000 |
 
 **Accounting narrative:** Debit Cash (asset increases), Credit Tithe Income (income increases).
 
@@ -805,10 +1125,10 @@ async recordOffering(
 
 **Journal entry:**
 
-| Account | Debit | Credit |
-|---------|-------|--------|
-| 5-5002 ค่าสาธารณูปโภค (Utilities) | ฿2,500 | — |
-| 1-1001 เงินสด (Cash) | — | ฿2,500 |
+| Account                           | Debit  | Credit |
+| --------------------------------- | ------ | ------ |
+| 5-5002 ค่าสาธารณูปโภค (Utilities) | ฿2,500 | —      |
+| 1-1001 เงินสด (Cash)              | —      | ฿2,500 |
 
 **Accounting narrative:** Debit Utility Expense (expense increases), Credit Cash (asset decreases).
 
@@ -856,10 +1176,10 @@ async recordExpense(
 
 **Journal entry:**
 
-| Account | Debit | Credit |
-|---------|-------|--------|
-| 3-3001 กองทุนทั่วไป (General Fund) | ฿10,000 | — |
-| 3-3002 กองทุนอาคาร (Building Fund) | — | ฿10,000 |
+| Account                            | Debit   | Credit  |
+| ---------------------------------- | ------- | ------- |
+| 3-3001 กองทุนทั่วไป (General Fund) | ฿10,000 | —       |
+| 3-3002 กองทุนอาคาร (Building Fund) | —       | ฿10,000 |
 
 **Accounting narrative:** Debit General Fund equity (decreases), Credit Building Fund equity (increases). No cash changes hands — this is purely equity reclassification.
 
@@ -869,10 +1189,10 @@ async recordExpense(
 
 **Journal entry:**
 
-| Account | Debit | Credit |
-|---------|-------|--------|
-| 1-1002 เงินฝากธนาคาร (Bank) | ฿50,000 | — |
-| 3-3001 กองทุนทั่วไป (General Fund) | — | ฿50,000 |
+| Account                            | Debit   | Credit  |
+| ---------------------------------- | ------- | ------- |
+| 1-1002 เงินฝากธนาคาร (Bank)        | ฿50,000 | —       |
+| 3-3001 กองทุนทั่วไป (General Fund) | —       | ฿50,000 |
 
 ### 7.5 Void Transaction (ยกเลิกรายการ)
 
@@ -880,17 +1200,17 @@ async recordExpense(
 
 **Original entry (locked, inaccessible):**
 
-| Account | Debit | Credit |
-|---------|-------|--------|
-| 5-5002 Utilities | ฿2,500 | — |
-| 1-1001 Cash | — | ฿2,500 |
+| Account          | Debit  | Credit |
+| ---------------- | ------ | ------ |
+| 5-5002 Utilities | ฿2,500 | —      |
+| 1-1001 Cash      | —      | ฿2,500 |
 
 **Voiding entry (reversal):**
 
-| Account | Debit | Credit |
-|---------|-------|--------|
-| 1-1001 Cash | ฿2,500 | — |
-| 5-5002 Utilities | — | ฿2,500 |
+| Account          | Debit  | Credit |
+| ---------------- | ------ | ------ |
+| 1-1001 Cash      | ฿2,500 | —      |
+| 5-5002 Utilities | —      | ฿2,500 |
 
 ```typescript
 async voidEntry(originalEntryId: string, reason: string, userId: string): Promise<JournalEntry> {
@@ -939,7 +1259,7 @@ export class PeriodService {
   async closePeriod(periodId: string, userId: string): Promise<void> {
     const period = await this.periodRepo.findById(periodId);
 
-    if (period.status !== 'open') {
+    if (period.status !== "open") {
       throw new PeriodAlreadyClosedError(periodId);
     }
 
@@ -949,7 +1269,7 @@ export class PeriodService {
         period.fiscalYear,
         period.periodNumber - 1,
       );
-      if (priorPeriod.status !== 'reconciled') {
+      if (priorPeriod.status !== "reconciled") {
         throw new PriorPeriodNotReconciledError(
           `ต้องปิดงวด ${priorPeriod.fiscalYear}-${priorPeriod.periodNumber} ก่อน`,
         );
@@ -964,9 +1284,7 @@ export class PeriodService {
         period.periodNumber,
       );
       if (pendingCount > 0) {
-        throw new PendingTransactionsExistError(
-          `มี ${pendingCount} รายการที่ยังรออนุมัติในงวดนี้`,
-        );
+        throw new PendingTransactionsExistError(`มี ${pendingCount} รายการที่ยังรออนุมัติในงวดนี้`);
       }
 
       // 2. Snapshot fund balances at period close
@@ -987,26 +1305,26 @@ export class PeriodService {
       }
 
       // 3. Mark period as closed
-      await this.periodRepo.updateStatus(tx, periodId, 'closed', userId);
+      await this.periodRepo.updateStatus(tx, periodId, "closed", userId);
     });
   }
 
   async reopenPeriod(periodId: string, userId: string): Promise<void> {
     const period = await this.periodRepo.findById(periodId);
 
-    if (period.status === 'reconciled') {
+    if (period.status === "reconciled") {
       throw new PeriodAlreadyReconciledError(
-        'ไม่สามารถเปิดงวดที่กระทบยอดแล้ว — ต้องขอสิทธิ์ผู้ตรวจสอบ',
+        "ไม่สามารถเปิดงวดที่กระทบยอดแล้ว — ต้องขอสิทธิ์ผู้ตรวจสอบ",
       );
     }
 
     // Require auditor or super_admin role to reopen
     const user = await this.userRepo.findById(userId);
-    if (!['super_admin', 'auditor'].includes(user.role)) {
-      throw new UnauthorizedError('เฉพาะผู้ดูแลระบบหรือผู้ตรวจสอบเท่านั้นที่สามารถเปิดงวดได้');
+    if (!["super_admin", "auditor"].includes(user.role)) {
+      throw new UnauthorizedError("เฉพาะผู้ดูแลระบบหรือผู้ตรวจสอบเท่านั้นที่สามารถเปิดงวดได้");
     }
 
-    await this.periodRepo.updateStatus(tx, periodId, 'open', userId);
+    await this.periodRepo.updateStatus(tx, periodId, "open", userId);
   }
 }
 ```
@@ -1043,11 +1361,11 @@ export interface ReconciliationRecord {
   id: string;
   periodId: string;
   fundId: string;
-  openingBalance: Money;          // From previous reconciliation
-  systemBalance: Money;           // Calculated from GL
-  actualBalance: Money;           // From bank statement / cash count
-  variance: Money;                // systemBalance - actualBalance
-  explanation: string | null;     // Required if variance != 0
+  openingBalance: Money; // From previous reconciliation
+  systemBalance: Money; // Calculated from GL
+  actualBalance: Money; // From bank statement / cash count
+  variance: Money; // systemBalance - actualBalance
+  explanation: string | null; // Required if variance != 0
   isReconciled: boolean;
   previousReconciliationId: string | null;
   reconciledBy: string;
@@ -1068,8 +1386,8 @@ export class ReconciliationService {
   ): Promise<ReconciliationRecord> {
     const period = await this.periodRepo.findById(periodId);
 
-    if (period.status !== 'closed') {
-      throw new PeriodNotClosedError('ต้องปิดงวดก่อนการกระทบยอด');
+    if (period.status !== "closed") {
+      throw new PeriodNotClosedError("ต้องปิดงวดก่อนการกระทบยอด");
     }
 
     return await this.db.transaction(async (tx) => {
@@ -1118,7 +1436,7 @@ export class ReconciliationService {
       const allFundsReconciled = await this.areAllFundsReconciled(tx, periodId);
       if (allFundsReconciled) {
         // Lock the period
-        await this.periodRepo.updateStatus(tx, periodId, 'reconciled', userId);
+        await this.periodRepo.updateStatus(tx, periodId, "reconciled", userId);
       }
 
       return record;
@@ -1162,8 +1480,8 @@ export class BudgetService {
   async getBudgetUtilization(budgetId: string): Promise<BudgetUtilization> {
     const budget = await this.budgetRepo.findById(budgetId);
 
-    if (budget.status !== 'approved') {
-      throw new BudgetNotApprovedError('งบประมาณยังไม่ได้รับการอนุมัติ');
+    if (budget.status !== "approved") {
+      throw new BudgetNotApprovedError("งบประมาณยังไม่ได้รับการอนุมัติ");
     }
 
     // Build the query to calculate actual spending
@@ -1204,9 +1522,9 @@ export class BudgetService {
 export interface BalanceSheet {
   asOfDate: Date;
   churchName: string;
-  assets: BalanceSheetSection;      // Accounts 1xxx
+  assets: BalanceSheetSection; // Accounts 1xxx
   liabilities: BalanceSheetSection; // Accounts 2xxx
-  equity: BalanceSheetSection;      // Accounts 3xxx + net income
+  equity: BalanceSheetSection; // Accounts 3xxx + net income
   totalAssets: Money;
   totalLiabilitiesAndEquity: Money;
 }
@@ -1215,19 +1533,19 @@ export class ReportService {
   async generateBalanceSheet(asOfDate: Date): Promise<BalanceSheet> {
     const trialBalance = await this.trialBalanceService.generateTrialBalance(asOfDate);
 
-    const assets = this.buildSection(trialBalance, 'asset');
-    const liabilities = this.buildSection(trialBalance, 'liability');
-    const equity = this.buildSection(trialBalance, 'equity');
+    const assets = this.buildSection(trialBalance, "asset");
+    const liabilities = this.buildSection(trialBalance, "liability");
+    const equity = this.buildSection(trialBalance, "equity");
 
     // Net Income = Total Income - Total Expenses
-    const totalIncome = this.buildSection(trialBalance, 'income').total;
-    const totalExpenses = this.buildSection(trialBalance, 'expense').total;
+    const totalIncome = this.buildSection(trialBalance, "income").total;
+    const totalExpenses = this.buildSection(trialBalance, "expense").total;
     const netIncome = totalIncome.subtract(totalExpenses);
 
     // Add net income to equity
     equity.lines.push({
-      accountCode: '',
-      accountName: 'รายได้สูง(ต่ำ)กว่าค่าใช้จ่ายสุทธิ',
+      accountCode: "",
+      accountName: "รายได้สูง(ต่ำ)กว่าค่าใช้จ่ายสุทธิ",
       balance: netIncome,
     });
     equity.total = equity.total.add(netIncome);
@@ -1267,15 +1585,12 @@ export interface IncomeStatement {
 }
 
 export class ReportService {
-  async generateIncomeStatement(
-    periodStart: Date,
-    periodEnd: Date,
-  ): Promise<IncomeStatement> {
+  async generateIncomeStatement(periodStart: Date, periodEnd: Date): Promise<IncomeStatement> {
     // Get period-specific trial balance (filtered by date range)
     const lines = await this.ledgerRepo.getPeriodActivity(periodStart, periodEnd);
 
-    const incomeLines = lines.filter(l => l.accountType === 'income');
-    const expenseLines = lines.filter(l => l.accountType === 'expense');
+    const incomeLines = lines.filter((l) => l.accountType === "income");
+    const expenseLines = lines.filter((l) => l.accountType === "expense");
 
     const totalIncome = incomeLines.reduce((sum, l) => sum.add(l.creditAmount), Money.zero());
     const totalExpenses = expenseLines.reduce((sum, l) => sum.add(l.debitAmount), Money.zero());
@@ -1285,7 +1600,7 @@ export class ReportService {
       periodEnd,
       churchName: await this.settingsRepo.getChurchName(),
       income: {
-        lines: incomeLines.map(l => ({
+        lines: incomeLines.map((l) => ({
           accountCode: l.accountCode,
           accountName: l.accountName,
           amount: l.creditAmount,
@@ -1293,7 +1608,7 @@ export class ReportService {
         total: totalIncome,
       },
       expenses: {
-        lines: expenseLines.map(l => ({
+        lines: expenseLines.map((l) => ({
           accountCode: l.accountCode,
           accountName: l.accountName,
           amount: l.debitAmount,
@@ -1323,4 +1638,4 @@ The accounting engine enforces these invariants:
 
 ---
 
-*This accounting engine is the core of Grace Ledger v2. It converts every financial operation into balanced, auditable journal entries. No financial data exists outside of the general ledger.*
+_This accounting engine is the core of Grace Ledger v2. It converts every financial operation into balanced, auditable journal entries. No financial data exists outside of the general ledger._

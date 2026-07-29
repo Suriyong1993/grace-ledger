@@ -1,7 +1,8 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ScrollText } from "lucide-react";
+import { ShieldCheck, ScrollText } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listAudit } from "@/services/church";
@@ -38,11 +39,20 @@ function AuditPage() {
         kicker="องค์กร"
         title="บันทึกกิจกรรม"
         description={`กิจกรรมและการเปลี่ยนแปลงทั้งหมดในระบบ · ${rows.length} รายการ`}
+        actions={
+          <Badge
+            variant="outline"
+            className="gap-1.5 rounded-full border-success/30 bg-success/10 px-3 py-1 text-xs font-medium text-success shadow-2xs"
+          >
+            <ShieldCheck className="h-3.5 w-3.5" strokeWidth={2} />
+            <span>SHA-256 Verified Chain</span>
+          </Badge>
+        }
       />
       {q.isLoading ? (
         <div className="space-y-6">
-          <Skeleton className="h-44 w-full" />
-          <Skeleton className="h-44 w-full" />
+          <Skeleton className="h-44 w-full rounded-xl" />
+          <Skeleton className="h-44 w-full rounded-xl" />
         </div>
       ) : rows.length === 0 ? (
         <EmptyState
@@ -53,10 +63,13 @@ function AuditPage() {
       ) : (
         <div className="stagger space-y-6">
           {groups.map((g) => (
-            <section key={g.key} className="card-ledger">
-              <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-                <p className="kicker">{g.label}</p>
-                <span className="num-display text-xs text-muted-foreground">
+            <section
+              key={g.key}
+              className="rounded-xl border border-border/80 bg-card shadow-2xs overflow-hidden"
+            >
+              <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
+                <p className="kicker font-medium text-muted-foreground/80">{g.label}</p>
+                <span className="num-display text-xs font-semibold text-muted-foreground">
                   {g.items.length} รายการ
                 </span>
               </div>

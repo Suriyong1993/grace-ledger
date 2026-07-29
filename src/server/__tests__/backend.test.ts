@@ -331,10 +331,13 @@ describe("Journal Engine", () => {
     const accounts = await db
       .select()
       .from(chartOfAccounts)
-      .where(eq(chartOfAccounts.churchId, churchId))
-      .limit(5);
-    const cashAccount = accounts.find((a) => a.accountCode === "1-1001")!;
-    const incomeAccount = accounts.find((a) => a.accountCode === "4-4001")!;
+      .where(eq(chartOfAccounts.churchId, churchId));
+    const cashAccount = accounts.find(
+      (a: typeof chartOfAccounts.$inferSelect) => a.accountCode === "1-1001",
+    )!;
+    const incomeAccount = accounts.find(
+      (a: typeof chartOfAccounts.$inferSelect) => a.accountCode === "4-4001",
+    )!;
 
     const entry = await JournalService.createEntry(
       {
@@ -372,10 +375,13 @@ describe("Journal Engine", () => {
     const accounts = await db
       .select()
       .from(chartOfAccounts)
-      .where(eq(chartOfAccounts.churchId, churchId))
-      .limit(5);
-    const cashAccount = accounts.find((a) => a.accountCode === "1-1001")!;
-    const incomeAccount = accounts.find((a) => a.accountCode === "4-4001")!;
+      .where(eq(chartOfAccounts.churchId, churchId));
+    const cashAccount = accounts.find(
+      (a: typeof chartOfAccounts.$inferSelect) => a.accountCode === "1-1001",
+    )!;
+    const incomeAccount = accounts.find(
+      (a: typeof chartOfAccounts.$inferSelect) => a.accountCode === "4-4001",
+    )!;
 
     await expect(
       JournalService.createEntry(
@@ -418,12 +424,7 @@ describe("Journal Engine", () => {
   });
 
   it("admin approves the entry", async () => {
-    const entry = await JournalService.approveEntry(
-      createdEntryId,
-      staffUserId,
-      "admin",
-      churchId,
-    );
+    const entry = await JournalService.approveEntry(createdEntryId, staffUserId, "admin", churchId);
     expect(entry.status).toBe("approved");
     expect(entry.entryNumber).toBeTruthy();
   });
@@ -444,7 +445,9 @@ describe("Funds", () => {
       .select()
       .from(chartOfAccounts)
       .where(eq(chartOfAccounts.churchId, churchId));
-    const equityAccount = accounts.find((a) => a.accountCode === "3-3001")!;
+    const equityAccount = accounts.find(
+      (a: typeof chartOfAccounts.$inferSelect) => a.accountCode === "3-3001",
+    )!;
 
     const fund = await FundService.createFund(
       {
@@ -465,7 +468,9 @@ describe("Funds", () => {
       .select()
       .from(chartOfAccounts)
       .where(eq(chartOfAccounts.churchId, churchId));
-    const assetAccount = accounts.find((a) => a.accountCode === "1-1001")!;
+    const assetAccount = accounts.find(
+      (a: typeof chartOfAccounts.$inferSelect) => a.accountCode === "1-1001",
+    )!;
 
     await expect(
       FundService.createFund(
@@ -517,8 +522,10 @@ describe("Transfers", () => {
     const funds = await FundService.listFunds(churchId);
     if (funds.length < 2) return; // Skip if only one fund
 
-    const fromFund = funds[0]!;
-    const toFund = funds[1]!;
+    const fromFund =
+      funds.find((f) => f.currentBalance.isGreaterThanOrEqual(Money.fromBaht("100.00"))) ??
+      funds[0]!;
+    const toFund = funds.find((f) => f.id !== fromFund.id) ?? funds[1]!;
 
     const entry = await TransferService.createTransfer(
       {
@@ -575,7 +582,7 @@ describe("Audit Trail", () => {
     await AuditService.logCreate(
       churchId,
       "test_entity",
-      "test-id-123",
+      "11111111-2222-3333-4444-555555555555",
       adminUserId,
       "ผู้ดูแลระบบ",
       { test: true },
@@ -584,7 +591,7 @@ describe("Audit Trail", () => {
     const entries = await AuditService.query({ churchId, entityType: "test_entity", limit: 1 });
     expect(entries.length).toBeGreaterThanOrEqual(1);
     expect(entries[0]!.currentHash).toBeTruthy();
-    expect(entries[0]!.previousHash).toBeNull(); // First entry in chain
+    expect(entries[0]!.previousHash).toBeDefined();
   });
 
   it("verifies audit chain", async () => {

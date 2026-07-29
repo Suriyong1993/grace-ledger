@@ -13,13 +13,17 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { OfflineIndicator } from "@/components/shared/OfflineIndicator";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <p className="kicker justify-center">Grace Ledger</p>
-        <h1 className="num-display font-display mt-3 text-7xl font-semibold text-foreground">404</h1>
+        <h1 className="num-display font-display mt-3 text-7xl font-semibold text-foreground">
+          404
+        </h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">ไม่พบหน้าที่ค้นหา</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           หน้าที่คุณต้องการไม่มีอยู่ หรือถูกย้ายไปแล้ว
@@ -131,11 +135,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-right" richColors />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster position="top-right" richColors />
+          <OfflineIndicator />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

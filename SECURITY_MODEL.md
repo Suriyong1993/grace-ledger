@@ -25,13 +25,13 @@
 
 ### 1.1 Threat Actors
 
-| Actor | Motivation | Capability | Primary Targets |
-|-------|-----------|------------|-----------------|
-| External attacker | Financial gain, data theft | Medium | Credentials, financial data, member PII |
-| Malicious insider (staff) | Fraud, embezzlement | High (authorized access) | Cash handling, false expenses, fund transfers |
-| Accidental insider | Human error | Low | Data deletion, incorrect entries |
-| Auditor bypass | Covering fraud | High (authorized access) | Audit log deletion, period manipulation |
-| Physical access attacker | Credential theft | Low-Medium | Unlocked sessions, PIN/password theft |
+| Actor                     | Motivation                 | Capability               | Primary Targets                               |
+| ------------------------- | -------------------------- | ------------------------ | --------------------------------------------- |
+| External attacker         | Financial gain, data theft | Medium                   | Credentials, financial data, member PII       |
+| Malicious insider (staff) | Fraud, embezzlement        | High (authorized access) | Cash handling, false expenses, fund transfers |
+| Accidental insider        | Human error                | Low                      | Data deletion, incorrect entries              |
+| Auditor bypass            | Covering fraud             | High (authorized access) | Audit log deletion, period manipulation       |
+| Physical access attacker  | Credential theft           | Low-Medium               | Unlocked sessions, PIN/password theft         |
 
 ### 1.2 Trust Boundaries
 
@@ -47,14 +47,14 @@
 
 ### 1.3 Key Security Properties
 
-| Property | Mechanism |
-|----------|-----------|
-| Confidentiality | Encryption at rest (Supabase), TLS in transit, RLS at DB |
-| Integrity | Double-entry balance enforcement, hash-chained audit trail, CHECK constraints |
-| Availability | Automated backups, PITR, multi-region (Supabase) |
-| Non-repudiation | Immutable audit trail, cryptographic signing |
-| Authentication | bcrypt passwords, httpOnly JWT sessions, TOTP MFA |
-| Authorization | RBAC middleware, RLS at database, permission matrix |
+| Property        | Mechanism                                                                     |
+| --------------- | ----------------------------------------------------------------------------- |
+| Confidentiality | Encryption at rest (Supabase), TLS in transit, RLS at DB                      |
+| Integrity       | Double-entry balance enforcement, hash-chained audit trail, CHECK constraints |
+| Availability    | Automated backups, PITR, multi-region (Supabase)                              |
+| Non-repudiation | Immutable audit trail, cryptographic signing                                  |
+| Authentication  | bcrypt passwords, httpOnly JWT sessions, TOTP MFA                             |
+| Authorization   | RBAC middleware, RLS at database, permission matrix                           |
 
 ---
 
@@ -81,14 +81,14 @@
 
 ```typescript
 // src/server/auth/password.ts
-import { hash, verify } from 'argon2';
+import { hash, verify } from "argon2";
 
 export class PasswordService {
   private readonly ARGON2_OPTIONS = {
-    type: argon2id,       // Hybrid (most resistant to GPU/side-channel attacks)
-    memoryCost: 65536,    // 64 MB
-    timeCost: 3,          // 3 iterations
-    parallelism: 4,       // 4 threads
+    type: argon2id, // Hybrid (most resistant to GPU/side-channel attacks)
+    memoryCost: 65536, // 64 MB
+    timeCost: 3, // 3 iterations
+    parallelism: 4, // 4 threads
   };
 
   async hashPassword(plaintext: string): Promise<string> {
@@ -96,18 +96,18 @@ export class PasswordService {
   }
 
   async verifyPassword(hash: string, plaintext: string): Promise<boolean> {
-    return verify(hash, plaintext);  // Constant-time comparison built-in
+    return verify(hash, plaintext); // Constant-time comparison built-in
   }
 }
 ```
 
 ### 2.3 Credential Storage
 
-| Field | Storage | Notes |
-|-------|---------|-------|
-| `password_hash` | PostgreSQL `users` table | argon2id hash only — never plaintext |
-| `mfa_secret` | PostgreSQL `users` table | Encrypted at rest by Supabase; decrypted only for MFA verification |
-| `token_hash` | `user_sessions` table | SHA-256 hash of JWT — actual JWT only in httpOnly cookie |
+| Field           | Storage                  | Notes                                                              |
+| --------------- | ------------------------ | ------------------------------------------------------------------ |
+| `password_hash` | PostgreSQL `users` table | argon2id hash only — never plaintext                               |
+| `mfa_secret`    | PostgreSQL `users` table | Encrypted at rest by Supabase; decrypted only for MFA verification |
+| `token_hash`    | `user_sessions` table    | SHA-256 hash of JWT — actual JWT only in httpOnly cookie           |
 
 ---
 
@@ -147,15 +147,15 @@ export class SessionService {
     const payload = this.verifyJWT(token);
     const session = await this.sessionRepo.findById(payload.sid);
 
-    if (!session) throw new UnauthorizedError('Session not found');
-    if (new Date() > new Date(session.expiresAt)) throw new UnauthorizedError('Session expired');
+    if (!session) throw new UnauthorizedError("Session not found");
+    if (new Date() > new Date(session.expiresAt)) throw new UnauthorizedError("Session expired");
 
     const idleMs = Date.now() - new Date(session.lastActivityAt).getTime();
     const idleTimeoutMs = (await this.settingsRepo.get()).idleTimeoutMin * 60 * 1000;
 
     if (idleMs > idleTimeoutMs) {
       await this.sessionRepo.delete(session.id);
-      throw new UnauthorizedError('Session timed out due to inactivity');
+      throw new UnauthorizedError("Session timed out due to inactivity");
     }
 
     // Update last activity
@@ -167,15 +167,15 @@ export class SessionService {
 
 ### 3.3 Session Lifecycle
 
-| Event | Action |
-|-------|--------|
-| Login | Create session record, set httpOnly cookie |
-| Each request (with idle check passing) | Update `last_activity_at` |
-| Idle timeout exceeded | Delete session, force logout |
-| Manual logout | Delete session, clear cookie |
-| Password changed | Delete ALL sessions for user (force re-login everywhere) |
-| Admin deactivates user | Delete ALL sessions for user |
-| Session max age exceeded | Session expires, cookie invalidated |
+| Event                                  | Action                                                   |
+| -------------------------------------- | -------------------------------------------------------- |
+| Login                                  | Create session record, set httpOnly cookie               |
+| Each request (with idle check passing) | Update `last_activity_at`                                |
+| Idle timeout exceeded                  | Delete session, force logout                             |
+| Manual logout                          | Delete session, clear cookie                             |
+| Password changed                       | Delete ALL sessions for user (force re-login everywhere) |
+| Admin deactivates user                 | Delete ALL sessions for user                             |
+| Session max age exceeded               | Session expires, cookie invalidated                      |
 
 ---
 
@@ -183,27 +183,28 @@ export class SessionService {
 
 ### 4.1 Requirements
 
-| Requirement | Value |
-|------------|-------|
-| Minimum length | 12 characters |
+| Requirement       | Value                                                 |
+| ----------------- | ----------------------------------------------------- |
+| Minimum length    | 12 characters                                         |
 | Character classes | Uppercase + lowercase + digit + symbol (all required) |
-| Maximum age | 90 days (configurable) |
-| Password history | Last 5 passwords cannot be reused |
-| Minimum age | 1 day before allowed to change again |
+| Maximum age       | 90 days (configurable)                                |
+| Password history  | Last 5 passwords cannot be reused                     |
+| Minimum age       | 1 day before allowed to change again                  |
 
 ### 4.2 Validation
 
 ```typescript
 // src/server/schemas/password.schema.ts
-export const passwordSchema = z.string()
-  .min(12, 'Password must be at least 12 characters')
-  .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Must contain at least one digit')
-  .regex(/[^A-Za-z0-9]/, 'Must contain at least one symbol')
+export const passwordSchema = z
+  .string()
+  .min(12, "Password must be at least 12 characters")
+  .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Must contain at least one digit")
+  .regex(/[^A-Za-z0-9]/, "Must contain at least one symbol")
   .refine(
     async (pwd) => !(await isCommonPassword(pwd)),
-    'Password is too common — please choose a stronger one'
+    "Password is too common — please choose a stronger one",
   );
 ```
 
@@ -225,14 +226,14 @@ export const passwordSchema = z.string()
 
 ### 5.2 MFA Enforcement
 
-| Role | MFA Required |
-|------|-------------|
-| super_admin | Yes (mandatory) |
-| treasurer | Yes (mandatory) |
-| pastor | Recommended (not forced) |
+| Role          | MFA Required             |
+| ------------- | ------------------------ |
+| super_admin   | Yes (mandatory)          |
+| treasurer     | Yes (mandatory)          |
+| pastor        | Recommended (not forced) |
 | finance_staff | Recommended (not forced) |
-| auditor | Optional |
-| viewer | Optional |
+| auditor       | Optional                 |
+| viewer        | Optional                 |
 
 ### 5.3 Backup Codes
 
@@ -247,12 +248,12 @@ export const passwordSchema = z.string()
 
 ### 6.1 Login Rate Limiting
 
-| Scope | Limit | Window | Action on Exceed |
-|-------|-------|--------|-----------------|
-| Per user (failed attempts) | 5 | Rolling | Account locked 15 minutes |
-| Per IP (failed attempts) | 20 | 15 minutes | IP blocked 1 hour |
-| Per user (all logins) | 30 | 1 hour | Temporary throttle |
-| Global (all logins) | 100 | 1 minute | WAF-level throttling |
+| Scope                      | Limit | Window     | Action on Exceed          |
+| -------------------------- | ----- | ---------- | ------------------------- |
+| Per user (failed attempts) | 5     | Rolling    | Account locked 15 minutes |
+| Per IP (failed attempts)   | 20    | 15 minutes | IP blocked 1 hour         |
+| Per user (all logins)      | 30    | 1 hour     | Temporary throttle        |
+| Global (all logins)        | 100   | 1 minute   | WAF-level throttling      |
 
 ### 6.2 Account Lockout
 
@@ -263,9 +264,7 @@ export class LoginRateLimiter {
 
     if (user.lockedUntil && new Date() < new Date(user.lockedUntil)) {
       const remaining = Math.ceil((new Date(user.lockedUntil).getTime() - Date.now()) / 60000);
-      throw new AccountLockedError(
-        `Account is locked. Try again in ${remaining} minutes.`,
-      );
+      throw new AccountLockedError(`Account is locked. Try again in ${remaining} minutes.`);
     }
 
     // Reset lock if it has expired
@@ -283,12 +282,14 @@ export class LoginRateLimiter {
 
       // Log security event
       await this.auditRepo.recordSecurityEvent({
-        eventType: 'account_locked',
+        eventType: "account_locked",
         userId,
-        reason: '5 consecutive failed login attempts',
+        reason: "5 consecutive failed login attempts",
       });
 
-      throw new AccountLockedError('Account locked for 15 minutes due to multiple failed attempts.');
+      throw new AccountLockedError(
+        "Account locked for 15 minutes due to multiple failed attempts.",
+      );
     }
   }
 
@@ -303,12 +304,12 @@ export class LoginRateLimiter {
 ```typescript
 // Rate limit configuration
 const RATE_LIMITS = {
-  'auth.login': { window: 60_000, max: 10 },      // 10/minute
-  'auth.mfa': { window: 60_000, max: 5 },           // 5/minute
-  'journal.create': { window: 60_000, max: 30 },    // 30/minute
-  'reports.generate': { window: 300_000, max: 10 }, // 10/5min
-  'export': { window: 300_000, max: 5 },            // 5/5min
-  'settings.update': { window: 300_000, max: 3 },   // 3/5min
+  "auth.login": { window: 60_000, max: 10 }, // 10/minute
+  "auth.mfa": { window: 60_000, max: 5 }, // 5/minute
+  "journal.create": { window: 60_000, max: 30 }, // 30/minute
+  "reports.generate": { window: 300_000, max: 10 }, // 10/5min
+  export: { window: 300_000, max: 5 }, // 5/5min
+  "settings.update": { window: 300_000, max: 3 }, // 3/5min
 };
 ```
 
@@ -342,9 +343,7 @@ export function requirePermission(...permissions: Permission[]) {
 
     for (const perm of permissions) {
       if (!PERMISSION_MATRIX[user.role].includes(perm)) {
-        throw new ForbiddenError(
-          `User '${user.name}' lacks permission '${perm}'`
-        );
+        throw new ForbiddenError(`User '${user.name}' lacks permission '${perm}'`);
       }
     }
 
@@ -359,42 +358,42 @@ export function requirePermission(...permissions: Permission[]) {
 
 ### 8.1 Data at Rest
 
-| Data Type | Protection |
-|-----------|-----------|
-| Database | Supabase encrypted storage (AES-256) |
-| Passwords | argon2id hash |
+| Data Type   | Protection                                    |
+| ----------- | --------------------------------------------- |
+| Database    | Supabase encrypted storage (AES-256)          |
+| Passwords   | argon2id hash                                 |
 | MFA secrets | Encrypted column (Supabase Vault or pgcrypto) |
-| Attachments | Supabase Storage (encrypted at rest) |
-| Backups | Encrypted (Supabase managed) |
+| Attachments | Supabase Storage (encrypted at rest)          |
+| Backups     | Encrypted (Supabase managed)                  |
 
 ### 8.2 Data in Transit
 
-| Path | Protection |
-|------|-----------|
-| Browser ↔ Server | TLS 1.3 |
-| Server ↔ Database | TLS (Supabase internal) |
-| Server ↔ Storage | TLS (Supabase internal) |
-| Audit forward → SIEM | TLS + mTLS |
+| Path                 | Protection              |
+| -------------------- | ----------------------- |
+| Browser ↔ Server     | TLS 1.3                 |
+| Server ↔ Database    | TLS (Supabase internal) |
+| Server ↔ Storage     | TLS (Supabase internal) |
+| Audit forward → SIEM | TLS + mTLS              |
 
 ### 8.3 PII Handling
 
-| Field | Classification | Access Control |
-|-------|---------------|----------------|
-| User name | Internal | All authenticated users |
-| User password hash | Secret | Never exposed via API |
-| Member name | PII | Authenticated users (role-dependent) |
-| Member phone | PII | super_admin, pastor, treasurer, finance_staff only |
-| Member email | PII | super_admin, pastor, treasurer, finance_staff only |
-| Member address | PII | super_admin, pastor, treasurer only |
-| Church tax ID | Confidential | super_admin, pastor, treasurer, auditor |
-| Financial amounts | Confidential | All authenticated users |
+| Field              | Classification | Access Control                                     |
+| ------------------ | -------------- | -------------------------------------------------- |
+| User name          | Internal       | All authenticated users                            |
+| User password hash | Secret         | Never exposed via API                              |
+| Member name        | PII            | Authenticated users (role-dependent)               |
+| Member phone       | PII            | super_admin, pastor, treasurer, finance_staff only |
+| Member email       | PII            | super_admin, pastor, treasurer, finance_staff only |
+| Member address     | PII            | super_admin, pastor, treasurer only                |
+| Church tax ID      | Confidential   | super_admin, pastor, treasurer, auditor            |
+| Financial amounts  | Confidential   | All authenticated users                            |
 
 ### 8.4 PII Masking
 
 ```typescript
 // API response DTO masks PII based on role
 export function toMemberDTO(member: Member, viewerRole: Role): MemberDTO {
-  const canViewPII = ['super_admin', 'pastor', 'treasurer', 'finance_staff'].includes(viewerRole);
+  const canViewPII = ["super_admin", "pastor", "treasurer", "finance_staff"].includes(viewerRole);
 
   return {
     id: member.id,
@@ -431,17 +430,17 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 ```typescript
 const CORS_ORIGINS = [
-  process.env.APP_URL,              // Production
-  'http://localhost:5173',          // Development
-  'https://staging.graceledger.app', // Staging
+  process.env.APP_URL, // Production
+  "http://localhost:5173", // Development
+  "https://staging.graceledger.app", // Staging
 ];
 
 const corsConfig = {
   origin: CORS_ORIGINS,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,                 // Required for httpOnly cookies
-  maxAge: 86400,                     // 24 hours
+  methods: ["GET", "POST", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // Required for httpOnly cookies
+  maxAge: 86400, // 24 hours
 };
 ```
 
@@ -451,53 +450,53 @@ const corsConfig = {
 
 ### 10.1 Cash Skimming Prevention
 
-| Control | Mechanism |
-|---------|-----------|
-| Independent counter verification | Minimum 2 authenticated users, independent entry |
-| Counter reconciliation | System compares amounts; discrepancy > ฿100 requires recount |
-| Count sheet locking | Locked by pastor/super_admin; generates journal entries automatically |
-| Physical deposit matching | Reconciliation against actual bank deposit |
-| Audit logging | All count activities logged (who entered, when, amounts) |
+| Control                          | Mechanism                                                             |
+| -------------------------------- | --------------------------------------------------------------------- |
+| Independent counter verification | Minimum 2 authenticated users, independent entry                      |
+| Counter reconciliation           | System compares amounts; discrepancy > ฿100 requires recount          |
+| Count sheet locking              | Locked by pastor/super_admin; generates journal entries automatically |
+| Physical deposit matching        | Reconciliation against actual bank deposit                            |
+| Audit logging                    | All count activities logged (who entered, when, amounts)              |
 
 ### 10.2 Fictitious Expense Prevention
 
-| Control | Mechanism |
-|---------|-----------|
-| Segregation of duties | Creator ≠ Approver |
-| Approval thresholds | >฿50,000 requires dual approval |
-| Receipt requirement | Attachment mandatory above ฿5,000 |
-| Vendor verification | Vendor name recorded; vendor history visible |
-| Void-only for approved | Cannot delete — only void with reversals |
-| Audit trail | Full before/after state capture |
+| Control                | Mechanism                                    |
+| ---------------------- | -------------------------------------------- |
+| Segregation of duties  | Creator ≠ Approver                           |
+| Approval thresholds    | >฿50,000 requires dual approval              |
+| Receipt requirement    | Attachment mandatory above ฿5,000            |
+| Vendor verification    | Vendor name recorded; vendor history visible |
+| Void-only for approved | Cannot delete — only void with reversals     |
+| Audit trail            | Full before/after state capture              |
 
 ### 10.3 Fund Transfer Fraud Prevention
 
-| Control | Mechanism |
-|---------|-----------|
-| Transfer approval | >฿10,000 requires approval |
-| Atomicity | Single journal entry (both sides together) |
-| Overdraft prevention | Server-side balance check before posting |
-| Transfer purpose | Mandatory description field |
-| Loan tracking | Inter-fund loans tracked with repayment terms |
+| Control              | Mechanism                                     |
+| -------------------- | --------------------------------------------- |
+| Transfer approval    | >฿10,000 requires approval                    |
+| Atomicity            | Single journal entry (both sides together)    |
+| Overdraft prevention | Server-side balance check before posting      |
+| Transfer purpose     | Mandatory description field                   |
+| Loan tracking        | Inter-fund loans tracked with repayment terms |
 
 ### 10.4 Back-Dating Prevention
 
-| Control | Mechanism |
-|---------|-----------|
-| Date validation | Cannot post > 30 days in the past |
-| Period locking | Closed periods block transactions |
-| Reconciliation locking | Reconciled periods are sealed |
-| Audit trail | Posting timestamp independently recorded |
+| Control                | Mechanism                                |
+| ---------------------- | ---------------------------------------- |
+| Date validation        | Cannot post > 30 days in the past        |
+| Period locking         | Closed periods block transactions        |
+| Reconciliation locking | Reconciled periods are sealed            |
+| Audit trail            | Posting timestamp independently recorded |
 
 ### 10.5 Anomaly Detection (Future Phase)
 
-| Signal | Threshold |
-|--------|-----------|
-| Unusual transaction amount | > 3 standard deviations from user's average |
-| Off-hours activity | Transactions outside 08:00-20:00 local time |
-| Rapid transactions | > 10 entries in 1 minute |
-| New vendor + large amount | First-time vendor > ฿5,000 |
-| Round-dollar amounts | Exact ฿100, ฿1,000 amounts (potential structuring) |
+| Signal                     | Threshold                                          |
+| -------------------------- | -------------------------------------------------- |
+| Unusual transaction amount | > 3 standard deviations from user's average        |
+| Off-hours activity         | Transactions outside 08:00-20:00 local time        |
+| Rapid transactions         | > 10 entries in 1 minute                           |
+| New vendor + large amount  | First-time vendor > ฿5,000                         |
+| Round-dollar amounts       | Exact ฿100, ฿1,000 amounts (potential structuring) |
 
 ---
 
@@ -505,12 +504,12 @@ const corsConfig = {
 
 ### 11.1 Security Incident Classification
 
-| Severity | Examples | Response Time |
-|----------|---------|--------------|
-| Critical | Confirmed data breach, audit trail tampering, fund theft | 1 hour |
-| High | Account compromise (treasurer/super_admin), RLS bypass | 4 hours |
-| Medium | Brute-force attack, suspicious activity pattern | 24 hours |
-| Low | Failed login spike, port scan | 48 hours |
+| Severity | Examples                                                 | Response Time |
+| -------- | -------------------------------------------------------- | ------------- |
+| Critical | Confirmed data breach, audit trail tampering, fund theft | 1 hour        |
+| High     | Account compromise (treasurer/super_admin), RLS bypass   | 4 hours       |
+| Medium   | Brute-force attack, suspicious activity pattern          | 24 hours      |
+| Low      | Failed login spike, port scan                            | 48 hours      |
 
 ### 11.2 Response Procedure
 
@@ -529,4 +528,4 @@ const corsConfig = {
 
 ---
 
-*This security model is built on defense-in-depth. Every control has at least two layers of enforcement. No single compromised layer can defeat the entire system.*
+_This security model is built on defense-in-depth. Every control has at least two layers of enforcement. No single compromised layer can defeat the entire system._

@@ -1,18 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  Plus,
-  Download,
-  ArrowDownCircle,
-  ArrowDownLeft,
-  HandHeart,
-  Wallet,
-} from "lucide-react";
+import { Plus, Download, ArrowDownCircle, ArrowDownLeft, HandHeart, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -58,6 +51,7 @@ import {
   approveIncome,
   createIncome,
   deleteIncome,
+  getChurchId,
   listCategories,
   listFunds,
   listIncome,
@@ -91,9 +85,15 @@ type FormValues = z.infer<typeof schema>;
 function IncomePage() {
   const { user, can } = useAuth();
   const qc = useQueryClient();
+  const [churchId, setChurchId] = useState<string>();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [attachment, setAttachment] = useState<AttachmentValue | undefined>();
+
+  // Load churchId for attachment uploads
+  useEffect(() => {
+    getChurchId().then(setChurchId);
+  }, []);
 
   const incomeQ = useQuery({ queryKey: ["income"], queryFn: listIncome });
   const offeringQ = useQuery({ queryKey: ["offering"], queryFn: listOffering });
@@ -109,6 +109,7 @@ function IncomePage() {
           description: v.description ?? "",
           attachmentName: attachment?.name,
           attachmentDataUrl: attachment?.url,
+          attachmentStoragePath: attachment?.storagePath,
           attachmentType: attachment?.type,
           attachmentSize: attachment?.size,
         },
@@ -255,11 +256,7 @@ function IncomePage() {
                             <FormItem>
                               <FormLabel>วันที่</FormLabel>
                               <FormControl>
-                                <Input
-                                  type="date"
-                                  className="bg-card shadow-none"
-                                  {...field}
-                                />
+                                <Input type="date" className="bg-card shadow-none" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -339,18 +336,18 @@ function IncomePage() {
                           <FormItem>
                             <FormLabel>รายละเอียด</FormLabel>
                             <FormControl>
-                              <Textarea
-                                rows={3}
-                                className="bg-card shadow-none"
-                                {...field}
-                              />
+                              <Textarea rows={3} className="bg-card shadow-none" {...field} />
                             </FormControl>
                           </FormItem>
                         )}
                       />
                       <div>
                         <p className="text-sm font-medium mb-2">เอกสารแนบ (ไม่บังคับ)</p>
-                        <AttachmentInput value={attachment} onChange={setAttachment} />
+                        <AttachmentInput
+                          value={attachment}
+                          onChange={setAttachment}
+                          churchId={churchId}
+                        />
                       </div>
                       <DialogFooter>
                         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
@@ -403,10 +400,12 @@ function IncomePage() {
 
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายรับหรือเงินถวาย..." />
 
-      <section className="card-ledger animate-fade-up">
-        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-          <p className="kicker">รายการทั้งหมด</p>
-          <p className="num-display text-xs text-muted-foreground">{rows.length} รายการ</p>
+      <section className="rounded-xl border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+        <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
+          <p className="kicker font-medium text-muted-foreground/80">รายการทั้งหมด</p>
+          <p className="num-display text-xs font-semibold text-muted-foreground">
+            {rows.length} รายการ
+          </p>
         </div>
         {isLoading ? (
           <div className="divide-y divide-border">
@@ -487,4 +486,3 @@ function IncomePage() {
     </div>
   );
 }
-

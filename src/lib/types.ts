@@ -32,6 +32,7 @@ export interface Income {
   description?: string;
   attachmentName?: string;
   attachmentDataUrl?: string;
+  attachmentStoragePath?: string;
   attachmentType?: string;
   attachmentSize?: number;
   createdBy: string;
@@ -50,6 +51,7 @@ export interface Expense {
   description?: string;
   attachmentName?: string;
   attachmentDataUrl?: string;
+  attachmentStoragePath?: string;
   attachmentType?: string;
   attachmentSize?: number;
   createdBy: string;

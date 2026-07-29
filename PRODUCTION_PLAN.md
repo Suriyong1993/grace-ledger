@@ -1,4 +1,5 @@
 # Grace Ledger v2 — Production Plan
+
 ## Supabase Backend + Vercel Frontend
 
 ---
@@ -31,7 +32,9 @@
 ## Phase 1: Backend — Supabase Schema + Auth (Week 1)
 
 ### 1.1 Schema Migration (`supabase/migrations/001_init_schema.sql`)
+
 **Already done** ✅
+
 - All tables created with RLS enabled
 - All enum types defined
 - CHECK constraints for business rules (self-approval prevention, dual approval)
@@ -41,18 +44,22 @@
 - Row Level Security policies per table
 
 **Why this matters for frontend:**
+
 - Frontend queries **don't need church_id** in WHERE clause (RLS auto-filters)
 - Frontend doesn't need to check permissions server-side — DB rejects unauthorized requests
 - This simplifies frontend code significantly
 
 ### 1.2 Edge Functions
+
 **Already done** ✅
+
 - `auth-login` — email/password sign in → returns session
 - `auth-register` — creates user + church record
 - `get-church` — fetches user's church profile
 - `_shared/cors.ts` — shared CORS headers
 
 **Still needed:**
+
 - `auth-logout` — server-side session invalidation (if MFA is used later)
 - `upload-attachment` — presigned URL for Supabase Storage (receipt images)
 
@@ -61,10 +68,12 @@
 ## Phase 2: Backend — Service Layer (Week 1)
 
 ### 2.1 `src/services/supabaseClient.ts` ✅ Done
+
 - Creates Supabase JS client with auto-refresh session
 - Uses `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`
 
 ### 2.2 `src/services/supabaseService.ts` ✅ Done
+
 - Full CRUD for all entities
 - `getChurchId()` helper fetches church from auth session
 - Self-approval prevention in `approveIncome()` and `setExpenseStatus()`
@@ -72,15 +81,18 @@
 - **Removed**: `delay()` mock latency (keep or remove — debatable)
 
 ### 2.3 `src/services/church.ts` ✅ Done
+
 - Rewritten from mock-db.ts to supabaseService.ts
 - All CRUD operations query Supabase directly
 - `logAudit()` helper for audit trail
 
 ### 2.4 `src/services/api.ts` ✅ Done
+
 - Removed axios dependency for Supabase operations
 - Keep as compatibility layer (empty string for API_URL)
 
 **What this eliminates from frontend:**
+
 - No more `loadDb()` — data comes from Supabase
 - No more `demoUsers` hardcoded in auth page
 - No more localStorage for data persistence
@@ -96,6 +108,7 @@
 **Target state:** Email/password form + real Supabase Auth
 
 **Files to modify:**
+
 ```
 src/routes/auth.tsx
   ├─ Remove: PinPad import
@@ -109,6 +122,7 @@ src/routes/auth.tsx
 ```
 
 **New UI flow:**
+
 ```
 ┌──────────────────────────────────┐
 │  🏛️ Grace Ledger                 │
@@ -135,12 +149,14 @@ src/routes/auth.tsx
 ---
 
 ### 3.3 `src/lib/auth.tsx` ✅ Already rewrote
+
 - Uses `supabase.auth.onAuthStateChange()` instead of localStorage
 - `PERMISSION_MATRIX` for role-based access control
 - `can(permission)` check for UI elements
 - `hasRole(...roles)` check for role-specific features
 
 **What this means for frontend:**
+
 - All protected routes already use `<AuthProvider>` and `useAuth()`
 - `_app.tsx` already redirects unauthenticated users to `/auth`
 - `RoleGuard.tsx` already uses `can()` and `hasRole()`
@@ -176,8 +192,8 @@ src/routes/auth.tsx
 
 ```sql
 -- Run in Supabase SQL Editor
-SELECT sqlfrom('SELECT storage.create_bucket('attachments', 
-  {public:false, file_size_limit: 10485760, allowed_mime_types: 
+SELECT sqlfrom('SELECT storage.create_bucket('attachments',
+  {public:false, file_size_limit: 10485760, allowed_mime_types:
     ['image/jpeg','image/png','image/pdf','application/pdf']});
 -- Enable RLS on storage.objects for the attachments bucket
 ```
@@ -185,6 +201,7 @@ SELECT sqlfrom('SELECT storage.create_bucket('attachments',
 ### 4.3 Edge Function for Upload Presigned URL
 
 **Function:** `supabase/functions/upload-url/index.ts`
+
 - Returns presigned URL for upload
 - Validates file type + size before generating URL
 - Logs audit
@@ -192,6 +209,7 @@ SELECT sqlfrom('SELECT storage.create_bucket('attachments',
 ### 4.4 `AttachmentInput.tsx` changes
 
 **Current:** Stores `dataUrl` in DB (base64 string)
+
 ```tsx
 // src/components/shared/AttachmentInput.tsx
 // Current pattern:
@@ -201,6 +219,7 @@ const [attachment, setAttachment] = useState<AttachmentValue>();
 ```
 
 **New:** Upload to Supabase Storage → store URL in DB
+
 ```tsx
 // New pattern:
 async function uploadAttachment(file: File): Promise<string> {
@@ -212,6 +231,7 @@ async function uploadAttachment(file: File): Promise<string> {
 ```
 
 **Frontend files to modify:**
+
 - `src/components/shared/AttachmentInput.tsx` — add upload progress + Storage integration
 - `src/services/supabaseService.ts` — add `uploadAttachment()` helper
 
@@ -228,15 +248,16 @@ With Realtime: When pastor approves an income record, treasurer sees it instantl
 ### 5.2 Implementation
 
 **New file:** `src/hooks/useRealtime.ts`
+
 ```typescript
-import { useEffect, useRef } from 'react';
-import { supabase } from '@/services/supabaseClient';
+import { useEffect, useRef } from "react";
+import { supabase } from "@/services/supabaseClient";
 
 export function useRealtime<T>(
   channel: string,
   table: string,
   churchId: string,
-  callback: (payload: T) => void
+  callback: (payload: T) => void,
 ) {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
@@ -244,19 +265,21 @@ export function useRealtime<T>(
   useEffect(() => {
     const ch = supabase
       .channel(channel)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
         table,
         filter: `church_id=eq.${churchId}`,
       })
       .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
+        if (status === "SUBSCRIBED") {
           // subscribed
         }
       });
 
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [channel, table, churchId]);
 }
 ```
@@ -290,11 +313,12 @@ When Supabase RLS rejects a request, frontend must handle gracefully:
 ```typescript
 // src/lib/error-handler.ts
 export function handleSupabaseError(error: any): string {
-  if (error.code === '42501') { // insufficient_privilege
-    return 'คุณไม่มีสิทธิ์ดำเนินการนี้';
+  if (error.code === "42501") {
+    // insufficient_privilege
+    return "คุณไม่มีสิทธิ์ดำเนินการนี้";
   }
-  if (error.code === '401') {
-    return 'Session expired. กรุณาเข้าสู่ระบบอีกครั้ง';
+  if (error.code === "401") {
+    return "Session expired. กรุณาเข้าสู่ระบบอีกครั้ง";
   }
   // ...map other error codes
 }
@@ -303,6 +327,7 @@ export function handleSupabaseError(error: any): string {
 ### 6.2 Route Guards
 
 Currently `_app.tsx` checks `user` from `useAuth()`. With Supabase:
+
 - If session expired → Supabase auto-refreshes (silent)
 - If refresh fails → `onAuthStateChange` fires with `SIGNED_OUT` event → redirect to `/auth`
 
@@ -316,8 +341,8 @@ With real backend (not localStorage), every query is an HTTP request. Loading sp
 // Every page needs loading state while Supabase returns data
 function IncomePage() {
   const [loading, setLoading] = useState(true);
-  const incomes = useQuery(['incomes'], fetchIncomes);
-  
+  const incomes = useQuery(["incomes"], fetchIncomes);
+
   if (loading) return <IncomeLoadingSkeleton />;
   // ...render
 }
@@ -330,10 +355,12 @@ function IncomePage() {
 ### 7.1 Vercel Deployment
 
 **Prerequisites:**
+
 1. `vercel.json` or `vercel` in project root
 2. Environment variables set in Vercel dashboard OR vercel.json
 
 **Config:**
+
 ```json
 // vercel.json
 {
@@ -351,6 +378,7 @@ function IncomePage() {
 ### 7.2 Supabase Deployment
 
 **Local → Production pipeline:**
+
 ```bash
 # 1. Test migration locally with Supabase local
 supabase start
@@ -383,19 +411,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
-        with: { node-version: '22' }
-      
+        with: { node-version: "22" }
+
       - run: npm ci
       - run: npm run test
       - run: npm run build
-      
+
       - uses: supabase/setup-cli@v1
-        with: { version: 'latest' }
-      - run: supabase db push  # deploy migrations
+        with: { version: "latest" }
+      - run: supabase db push # deploy migrations
       - run: supabase functions deploy --all
-      
+
       - uses: vercel-action@v30
         with:
           token: ${{ secrets.VERCEL_TOKEN }}
@@ -412,6 +440,7 @@ jobs:
 The demo users from `mock-db.ts` (demouser1–demouser4) need to be migrated to Supabase Auth + users table.
 
 **Script:** `supabase/functions/seed-demo-users/index.ts`
+
 1. Create auth users with passwords (use admin API)
 2. Insert records into `users` table with church_id
 3. Seed demo data (chart of accounts, funds, sample transactions)
@@ -421,6 +450,7 @@ The demo users from `mock-db.ts` (demouser1–demouser4) need to be migrated to 
 Existing `localStorage` data → SQL `INSERT` statements or `COPY` command.
 
 **Tooling:**
+
 1. Supabase Dashboard → SQL Editor → Run migration
 2. Or use `psql` with the connection string
 3. Or build a migration script in Edge Function
@@ -430,47 +460,50 @@ Existing `localStorage` data → SQL `INSERT` statements or `COPY` command.
 ## 📋 Complete File Change Map
 
 ### Files Already Modified ✅
-| File | Status | What changed |
-|------|--------|-------------|
-| `supabase/migrations/001_init_schema.sql` | ✅ New | Full schema + RLS + indexes |
-| `supabase/functions/auth-login/index.ts` | ✅ New | Email/password login |
-| `supabase/functions/auth-register/index.ts` | ✅ New | Registration + role |
-| `supabase/functions/get-church/index.ts` | ✅ New | Get current user's church |
-| `supabase/functions/_shared/cors.ts` | ✅ New | Shared CORS headers |
-| `src/services/supabaseClient.ts` | ✅ New | Supabase JS client factory |
-| `src/services/supabaseService.ts` | ✅ New | Full CRUD service layer |
-| `src/services/church.ts` | ✅ Rewritten | Business logic → Supabase |
-| `src/services/api.ts` | ✅ Updated | Supabase-compatible bridge |
-| `src/lib/auth.tsx` | ✅ Rewritten | PIN → email/password auth |
-| `.env.example` | ✅ Updated | Supabase + Vercel vars |
 
-### Files Still Need Modifying ⏳ **
-| File | Priority | What needs to change |
-|------|----------|---------------------|
-| `src/routes/auth.tsx` | **P0** | PIN Pad → Email/Password form |
-| `src/routes/_app.settings.tsx` | P1 | Remove `resetDb` import from mock-db |
-| `src/components/shared/PinPad.tsx` | Optional | Keep for future use (transaction PIN) |
-| `src/components/shared/AttachmentInput.tsx` | P1 | Add Supabase Storage upload flow |
-| `src/lib/mock-db.ts` | P2 | Mark deprecated or remove |
-| `src/routes/_app.audit.tsx` | P1 | Add realtime subscription for audit log |
-| `src/routes/_app.dashboard.tsx` | P1 | Add realtime subscription |
-| `src/routes/_app.income.tsx` | P1 | Handle RLS 403 errors, add realtime |
-| `src/routes/_app.expense.tsx` | P1 | Handle RLS 403 errors, add realtime |
-| `src/routes/_app.offering.tsx` | P1 | Add realtime subscription |
-| `src/hooks/useRealtime.ts` | P1 | New hook for Supabase Realtime |
-| `src/lib/error-handler.ts` | P2 | New — map Supabase errors to Thai messages |
+| File                                        | Status       | What changed                |
+| ------------------------------------------- | ------------ | --------------------------- |
+| `supabase/migrations/001_init_schema.sql`   | ✅ New       | Full schema + RLS + indexes |
+| `supabase/functions/auth-login/index.ts`    | ✅ New       | Email/password login        |
+| `supabase/functions/auth-register/index.ts` | ✅ New       | Registration + role         |
+| `supabase/functions/get-church/index.ts`    | ✅ New       | Get current user's church   |
+| `supabase/functions/_shared/cors.ts`        | ✅ New       | Shared CORS headers         |
+| `src/services/supabaseClient.ts`            | ✅ New       | Supabase JS client factory  |
+| `src/services/supabaseService.ts`           | ✅ New       | Full CRUD service layer     |
+| `src/services/church.ts`                    | ✅ Rewritten | Business logic → Supabase   |
+| `src/services/api.ts`                       | ✅ Updated   | Supabase-compatible bridge  |
+| `src/lib/auth.tsx`                          | ✅ Rewritten | PIN → email/password auth   |
+| `.env.example`                              | ✅ Updated   | Supabase + Vercel vars      |
+
+### Files Still Need Modifying ⏳ \*\*
+
+| File                                        | Priority | What needs to change                       |
+| ------------------------------------------- | -------- | ------------------------------------------ |
+| `src/routes/auth.tsx`                       | **P0**   | PIN Pad → Email/Password form              |
+| `src/routes/_app.settings.tsx`              | P1       | Remove `resetDb` import from mock-db       |
+| `src/components/shared/PinPad.tsx`          | Optional | Keep for future use (transaction PIN)      |
+| `src/components/shared/AttachmentInput.tsx` | P1       | Add Supabase Storage upload flow           |
+| `src/lib/mock-db.ts`                        | P2       | Mark deprecated or remove                  |
+| `src/routes/_app.audit.tsx`                 | P1       | Add realtime subscription for audit log    |
+| `src/routes/_app.dashboard.tsx`             | P1       | Add realtime subscription                  |
+| `src/routes/_app.income.tsx`                | P1       | Handle RLS 403 errors, add realtime        |
+| `src/routes/_app.expense.tsx`               | P1       | Handle RLS 403 errors, add realtime        |
+| `src/routes/_app.offering.tsx`              | P1       | Add realtime subscription                  |
+| `src/hooks/useRealtime.ts`                  | P1       | New hook for Supabase Realtime             |
+| `src/lib/error-handler.ts`                  | P2       | New — map Supabase errors to Thai messages |
 
 ### Files to Create ➕ NEW
-| File | Purpose |
-|------|---------|
-| `supabase/startup.sql` | Auto-run migrations when Supabase starts locally |
-| `supabase/functions/upload-url/index.ts` | Generate presigned URL for attachments |
-| `src/components/auth/LoginForm.tsx` | Reusable login form component |
-| `src/components/auth/RegisterForm.tsx` | Sign-up form |
-| `src/hooks/useRealtime.ts` | Supabase Realtime subscription hook |
-| `.vercel.json` | Vercel configuration |
-| `.github/workflows/deploy.yml` | CI/CD pipeline |
-| `src/lib/error-handler.ts` | Error message mapping |
+
+| File                                     | Purpose                                          |
+| ---------------------------------------- | ------------------------------------------------ |
+| `supabase/startup.sql`                   | Auto-run migrations when Supabase starts locally |
+| `supabase/functions/upload-url/index.ts` | Generate presigned URL for attachments           |
+| `src/components/auth/LoginForm.tsx`      | Reusable login form component                    |
+| `src/components/auth/RegisterForm.tsx`   | Sign-up form                                     |
+| `src/hooks/useRealtime.ts`               | Supabase Realtime subscription hook              |
+| `.vercel.json`                           | Vercel configuration                             |
+| `.github/workflows/deploy.yml`           | CI/CD pipeline                                   |
+| `src/lib/error-handler.ts`               | Error message mapping                            |
 
 ---
 
@@ -518,6 +551,7 @@ Week 4: Data Migration + Testing + Deploy         (⏳ Pending)
 **Immediate next step:** Rewrite `src/routes/auth.tsx` to replace PIN Pad with email/password form.
 
 "แข็ดแหล็ด" ต้องการเริ่มตรงไหนครับ؟
+
 1. Rewrite `auth.tsx` (login page) — **P0**
 2. Add error handling across all pages — **P1**
 3. Set up Vercel deployment — **P1**

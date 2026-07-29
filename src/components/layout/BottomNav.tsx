@@ -21,10 +21,7 @@ export function BottomNav() {
               )}
             >
               {active && <span aria-hidden className="absolute top-0 h-0.5 w-8 bg-primary" />}
-              <item.icon
-                className={cn("h-5 w-5", active && "text-primary")}
-                strokeWidth={1.75}
-              />
+              <item.icon className={cn("h-5 w-5", active && "text-primary")} strokeWidth={1.75} />
               <span>{item.label}</span>
             </Link>
           );

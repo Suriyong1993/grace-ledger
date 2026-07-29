@@ -7,7 +7,7 @@ import { gsap } from "@/lib/gsap";
  */
 export function useGSAPAnimation<T extends HTMLElement = HTMLDivElement>(
   animationCallback: (element: T) => void,
-  deps: DependencyList = []
+  deps: DependencyList = [],
 ) {
   const containerRef = useRef<T | null>(null);
 

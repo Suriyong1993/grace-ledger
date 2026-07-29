@@ -45,8 +45,8 @@ export async function getGoogleToken(): Promise<string> {
   if (!GOOGLE_CLIENT_ID) throw new Error("VITE_GOOGLE_CLIENT_ID not configured");
   await initGis();
   return new Promise((resolve, reject) => {
-  if (!tokenClient) throw new Error("Google token client not initialized");
-  tokenClient.callback = (response: { access_token?: string; error?: string }) => {
+    if (!tokenClient) throw new Error("Google token client not initialized");
+    tokenClient.callback = (response: { access_token?: string; error?: string }) => {
       if (response.error) {
         reject(new Error(response.error));
         return;

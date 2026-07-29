@@ -336,7 +336,6 @@ export function FundTransferDialog({
         </DialogContent>
       </Dialog>
 
-
       <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
         <AlertDialogContent className="max-w-md rounded-none border-border shadow-none">
           <AlertDialogHeader>
@@ -344,9 +343,7 @@ export function FundTransferDialog({
               <span aria-hidden className="inline-block h-px w-5 bg-primary" />
               ยืนยันรายการ
             </p>
-            <AlertDialogTitle className="font-display text-xl">
-              ยืนยันการโอนกองทุน
-            </AlertDialogTitle>
+            <AlertDialogTitle className="font-display text-xl">ยืนยันการโอนกองทุน</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="pt-2">
                 {/* From → To summary */}
@@ -411,4 +408,3 @@ export function FundTransferDialog({
     </>
   );
 }
-

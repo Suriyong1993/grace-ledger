@@ -1,5 +1,7 @@
 // src/services/churchVoucherAiService.ts
 // Specialized AI Handwritten Vision Parser for "ใบตรวจนับเงินแยกรายการ" & "ใบเบิกเงินคริสตจักร"
+// Primary AI: Fireworks AI (Kimi-K3) via OpenAI-compatible API
+// Fallback AI: Google Gemini 2.0 Flash
 
 export interface OfferingMemberRow {
   no: number;
@@ -51,8 +53,11 @@ export interface ChurchVoucherParsed {
 
 export type ChurchDocParsedResult = ChurchOfferingSheetParsed | ChurchVoucherParsed;
 
-const AI_API_KEY = import.meta.env.VITE_AI_API_KEY ?? import.meta.env.VITE_GEMINI_API_KEY ?? "";
-const AI_MODEL = "gemini-2.0-flash";
+const FIREWORKS_API_KEY = import.meta.env.VITE_FIREWORKS_API_KEY ?? "";
+const GEMINI_API_KEY = import.meta.env.VITE_AI_API_KEY ?? import.meta.env.VITE_GEMINI_API_KEY ?? "";
+const GEMINI_MODEL = "gemini-2.0-flash";
+const FIREWORKS_MODEL = "accounts/fireworks/models/kimi-k3";
+const FIREWORKS_BASE_URL = "https://api.fireworks.ai/inference/v1";
 
 // File to Base64 converter
 function fileToBase64(file: File): Promise<string> {
@@ -68,14 +73,8 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-// AI Vision Parser for Handwritten Church Forms
-export async function parseChurchHandwrittenForm(file: File): Promise<ChurchDocParsedResult> {
-  const mimeType = file.type || "image/jpeg";
-  const base64Data = await fileToBase64(file);
-
-  if (AI_API_KEY) {
-    try {
-      const prompt = `You are a specialist AI OCR for Thai Church Handwritten Records, specifically "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์".
+// Shared prompt for all AI providers
+const CHURCH_PROMPT = `You are a specialist AI OCR for Thai Church Handwritten Records, specifically "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์".
 
 Determine if the image is a "ใบตรวจนับเงินแยกรายการ" (Offering Worksheet) or "ใบเบิกเงิน คริสตจักร" (Disbursement Voucher).
 
@@ -116,35 +115,130 @@ If it is a "ใบเบิกเงิน คริสตจักร" (Disburs
     }
   ],
   "totalAmount": 1212
-}`;
+}
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${AI_API_KEY}`,
+Respond with STRICT JSON only — no markdown fences, no explanation.`;
+
+// Helper: strip markdown code fences from LLM output
+function cleanLLMJson(raw: string): string {
+  return raw
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
+}
+
+// Primary: Fireworks AI (Kimi-K3) vision
+async function parseChurchWithFireworks(file: File): Promise<ChurchDocParsedResult> {
+  const reader = new FileReader();
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+  });
+
+  const res = await fetch(`${FIREWORKS_BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${FIREWORKS_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: FIREWORKS_MODEL,
+      max_tokens: 2048,
+      temperature: 0.1,
+      top_k: 40,
+      presence_penalty: 0,
+      frequency_penalty: 0,
+      messages: [
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [{ inlineData: { mimeType, data: base64Data } }, { text: prompt }],
-              },
-            ],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 1200 },
-          }),
+          role: "user",
+          content: [
+            { type: "image_url", image_url: { url: dataUrl } },
+            { type: "text", text: CHURCH_PROMPT },
+          ],
         },
-      );
+      ],
+    }),
+  });
+  if (!res.ok) throw new Error(`Fireworks ${res.status}`);
+  const json = await res.json();
+  const raw: string = json.choices?.[0]?.message?.content ?? "";
+  return JSON.parse(cleanLLMJson(raw)) as ChurchDocParsedResult;
+}
 
-      if (res.ok) {
-        const json = await res.json();
-        const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-        const cleanJson = rawText
-          .replace(/```json/g, "")
-          .replace(/```/g, "")
-          .trim();
-        return JSON.parse(cleanJson) as ChurchDocParsedResult;
+// Fallback: Google Gemini 2.0 Flash
+async function parseChurchWithGemini(file: File): Promise<ChurchDocParsedResult> {
+  const mimeType = file.type || "image/jpeg";
+  const base64Data = await fileToBase64(file);
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          { parts: [{ inlineData: { mimeType, data: base64Data } }, { text: CHURCH_PROMPT }] },
+        ],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1200 },
+      }),
+    },
+  );
+  if (!res.ok) throw new Error(`Gemini ${res.status}`);
+  const json = await res.json();
+  const raw: string = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  return JSON.parse(cleanLLMJson(raw)) as ChurchDocParsedResult;
+}
+
+export function fileToDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+  });
+}
+
+// AI Vision Parser for Handwritten Church Forms
+// Priority: Server API Proxy → Fireworks AI (Kimi-K3) → Gemini → Demo fallback
+export async function parseChurchHandwrittenForm(file: File): Promise<ChurchDocParsedResult> {
+  // --- 0. Try Server API Proxy (secure, keeps API keys on server) ---
+  try {
+    const dataUrl = await fileToDataURL(file);
+    const mimeType = file.type || "image/jpeg";
+    const res = await fetch("/api/ai/parse-church-form", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: dataUrl, mimeType }),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { raw?: string };
+      if (data.raw) {
+        return JSON.parse(cleanLLMJson(data.raw)) as ChurchDocParsedResult;
       }
+    }
+  } catch (err) {
+    console.warn(
+      "[AI Proxy] Server church form proxy failed or offline, trying client fallback:",
+      err,
+    );
+  }
+
+  // --- 1. Try Fireworks AI (Kimi-K3) first ---
+  if (FIREWORKS_API_KEY) {
+    try {
+      return await parseChurchWithFireworks(file);
     } catch (err) {
-      console.warn("AI Vision Parser fallback for handwritten forms:", err);
+      console.warn("[Fireworks AI] Church OCR failed, trying Gemini:", err);
+    }
+  }
+
+  // --- 2. Try Gemini fallback ---
+  if (GEMINI_API_KEY) {
+    try {
+      return await parseChurchWithGemini(file);
+    } catch (err) {
+      console.warn("[Gemini] Church OCR failed, using demo data:", err);
     }
   }
 

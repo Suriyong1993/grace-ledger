@@ -408,44 +408,44 @@ CREATE INDEX idx_coa_active ON chart_of_accounts(is_active) WHERE is_active = TR
 
 **Default Chart of Accounts (Thai Church):**
 
-| Code | Name (TH) | Name (EN) | Type | Normal |
-|------|-----------|-----------|------|--------|
-| **1xxx — Assets** | | | | |
-| 1-1001 | เงินสด | Cash on Hand | asset | debit |
-| 1-1002 | เงินฝากธนาคาร | Bank Deposits | asset | debit |
-| 1-1003 | ลูกหนี้ | Accounts Receivable | asset | debit |
-| 1-1004 | ที่ดิน | Land | asset | debit |
-| 1-1005 | อาคาร | Buildings | asset | debit |
-| 1-1006 | อุปกรณ์ | Equipment | asset | debit |
-| 1-1007 | ค่าเสื่อมราคาสะสม | Accumulated Depreciation | asset | credit* |
-| **2xxx — Liabilities** | | | | |
-| 2-2001 | เจ้าหนี้การค้า | Accounts Payable | liability | credit |
-| 2-2002 | เงินกู้ยืม | Loans Payable | liability | credit |
-| 2-2003 | ภาษีหัก ณ ที่จ่าย | Withholding Tax Payable | liability | credit |
-| 2-2004 | เงินประกันสังคมค้างจ่าย | Social Security Payable | liability | credit |
-| **3xxx — Equity** | | | | |
-| 3-3001 | กองทุนทั่วไป | General Fund | equity | credit |
-| 3-3002 | กองทุนที่ดิน | Building Fund | equity | credit |
-| 3-3003 | กองทุนพันธกิจ | Mission Fund | equity | credit |
-| 3-3004 | กำไรสะสม | Retained Earnings | equity | credit |
-| **4xxx — Income** | | | | |
-| 4-4001 | เงินถวายสิบลด | Tithes | income | credit |
-| 4-4002 | เงินถวายพิเศษ | Special Offerings | income | credit |
-| 4-4003 | เงินถวายพันธกิจ | Mission Offerings | income | credit |
-| 4-4004 | เงินบริจาค | Donations | income | credit |
-| 4-4005 | ดอกเบี้ยรับ | Interest Income | income | credit |
-| 4-4006 | รายได้ค่าเช่า | Rental Income | income | credit |
-| 4-4007 | รายรับอื่น ๆ | Other Income | income | credit |
-| **5xxx — Expenses** | | | | |
-| 5-5001 | เงินเดือนบุคลากร | Staff Salaries | expense | debit |
-| 5-5002 | ค่าสาธารณูปโภค | Utilities | expense | debit |
-| 5-5003 | ค่าซ่อมบำรุง | Maintenance | expense | debit |
-| 5-5004 | ค่าพันธกิจ | Mission Expenses | expense | debit |
-| 5-5005 | ค่าอุปกรณ์ | Supplies | expense | debit |
-| 5-5006 | ค่าเดินทาง | Travel Expenses | expense | debit |
-| 5-5007 | ค่าใช้จ่ายอื่น ๆ | Other Expenses | expense | debit |
+| Code                   | Name (TH)               | Name (EN)                | Type      | Normal   |
+| ---------------------- | ----------------------- | ------------------------ | --------- | -------- |
+| **1xxx — Assets**      |                         |                          |           |          |
+| 1-1001                 | เงินสด                  | Cash on Hand             | asset     | debit    |
+| 1-1002                 | เงินฝากธนาคาร           | Bank Deposits            | asset     | debit    |
+| 1-1003                 | ลูกหนี้                 | Accounts Receivable      | asset     | debit    |
+| 1-1004                 | ที่ดิน                  | Land                     | asset     | debit    |
+| 1-1005                 | อาคาร                   | Buildings                | asset     | debit    |
+| 1-1006                 | อุปกรณ์                 | Equipment                | asset     | debit    |
+| 1-1007                 | ค่าเสื่อมราคาสะสม       | Accumulated Depreciation | asset     | credit\* |
+| **2xxx — Liabilities** |                         |                          |           |          |
+| 2-2001                 | เจ้าหนี้การค้า          | Accounts Payable         | liability | credit   |
+| 2-2002                 | เงินกู้ยืม              | Loans Payable            | liability | credit   |
+| 2-2003                 | ภาษีหัก ณ ที่จ่าย       | Withholding Tax Payable  | liability | credit   |
+| 2-2004                 | เงินประกันสังคมค้างจ่าย | Social Security Payable  | liability | credit   |
+| **3xxx — Equity**      |                         |                          |           |          |
+| 3-3001                 | กองทุนทั่วไป            | General Fund             | equity    | credit   |
+| 3-3002                 | กองทุนที่ดิน            | Building Fund            | equity    | credit   |
+| 3-3003                 | กองทุนพันธกิจ           | Mission Fund             | equity    | credit   |
+| 3-3004                 | กำไรสะสม                | Retained Earnings        | equity    | credit   |
+| **4xxx — Income**      |                         |                          |           |          |
+| 4-4001                 | เงินถวายสิบลด           | Tithes                   | income    | credit   |
+| 4-4002                 | เงินถวายพิเศษ           | Special Offerings        | income    | credit   |
+| 4-4003                 | เงินถวายพันธกิจ         | Mission Offerings        | income    | credit   |
+| 4-4004                 | เงินบริจาค              | Donations                | income    | credit   |
+| 4-4005                 | ดอกเบี้ยรับ             | Interest Income          | income    | credit   |
+| 4-4006                 | รายได้ค่าเช่า           | Rental Income            | income    | credit   |
+| 4-4007                 | รายรับอื่น ๆ            | Other Income             | income    | credit   |
+| **5xxx — Expenses**    |                         |                          |           |          |
+| 5-5001                 | เงินเดือนบุคลากร        | Staff Salaries           | expense   | debit    |
+| 5-5002                 | ค่าสาธารณูปโภค          | Utilities                | expense   | debit    |
+| 5-5003                 | ค่าซ่อมบำรุง            | Maintenance              | expense   | debit    |
+| 5-5004                 | ค่าพันธกิจ              | Mission Expenses         | expense   | debit    |
+| 5-5005                 | ค่าอุปกรณ์              | Supplies                 | expense   | debit    |
+| 5-5006                 | ค่าเดินทาง              | Travel Expenses          | expense   | debit    |
+| 5-5007                 | ค่าใช้จ่ายอื่น ๆ        | Other Expenses           | expense   | debit    |
 
-*Account 1-1007 (สะสมค่าเสื่อมราคา) is a contra-asset with `is_contra = TRUE`
+\*Account 1-1007 (สะสมค่าเสื่อมราคา) is a contra-asset with `is_contra = TRUE`
 
 ### 3.2 journal_entries
 
@@ -731,6 +731,7 @@ CREATE INDEX idx_budgets_account ON budgets(account_id);
 ```
 
 Budget utilization is calculated dynamically:
+
 ```sql
 -- Budget vs. Actual query
 SELECT
@@ -825,6 +826,7 @@ CREATE INDEX idx_projects_status ON projects(status);
 ```
 
 Project spending is tracked dynamically through journal entry lines:
+
 ```sql
 SELECT
   p.id,
@@ -974,17 +976,17 @@ CREATE INDEX idx_attachments_entity ON attachments(entity_type, entity_id);
 
 ### 12.1 Primary Access Patterns
 
-| Query Pattern | Index Used | Reason |
-|---------------|-----------|--------|
-| List journal entries by date range | `idx_journal_entries_posting_date` | Date-range queries for reporting |
-| Get journal entry by number | `idx_journal_entries_number` (UNIQUE) | Lookup by sequential ID |
-| Get GL by account + date range | `idx_gl_account_date` | Account history queries |
-| Get GL by fund + date range | `idx_gl_fund_date` | Fund balance queries |
-| List audit log chronologically | `idx_audit_created` | Audit viewer (always time-ordered) |
-| Find audit entries for entity | `idx_audit_entity` | Drill-down: "who changed this record" |
-| Authenticate user (token hash) | `idx_sessions_token` | Session validation |
-| Find active periods | `idx_fp_status` | Period management |
-| Budget vs. actual queries | `idx_budgets_year`, `idx_gl_account_date` | Report generation |
+| Query Pattern                      | Index Used                                | Reason                                |
+| ---------------------------------- | ----------------------------------------- | ------------------------------------- |
+| List journal entries by date range | `idx_journal_entries_posting_date`        | Date-range queries for reporting      |
+| Get journal entry by number        | `idx_journal_entries_number` (UNIQUE)     | Lookup by sequential ID               |
+| Get GL by account + date range     | `idx_gl_account_date`                     | Account history queries               |
+| Get GL by fund + date range        | `idx_gl_fund_date`                        | Fund balance queries                  |
+| List audit log chronologically     | `idx_audit_created`                       | Audit viewer (always time-ordered)    |
+| Find audit entries for entity      | `idx_audit_entity`                        | Drill-down: "who changed this record" |
+| Authenticate user (token hash)     | `idx_sessions_token`                      | Session validation                    |
+| Find active periods                | `idx_fp_status`                           | Period management                     |
+| Budget vs. actual queries          | `idx_budgets_year`, `idx_gl_account_date` | Report generation                     |
 
 ### 12.2 Partitioning Strategy
 
@@ -1065,10 +1067,12 @@ CREATE POLICY members_viewer_read ON members
 ### 14.1 From v1 (localStorage) to v2 (PostgreSQL)
 
 **Step 1: Extract v1 data**
+
 - User exports JSON from the v1 application
 - Export contains all localStorage data in a structured format
 
 **Step 2: Transform**
+
 - Map `Income`, `Expense`, `Offering` records to `journal_entries` + `journal_entry_lines`
 - Each v1 record becomes a balanced journal entry:
   - **Offering:** Debit `1-1001 Cash` / Credit `4-4001 Tithes`
@@ -1079,11 +1083,13 @@ CREATE POLICY members_viewer_read ON members
 - Convert users: hash existing PINs with bcrypt
 
 **Step 3: Validate**
+
 - Calculate total debits = total credits across all migrated entries
 - Reconcile fund balances against v1 computed balances
 - Verify audit trail completeness
 
 **Step 4: Import**
+
 - Run migration script against a staging database
 - Run reconciliation verification queries
 - Get church treasurer approval before production migration
@@ -1107,19 +1113,19 @@ Migrations are versioned files stored in `src/server/infrastructure/migrations/`
 
 ## 15. Data Retention Policy
 
-| Data Type | Retention | Justification |
-|-----------|-----------|---------------|
-| Journal entries | Permanent | Core financial records — never deleted |
-| General ledger | Permanent | Core financial records |
-| Audit log | 7 years (minimum) | Thai Revenue Code + TFRS requirement |
-| User sessions | 90 days after expiry | Security forensics |
-| Attachments | 7 years | Tax receipt documentation |
-| Soft-deleted records | 30 days from deletion | Recovery window |
-| Backups | See ARCHITECTURE_V2.md §7.3 | Operational resilience |
-| Archived fiscal years | 7 years after close | Tax audit requirements; can be moved to cold storage after 2 years |
+| Data Type             | Retention                   | Justification                                                      |
+| --------------------- | --------------------------- | ------------------------------------------------------------------ |
+| Journal entries       | Permanent                   | Core financial records — never deleted                             |
+| General ledger        | Permanent                   | Core financial records                                             |
+| Audit log             | 7 years (minimum)           | Thai Revenue Code + TFRS requirement                               |
+| User sessions         | 90 days after expiry        | Security forensics                                                 |
+| Attachments           | 7 years                     | Tax receipt documentation                                          |
+| Soft-deleted records  | 30 days from deletion       | Recovery window                                                    |
+| Backups               | See ARCHITECTURE_V2.md §7.3 | Operational resilience                                             |
+| Archived fiscal years | 7 years after close         | Tax audit requirements; can be moved to cold storage after 2 years |
 
 ---
 
-*This database schema is the authoritative data model for Grace Ledger v2. All data access must go through the repository layer defined in ARCHITECTURE_V2.md. Direct table access (except via database administration tools) is prohibited.*
+_This database schema is the authoritative data model for Grace Ledger v2. All data access must go through the repository layer defined in ARCHITECTURE_V2.md. Direct table access (except via database administration tools) is prohibited._
 
-*Next: See ACCOUNTING_ENGINE.md for the double-entry accounting engine design.*
+_Next: See ACCOUNTING_ENGINE.md for the double-entry accounting engine design._

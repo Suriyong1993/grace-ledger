@@ -41,10 +41,9 @@ export class AuthService {
       throw new AuthError("Invalid credentials", "INVALID_CREDENTIALS");
     }
 
-    // Check lockout
+    // Check lockout — use a generic error message to avoid revealing existence
     if (user.lockedUntil && user.lockedUntil > new Date()) {
-      const remaining = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
-      throw new AuthError(`Account locked for ${remaining} more minutes`, "ACCOUNT_LOCKED");
+      throw new AuthError("Invalid credentials", "INVALID_CREDENTIALS");
     }
 
     // Verify password

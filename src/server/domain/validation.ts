@@ -338,6 +338,53 @@ export type CreateMemberInput = z.infer<typeof createMemberSchema>;
 export type UpdateMemberInput = z.infer<typeof updateMemberSchema>;
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type CreateAccountInput = z.infer<typeof createAccountSchema>;
+
+// ============================================================================
+// Income/Expense schemas
+// ============================================================================
+
+export const createIncomeSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
+  categoryId: z.string().uuid(),
+  amount: z.number().positive("Amount must be positive"),
+  fundId: z.string().uuid(),
+  description: z.string().max(1000).optional().default(""),
+  attachmentName: z.string().max(255).optional(),
+  attachmentDataUrl: z.string().optional(),
+  attachmentStoragePath: z.string().optional().nullable(),
+  attachmentType: z.string().max(100).optional(),
+  attachmentSize: z.number().int().positive().optional(),
+  status: z.enum(["pending", "approved", "rejected"]).optional().default("pending"),
+});
+
+export const createExpenseSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD"),
+  categoryId: z.string().uuid(),
+  amount: z.number().positive("Amount must be positive"),
+  fundId: z.string().uuid(),
+  vendor: z.string().max(255).optional().default(""),
+  description: z.string().max(1000).optional().default(""),
+  attachmentName: z.string().max(255).optional(),
+  attachmentDataUrl: z.string().optional(),
+  attachmentStoragePath: z.string().optional().nullable(),
+  attachmentType: z.string().max(100).optional(),
+  attachmentSize: z.number().int().positive().optional(),
+  status: z.enum(["pending", "approved", "rejected"]).optional().default("pending"),
+});
+
+export const createBudgetFromRouteSchema = z.object({
+  name: z.string().min(1).max(255),
+  categoryId: z.string().uuid(),
+  fundId: z.string().uuid(),
+  period: z.string().optional(),
+  fiscalYear: z.number().int().min(2020).max(2100),
+  budgetAmount: z.number().positive("Budget amount must be positive"),
+  notes: z.string().max(2000).optional(),
+});
+
+export type CreateIncomeInput = z.infer<typeof createIncomeSchema>;
+export type CreateExpenseInput = z.infer<typeof createExpenseSchema>;
+export type CreateBudgetFromRouteInput = z.infer<typeof createBudgetFromRouteSchema>;
 export type JournalQueryInput = z.infer<typeof journalQuerySchema>;
 export type AuditQueryInput = z.infer<typeof auditQuerySchema>;
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;

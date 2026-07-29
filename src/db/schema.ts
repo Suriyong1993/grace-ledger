@@ -70,10 +70,7 @@ export const entryStatusEnum = pgEnum("entry_status", [
 
 export const lineTypeEnum = pgEnum("line_type", ["debit", "credit"]);
 
-export const userRoleEnum = pgEnum("user_role", [
-  "super_admin",
-  "admin",
-]);
+export const userRoleEnum = pgEnum("user_role", ["super_admin", "admin"]);
 
 export const periodStatusEnum = pgEnum("period_status", ["open", "closed", "reconciled"]);
 
@@ -246,6 +243,7 @@ export const funds = pgTable(
     currentBalance: decimal("current_balance", { precision: 18, scale: 2 })
       .notNull()
       .default("0.00"),
+    sortOrder: integer("sort_order").notNull().default(0),
     lastCalculatedAt: timestamp("last_calculated_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

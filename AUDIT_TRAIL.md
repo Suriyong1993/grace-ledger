@@ -24,14 +24,14 @@
 
 ### 1.1 Core Principles
 
-| Principle | Implementation |
-|-----------|---------------|
-| **Append-only** | No UPDATE or DELETE on `audit_log` table (enforced by DB permissions) |
-| **Immutable** | Cryptographic hash chain links every entry to its predecessor |
-| **Complete** | Every state mutation is captured with full before/after snapshots |
-| **Tamper-evident** | Any modification to audit entries breaks the hash chain |
-| **Verifiable** | External auditor can independently verify hash chain integrity |
-| **Retained** | Minimum 7 years per Thai Revenue Code requirements |
+| Principle          | Implementation                                                        |
+| ------------------ | --------------------------------------------------------------------- |
+| **Append-only**    | No UPDATE or DELETE on `audit_log` table (enforced by DB permissions) |
+| **Immutable**      | Cryptographic hash chain links every entry to its predecessor         |
+| **Complete**       | Every state mutation is captured with full before/after snapshots     |
+| **Tamper-evident** | Any modification to audit entries breaks the hash chain               |
+| **Verifiable**     | External auditor can independently verify hash chain integrity        |
+| **Retained**       | Minimum 7 years per Thai Revenue Code requirements                    |
 
 ### 1.2 Audit Log Table
 
@@ -92,24 +92,24 @@ Domain Mutation Request
 
 ### 2.1 Complete Audit Coverage
 
-| Entity | Audited Actions | Before State? | After State? |
-|--------|----------------|---------------|-------------|
-| Journal Entry | create, submit, approve, reject, void, soft_delete | Yes | Yes |
-| Journal Entry Line | (audited as part of parent journal entry) | Yes | Yes |
-| General Ledger Entry | (audited as part of journal entry posting) | N/A | N/A |
-| Fund | create, update_balance, deactivate | Yes | Yes |
-| Offering Count Sheet | create, counter_submit, reconcile, lock | Yes | Yes |
-| Budget | create, update, approve, reject | Yes | Yes |
-| Member | create, update, deactivate | Yes | Yes |
-| Member Consent | grant, revoke | Yes | Yes |
-| User | create, update_role, deactivate, password_change | Yes (excl. hash) | Yes (excl. hash) |
-| Period | close, reopen | Yes | Yes |
-| Reconciliation | create | N/A | Yes |
-| Settings | update | Yes | Yes |
-| Chart of Accounts | create, update, deactivate | Yes | Yes |
-| Attachment | upload, delete | No | Yes |
-| Login/Logout | login_success, login_failed, logout | N/A | N/A |
-| Session | create, expire, revoke | N/A | N/A |
+| Entity               | Audited Actions                                    | Before State?    | After State?     |
+| -------------------- | -------------------------------------------------- | ---------------- | ---------------- |
+| Journal Entry        | create, submit, approve, reject, void, soft_delete | Yes              | Yes              |
+| Journal Entry Line   | (audited as part of parent journal entry)          | Yes              | Yes              |
+| General Ledger Entry | (audited as part of journal entry posting)         | N/A              | N/A              |
+| Fund                 | create, update_balance, deactivate                 | Yes              | Yes              |
+| Offering Count Sheet | create, counter_submit, reconcile, lock            | Yes              | Yes              |
+| Budget               | create, update, approve, reject                    | Yes              | Yes              |
+| Member               | create, update, deactivate                         | Yes              | Yes              |
+| Member Consent       | grant, revoke                                      | Yes              | Yes              |
+| User                 | create, update_role, deactivate, password_change   | Yes (excl. hash) | Yes (excl. hash) |
+| Period               | close, reopen                                      | Yes              | Yes              |
+| Reconciliation       | create                                             | N/A              | Yes              |
+| Settings             | update                                             | Yes              | Yes              |
+| Chart of Accounts    | create, update, deactivate                         | Yes              | Yes              |
+| Attachment           | upload, delete                                     | No               | Yes              |
+| Login/Logout         | login_success, login_failed, logout                | N/A              | N/A              |
+| Session              | create, expire, revoke                             | N/A              | N/A              |
 
 ### 2.2 What is NOT Audited
 
@@ -197,29 +197,32 @@ export class AuditInterceptor {
    * Sanitizes state before storing — removes sensitive fields.
    */
   private sanitizeState(state: unknown): Record<string, unknown> | null {
-    if (!state || typeof state !== 'object') return null;
+    if (!state || typeof state !== "object") return null;
 
-    const sanitized = { ...state as Record<string, unknown> };
+    const sanitized = { ...(state as Record<string, unknown>) };
 
     // NEVER store in audit log:
     const REDACT_FIELDS = [
-      'password_hash',
-      'mfa_secret',
-      'pin',
-      'attachmentDataUrl',   // base64 content — too large
-      'attachment_data_url',
+      "password_hash",
+      "mfa_secret",
+      "pin",
+      "attachmentDataUrl", // base64 content — too large
+      "attachment_data_url",
     ];
 
     for (const field of REDACT_FIELDS) {
       if (field in sanitized) {
-        sanitized[field] = '[REDACTED]';
+        sanitized[field] = "[REDACTED]";
       }
     }
 
     // Truncate large fields to prevent bloating
     const MAX_FIELD_LENGTH = 10000;
     for (const key of Object.keys(sanitized)) {
-      if (typeof sanitized[key] === 'string' && (sanitized[key] as string).length > MAX_FIELD_LENGTH) {
+      if (
+        typeof sanitized[key] === "string" &&
+        (sanitized[key] as string).length > MAX_FIELD_LENGTH
+      ) {
         sanitized[key] = `[TRUNCATED: ${(sanitized[key] as string).length} chars]`;
       }
     }
@@ -309,7 +312,7 @@ async approve(entryId: string, approverId: string): Promise<JournalEntry> {
 
 ```typescript
 // src/server/services/audit-hash.service.ts
-import { createHash } from 'crypto';
+import { createHash } from "crypto";
 
 export class AuditHashService {
   /**
@@ -320,13 +323,9 @@ export class AuditHashService {
    * The "||" denotes concatenation.
    */
   computeHash(previousHash: string | null, serializedEntry: string): string {
-    const input = previousHash
-      ? previousHash + serializedEntry
-      : serializedEntry;
+    const input = previousHash ? previousHash + serializedEntry : serializedEntry;
 
-    return createHash('sha256')
-      .update(input, 'utf8')
-      .digest('hex');
+    return createHash("sha256").update(input, "utf8").digest("hex");
   }
 
   /**
@@ -398,19 +397,19 @@ export class AuditHashService {
 // GET /api/v1/audit/verify-integrity
 // Accessible only by auditor and super_admin roles
 export const verifyAuditIntegrity = createServerFn(
-  'GET',
-  '/api/v1/audit/verify-integrity',
+  "GET",
+  "/api/v1/audit/verify-integrity",
   async () => {
     const session = await validateSession();
-    await authorize(session.userId, 'audit.read');
+    await authorize(session.userId, "audit.read");
 
     const report = await auditHashService.verifyAuditTrailIntegrity();
 
     // Log the verification attempt itself
     await auditRepo.insert({
-      eventType: 'audit_integrity_verification',
-      entityType: 'audit_log',
-      action: 'verify',
+      eventType: "audit_integrity_verification",
+      entityType: "audit_log",
+      action: "verify",
       userId: session.userId,
       userName: session.userName,
       userRole: session.userRole,
@@ -418,7 +417,11 @@ export const verifyAuditIntegrity = createServerFn(
       afterState: JSON.stringify(report),
       currentHash: auditHashService.computeHash(
         null,
-        JSON.stringify({ report, verifiedBy: session.userId, verifiedAt: new Date().toISOString() }),
+        JSON.stringify({
+          report,
+          verifiedBy: session.userId,
+          verifiedAt: new Date().toISOString(),
+        }),
       ),
     });
 
@@ -434,6 +437,7 @@ export const verifyAuditIntegrity = createServerFn(
 ### 5.1 Request Tracing
 
 Every API request is assigned a unique `correlation_id` (UUID v7). This ID is:
+
 - Generated at the API gateway layer
 - Passed through all service calls, repository calls, and audit entries
 - Returned in the response headers (`x-correlation-id`)
@@ -443,7 +447,7 @@ Every API request is assigned a unique `correlation_id` (UUID v7). This ID is:
 // Correlation ID middleware
 export function createCorrelationId(req: Request): string {
   // Prefer incoming header (for distributed tracing)
-  const incoming = req.headers.get('x-correlation-id');
+  const incoming = req.headers.get("x-correlation-id");
   if (incoming && isValidUUID(incoming)) return incoming;
 
   return generateUUIDv7(); // Time-ordered UUID
@@ -481,23 +485,24 @@ ORDER BY created_at;
 
 Every audit entry includes:
 
-| Field | Source | Purpose |
-|-------|--------|---------|
-| `user_id` | JWT session | Who performed the action |
-| `user_name` | Database | Human-readable identity |
-| `user_role` | JWT session | What permissions they had |
-| `ip_address` | Request headers | Network origin |
-| `user_agent` | Request headers | Client device/browser |
-| `correlation_id` | Request context | Request tracing |
-| `created_at` | Server clock | When (server's authoritative time) |
+| Field            | Source          | Purpose                            |
+| ---------------- | --------------- | ---------------------------------- |
+| `user_id`        | JWT session     | Who performed the action           |
+| `user_name`      | Database        | Human-readable identity            |
+| `user_role`      | JWT session     | What permissions they had          |
+| `ip_address`     | Request headers | Network origin                     |
+| `user_agent`     | Request headers | Client device/browser              |
+| `correlation_id` | Request context | Request tracing                    |
+| `created_at`     | Server clock    | When (server's authoritative time) |
 
 ### 6.2 Device Fingerprint (Future Enhancement)
 
 For M6+, add a `device_fingerprint` field:
+
 ```typescript
-const fingerprint = createHash('sha256')
+const fingerprint = createHash("sha256")
   .update(`${ip_address}:${user_agent}:${session_id}`)
-  .digest('hex');
+  .digest("hex");
 ```
 
 ---
@@ -519,18 +524,18 @@ The audit page (`_app.audit.tsx`) provides:
 ```typescript
 export interface AuditExportRow {
   id: string;
-  timestamp: string;           // ISO 8601
+  timestamp: string; // ISO 8601
   eventType: string;
   entityType: string;
   entityId: string;
-  user: string;                // "name (role)"
+  user: string; // "name (role)"
   action: string;
-  changeDescription: string;   // Human-readable from change_summary
-  beforeState: string;         // Pretty-printed JSON
+  changeDescription: string; // Human-readable from change_summary
+  beforeState: string; // Pretty-printed JSON
   afterState: string;
   ipAddress: string;
   correlationId: string;
-  hashVerified: boolean;       // Was this entry's hash verified at export time?
+  hashVerified: boolean; // Was this entry's hash verified at export time?
 }
 ```
 
@@ -562,7 +567,7 @@ export class SIEMForwarder {
 
     const payload = {
       timestamp: auditEntry.createdAt.toISOString(),
-      source: 'grace-ledger',
+      source: "grace-ledger",
       host: process.env.APP_URL,
       event: {
         type: auditEntry.eventType,
@@ -584,10 +589,10 @@ export class SIEMForwarder {
     };
 
     await fetch(this.SIEM_ENDPOINT, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.SIEM_TOKEN}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.SIEM_TOKEN}`,
       },
       body: JSON.stringify(payload),
     });
@@ -598,6 +603,7 @@ export class SIEMForwarder {
 ### 8.3 Why Forward to SIEM?
 
 The external SIEM provides:
+
 - **Independent copy:** Even if the PostgreSQL database is compromised, SIEM has a copy
 - **Tamper comparison:** SIEM hash chain can be compared against source database
 - **Alerting:** SIEM can alert on suspicious patterns (e.g., audit log deletions at DB level)
@@ -609,11 +615,11 @@ The external SIEM provides:
 
 ### 9.1 Retention Policy
 
-| Period | Action |
-|--------|--------|
+| Period      | Action                                                          |
+| ----------- | --------------------------------------------------------------- |
 | 0 – 7 years | Audit log remains in operational database (active query access) |
-| 7+ years | Audit log archived to cold storage (S3 Glacier) |
-| Permanent | For journal entries — never deleted (linked records must exist) |
+| 7+ years    | Audit log archived to cold storage (S3 Glacier)                 |
+| Permanent   | For journal entries — never deleted (linked records must exist) |
 
 ### 9.2 Archival Process
 
@@ -657,12 +663,14 @@ async archiveOldAuditLogs(beforeYear: number): Promise<void> {
 External auditors can verify the audit trail independently:
 
 **Option 1: API Endpoint**
+
 ```
 GET /api/v1/audit/verify-integrity
 → { isIntegrityIntact: true, totalEntries: 15432, ... }
 ```
 
 **Option 2: Audit Export with Hash Verification**
+
 ```
 GET /api/v1/audit/export?from=2026-01-01&to=2026-12-31
 → JSONL file with hash chain metadata
@@ -670,6 +678,7 @@ GET /api/v1/audit/export?from=2026-01-01&to=2026-12-31
 ```
 
 **Option 3: Independent Verifier Script**
+
 ```bash
 #!/bin/bash
 # verify-audit-chain.sh
@@ -728,14 +737,14 @@ fi
 
 ### 10.2 What Auditors Can Verify
 
-| Verification | Method |
-|-------------|--------|
-| No entries have been inserted retroactively | Hash chain integrity check |
-| No entries have been modified | Hash chain integrity check |
-| No entries have been deleted | Sequential completeness check (gap detection) |
-| A specific transaction's audit trail | Drill-down by entity_id |
-| A user's complete activity history | Filter by user_id |
-| Financial state at any point in time | Replay audit log from beginning + verify against trial balance |
+| Verification                                | Method                                                         |
+| ------------------------------------------- | -------------------------------------------------------------- |
+| No entries have been inserted retroactively | Hash chain integrity check                                     |
+| No entries have been modified               | Hash chain integrity check                                     |
+| No entries have been deleted                | Sequential completeness check (gap detection)                  |
+| A specific transaction's audit trail        | Drill-down by entity_id                                        |
+| A user's complete activity history          | Filter by user_id                                              |
+| Financial state at any point in time        | Replay audit log from beginning + verify against trial balance |
 
 ---
 
@@ -743,49 +752,49 @@ fi
 
 ### A.1 Journal Entry Events
 
-| Event Type | Action | Before | After |
-|-----------|--------|--------|-------|
-| `journal_entry_created` | create | null | Full entry |
-| `journal_entry_submitted` | submit | draft entry | pending entry |
-| `journal_entry_approved` | approve | pending entry | approved entry |
-| `journal_entry_rejected` | reject | pending entry | rejected entry |
-| `journal_entry_voided` | void | approved entry | voided entry + void entry |
-| `journal_entry_deleted` | soft_delete | entry | entry (marked deleted) |
+| Event Type                | Action      | Before         | After                     |
+| ------------------------- | ----------- | -------------- | ------------------------- |
+| `journal_entry_created`   | create      | null           | Full entry                |
+| `journal_entry_submitted` | submit      | draft entry    | pending entry             |
+| `journal_entry_approved`  | approve     | pending entry  | approved entry            |
+| `journal_entry_rejected`  | reject      | pending entry  | rejected entry            |
+| `journal_entry_voided`    | void        | approved entry | voided entry + void entry |
+| `journal_entry_deleted`   | soft_delete | entry          | entry (marked deleted)    |
 
 ### A.2 Fund Events
 
-| Event Type | Action | Before | After |
-|-----------|--------|--------|-------|
-| `fund_created` | create | null | fund |
-| `fund_balance_updated` | update | old balance | new balance |
-| `fund_deactivated` | deactivate | active fund | inactive fund |
+| Event Type             | Action     | Before      | After         |
+| ---------------------- | ---------- | ----------- | ------------- |
+| `fund_created`         | create     | null        | fund          |
+| `fund_balance_updated` | update     | old balance | new balance   |
+| `fund_deactivated`     | deactivate | active fund | inactive fund |
 
 ### A.3 Period Events
 
-| Event Type | Action | Before | After |
-|-----------|--------|--------|-------|
-| `period_closed` | close | open period | closed period + fund snapshots |
-| `period_reopened` | reopen | closed period | open period |
+| Event Type        | Action | Before        | After                          |
+| ----------------- | ------ | ------------- | ------------------------------ |
+| `period_closed`   | close  | open period   | closed period + fund snapshots |
+| `period_reopened` | reopen | closed period | open period                    |
 
 ### A.4 Authentication Events
 
-| Event Type | Action | Before | After |
-|-----------|--------|--------|-------|
-| `login_success` | login | null | session created |
-| `login_failed` | login_failed | null | failed_attempts count |
-| `logout` | logout | session | session deleted |
-| `account_locked` | lock | unlocked user | locked user |
-| `password_changed` | password_change | old hash (redacted) | new hash (redacted) |
-| `mfa_enrolled` | mfa_enable | mfa_disabled | mfa_enabled |
+| Event Type         | Action          | Before              | After                 |
+| ------------------ | --------------- | ------------------- | --------------------- |
+| `login_success`    | login           | null                | session created       |
+| `login_failed`     | login_failed    | null                | failed_attempts count |
+| `logout`           | logout          | session             | session deleted       |
+| `account_locked`   | lock            | unlocked user       | locked user           |
+| `password_changed` | password_change | old hash (redacted) | new hash (redacted)   |
+| `mfa_enrolled`     | mfa_enable      | mfa_disabled        | mfa_enabled           |
 
 ### A.5 System Events
 
-| Event Type | Action | Before | After |
-|-----------|--------|--------|-------|
-| `settings_updated` | update | old settings | new settings |
-| `audit_integrity_verified` | verify | null | verification report |
-| `audit_archived` | archive | null | archive metadata |
+| Event Type                 | Action  | Before       | After               |
+| -------------------------- | ------- | ------------ | ------------------- |
+| `settings_updated`         | update  | old settings | new settings        |
+| `audit_integrity_verified` | verify  | null         | verification report |
+| `audit_archived`           | archive | null         | archive metadata    |
 
 ---
 
-*The audit trail is the central pillar of Grace Ledger v2's trustworthiness. It is immutable, cryptographically verifiable, and sufficient for external financial audits. Without a trustworthy audit trail, a financial system is nothing.*
+_The audit trail is the central pillar of Grace Ledger v2's trustworthiness. It is immutable, cryptographically verifiable, and sufficient for external financial audits. Without a trustworthy audit trail, a financial system is nothing._

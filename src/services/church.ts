@@ -7,7 +7,22 @@
 // 4. Church_id is implicitly enforced by Supabase RLS policies
 
 import { supabase } from "./supabaseClient";
+import { deleteAttachment } from "./storage";
 import { now } from "@/lib/format";
+import {
+  apiCreateIncome,
+  apiDeleteIncome,
+  apiApproveIncome,
+  apiRejectIncome,
+  apiCreateExpense,
+  apiDeleteExpense,
+  apiApproveExpense,
+  apiRejectExpense,
+  apiCreateOfferingFinancial,
+  apiDeleteOfferingFinancial,
+  apiCreateFund,
+  apiCreateTransfer,
+} from "./api";
 import type {
   Budget,
   Category,
@@ -132,44 +147,40 @@ export async function listFundsByChurch(churchId: string): Promise<Fund[]> {
   return (data || []) as Fund[];
 }
 
-export async function transferFund(fromId: string, toId: string, amount: number, by: User) {
-  const churchId = await getChurchId();
-  await logAudit(
-    by.id,
-    by.name,
-    "transfer",
-    "fund",
-    undefined,
-    `โอนเงิน ${amount} ระหว่างกองทุน ${fromId} -> ${toId}`,
-  );
-  return { success: true };
+/**
+ * Create a fund transfer through the server API.
+ * The server handles journal entries, balance updates, and audit logging.
+ */
+export async function transferFund(fromId: string, toId: string, amount: number, _by: User) {
+  const result = await apiCreateTransfer({
+    fromFundId: fromId,
+    toFundId: toId,
+    amount: amount,
+    description: `Transfer ${amount} from fund ${fromId} to ${toId}`,
+    postingDate: new Date().toISOString().split("T")[0],
+    fiscalYear: new Date().getFullYear(),
+    fiscalPeriod: new Date().getMonth() + 1,
+  });
+  return result;
 }
 
+/**
+ * Create a fund through the server API.
+ * The server handles audit logging and category setup.
+ */
 export async function createFund(
   input: Omit<Fund, "id" | "createdAt" | "currentBalance">,
-  by: User,
+  _by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("funds")
-    .insert({
-      church_id: churchId,
-      account_id: input.accountId,
-      fund_code: input.fundCode,
-      name: input.name,
-      description: input.description,
-      is_restricted: input.isRestricted,
-      opening_balance: input.openingBalance,
-      current_balance: input.openingBalance,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  await logAudit(by.id, by.name, "create", "fund", data.id, input.name);
-  return data as Fund;
+  const result = await apiCreateFund({
+    fundCode: input.fundCode,
+    name: input.name,
+    accountId: input.accountId,
+    description: input.description,
+    isRestricted: input.isRestricted,
+    openingBalance: input.openingBalance,
+  });
+  return result as Fund;
 }
 
 // ── Income ────────────────────────────────────────────────────────
@@ -190,73 +201,19 @@ export async function listIncome(): Promise<Income[]> {
 
 export async function createIncome(
   input: Omit<Income, "id" | "createdBy" | "status" | "createdAt"> & { status?: TxStatus },
-  by: User,
+  _by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("incomes")
-    .insert({
-      church_id: churchId,
-      date: input.date,
-      category_id: input.categoryId,
-      amount: input.amount,
-      fund_id: input.fundId,
-      description: input.description ?? "",
-      attachment_name: input.attachmentName,
-      attachment_data_url: input.attachmentDataUrl,
-      attachment_type: input.attachmentType,
-      attachment_size: input.attachmentSize,
-      created_by: by.id,
-      status: input.status ?? "pending",
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-
-  await logAudit(by.id, by.name, "create", "income", data.id, `${input.amount} baht`);
-  return data as Income;
+  const result = await apiCreateIncome(input as unknown as Record<string, unknown>);
+  return result as Income;
 }
 
-export async function deleteIncome(id: string, by: User) {
-  const churchId = await getChurchId();
-
-  const { error } = await supabase.from("incomes").delete().eq("id", id).eq("church_id", churchId);
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "delete", "income", id);
+export async function deleteIncome(id: string, _by: User) {
+  await apiDeleteIncome(id);
 }
 
-export async function approveIncome(id: string, by: User) {
-  const churchId = await getChurchId();
-
-  // Self-approval prevention
-  const { data: income } = await supabase
-    .from("incomes")
-    .select("created_by")
-    .eq("id", id)
-    .eq("church_id", churchId)
-    .single();
-
-  if (income?.created_by === by.id) {
-    throw new Error("Cannot approve your own income record");
-  }
-
-  const { data, error } = await supabase
-    .from("incomes")
-    .update({
-      status: "approved",
-      approved_by: by.id,
-    })
-    .eq("id", id)
-    .eq("church_id", churchId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "approve", "income", id);
-  return data;
+export async function approveIncome(id: string, _by: User) {
+  const result = await apiApproveIncome(id);
+  return result;
 }
 
 // ── Expense ───────────────────────────────────────────────────────
@@ -277,75 +234,35 @@ export async function listExpense(): Promise<Expense[]> {
 
 export async function createExpense(
   input: Omit<Expense, "id" | "createdBy" | "status" | "createdAt"> & { status?: TxStatus },
-  by: User,
+  _by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("expenses")
-    .insert({
-      church_id: churchId,
-      date: input.date,
-      category_id: input.categoryId,
-      amount: input.amount,
-      fund_id: input.fundId,
-      vendor: input.vendor ?? "",
-      description: input.description ?? "",
-      attachment_name: input.attachmentName,
-      attachment_data_url: input.attachmentDataUrl,
-      attachment_type: input.attachmentType,
-      attachment_size: input.attachmentSize,
-      created_by: by.id,
-      status: input.status ?? "pending",
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "create", "expense", data.id, `${input.amount} baht`);
-  return data as Expense;
+  const result = await apiCreateExpense(input as unknown as Record<string, unknown>);
+  return result as Expense;
 }
 
-export async function deleteExpense(id: string, by: User) {
-  const churchId = await getChurchId();
-
-  const { error } = await supabase.from("expenses").delete().eq("id", id).eq("church_id", churchId);
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "delete", "expense", id);
+export async function deleteExpense(id: string, _by: User) {
+  await apiDeleteExpense(id);
 }
 
-export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
-  const churchId = await getChurchId();
-
-  // Self-approval prevention
+/**
+ * Set expense status via server API.
+ * Accepts optional rejectReason for rejections.
+ * The server handles self-approval prevention, journal entry creation (on approve),
+ * and audit logging automatically.
+ */
+export async function setExpenseStatus(
+  id: string,
+  status: TxStatus,
+  _by: User,
+  rejectReason?: string,
+) {
   if (status === "approved") {
-    const { data: expense } = await supabase
-      .from("expenses")
-      .select("created_by")
-      .eq("id", id)
-      .eq("church_id", churchId)
-      .single();
-
-    if (expense?.created_by === by.id) {
-      throw new Error("Cannot approve your own expense");
-    }
+    return apiApproveExpense(id);
   }
-
-  const { data, error } = await supabase
-    .from("expenses")
-    .update({
-      status,
-      approved_by: status === "approved" ? by.id : null,
-    })
-    .eq("id", id)
-    .eq("church_id", churchId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, status, "expense", id);
-  return data;
+  if (status === "rejected") {
+    return apiRejectExpense(id, rejectReason ?? "Rejected");
+  }
+  throw new Error(`Unsupported status transition: ${status}`);
 }
 
 // ── Offering ──────────────────────────────────────────────────────
@@ -366,43 +283,14 @@ export async function listOffering(): Promise<Offering[]> {
 
 export async function createOffering(
   input: Omit<Offering, "id" | "createdBy" | "createdAt">,
-  by: User,
+  _by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("offerings")
-    .insert({
-      church_id: churchId,
-      date: input.date,
-      category_id: input.categoryId,
-      subcategory_id: input.subcategoryId ?? null,
-      channel: input.channel,
-      amount: input.amount,
-      member_id: input.memberId ?? null,
-      fund_id: input.fundId,
-      note: input.note ?? "",
-      created_by: by.id,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "create", "offering", data.id, `${input.amount} baht`);
-  return data as Offering;
+  const result = await apiCreateOfferingFinancial(input as unknown as Record<string, unknown>);
+  return result as Offering;
 }
 
-export async function deleteOffering(id: string, by: User) {
-  const churchId = await getChurchId();
-
-  const { error } = await supabase
-    .from("offerings")
-    .delete()
-    .eq("id", id)
-    .eq("church_id", churchId);
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "delete", "offering", id);
+export async function deleteOffering(id: string, _by: User) {
+  await apiDeleteOfferingFinancial(id);
 }
 
 // ── Offering Categories ────────────────────────────────────────────
@@ -821,10 +709,7 @@ export async function getLineUserStatus(): Promise<{ linked: boolean; lineUserId
 
 export async function listLineUsers() {
   const churchId = await getChurchId();
-  const { data, error } = await supabase
-    .from("line_users")
-    .select("*")
-    .eq("church_id", churchId);
+  const { data, error } = await supabase.from("line_users").select("*").eq("church_id", churchId);
   if (error) return [];
   return data || [];
 }

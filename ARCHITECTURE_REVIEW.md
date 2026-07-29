@@ -32,16 +32,16 @@
 
 ## 1. Overall Score
 
-| Category | Score | Max |
-|----------|-------|-----|
-| Production Readiness | 62 | 100 |
-| Implementation Readiness | 71 | 100 |
-| Maintainability | 68 | 100 |
-| Scalability | 55 | 100 |
-| Security | 67 | 100 |
-| Accounting Integrity | 65 | 100 |
-| Operational Readiness | 44 | 100 |
-| **Composite** | **62** | **100** |
+| Category                 | Score  | Max     |
+| ------------------------ | ------ | ------- |
+| Production Readiness     | 62     | 100     |
+| Implementation Readiness | 71     | 100     |
+| Maintainability          | 68     | 100     |
+| Scalability              | 55     | 100     |
+| Security                 | 67     | 100     |
+| Accounting Integrity     | 65     | 100     |
+| Operational Readiness    | 44     | 100     |
+| **Composite**            | **62** | **100** |
 
 **Grade: C+ — NOT READY FOR PRODUCTION DEPLOYMENT**
 
@@ -298,6 +298,7 @@ The `Money` class uses `BigInt` for internal storage (satang), which is correct.
 IMPLEMENTATION_ROADMAP.md M6.3 promises "Implement cash flow statement report" but ACCOUNTING_ENGINE.md §11 only documents Balance Sheet (§11.1) and Income Statement (§11.2). There is **no cash flow statement generation logic** in the accounting engine.
 
 A proper cash flow statement requires:
+
 1. Classifying transactions as operating, investing, or financing
 2. Reconciling net income to cash from operations
 3. Tracking changes in working capital accounts
@@ -311,6 +312,7 @@ None of this is modeled in the chart of accounts or the reporting service.
 **Affected Documents:** ACCOUNTING_ENGINE.md §2.2, §7.4
 
 When a church first sets up the system, they enter opening balances for all accounts. The double-entry for this is:
+
 - Debit: All asset accounts (for their opening balances)
 - Credit: All liability accounts (for their opening balances)
 - Credit: An **Opening Balance Equity** account (for the difference, making A = L + E)
@@ -332,6 +334,7 @@ const passwordHash = await hashPassword(user.pin); // Hash PIN as initial passwo
 ```
 
 A 6-digit PIN has ~20 bits of entropy. While bcrypt/argon2id makes brute-forcing the HASH slow, an attacker who:
+
 1. Knows a user's old PIN (shoulder-surfed, shared among staff, written down)
 2. Can attempt login with that PIN before the user changes their password
 
@@ -344,11 +347,13 @@ The migration script marks `passwordChangedAt: new Date()` to "force password ch
 **Affected Documents:** ACCOUNTING_ENGINE.md, DATABASE_V2.md
 
 The chart of accounts includes:
+
 - `1-1005 อาคาร` (Buildings)
 - `1-1006 อุปกรณ์` (Equipment)
 - `1-1007 ค่าเสื่อมราคาสะสม` (Accumulated Depreciation)
 
 But there is **no depreciation calculation module**. No:
+
 - Asset useful life tracking
 - Depreciation method (straight-line, declining balance)
 - Monthly/annual depreciation journal entry generation
@@ -363,6 +368,7 @@ Without this, accumulated depreciation must be entered manually — error-prone 
 **Affected Documents:** ACCOUNTING_ENGINE.md, ARCHITECTURE_V2.md §9
 
 Report endpoints accept `from` and `to` date parameters. There is no documented validation for:
+
 1. `from` before `to`
 2. Date range within reasonable bounds (not 100 years)
 3. Date range not in the far future
@@ -377,6 +383,7 @@ A malicious or buggy client could request a report from year 1900 to 2100, causi
 **Affected Documents:** TRANSACTION_ENGINE.md §5.2
 
 The `detectGaps` method finds gaps in sequential numbering. The comment says "These represent voided or deleted entries" — but this is misleading. Legitimate gaps occur when:
+
 1. A PostgreSQL sequence allocates a number but the transaction rolls back (sequence values are never returned)
 2. A draft is soft-deleted after being assigned a number (if numbers are assigned at draft creation)
 
@@ -498,20 +505,20 @@ The following architectural decisions are sound and should be preserved:
 
 ## 7. Cross-Document Contradictions
 
-| # | Documents | Contradiction | Severity |
-|---|-----------|--------------|----------|
-| 1 | BUSINESS_RULES.md §3.1 vs AUTHORIZATION_MODEL.md §2.1 | Treasurer approval authority (<฿5,000) | CRITICAL |
-| 2 | ARCHITECTURE_V2.md §8.1 vs SECURITY_MODEL.md §2.2 | bcrypt vs argon2id for password hashing | Minor |
-| 3 | ARCHITECTURE_V2.md §8.2 vs DATABASE_V2.md §13.2 | RLS policies: "service role bypasses RLS" vs RLS as "defense-in-depth" | Major |
-| 4 | ARCHITECTURE_V2.md §1.5 vs ACCOUNTING_ENGINE.md §5.1 | Single source of truth: GL vs funds.current_balance | Major |
-| 5 | ARCHITECTURE_V2.md §11.1 vs DATABASE_V2.md | Materialized views referenced but never defined | Major |
-| 6 | ARCHITECTURE_V2.md §11.1 vs §9.1 | Cursor-based pagination vs page-based response format | Minor |
-| 7 | TRANSACTION_ENGINE.md §2.1 vs BUSINESS_RULES.md §2.1 | TRANSACTION_ENGINE has `deleted` state in state machine; BUSINESS_RULES has "soft deleted" as separate concept | Minor |
-| 8 | IMPLEMENTATION_ROADMAP.md M1.4 vs SECURITY_MODEL.md §2.2 | "bcrypt/argon2" vs "argon2id" | Minor |
-| 9 | SECURITY_MODEL.md §8.1 vs DATABASE_V2.md §9.1 | Password hash stored in users table vs Supabase Vault | Major |
-| 10 | BUSINESS_RULES.md §5.1 OFF-003 vs ARCHITECTURE_V2 | "Counters cannot view each other's inputs" — not reflected in table schema (all amounts in one row) | Major |
-| 11 | DATABASE_V2.md §3.2 vs TRANSACTION_ENGINE.md §5.1 | Entry number format: VARCHAR(30) allows any format; code generates TYPE-YEAR-SEQ | Minor |
-| 12 | SECURITY_MODEL.md §6.1 vs MIGRATION_PLAN.md §3 | Rate limiting at API level vs per-user/global; different threshold values | Minor |
+| #   | Documents                                                | Contradiction                                                                                                  | Severity |
+| --- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- |
+| 1   | BUSINESS_RULES.md §3.1 vs AUTHORIZATION_MODEL.md §2.1    | Treasurer approval authority (<฿5,000)                                                                         | CRITICAL |
+| 2   | ARCHITECTURE_V2.md §8.1 vs SECURITY_MODEL.md §2.2        | bcrypt vs argon2id for password hashing                                                                        | Minor    |
+| 3   | ARCHITECTURE_V2.md §8.2 vs DATABASE_V2.md §13.2          | RLS policies: "service role bypasses RLS" vs RLS as "defense-in-depth"                                         | Major    |
+| 4   | ARCHITECTURE_V2.md §1.5 vs ACCOUNTING_ENGINE.md §5.1     | Single source of truth: GL vs funds.current_balance                                                            | Major    |
+| 5   | ARCHITECTURE_V2.md §11.1 vs DATABASE_V2.md               | Materialized views referenced but never defined                                                                | Major    |
+| 6   | ARCHITECTURE_V2.md §11.1 vs §9.1                         | Cursor-based pagination vs page-based response format                                                          | Minor    |
+| 7   | TRANSACTION_ENGINE.md §2.1 vs BUSINESS_RULES.md §2.1     | TRANSACTION_ENGINE has `deleted` state in state machine; BUSINESS_RULES has "soft deleted" as separate concept | Minor    |
+| 8   | IMPLEMENTATION_ROADMAP.md M1.4 vs SECURITY_MODEL.md §2.2 | "bcrypt/argon2" vs "argon2id"                                                                                  | Minor    |
+| 9   | SECURITY_MODEL.md §8.1 vs DATABASE_V2.md §9.1            | Password hash stored in users table vs Supabase Vault                                                          | Major    |
+| 10  | BUSINESS_RULES.md §5.1 OFF-003 vs ARCHITECTURE_V2        | "Counters cannot view each other's inputs" — not reflected in table schema (all amounts in one row)            | Major    |
+| 11  | DATABASE_V2.md §3.2 vs TRANSACTION_ENGINE.md §5.1        | Entry number format: VARCHAR(30) allows any format; code generates TYPE-YEAR-SEQ                               | Minor    |
+| 12  | SECURITY_MODEL.md §6.1 vs MIGRATION_PLAN.md §3           | Rate limiting at API level vs per-user/global; different threshold values                                      | Minor    |
 
 **Most concerning**: The approval authority contradiction (CF-1) and the dual approval race condition (CF-2) would directly manifest as bugs in production if implemented as documented.
 
@@ -521,17 +528,17 @@ The following architectural decisions are sound and should be preserved:
 
 ### 8.1 Normalization Assessment
 
-| Table | Normal Form | Issues |
-|-------|-------------|--------|
-| `chart_of_accounts` | 3NF | Clean |
-| `journal_entries` | 2NF | `total_debit`/`total_credit` are derivable from journal_entry_lines (denormalized for CHECK constraint) |
-| `journal_entry_lines` | 3NF | Clean |
-| `general_ledger` | 2NF | `running_balance` is derivable from prior entries (denormalized intentionally for performance) |
-| `funds` | 2NF | `current_balance` duplicates general_ledger data |
-| `offering_count_sheets` | 1NF | Counter amounts in columns (counter_1_amount, counter_2_amount) rather than rows — limits to exactly 3 counters |
-| `budgets` | 3NF | Clean |
-| `audit_log` | 3NF | Clean; JSONB for state snapshots is appropriate |
-| `user_sessions` | 3NF | Clean |
+| Table                   | Normal Form | Issues                                                                                                          |
+| ----------------------- | ----------- | --------------------------------------------------------------------------------------------------------------- |
+| `chart_of_accounts`     | 3NF         | Clean                                                                                                           |
+| `journal_entries`       | 2NF         | `total_debit`/`total_credit` are derivable from journal_entry_lines (denormalized for CHECK constraint)         |
+| `journal_entry_lines`   | 3NF         | Clean                                                                                                           |
+| `general_ledger`        | 2NF         | `running_balance` is derivable from prior entries (denormalized intentionally for performance)                  |
+| `funds`                 | 2NF         | `current_balance` duplicates general_ledger data                                                                |
+| `offering_count_sheets` | 1NF         | Counter amounts in columns (counter_1_amount, counter_2_amount) rather than rows — limits to exactly 3 counters |
+| `budgets`               | 3NF         | Clean                                                                                                           |
+| `audit_log`             | 3NF         | Clean; JSONB for state snapshots is appropriate                                                                 |
+| `user_sessions`         | 3NF         | Clean                                                                                                           |
 
 **Assessment**: Intentionally denormalized for financial integrity (CHECK constraints on journal entries) and performance (running balances). The `offering_count_sheets` design is the most concerning — it hardcodes 3 counters rather than using a normalized `count_sheet_counters` table with one row per counter. This limits flexibility and makes querying counter history awkward.
 
@@ -555,12 +562,14 @@ The following architectural decisions are sound and should be preserved:
 ### 8.3 Constraint Review
 
 **Strong constraints:**
+
 - `chk_balanced` on journal_entries: CHECK(total_debit = total_credit) — excellent
 - `chk_positive_totals` on journal_entries: CHECK(total_debit > 0) — prevents zero-amount entries
 - `chk_counters_different_*` on offering_count_sheets — prevents same-user counter fraud
 - `chk_budget_period` on budgets — enforces period type rules at DB level
 
 **Missing constraints:**
+
 1. No CHECK constraint preventing `approved_by = created_by` on journal_entries (only enforced in application code)
 2. No CHECK constraint ensuring `rejection_reason IS NOT NULL` when `status = 'rejected'`
 3. No CHECK constraint requiring `posted_at IS NOT NULL` when `status = 'approved'`
@@ -589,16 +598,16 @@ The proposal to partition `general_ledger` by `fiscal_year` is sound, but:
 
 At 10 million transactions (~10,000 entries/month for 100 churches over 8 years):
 
-| Query | Current Index Support | Performance |
-|-------|----------------------|-------------|
-| Trial balance at date | `idx_gl_account_date` + `idx_gl_fiscal` | Good (index scan) |
-| Fund balance | `idx_gl_fund_date` | Good |
-| Account history | `idx_gl_account_date` | Good |
-| Budget vs. actual | Subquery approach (DATABASE_V2.md §7) | **Poor** — correlated subqueries on unindexed columns |
-| Audit log verification | `idx_audit_created` | **Poor** — full scan of entire audit_log table |
-| Member giving statement | `idx_journal_lines_member` | Good |
-| Period close (snapshot all funds) | Per-fund query | Good (N queries, each indexed) |
-| Report generation | Direct GL scan | **Poor** — full partition scan for date range |
+| Query                             | Current Index Support                   | Performance                                           |
+| --------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| Trial balance at date             | `idx_gl_account_date` + `idx_gl_fiscal` | Good (index scan)                                     |
+| Fund balance                      | `idx_gl_fund_date`                      | Good                                                  |
+| Account history                   | `idx_gl_account_date`                   | Good                                                  |
+| Budget vs. actual                 | Subquery approach (DATABASE_V2.md §7)   | **Poor** — correlated subqueries on unindexed columns |
+| Audit log verification            | `idx_audit_created`                     | **Poor** — full scan of entire audit_log table        |
+| Member giving statement           | `idx_journal_lines_member`              | Good                                                  |
+| Period close (snapshot all funds) | Per-fund query                          | Good (N queries, each indexed)                        |
+| Report generation                 | Direct GL scan                          | **Poor** — full partition scan for date range         |
 
 **Critical bottleneck**: Audit hash chain verification reads every audit entry sequentially. At 10M entries with 2KB JSONB each, that's 20GB of data to read and hash-verify. This would take minutes to hours. The verification should be incremental (verify the last N entries or a random sample) with full verification as a batch job.
 
@@ -625,6 +634,7 @@ The core double-entry logic in ACCOUNTING_ENGINE.md is **fundamentally correct**
 The trial balance generation in §6.1 is **correct**. It queries each account's running balance and classifies as debit or credit based on normal balance. The `isBalanced` check verifies the accounting equation.
 
 **Issue**: The trial balance as designed is ALL-TIME (or as-of-date). There's no PERIOD-SPECIFIC trial balance showing only activity within a date range. Period-specific trial balance is needed for:
+
 - Checking if debits = credits for just this month's activity
 - Identifying entries posted to wrong periods
 - Supporting period-based financial statements
@@ -642,6 +652,7 @@ The trial balance generation in §6.1 is **correct**. It queries each account's 
 ### 9.4 Opening Balances
 
 The opening balance entry example (§7.4) shows:
+
 ```
 Debit: 1-1002 Bank ฿50,000
 Credit: 3-3001 General Fund ฿50,000
@@ -675,6 +686,7 @@ The architecture acknowledges Thai church context with bilingual account names (
 ### 10.1 Authentication
 
 **Strengths:**
+
 - argon2id for password hashing (when consistently applied)
 - httpOnly, Secure, SameSite=Strict cookies for session
 - TOTP-based MFA for high-privilege roles
@@ -682,6 +694,7 @@ The architecture acknowledges Thai church context with bilingual account names (
 - Per-IP and per-user rate limiting
 
 **Weaknesses:**
+
 - No WebAuthn/Passkey support — TOTP is phishable
 - No password breach detection (checking against HaveIBeenPwned)
 - PIN-to-password migration risk (MF-12)
@@ -690,12 +703,14 @@ The architecture acknowledges Thai church context with bilingual account names (
 ### 10.2 Authorization
 
 **Strengths:**
+
 - Clear RBAC model with explicit permission matrix
 - Multi-layer enforcement (middleware, domain, RLS)
 - Self-approval prevention
 - Tiered approval thresholds
 
 **Weaknesses:**
+
 - Treasurer approval contradiction (CF-1)
 - Dual approval race condition (CF-2)
 - RLS bypass via `current_setting()` (MF-8)
@@ -705,6 +720,7 @@ The architecture acknowledges Thai church context with bilingual account names (
 ### 10.3 Audit Trail Security
 
 **Strengths:**
+
 - Append-only at database level (REVOKE UPDATE/DELETE)
 - SHA-256 hash chain with verifiable integrity
 - Before/after snapshots for every mutation
@@ -712,6 +728,7 @@ The architecture acknowledges Thai church context with bilingual account names (
 - Independent verifier script
 
 **Weaknesses:**
+
 - Hash chain serialization bottleneck (CF-3)
 - Audit verification is point-in-time — continuous monitoring not built-in
 - No alerting on hash chain breaks (must be manually checked)
@@ -720,12 +737,14 @@ The architecture acknowledges Thai church context with bilingual account names (
 ### 10.4 Data Protection
 
 **Strengths:**
+
 - PII masking at API response layer
 - Consent tracking for member data
 - TLS 1.3 for all data in transit
 - Encryption at rest (Supabase managed)
 
 **Weaknesses:**
+
 - Staging environment contains production data (CF-5)
 - No data classification/labeling system
 - No automated PII scanning or data loss prevention
@@ -733,33 +752,33 @@ The architecture acknowledges Thai church context with bilingual account names (
 
 ### 10.5 Fraud Prevention Assessment
 
-| Fraud Scenario | Detected/Prevented? | Gap |
-|---------------|---------------------|-----|
-| Cash skimming by single counter | ✅ Prevented (dual counter requirement) | Counter 3 is optional — two counters could collude |
-| Fictitious expense | ✅ Prevented (segregation of duties) | Super admin can create AND approve — bypasses segregation |
-| Fund transfer to personal account | ⚠️ Partial | No external bank account verification; no payee validation |
-| Back-dated transaction to hide fraud | ✅ Prevented (period locking) | But super admin can reopen periods |
-| Audit log tampering | ✅ Prevented (hash chain + append-only) | But DB admin can disable triggers |
-| Ghost employee (fake salary) | ❌ Not addressed | No employee master data; no salary verification workflow |
-| Duplicate reimbursement | ⚠️ Partial | Idempotency keys prevent exact duplicates; similar amounts not flagged |
-| Round-dollar fraud (฿1,000 increments) | ⚠️ Partial | Anomaly detection listed as "Future Phase" only |
-| Collusion (treasurer + pastor) | ❌ Not prevented | No mandatory rotation; no external notification of large transactions |
-| Data deletion to hide fraud | ✅ Prevented | Void-only; immutable audit trail |
+| Fraud Scenario                         | Detected/Prevented?                     | Gap                                                                    |
+| -------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------- |
+| Cash skimming by single counter        | ✅ Prevented (dual counter requirement) | Counter 3 is optional — two counters could collude                     |
+| Fictitious expense                     | ✅ Prevented (segregation of duties)    | Super admin can create AND approve — bypasses segregation              |
+| Fund transfer to personal account      | ⚠️ Partial                              | No external bank account verification; no payee validation             |
+| Back-dated transaction to hide fraud   | ✅ Prevented (period locking)           | But super admin can reopen periods                                     |
+| Audit log tampering                    | ✅ Prevented (hash chain + append-only) | But DB admin can disable triggers                                      |
+| Ghost employee (fake salary)           | ❌ Not addressed                        | No employee master data; no salary verification workflow               |
+| Duplicate reimbursement                | ⚠️ Partial                              | Idempotency keys prevent exact duplicates; similar amounts not flagged |
+| Round-dollar fraud (฿1,000 increments) | ⚠️ Partial                              | Anomaly detection listed as "Future Phase" only                        |
+| Collusion (treasurer + pastor)         | ❌ Not prevented                        | No mandatory rotation; no external notification of large transactions  |
+| Data deletion to hide fraud            | ✅ Prevented                            | Void-only; immutable audit trail                                       |
 
 ### 10.6 Vulnerability Assessment
 
-| Vulnerability Class | Addressed? | Assessment |
-|--------------------|------------|------------|
-| SQL Injection | ⚠️ Partial | Drizzle ORM parameterizes queries, but `current_setting()` in RLS is an injection surface |
-| XSS | ✅ Addressed | CSP headers, httpOnly cookies, React's built-in XSS protection |
-| CSRF | ✅ Addressed | SameSite=Strict cookies, CORS configuration |
-| JWT attacks | ⚠️ Partial | No token versioning; no key rotation plan |
-| Brute force | ✅ Addressed | Rate limiting + account lockout |
-| Privilege escalation | ✅ Addressed | Multi-layer enforcement |
-| Session hijacking | ⚠️ Partial | httpOnly cookies prevent JS access but no device fingerprinting |
-| Replay attacks | ⚠️ Partial | Idempotency keys on mutations; GET requests not protected |
-| Supply chain | ❌ Not addressed | No dependency scanning; no SBOM; no build provenance |
-| Insider threat | ⚠️ Partial | Audit trail captures actions but detection is manual |
+| Vulnerability Class  | Addressed?       | Assessment                                                                                |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------------------- |
+| SQL Injection        | ⚠️ Partial       | Drizzle ORM parameterizes queries, but `current_setting()` in RLS is an injection surface |
+| XSS                  | ✅ Addressed     | CSP headers, httpOnly cookies, React's built-in XSS protection                            |
+| CSRF                 | ✅ Addressed     | SameSite=Strict cookies, CORS configuration                                               |
+| JWT attacks          | ⚠️ Partial       | No token versioning; no key rotation plan                                                 |
+| Brute force          | ✅ Addressed     | Rate limiting + account lockout                                                           |
+| Privilege escalation | ✅ Addressed     | Multi-layer enforcement                                                                   |
+| Session hijacking    | ⚠️ Partial       | httpOnly cookies prevent JS access but no device fingerprinting                           |
+| Replay attacks       | ⚠️ Partial       | Idempotency keys on mutations; GET requests not protected                                 |
+| Supply chain         | ❌ Not addressed | No dependency scanning; no SBOM; no build provenance                                      |
+| Insider threat       | ⚠️ Partial       | Audit trail captures actions but detection is manual                                      |
 
 ---
 
@@ -796,6 +815,7 @@ The monitoring section (ARCHITECTURE_V2.md §12) is thin:
 ### 11.4 Backup & Disaster Recovery
 
 **Backup:**
+
 - Daily full backups (30-day retention) — good
 - Continuous WAL archiving (7-day retention) — good for PITR
 - Weekly cross-region backup (90-day retention) — good
@@ -812,30 +832,30 @@ The monitoring section (ARCHITECTURE_V2.md §12) is thin:
 
 ### 11.5 Scalability Projections
 
-| Scale | Transactions/Year | GL Rows/Year | Audit Rows/Year | Assessment |
-|-------|-------------------|-------------|-----------------|------------|
-| 1 church | ~1,000 | ~2,000 | ~5,000 | No issues |
-| 100 churches | ~100,000 | ~200,000 | ~500,000 | Minor bottlenecks in reporting |
-| 1,000 churches | ~1,000,000 | ~2,000,000 | ~5,000,000 | Hash chain bottleneck becomes significant |
-| 10,000 churches | ~10,000,000 | ~20,000,000 | ~50,000,000 | System fails without major rearchitecture |
-| 100,000 churches | ~100,000,000 | ~200,000,000 | ~500,000,000 | Requires full distributed architecture |
+| Scale            | Transactions/Year | GL Rows/Year | Audit Rows/Year | Assessment                                |
+| ---------------- | ----------------- | ------------ | --------------- | ----------------------------------------- |
+| 1 church         | ~1,000            | ~2,000       | ~5,000          | No issues                                 |
+| 100 churches     | ~100,000          | ~200,000     | ~500,000        | Minor bottlenecks in reporting            |
+| 1,000 churches   | ~1,000,000        | ~2,000,000   | ~5,000,000      | Hash chain bottleneck becomes significant |
+| 10,000 churches  | ~10,000,000       | ~20,000,000  | ~50,000,000     | System fails without major rearchitecture |
+| 100,000 churches | ~100,000,000      | ~200,000,000 | ~500,000,000    | Requires full distributed architecture    |
 
 The current architecture scales to approximately **100-200 churches** before performance degradation becomes noticeable. Beyond that, the shared database, audit hash chain, and report generation will cause problems.
 
 ### 11.6 Operational Maturity
 
-| Practice | Status | Notes |
-|----------|--------|-------|
-| Infrastructure as Code | ❌ Missing | No Terraform/Pulumi/CDK |
-| Configuration Management | ❌ Missing | No config-as-code; settings in database only |
-| Secret Management | ⚠️ Partial | Relies on Supabase Vault; no rotation |
-| Log Aggregation | ⚠️ Partial | Pino structured logs but no aggregation system |
-| Distributed Tracing | ❌ Missing | No tracing infrastructure |
-| Capacity Planning | ❌ Missing | No load testing or capacity model |
-| Incident Management | ⚠️ Partial | Response procedure exists but no on-call rotation, escalation, or postmortem process |
-| Change Management | ❌ Missing | No change approval process documented |
-| Business Continuity | ❌ Missing | No BCP document; no failover testing |
-| Compliance Monitoring | ❌ Missing | No automated compliance checks |
+| Practice                 | Status     | Notes                                                                                |
+| ------------------------ | ---------- | ------------------------------------------------------------------------------------ |
+| Infrastructure as Code   | ❌ Missing | No Terraform/Pulumi/CDK                                                              |
+| Configuration Management | ❌ Missing | No config-as-code; settings in database only                                         |
+| Secret Management        | ⚠️ Partial | Relies on Supabase Vault; no rotation                                                |
+| Log Aggregation          | ⚠️ Partial | Pino structured logs but no aggregation system                                       |
+| Distributed Tracing      | ❌ Missing | No tracing infrastructure                                                            |
+| Capacity Planning        | ❌ Missing | No load testing or capacity model                                                    |
+| Incident Management      | ⚠️ Partial | Response procedure exists but no on-call rotation, escalation, or postmortem process |
+| Change Management        | ❌ Missing | No change approval process documented                                                |
+| Business Continuity      | ❌ Missing | No BCP document; no failover testing                                                 |
+| Compliance Monitoring    | ❌ Missing | No automated compliance checks                                                       |
 
 ---
 
@@ -847,6 +867,7 @@ The current architecture scales to approximately **100-200 churches** before per
 **Alternative**: Each church gets its own PostgreSQL schema (`church_{id}.journal_entries`) within a shared database, or its own Supabase project.
 
 **Trade-offs:**
+
 - Pro: Complete data isolation; independent backup/restore; per-church performance tuning; simpler RLS (or no RLS needed)
 - Pro: Churches can be on different versions (staggered upgrades)
 - Pro: One church's heavy reporting doesn't impact others
@@ -861,6 +882,7 @@ The current architecture scales to approximately **100-200 churches** before per
 **Alternative**: Use READ COMMITTED with explicit `SELECT ... FOR UPDATE` on rows that need serialization (fund balances, journal entries being approved).
 
 **Trade-offs:**
+
 - Pro: Better throughput — SERIALIZABLE aborts on any conflict; FOR UPDATE only blocks conflicting operations
 - Pro: Predictable behavior — developers understand locking better than serialization failures
 - Pro: Easier to debug — deadlocks show in pg_locks; serialization failures are opaque
@@ -875,6 +897,7 @@ The current architecture scales to approximately **100-200 churches** before per
 **Alternative**: Each church has an independent hash chain. The first entry for each church has `previous_hash = NULL`. Cross-church correlation uses `correlation_id`, not hash chain.
 
 **Trade-offs:**
+
 - Pro: No serialization across churches — parallel writes scale linearly with churches
 - Pro: Church A's audit verification doesn't require reading Church B's entries
 - Con: Cannot prove global ordering across churches without additional mechanism
@@ -888,6 +911,7 @@ The current architecture scales to approximately **100-200 churches** before per
 **Alternative**: Use event sourcing where the journal_entries, general_ledger, and audit_log are all projections of an immutable event stream.
 
 **Trade-offs:**
+
 - Pro: Natural double-entry — journal entries ARE events
 - Pro: Audit trail is the source of truth, not an artifact
 - Pro: Time-travel queries (reconstruct state at any point) are built-in
@@ -902,20 +926,20 @@ The current architecture scales to approximately **100-200 churches** before per
 
 ## 13. Risk Matrix
 
-| Risk | Likelihood | Impact | Mitigation Status | Residual Risk |
-|------|-----------|--------|-------------------|---------------|
-| Cross-document contradiction causes implementation bug | HIGH | HIGH | Not mitigated — documents unreconciled | **HIGH** |
-| Insider fraud via super_admin single-approval | MEDIUM | CRITICAL | Not mitigated — super_admin has unlimited power | **CRITICAL** |
-| Data breach via staging environment sync | MEDIUM | CRITICAL | Not mitigated — daily production sync to staging | **CRITICAL** |
-| Database corruption without tenant isolation | LOW | CRITICAL | Not mitigated — no per-church restore | **HIGH** |
-| Hash chain write bottleneck at scale | HIGH (at >100 churches) | MEDIUM | Not mitigated | **MEDIUM** |
-| JWT secret compromise without rotation | LOW | CRITICAL | Not mitigated — no key rotation plan | **HIGH** |
-| Migration data loss (localStorage cleared before export) | MEDIUM | HIGH | Partial — user-initiated export | **MEDIUM** |
-| Supabase vendor lock-in prevents migration | LOW | MEDIUM | Not mitigated | **MEDIUM** |
-| Untested backups fail during restore | MEDIUM | CRITICAL | Not mitigated — no restore testing | **CRITICAL** |
-| Double-entry implementation error (accounting logic bug) | MEDIUM | CRITICAL | Partial — accounting consultant review mentioned | **HIGH** |
-| Performance degradation under concurrent load | MEDIUM | MEDIUM | Partial — retry logic exists but SERIALIZABLE is expensive | **MEDIUM** |
-| Thai tax law changes requiring schema changes | LOW | MEDIUM | Partial — extensible COA design | **LOW** |
+| Risk                                                     | Likelihood              | Impact   | Mitigation Status                                          | Residual Risk |
+| -------------------------------------------------------- | ----------------------- | -------- | ---------------------------------------------------------- | ------------- |
+| Cross-document contradiction causes implementation bug   | HIGH                    | HIGH     | Not mitigated — documents unreconciled                     | **HIGH**      |
+| Insider fraud via super_admin single-approval            | MEDIUM                  | CRITICAL | Not mitigated — super_admin has unlimited power            | **CRITICAL**  |
+| Data breach via staging environment sync                 | MEDIUM                  | CRITICAL | Not mitigated — daily production sync to staging           | **CRITICAL**  |
+| Database corruption without tenant isolation             | LOW                     | CRITICAL | Not mitigated — no per-church restore                      | **HIGH**      |
+| Hash chain write bottleneck at scale                     | HIGH (at >100 churches) | MEDIUM   | Not mitigated                                              | **MEDIUM**    |
+| JWT secret compromise without rotation                   | LOW                     | CRITICAL | Not mitigated — no key rotation plan                       | **HIGH**      |
+| Migration data loss (localStorage cleared before export) | MEDIUM                  | HIGH     | Partial — user-initiated export                            | **MEDIUM**    |
+| Supabase vendor lock-in prevents migration               | LOW                     | MEDIUM   | Not mitigated                                              | **MEDIUM**    |
+| Untested backups fail during restore                     | MEDIUM                  | CRITICAL | Not mitigated — no restore testing                         | **CRITICAL**  |
+| Double-entry implementation error (accounting logic bug) | MEDIUM                  | CRITICAL | Partial — accounting consultant review mentioned           | **HIGH**      |
+| Performance degradation under concurrent load            | MEDIUM                  | MEDIUM   | Partial — retry logic exists but SERIALIZABLE is expensive | **MEDIUM**    |
+| Thai tax law changes requiring schema changes            | LOW                     | MEDIUM   | Partial — extensible COA design                            | **LOW**       |
 
 ---
 
@@ -923,18 +947,19 @@ The current architecture scales to approximately **100-200 churches** before per
 
 ### 14.1 By Number of Churches
 
-| Churches | Write Throughput | Read Throughput | Storage | Status |
-|----------|-----------------|-----------------|---------|--------|
-| 1 | < 1 txn/min | < 10 queries/min | < 100 MB | ✅ Trivial |
-| 10 | < 5 txn/min | < 50 queries/min | < 1 GB | ✅ No issue |
-| 100 | < 50 txn/min | < 500 queries/min | < 10 GB | ⚠️ Need connection pooling |
-| 1,000 | < 500 txn/min | < 5,000 queries/min | < 100 GB | ❌ Hash chain bottleneck; need read replicas |
-| 10,000 | < 5,000 txn/min | < 50,000 queries/min | < 1 TB | ❌ Requires full rearchitecture |
-| 100,000 | < 50,000 txn/min | < 500,000 queries/min | < 10 TB | ❌ Single PostgreSQL cannot handle this |
+| Churches | Write Throughput | Read Throughput       | Storage  | Status                                       |
+| -------- | ---------------- | --------------------- | -------- | -------------------------------------------- |
+| 1        | < 1 txn/min      | < 10 queries/min      | < 100 MB | ✅ Trivial                                   |
+| 10       | < 5 txn/min      | < 50 queries/min      | < 1 GB   | ✅ No issue                                  |
+| 100      | < 50 txn/min     | < 500 queries/min     | < 10 GB  | ⚠️ Need connection pooling                   |
+| 1,000    | < 500 txn/min    | < 5,000 queries/min   | < 100 GB | ❌ Hash chain bottleneck; need read replicas |
+| 10,000   | < 5,000 txn/min  | < 50,000 queries/min  | < 1 TB   | ❌ Requires full rearchitecture              |
+| 100,000  | < 50,000 txn/min | < 500,000 queries/min | < 10 TB  | ❌ Single PostgreSQL cannot handle this      |
 
 ### 14.2 By Transaction Volume
 
 Per church:
+
 - Small church: ~500 transactions/year (weekly offerings + monthly expenses)
 - Medium church: ~2,000 transactions/year (weekly + salary + transfers)
 - Large church: ~10,000 transactions/year (daily activity + projects + payroll)
@@ -955,49 +980,49 @@ The GL grows at 2x transaction rate (debit + credit lines). The audit log grows 
 
 ### 15.1 PDPA (Thailand Personal Data Protection Act)
 
-| Requirement | Status | Gap |
-|-------------|--------|-----|
-| Consent management | ✅ Addressed | `consent_given` + `consent_date` fields |
-| Data subject access request | ⚠️ Partial | Data export endpoint mentioned but no SAR workflow |
-| Right to erasure | ⚠️ Partial | Anonymization endpoint mentioned but member records may be needed for audit |
-| Data breach notification | ⚠️ Partial | 72-hour notification mentioned but no notification procedure |
-| Data retention policy | ✅ Addressed | 7-year retention documented |
-| Cross-border data transfer | ❌ Not addressed | Supabase data residency; CDN edge locations |
-| Data Protection Officer | ❌ Not addressed | No DPO role in the role hierarchy |
+| Requirement                 | Status           | Gap                                                                         |
+| --------------------------- | ---------------- | --------------------------------------------------------------------------- |
+| Consent management          | ✅ Addressed     | `consent_given` + `consent_date` fields                                     |
+| Data subject access request | ⚠️ Partial       | Data export endpoint mentioned but no SAR workflow                          |
+| Right to erasure            | ⚠️ Partial       | Anonymization endpoint mentioned but member records may be needed for audit |
+| Data breach notification    | ⚠️ Partial       | 72-hour notification mentioned but no notification procedure                |
+| Data retention policy       | ✅ Addressed     | 7-year retention documented                                                 |
+| Cross-border data transfer  | ❌ Not addressed | Supabase data residency; CDN edge locations                                 |
+| Data Protection Officer     | ❌ Not addressed | No DPO role in the role hierarchy                                           |
 
 ### 15.2 Thai Revenue Code
 
-| Requirement | Status | Gap |
-|-------------|--------|-----|
-| 7-year record retention | ✅ Addressed | Archival policy to cold storage |
-| Withholding tax (ภ.ง.ด.3, ภ.ง.ด.53) | ⚠️ Partial | Accounts exist but no form generation |
-| Donation receipt requirements | ⚠️ Partial | Sequential numbering; format not validated against Revenue Department specs |
-| Annual financial statements | ⚠️ Partial | Balance sheet + income statement exist; cash flow statement missing |
-| Audit trail integrity | ✅ Addressed | Hash-chained, verifiable |
+| Requirement                         | Status       | Gap                                                                         |
+| ----------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| 7-year record retention             | ✅ Addressed | Archival policy to cold storage                                             |
+| Withholding tax (ภ.ง.ด.3, ภ.ง.ด.53) | ⚠️ Partial   | Accounts exist but no form generation                                       |
+| Donation receipt requirements       | ⚠️ Partial   | Sequential numbering; format not validated against Revenue Department specs |
+| Annual financial statements         | ⚠️ Partial   | Balance sheet + income statement exist; cash flow statement missing         |
+| Audit trail integrity               | ✅ Addressed | Hash-chained, verifiable                                                    |
 
 ### 15.3 TFRS (Thai Financial Reporting Standards)
 
-| Requirement | Status | Gap |
-|-------------|--------|-----|
-| Chart of accounts mapping | ✅ Addressed | `tfrs_code` on all accounts |
-| Double-entry bookkeeping | ✅ Addressed | Core accounting engine |
-| Accrual basis (if applicable) | ❌ Not addressed | Cash-basis only |
-| Fixed asset depreciation | ❌ Not addressed | No depreciation module |
+| Requirement                   | Status           | Gap                         |
+| ----------------------------- | ---------------- | --------------------------- |
+| Chart of accounts mapping     | ✅ Addressed     | `tfrs_code` on all accounts |
+| Double-entry bookkeeping      | ✅ Addressed     | Core accounting engine      |
+| Accrual basis (if applicable) | ❌ Not addressed | Cash-basis only             |
+| Fixed asset depreciation      | ❌ Not addressed | No depreciation module      |
 
 ---
 
 ## 16. Final Scores
 
-| Score Category | Score | Justification |
-|---------------|-------|---------------|
-| **Production Readiness** | 62/100 | 6 critical findings that would cause financial loss or data breach. Cannot be deployed to production as documented. |
-| **Implementation Readiness** | 71/100 | Detailed implementation roadmap exists. But cross-document contradictions mean implementers will make conflicting choices. Code-level detail (Money class, state machine, SQL) is strong. |
-| **Maintainability** | 68/100 | Clean layered architecture. Well-defined directory structure. The dual balance storage and global audit chain are maintenance liabilities. |
-| **Scalability** | 55/100 | Single PostgreSQL with global hash chain limits to ~100 churches. No horizontal scaling strategy. No tenant isolation. |
-| **Security** | 67/100 | Good defense-in-depth philosophy. Authentication and authorization are well-modeled. Undermined by staging data risk, super_admin unlimited power, and tenant isolation gap. |
-| **Accounting Integrity** | 65/100 | Double-entry foundation is sound. Undermined by fund accounting gaps (funds as equity accounts), missing year-end close, missing depreciation, cash-only basis. |
-| **Operational Readiness** | 44/100 | Worst-scoring category. No DR testing, no restore testing, no SLO, no capacity planning, no IaC, no runbooks. The system could be built correctly and still fail in production due to operational gaps. |
-| **Composite** | **62/100** | Grade C+. Architecture is a strong foundation but is not ready for production deployment. |
+| Score Category               | Score      | Justification                                                                                                                                                                                           |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Production Readiness**     | 62/100     | 6 critical findings that would cause financial loss or data breach. Cannot be deployed to production as documented.                                                                                     |
+| **Implementation Readiness** | 71/100     | Detailed implementation roadmap exists. But cross-document contradictions mean implementers will make conflicting choices. Code-level detail (Money class, state machine, SQL) is strong.               |
+| **Maintainability**          | 68/100     | Clean layered architecture. Well-defined directory structure. The dual balance storage and global audit chain are maintenance liabilities.                                                              |
+| **Scalability**              | 55/100     | Single PostgreSQL with global hash chain limits to ~100 churches. No horizontal scaling strategy. No tenant isolation.                                                                                  |
+| **Security**                 | 67/100     | Good defense-in-depth philosophy. Authentication and authorization are well-modeled. Undermined by staging data risk, super_admin unlimited power, and tenant isolation gap.                            |
+| **Accounting Integrity**     | 65/100     | Double-entry foundation is sound. Undermined by fund accounting gaps (funds as equity accounts), missing year-end close, missing depreciation, cash-only basis.                                         |
+| **Operational Readiness**    | 44/100     | Worst-scoring category. No DR testing, no restore testing, no SLO, no capacity planning, no IaC, no runbooks. The system could be built correctly and still fail in production due to operational gaps. |
+| **Composite**                | **62/100** | Grade C+. Architecture is a strong foundation but is not ready for production deployment.                                                                                                               |
 
 ---
 
@@ -1037,6 +1062,7 @@ If timeline pressure prevents full remediation:
 ### What the Architecture Gets Right
 
 The team clearly understands:
+
 - Double-entry accounting
 - Financial fraud prevention
 - Audit trail integrity
@@ -1048,7 +1074,7 @@ The architecture is worth fixing. The problems are in the **integration** betwee
 
 ---
 
-*This review was conducted by the Architecture Review Board assuming multiple professional roles. The findings represent our collective assessment that Grace Ledger v2 architecture requires significant remediation before it is safe for production deployment managing real church finances. We look forward to reviewing the remediated architecture.*
+_This review was conducted by the Architecture Review Board assuming multiple professional roles. The findings represent our collective assessment that Grace Ledger v2 architecture requires significant remediation before it is safe for production deployment managing real church finances. We look forward to reviewing the remediated architecture._
 
-*Review Date: 22 July 2026*
-*Next Review: After remediation (estimated October 2026)*
+_Review Date: 22 July 2026_
+_Next Review: After remediation (estimated October 2026)_

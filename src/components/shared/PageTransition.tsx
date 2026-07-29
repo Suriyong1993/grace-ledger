@@ -9,11 +9,7 @@ interface Props {
 
 export function PageTransition({ children, className = "" }: Props) {
   const containerRef = useGSAPAnimation<HTMLDivElement>((el) => {
-    gsap.fromTo(
-      el,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
-    );
+    gsap.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
   });
 
   return (

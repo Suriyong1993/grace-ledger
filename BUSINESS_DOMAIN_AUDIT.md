@@ -40,6 +40,7 @@ Grace Ledger is a **Phase 1 prototype** built on TanStack Start (React + Vite) w
 **Critical Finding:** This application is **not ready for production** and would **fail an external financial audit immediately**. The localization to Thai language and Thai Baht currency is adequate, but the underlying financial architecture has fundamental gaps that would lead to data inconsistency, unauditability, and potential financial loss.
 
 **Severity Summary:**
+
 - 🔴 **Critical (9):** Issues that would cause financial data corruption, regulatory failure, or irrecoverable audit gaps
 - 🟠 **High (17):** Issues that enable fraud, bypass controls, or cause unreliable reporting
 - 🟡 **Medium (14):** Process gaps and UX deficiencies that degrade trust or operational efficiency
@@ -54,6 +55,7 @@ Grace Ledger is a **Phase 1 prototype** built on TanStack Start (React + Vite) w
 **Finding:** All financial data resides exclusively in `window.localStorage` with no server-side persistence, backup, or replication.
 
 **Impact:**
+
 - A browser cache clear, localStorage quota exceeded, or device failure results in **total loss of all financial records** — every offering, every expense, every audit log
 - No multi-user concurrent access (data is local to one browser)
 - No cross-device sync — different church staff see different data on different machines
@@ -70,13 +72,14 @@ Grace Ledger is a **Phase 1 prototype** built on TanStack Start (React + Vite) w
 // church.ts — updateDb is a simple read-modify-write with no atomicity guarantee
 export function updateDb(fn: (db: DB) => void) {
   const db = loadDb();
-  fn(db);       // If this throws mid-way, partial mutations persist on next attempt
+  fn(db); // If this throws mid-way, partial mutations persist on next attempt
   saveDb();
   return db;
 }
 ```
 
 **Impact:**
+
 - If `saveDb()` fails (quota exceeded, parse error), mutations are applied in memory but not persisted — next page load loses them
 - If `loadDb()` fails during an operation, a brand-new `seed()` database is returned, silently replacing all data
 - Multiple rapid operations can interleave and corrupt data
@@ -88,6 +91,7 @@ export function updateDb(fn: (db: DB) => void) {
 **Finding:** All business logic and validation runs in the browser. A malicious user can open DevTools, call `loadDb()` directly, and modify any record — balances, transaction amounts, statuses, audit logs, user PINs.
 
 **Examples of what an attacker can do client-side:**
+
 ```javascript
 // Anyone with DevTools can:
 db.expenses.push({ id: "fake", amount: -999999, ... })  // Negative expense = free money
@@ -104,6 +108,7 @@ db.session.userId = "u1"  // Impersonate super_admin
 ### 2.4 🟠 Seed Data Contains Realistic Financial Figures (Church Consultant)
 
 **Finding:** The `seed()` function creates offerings, expenses, and fund balances that look like real church financial data:
+
 - Fund `f1` (กองทุนทั่วไป) has an `openingBalance` of **-7,553** (negative equity — a liability)
 - Fund `f2` (บัญชีธนาคาร) has `openingBalance` of **+13,825.06**
 - 150+ offering records spanning January–July 2026 with specific amounts
@@ -127,8 +132,9 @@ Expected model: Transaction { id, date, entries: [ { account, debit, credit }, .
 ```
 
 **Impact:**
+
 - Impossible to verify that the books balance through the system itself — balancing is done ad-hoc in the reconciliation page
-- No audit trail of *why* a balance changed — only *what* changed
+- No audit trail of _why_ a balance changed — only _what_ changed
 - Cannot trace a fund's balance through journal entries
 - A deleted income record silently changes the fund balance with no corresponding entry
 
@@ -144,6 +150,7 @@ const balance = f.openingBalance + income + offering - expense;
 ```
 
 **Impact:**
+
 - Any data corruption (duplicate entry, missing entry) silently propagates through all balance calculations
 - Cannot verify that a fund's balance is correct without recalculating from scratch
 - No way to detect if a historical balance was tampered with (since there's no stored snapshot)
@@ -156,16 +163,19 @@ const balance = f.openingBalance + income + offering - expense;
 **Finding:** Categories are flat lists (`Category { id, name, kind }`) with no hierarchical structure, no account codes, and no accounting standard mapping.
 
 **Example of missing structure:**
+
 - "ค่าสาธารณูปโภค" (Utilities) — is this an operating expense or a ministry expense?
 - "ดอกเบี้ย" (Interest) — should this be non-operating income?
 - No distinction between restricted and unrestricted funds
 
 **Impact:**
+
 - Cannot generate GAAP-compliant financial statements (Income Statement, Balance Sheet, Statement of Cash Flows)
 - No account numbering system (1xxx Assets, 2xxx Liabilities, 3xxx Equity, 4xxx Income, 5xxx Expenses)
 - Thai Revenue Department requires specific account classifications for tax purposes
 
 **Recommendation:** Implement a chart of accounts with:
+
 - Account codes (e.g., 4-1001 for Tithe Income, 5-2001 for Utilities Expense)
 - Account types (Asset, Liability, Equity, Income, Expense)
 - Parent-child hierarchy
@@ -182,6 +192,7 @@ export interface Settings {
 ```
 
 **Impact:**
+
 - All date-based reports assume calendar year (Jan-Dec), which may not match the church's fiscal year
 - Fiscal year close/open procedures are not implemented
 - Retained earnings are not tracked across fiscal years
@@ -193,11 +204,13 @@ export interface Settings {
 **Finding:** There is no mechanism to close a period (month/year). Transactions can be added, modified, or deleted in any past period at any time.
 
 **Impact:**
+
 - Financial reports for "closed" periods can silently change
 - Auditors reviewing last month's report may find different numbers the next day
 - No way to lock a reconciled month to prevent back-dated entries
 
 **Recommendation:** Implement period closing that:
+
 1. Locks all transactions dated within the closed period
 2. Stores a snapshot of all balances at closing
 3. Requires special authorization (auditor role) to reopen a closed period
@@ -212,18 +225,20 @@ export interface Settings {
 **Finding:** The seed data for Fund `f1` (กองทุนทั่วไป / General Fund) has `openingBalance: -7553`. Combined with the checking account fund (`f2`, opening balance +13,825.06), the system starts with a net positive but Fund f1 is in deficit.
 
 **Accounting Analysis:**
+
 - A negative opening balance means the fund starts with a liability — the church owes money that doesn't exist in the records
 - If this represents accumulated deficit from prior periods, it should be tracked as retained earnings, not negative fund balance
 - The system has no concept of liabilities or deficit tracking
 
 **Recommendation:**
+
 1. Establish a proper equity structure (Net Assets = Assets - Liabilities)
 2. Never allow fund balances to go negative without explicit liability entries
 3. Add a fund balance floor check — transactions that would make a fund negative should require override authorization
 
 ### 4.2 🟠 No Fund Balance Validation on Transaction Creation (Financial Systems Architect)
 
-**Finding:** When creating an expense against Fund `f1`, the system does not check if the fund has sufficient balance. The only place this check exists is in `FundTransferDialog` — and only for the *from* fund, not for any expense.
+**Finding:** When creating an expense against Fund `f1`, the system does not check if the fund has sufficient balance. The only place this check exists is in `FundTransferDialog` — and only for the _from_ fund, not for any expense.
 
 ```typescript
 // FundTransferDialog.tsx — only place this check exists
@@ -233,6 +248,7 @@ const insufficient = fromId && amount > fromBal;
 **Impact:** An expense of ฿100,000 can be recorded against a fund with only ฿5,000 — silently driving the fund negative. The reconciliation page will show the deficit but won't prevent it.
 
 **Recommendation:**
+
 1. Add fund balance validation on every expense and transfer creation
 2. Block transactions that would make a fund negative (with authorized override for overdrafts)
 3. Show a real-time fund balance when selecting a fund in the expense form
@@ -275,7 +291,7 @@ export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
   updateDb((db) => {
     const it = db.expenses.find((x) => x.id === id);
     if (it) {
-      it.status = status;  // Any status change accepted — no validation
+      it.status = status; // Any status change accepted — no validation
       if (status === "approved") it.approvedBy = by.id;
     }
   });
@@ -283,6 +299,7 @@ export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
 ```
 
 **Valid transitions that should be enforced:**
+
 - `draft` → `pending` (submit for approval)
 - `pending` → `approved` (approver action)
 - `pending` → `rejected` (approver action)
@@ -290,6 +307,7 @@ export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
 - `draft` → DELETED (only draft can be deleted)
 
 **Currently possible invalid transitions:**
+
 - `approved` → `rejected` (undoing an approval without audit)
 - `approved` → `draft` (hiding an approved transaction)
 - `draft` → `approved` (bypassing approval workflow)
@@ -302,6 +320,7 @@ export async function setExpenseStatus(id: string, status: TxStatus, by: User) {
 ### 5.2 🟠 No Segregation of Duties Between Creator and Approver (Security Engineer)
 
 **Finding:** The approval check is:
+
 ```typescript
 {can("expense.approve") && r.status === "pending" && (
   // Show approve button
@@ -313,6 +332,7 @@ There is no check that the approver is **different from the creator**. A treasur
 **Impact:** Self-approval defeats the purpose of the approval workflow. This is a fundamental internal control violation.
 
 **Recommendation:**
+
 1. Prevent a user from approving their own transactions (`r.createdBy !== user.id`)
 2. Require at least two different individuals for create + approve
 3. For large amounts (> threshold), require dual approval
@@ -322,13 +342,14 @@ There is no check that the approver is **different from the creator**. A treasur
 **Finding:** All transactions go through the same approval flow regardless of amount. A ฿100 expense and a ฿100,000 expense require the same approval.
 
 **Recommendation:** Implement tiered approval:
+
 - < ฿5,000: finance_staff can create, treasurer approves (or auto-approve)
 - ฿5,000 – ฿50,000: treasurer creates, pastor approves
 - > ฿50,000: pastor creates, requires dual approval (pastor + super_admin or board)
 
 ### 5.4 🟠 Approval Rejection Has No Reason Field (UX Lead)
 
-**Finding:** The reject action for expenses calls `setExpenseStatus(id, "rejected", user)` with no field for the rejection reason. The creator has no way to know *why* the transaction was rejected.
+**Finding:** The reject action for expenses calls `setExpenseStatus(id, "rejected", user)` with no field for the rejection reason. The creator has no way to know _why_ the transaction was rejected.
 
 **Impact:** Creates friction in the approval workflow. Rejected transactions pile up without resolution.
 
@@ -357,6 +378,7 @@ export interface Offering {
 ### 6.2 🟠 No Sunday Count Sheet Reconciliation with Independent Counters (Church Consultant)
 
 **Finding:** The Sunday Count Sheet (`SundayCountSheet.tsx`) has 3 counters but:
+
 1. All three counters' data is entered into the **same** browser by the **same** user — there's no independent verification
 2. The counter names are free-text fields with no authentication
 3. Counters 2 and 3 are optional — the system doesn't enforce a minimum of 2 counters
@@ -366,6 +388,7 @@ export interface Offering {
 **Impact:** A single person can falsify the entire Sunday count by entering any names as counters. This is the single highest-risk fraud vector in a church — cash offerings counted by one person with no verification.
 
 **Recommendation:**
+
 1. Require minimum 2 authenticated counters
 2. Implement a counter reconciliation step where counters independently enter their counts and the system compares them
 3. Lock the count sheet after all counters have verified
@@ -415,10 +438,11 @@ note: `ถวายโดย: ${r.name || "ไม่ระบุชื่อ"} |
 ### 7.1 🟠 Expenses Can Be Deleted at Any Status (Financial Systems Architect)
 
 **Finding:** `deleteExpense()` has no status check:
+
 ```typescript
 export async function deleteExpense(id: string, by: User) {
   updateDb((db) => {
-    db.expenses = db.expenses.filter((x) => x.id !== id);  // No status check
+    db.expenses = db.expenses.filter((x) => x.id !== id); // No status check
   });
 }
 ```
@@ -428,6 +452,7 @@ A user with `expense.write` can delete an **approved** expense, silently removin
 **Impact:** Approved expenses can be silently removed. The audit log says "expense deleted" but doesn't capture the amount or details of the deleted record.
 
 **Recommendation:**
+
 1. Only allow deletion of `draft` or `rejected` expenses
 2. Approved expenses should be voided (status changed to `voided`) rather than deleted — creating a reversing entry
 3. Audit log entries for deletions must capture the full record being deleted
@@ -443,6 +468,7 @@ A user with `expense.write` can delete an **approved** expense, silently removin
 ### 7.3 🟡 Attachment Receipt Not Validated (Security Engineer)
 
 **Finding:** The `AttachmentInput` component accepts files up to 10MB and stores them as base64 data URLs in localStorage. There is no:
+
 - Virus/malware scanning
 - File type validation beyond extension
 - Size enforcement on the server side
@@ -477,6 +503,7 @@ export async function deleteIncome(id: string, by: User) {
 **Finding:** The income page (`_app.income.tsx`) merges Income and Offering records into a single combined list for display, but they remain separate in the data model with different schemas.
 
 This creates confusion:
+
 - Offerings appear as "approved" by convention, not by data
 - Income has `status`, Offering doesn't
 - Income has `attachmentDataUrl`, Offering doesn't
@@ -531,7 +558,7 @@ The `transferFund()` service function has no such check. A user bypassing the UI
 
 ```typescript
 export interface Budget {
-  used: number;  // NEVER UPDATED ANYWHERE
+  used: number; // NEVER UPDATED ANYWHERE
 }
 ```
 
@@ -568,6 +595,7 @@ The `listBudget()` function returns budgets from the data store, and the budget 
 3. Has no concept of a "reconciled" state that prevents further changes to the period
 
 **Impact:** This is not a reconciliation — it's a calculator. True reconciliation means:
+
 - Comparing system records against external statements (bank statements, cash counts)
 - Identifying and explaining discrepancies
 - Locking the period after reconciliation
@@ -576,6 +604,7 @@ The `listBudget()` function returns budgets from the data store, and the budget 
 Without persisted reconciliation records, auditors cannot verify that reconciliations were performed or what the results were.
 
 **Recommendation:** Implement proper reconciliation:
+
 1. Store reconciliation records with date, period, system balance, actual balance, difference, and explanation
 2. Link reconciling items to specific transactions
 3. Lock reconciled periods
@@ -620,6 +649,7 @@ But this uses **all-time** data, not period-specific data — inconsistent with 
 ### 12.1 🟠 No Balance Sheet, Income Statement, or Cash Flow Report (Church Consultant)
 
 **Finding:** The reports page only provides a 6-month summary table (income/offering/expense/net). There are no formal financial statements:
+
 - No Balance Sheet (Statement of Financial Position)
 - No Income Statement (Statement of Activities)
 - No Cash Flow Statement
@@ -640,6 +670,7 @@ const income = inc.filter((x) => x.date.startsWith(key)).reduce(...);
 ```
 
 This works for the `YYYY-MM-DD` format but is fragile:
+
 - If date format changes, all reports break silently
 - No date range validation (what if a date is "2026-13-01"?)
 - `startsWith` is case-sensitive on strings — unlikely to fail but not robust
@@ -678,6 +709,7 @@ transferFund("f1", "f2", 999999, anyUserObject)
 The `by: User` parameter in every service function is decorative — it's only used for audit logging, not for authorization.
 
 **Recommendation:** Move authorization to a server-side middleware layer. Each API endpoint must verify:
+
 1. The user is authenticated
 2. The user's role has the required permission
 3. The user is not attempting self-approval
@@ -686,10 +718,12 @@ The `by: User` parameter in every service function is decorative — it's only u
 ### 13.2 🟡 Permission Matrix Has Overlaps That Enable Fraud (Security Engineer)
 
 **Finding:** The role matrix allows:
+
 - `super_admin`: ALL permissions — can create, approve own transactions, transfer funds, modify settings, delete audit logs (indirectly via `resetDb`)
 - `treasurer`: Can create income, expenses, offerings, AND transfer funds — but cannot approve. However, since offerings have no approval, the treasurer effectively has unchecked power over offerings.
 
 **Actual Permissions Gap:**
+
 ```
 treasurer has: income.write, expense.write, offering.write, fund.write
 treasurer lacks: income.approve, expense.approve, audit.view
@@ -698,6 +732,7 @@ treasurer lacks: income.approve, expense.approve, audit.view
 Income and Expenses created by treasurer require pastor approval (good), but **offerings and fund transfers do not** (bad). A treasurer can record arbitrary offerings and fund transfers with no approval.
 
 **Recommendation:**
+
 1. Add `offering.approve` and `fund.transfer` permissions
 2. Give treasurer `offering.write` and `fund.transfer` but require approval for both
 3. Separate `fund.transfer` from `fund.write` (fund.write should create funds; fund.transfer should move money)
@@ -715,6 +750,7 @@ Income and Expenses created by treasurer require pastor approval (good), but **o
 ### 14.1 🔴 6-Digit PIN Authentication (Principal Security Engineer)
 
 **Finding:** The entire authentication system is based on 6-digit numeric PINs:
+
 ```typescript
 const login = useCallback(async (pin: string) => {
   const db = loadDb();
@@ -732,11 +768,13 @@ const login = useCallback(async (pin: string) => {
 - No session timeout enforcement (the `idleTimeoutMin` setting exists but is never consumed)
 
 **Impact:** A 6-digit PIN offers approximately 20 bits of entropy. An attacker with physical access to the browser can:
+
 1. Open DevTools → find all PINs in localStorage
 2. Extract all user PINs
 3. Impersonate any user
 
 **Recommendation:**
+
 1. Implement proper password-based authentication with bcrypt/argon2 hashing
 2. Enforce minimum password complexity (12+ chars, mixed case, numbers, symbols)
 3. Add rate limiting (5 failed attempts → 15-minute lockout)
@@ -751,6 +789,7 @@ const login = useCallback(async (pin: string) => {
 **Impact:** A logged-in session persists indefinitely. If a treasurer leaves their computer unlocked, anyone can access the system.
 
 **Recommendation:** Implement idle timeout:
+
 1. Track last user interaction (mouse move, key press, click)
 2. After `idleTimeoutMin` of inactivity, show a warning with 60-second countdown
 3. Auto-logout if no response
@@ -760,6 +799,7 @@ const login = useCallback(async (pin: string) => {
 ### 14.3 🟡 session.userId Stored in Same DB as Everything Else (Security Engineer)
 
 **Finding:** The session is stored as a field in the same JSON blob as all financial data:
+
 ```typescript
 export interface DB {
   // ... all financial data
@@ -778,22 +818,26 @@ export interface DB {
 ### 15.1 🟠 Audit Trail is Client-Side, Mutable, and Truncated (Security Engineer)
 
 **Finding:** The audit trail has critical weaknesses:
+
 1. **Mutable:** Stored in the same localStorage DB as everything else — trivially deletable
 2. **Truncated:** Capped at 500 entries (`if (db.audit.length > 500) db.audit.length = 500`). Oldest entries are silently discarded.
 3. **Not tamper-evident:** No cryptographic hashing or chaining
 4. **Incomplete:** Doesn't capture the **before** state of mutations, only the action
 
 **Examples of missing audit data:**
+
 - `deleteOffering("o1", user)` logs: `action:"delete", entity:"offering", entityId:"o1"` — but not the amount, date, category, or fund of the deleted offering
 - `setExpenseStatus("e1", "approved", user)` logs: `action:"approved", entity:"expense", entityId:"e1"` — but not the amount or what it was approved from
 
 **Impact:** The audit trail would fail any external audit:
+
 - Auditors cannot reconstruct what was deleted
 - The 500-entry limit means historical audits are impossible
 - No cryptographic proof that entries haven't been tampered with
 - A malicious super_admin can call `resetDb()` and wipe the entire audit trail
 
 **Recommendation:**
+
 1. Store audit logs in an append-only, immutable data store
 2. Never truncate — audit trails must be complete for the entire fiscal year (minimum 7 years for Thai tax purposes)
 3. Capture full before/after snapshots for every mutation
@@ -820,12 +864,14 @@ export interface DB {
 ### 16.1 🔴 No Concurrency Control (Senior DBA)
 
 **Finding:** The entire application has zero concurrency control:
+
 - `updateDb()` reads → mutates → writes with no locking
 - No optimistic concurrency (version numbers, timestamps)
 - No pessimistic concurrency (locks)
 - Multiple browser tabs on the same origin share the same localStorage — simultaneous mutations from different tabs will corrupt data
 
 **Race Condition Scenario:**
+
 1. Tab A reads DB (balance = 1000)
 2. Tab B reads DB (balance = 1000)
 3. Tab A records expense of 500 (local balance = 500), saves DB
@@ -835,6 +881,7 @@ export interface DB {
 **Impact:** In a real multi-user scenario (or even multi-tab single-user), financial data corruption is guaranteed.
 
 **Recommendation:** The localStorage mock DB is fundamentally incompatible with concurrent access. Migration to a real database is the only solution. At minimum, implement:
+
 - Optimistic locking with version numbers
 - Merge strategies for concurrent edits
 - Single-tab enforcement (BroadcastChannel API to detect other tabs)
@@ -854,6 +901,7 @@ export interface DB {
 ### 17.1 🔴 No Backup Mechanism (DevOps Lead)
 
 **Finding:** The only "backup" is the browser's localStorage, which:
+
 - Can be cleared by the user, a browser update, or privacy settings
 - Has a per-origin limit of 5-10MB
 - Is not backed up to any server, cloud storage, or external drive
@@ -861,7 +909,8 @@ export interface DB {
 
 **Impact:** Total data loss is not just possible — it's inevitable over time with localStorage.
 
-**Recommendation:** 
+**Recommendation:**
+
 1. Implement automated database backups (daily full, hourly incremental)
 2. Store backups in at least two geographically separated locations
 3. Test restore procedures quarterly
@@ -882,6 +931,7 @@ export interface DB {
 ### 18.1 🔴 Cash Skimming via Unverified Sunday Counts (Church Consultant)
 
 **Vector:** A single person (treasurer) can:
+
 1. Count the Sunday cash offerings alone
 2. Enter their own name as all three counters in the Sunday Count Sheet
 3. Reduce the actual amounts by any amount
@@ -889,6 +939,7 @@ export interface DB {
 5. The validation checks pass because they compare entered amounts against entered counts — not against actual physical money
 
 **Controls Missing:**
+
 - Independent counter verification (counters enter their own counts)
 - Physical count sheet signed by all counters and filed
 - Reconciliation against deposit slip (bank deposit amount must match system amount)
@@ -898,12 +949,14 @@ export interface DB {
 ### 18.2 🔴 Fictitious Expense Fraud (Church Consultant)
 
 **Vector:** A finance_staff or treasurer can:
+
 1. Create a fictitious expense (e.g., "ค่าซ่อมบำรุง" ฿5,000)
 2. Attach a fake receipt (photo of unrelated bill)
 3. If they also have approval rights or can collude, approve it
 4. The expense reduces fund balance, and the perpetrator withdraws the cash
 
 **Controls Missing:**
+
 - Require original physical receipts (not just photos)
 - Require vendor verification (phone call to vendor above threshold)
 - Three-way match: Purchase Order → Receipt → Invoice
@@ -913,11 +966,13 @@ export interface DB {
 ### 18.3 🟠 Fund Transfer Fraud (Church Consultant)
 
 **Vector:** A treasurer with `fund.write` can:
+
 1. Transfer ฿50,000 from Building Fund to General Fund
 2. Then record a ฿50,000 expense from General Fund (fake expense)
 3. The Building Fund balance drops but the money doesn't actually go to a legitimate expense
 
 **Controls Missing:**
+
 - Fund transfer approval workflow
 - Transfer purpose documentation requirement
 - Board notification for transfers above threshold
@@ -926,11 +981,13 @@ export interface DB {
 ### 18.4 🟡 Journal Entry Manipulation via Back-Dating (Church Consultant)
 
 **Vector:** A user can:
+
 1. Wait until after a period has been "reconciled" (informally)
 2. Add an offering dated in the reconciled period
 3. Since there's no period locking, the reconciled numbers change silently
 
 **Controls Missing:**
+
 - Period locking (Section 3.5)
 - System-enforced cutoff dates
 - Alert when transactions are dated more than N days in the past
@@ -940,6 +997,7 @@ export interface DB {
 **Vector:** PINs are shared verbally ("the treasurer PIN is 333333"). Anyone who knows a PIN can operate as that person with no additional verification.
 
 **Controls Missing:**
+
 - Unique per-user credentials (not shared PINs)
 - MFA for sensitive operations
 - Session logging with IP/device tracking
@@ -986,6 +1044,7 @@ No confirmation dialog, no "Are you sure?" prompt. One misclick deletes a financ
 ### 20.1 🔴 No Production Build Configuration (DevOps Lead)
 
 **Finding:** The project has `vite build` but no production deployment configuration:
+
 - No environment variable management
 - No production database configuration
 - No CDN/static asset strategy
@@ -1005,13 +1064,15 @@ try {
   cache = migrateDb(parsed);
   return cache;
 } catch {
-  /* fall through to seed */  // ALL DATA LOST, NO USER NOTIFICATION
+  /* fall through to seed */
+  // ALL DATA LOST, NO USER NOTIFICATION
 }
 ```
 
 **Impact:** A JSON parse error silently destroys all financial data and replaces it with seed data. The user gets no warning, no error message, and no opportunity to recover.
 
-**Recommendation:** 
+**Recommendation:**
+
 1. Display a prominent error when data corruption is detected
 2. Offer data recovery options (export corrupted data, attempt repair)
 3. Never silently replace production data with seed data
@@ -1023,7 +1084,8 @@ try {
 
 **Impact:** Every code change risks introducing financial calculation errors, permission bypasses, or data corruption with no automated detection.
 
-**Recommendation:** 
+**Recommendation:**
+
 1. Unit tests for all service functions (`church.ts`)
 2. Integration tests for critical workflows (create → approve → reconcile)
 3. Financial calculation regression tests (known inputs → expected balances)
@@ -1044,22 +1106,23 @@ try {
 
 The following would cause an immediate audit failure:
 
-| Requirement | Status | Section |
-|---|---|---|
-| Immutable audit trail | ❌ | 15.1 |
-| Double-entry bookkeeping | ❌ | 3.1 |
-| Segregation of duties | ❌ | 5.2 |
-| Period locking | ❌ | 3.5 |
-| Server-side authorization | ❌ | 13.1 |
-| Data backup and recovery | ❌ | 17.1 |
-| Transaction sequencing | ❌ | 16.2 |
-| Durable data storage | ❌ | 2.1 |
-| User authentication beyond 6-digit PIN | ❌ | 14.1 |
-| Independent cash count verification | ❌ | 6.2 |
+| Requirement                            | Status | Section |
+| -------------------------------------- | ------ | ------- |
+| Immutable audit trail                  | ❌     | 15.1    |
+| Double-entry bookkeeping               | ❌     | 3.1     |
+| Segregation of duties                  | ❌     | 5.2     |
+| Period locking                         | ❌     | 3.5     |
+| Server-side authorization              | ❌     | 13.1    |
+| Data backup and recovery               | ❌     | 17.1    |
+| Transaction sequencing                 | ❌     | 16.2    |
+| Durable data storage                   | ❌     | 2.1     |
+| User authentication beyond 6-digit PIN | ❌     | 14.1    |
+| Independent cash count verification    | ❌     | 6.2     |
 
 ### 21.2 🟠 Thai Tax Compliance Not Addressed (Church Consultant)
 
 **Finding:** The system has no features for:
+
 - Tax receipt generation for donors (ใบอนุโมทนาบัตร)
 - Annual donor statements for tax deduction claims
 - Withholding tax tracking (ภ.ง.ด. 3, ภ.ง.ด. 53) for staff salaries
@@ -1067,6 +1130,7 @@ The following would cause an immediate audit failure:
 - Social security contribution tracking for employees
 
 **Recommendation:** Add tax compliance features appropriate for religious organizations in Thailand:
+
 1. Donor receipt generation with church tax ID
 2. Annual giving statements per member
 3. Expense categorization for tax-deductible vs. non-deductible
@@ -1075,12 +1139,14 @@ The following would cause an immediate audit failure:
 ### 21.3 🟡 No Data Privacy Controls (Security Engineer)
 
 **Finding:** Member data (names, phone numbers, emails) is stored in the same localStorage blob as financial data. There is no:
+
 - Data classification (PII vs. financial vs. public)
 - Access control on member contact details
 - Data anonymization for exports
 - GDPR/PDPA compliance consideration (Thailand has PDPA)
 
-**Recommendation:** 
+**Recommendation:**
+
 1. Classify data fields (PII, financial, operational)
 2. Restrict member contact details to authorized roles only
 3. Mask PII in exports and reports
@@ -1093,63 +1159,63 @@ The following would cause an immediate audit failure:
 
 ### Phase 0: Immediate Stopgap (Before Any Production Use)
 
-| # | Action | Severity |
-|---|---|---|
-| 1 | Migrate from localStorage to a server-side database (PostgreSQL) | 🔴 |
-| 2 | Implement server-side authentication with hashed passwords + MFA | 🔴 |
-| 3 | Move all business logic and authorization to server-side | 🔴 |
-| 4 | Implement double-entry bookkeeping with chart of accounts | 🔴 |
-| 5 | Add period locking and closing procedures | 🔴 |
-| 6 | Separate audit trail into append-only, immutable storage | 🔴 |
+| #   | Action                                                           | Severity |
+| --- | ---------------------------------------------------------------- | -------- |
+| 1   | Migrate from localStorage to a server-side database (PostgreSQL) | 🔴       |
+| 2   | Implement server-side authentication with hashed passwords + MFA | 🔴       |
+| 3   | Move all business logic and authorization to server-side         | 🔴       |
+| 4   | Implement double-entry bookkeeping with chart of accounts        | 🔴       |
+| 5   | Add period locking and closing procedures                        | 🔴       |
+| 6   | Separate audit trail into append-only, immutable storage         | 🔴       |
 
 ### Phase 1: Financial Controls (Month 1-2)
 
-| # | Action | Severity |
-|---|---|---|
-| 7 | Implement transaction approval workflow with proper state machine | 🔴 |
-| 8 | Add fund balance validation on all expense/transfer operations | 🟠 |
-| 9 | Enforce segregation of duties (no self-approval) | 🟠 |
-| 10 | Add status/approval to Offering records | 🟠 |
-| 11 | Implement independent counter verification for Sunday counts | 🟠 |
-| 12 | Add offering ↔ member linking for giving statements | 🟡 |
-| 13 | Implement fund transfer atomicity and approval | 🟠 |
-| 14 | Fix budget tracking (used field update or dynamic calculation) | 🟡 |
-| 15 | Add sequential transaction numbering | 🟠 |
+| #   | Action                                                            | Severity |
+| --- | ----------------------------------------------------------------- | -------- |
+| 7   | Implement transaction approval workflow with proper state machine | 🔴       |
+| 8   | Add fund balance validation on all expense/transfer operations    | 🟠       |
+| 9   | Enforce segregation of duties (no self-approval)                  | 🟠       |
+| 10  | Add status/approval to Offering records                           | 🟠       |
+| 11  | Implement independent counter verification for Sunday counts      | 🟠       |
+| 12  | Add offering ↔ member linking for giving statements               | 🟡       |
+| 13  | Implement fund transfer atomicity and approval                    | 🟠       |
+| 14  | Fix budget tracking (used field update or dynamic calculation)    | 🟡       |
+| 15  | Add sequential transaction numbering                              | 🟠       |
 
 ### Phase 2: Reporting & Compliance (Month 3-4)
 
-| # | Action | Severity |
-|---|---|---|
-| 16 | Implement proper balance sheet, income statement, cash flow reports | 🟠 |
-| 17 | Add tax receipt/donor statement generation | 🟠 |
-| 18 | Implement persisted reconciliation with period chaining | 🟠 |
-| 19 | Add PDPA compliance for member data | 🟡 |
-| 20 | Implement fiscal year handling in all reports | 🟠 |
-| 21 | Add IP/device tracking to audit logs | 🟡 |
+| #   | Action                                                              | Severity |
+| --- | ------------------------------------------------------------------- | -------- |
+| 16  | Implement proper balance sheet, income statement, cash flow reports | 🟠       |
+| 17  | Add tax receipt/donor statement generation                          | 🟠       |
+| 18  | Implement persisted reconciliation with period chaining             | 🟠       |
+| 19  | Add PDPA compliance for member data                                 | 🟡       |
+| 20  | Implement fiscal year handling in all reports                       | 🟠       |
+| 21  | Add IP/device tracking to audit logs                                | 🟡       |
 
 ### Phase 3: Operations & Resilience (Month 5-6)
 
-| # | Action | Severity |
-|---|---|---|
-| 22 | Implement automated database backups with restore testing | 🔴 |
-| 23 | Add comprehensive test suite (unit, integration, financial) | 🟡 |
-| 24 | Implement concurrency control and optimistic locking | 🔴 |
-| 25 | Add rate limiting and brute-force protection | 🟠 |
-| 26 | Implement session timeout enforcement | 🟠 |
-| 27 | Add error boundaries and graceful degradation | 🟠 |
-| 28 | Implement proper attachment storage (server-side, not localStorage) | 🟠 |
+| #   | Action                                                              | Severity |
+| --- | ------------------------------------------------------------------- | -------- |
+| 22  | Implement automated database backups with restore testing           | 🔴       |
+| 23  | Add comprehensive test suite (unit, integration, financial)         | 🟡       |
+| 24  | Implement concurrency control and optimistic locking                | 🔴       |
+| 25  | Add rate limiting and brute-force protection                        | 🟠       |
+| 26  | Implement session timeout enforcement                               | 🟠       |
+| 27  | Add error boundaries and graceful degradation                       | 🟠       |
+| 28  | Implement proper attachment storage (server-side, not localStorage) | 🟠       |
 
 ### Phase 4: Polish & Advanced Features (Month 7+)
 
-| # | Action | Severity |
-|---|---|---|
-| 29 | Add purchase order/commitment tracking | 🟡 |
-| 30 | Add inter-fund loan tracking | 🟡 |
-| 31 | Add expense report workflow with line items | 🟡 |
-| 32 | Implement budget creation/approval workflow | 🟡 |
-| 33 | Add multi-currency support | 🟢 |
-| 34 | Add bank feed integration (auto-import bank statements) | 🟢 |
-| 35 | Add mobile app for counter verification | 🟢 |
+| #   | Action                                                  | Severity |
+| --- | ------------------------------------------------------- | -------- |
+| 29  | Add purchase order/commitment tracking                  | 🟡       |
+| 30  | Add inter-fund loan tracking                            | 🟡       |
+| 31  | Add expense report workflow with line items             | 🟡       |
+| 32  | Implement budget creation/approval workflow             | 🟡       |
+| 33  | Add multi-currency support                              | 🟢       |
+| 34  | Add bank feed integration (auto-import bank statements) | 🟢       |
+| 35  | Add mobile app for counter verification                 | 🟢       |
 
 ---
 
@@ -1167,6 +1233,6 @@ Grace Ledger is a well-intentioned prototype with a solid UI foundation, but it 
 
 ---
 
-*Audit prepared by: Principal Software Architect, Principal Security Engineer, Senior DBA, Financial Systems Architect, Church Financial Consultant, UX Lead, QA Lead, DevOps Lead*
+_Audit prepared by: Principal Software Architect, Principal Security Engineer, Senior DBA, Financial Systems Architect, Church Financial Consultant, UX Lead, QA Lead, DevOps Lead_
 
-*This report should be reviewed by church leadership and the software development team before any production deployment.*
+_This report should be reviewed by church leadership and the software development team before any production deployment._

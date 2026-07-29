@@ -1,6 +1,7 @@
 # Grace Ledger v2 — Church Accounting Platform
 
 ## Tech Stack
+
 - **Frontend**: React 19 + TypeScript, TanStack Router, TanStack Start, Tailwind CSS v4, shadcn/ui
 - **Backend**: TanStack Start (SSR), Nitro server, Drizzle ORM
 - **Database**: PostgreSQL (Supabase compatible)
@@ -8,6 +9,7 @@
 - **Deployment**: Docker (production) / Vercel (preview)
 
 ## Project Structure
+
 ```
 src/
 ├── components/   # React components (church/, layout/, receipts/, shared/, ui/)
@@ -25,7 +27,9 @@ src/
 ```
 
 ## Available Skills (in .claude/skills/)
+
 Skills are already installed and linked to this project:
+
 - **Agent Workflow**: code-review, codebase-design, domain-modeling, implement, tdd, to-spec, planning-and-task-breakdown, debugging-and-error-recovery
 - **Frontend**: frontend-ui-engineering
 - **Backend**: api-and-interface-design, performance-optimization, security-and-hardening
@@ -36,6 +40,7 @@ Skills are already installed and linked to this project:
 - **Tools**: conventional-commit, playwright-cli, git-guardrails-claude-code, claude-handoff
 
 ## Key Commands
+
 ```bash
 npm run dev        # Start dev server
 npm run build      # Build for production
@@ -43,6 +48,7 @@ npm run preview    # Preview production build
 ```
 
 ## Architecture Notes
+
 - API routes match manually (no URLPattern dependency) via src/server/api/routes.ts
 - Audit trail uses SHA-256 hash chaining per church (src/server/services/audit.service.ts)
 - Approval thresholds: <5K baht (admin), 5K-50K (admin), >50K (dual super_admin)

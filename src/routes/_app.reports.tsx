@@ -48,9 +48,9 @@ function ReportsPage() {
     const csvContent =
       "data:text/csv;charset=utf-8," +
       "ประเภท,รายการ,จำนวนเงิน (บาท),วันที่\n" +
-      incomes.map((i) => `รายรับ,${i.description || 'รายรับ'},${i.amount},${i.date}`).join("\n") +
+      incomes.map((i) => `รายรับ,${i.description || "รายรับ"},${i.amount},${i.date}`).join("\n") +
       "\n" +
-      expenses.map((e) => `รายจ่าย,${e.description || 'รายจ่าย'},${e.amount},${e.date}`).join("\n");
+      expenses.map((e) => `รายจ่าย,${e.description || "รายจ่าย"},${e.amount},${e.date}`).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -120,7 +120,9 @@ function ReportsPage() {
         <TabsContent value="statement" className="mt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-medium">งบสรุปรายรับ-รายจ่ายประจำคริสตจักร</CardTitle>
+              <CardTitle className="text-base font-medium">
+                งบสรุปรายรับ-รายจ่ายประจำคริสตจักร
+              </CardTitle>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span>ข้อมูลอัปเดตล่าสุดเรียลไทม์</span>
@@ -139,7 +141,9 @@ function ReportsPage() {
                       {incomes.map((inc) => (
                         <div key={inc.id} className="flex justify-between p-3">
                           <div>
-                            <p className="font-medium text-foreground">{inc.description || "รายรับ"}</p>
+                            <p className="font-medium text-foreground">
+                              {inc.description || "รายรับ"}
+                            </p>
                             <p className="text-[11px] text-muted-foreground">{inc.date}</p>
                           </div>
                           <span className="font-semibold text-emerald-600 dark:text-emerald-400">
@@ -162,8 +166,12 @@ function ReportsPage() {
                       {expenses.map((exp) => (
                         <div key={exp.id} className="flex justify-between p-3">
                           <div>
-                            <p className="font-medium text-foreground">{exp.description || "รายจ่าย"}</p>
-                            <p className="text-[11px] text-muted-foreground">{exp.date} · หมวดหมู่ {exp.categoryId}</p>
+                            <p className="font-medium text-foreground">
+                              {exp.description || "รายจ่าย"}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              {exp.date} · หมวดหมู่ {exp.categoryId}
+                            </p>
                           </div>
                           <span className="font-semibold text-rose-600 dark:text-rose-400">
                             -{thb(exp.amount)}
@@ -185,18 +193,22 @@ function ReportsPage() {
             </CardHeader>
             <CardContent>
               {offerings.length === 0 ? (
-                <p className="text-xs text-muted-foreground py-4 text-center">ยังไม่มีบันทึกสรุปเงินถวาย</p>
+                <p className="text-xs text-muted-foreground py-4 text-center">
+                  ยังไม่มีบันทึกสรุปเงินถวาย
+                </p>
               ) : (
                 <div className="border border-border divide-y divide-border rounded-md text-xs">
                   {offerings.map((off) => (
                     <div key={off.id} className="flex justify-between p-3">
                       <div>
-                        <p className="font-medium text-foreground">เงินถวายประจำวันที่ {off.date}</p>
-                        <p className="text-[11px] text-muted-foreground">บันทึกโดย {off.createdBy}</p>
+                        <p className="font-medium text-foreground">
+                          เงินถวายประจำวันที่ {off.date}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          บันทึกโดย {off.createdBy}
+                        </p>
                       </div>
-                      <span className="font-semibold text-foreground">
-                        {thb(off.amount)}
-                      </span>
+                      <span className="font-semibold text-foreground">{thb(off.amount)}</span>
                     </div>
                   ))}
                 </div>
@@ -213,13 +225,19 @@ function ReportsPage() {
             <CardContent>
               <div className="space-y-3">
                 {Object.entries(
-                  expenses.reduce((acc, curr) => {
-                    const cat = curr.categoryId || "อื่นๆ";
-                    acc[cat] = (acc[cat] || 0) + (curr.amount || 0);
-                    return acc;
-                  }, {} as Record<string, number>)
+                  expenses.reduce(
+                    (acc, curr) => {
+                      const cat = curr.categoryId || "อื่นๆ";
+                      acc[cat] = (acc[cat] || 0) + (curr.amount || 0);
+                      return acc;
+                    },
+                    {} as Record<string, number>,
+                  ),
                 ).map(([category, amount]) => (
-                  <div key={category} className="flex items-center justify-between border-b border-border pb-2 text-xs">
+                  <div
+                    key={category}
+                    className="flex items-center justify-between border-b border-border pb-2 text-xs"
+                  >
                     <span className="font-medium">{category}</span>
                     <span className="font-semibold">{thb(amount)}</span>
                   </div>

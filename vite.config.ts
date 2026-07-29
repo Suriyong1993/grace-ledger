@@ -12,4 +12,19 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Proxy /api requests to the standalone API server (bun run src/server/index.ts)
+  // This enables the frontend dev server to forward all API mutations to the backend
+  // while keeping reads going directly through Supabase for speed.
+  // Note: wrapped in `vite:` because @lovable.dev/vite-tanstack-config expects
+  // raw Vite options under a nested key.
+  vite: {
+    server: {
+      proxy: {
+        "/api": {
+          target: "http://localhost:3001",
+          changeOrigin: true,
+        },
+      },
+    },
+  },
 });

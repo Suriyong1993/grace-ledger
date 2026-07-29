@@ -79,18 +79,25 @@ export function exportToPEAKCSV(expenses: Array<Parameters<typeof convertToPEAKF
     `"${d.status}"`,
   ]);
 
-  const csvString = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+  const csvString =
+    "data:text/csv;charset=utf-8,\uFEFF" +
+    [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
   const encodedUri = encodeURI(csvString);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `PEAK_Account_Import_${new Date().toISOString().split("T")[0]}.csv`);
+  link.setAttribute(
+    "download",
+    `PEAK_Account_Import_${new Date().toISOString().split("T")[0]}.csv`,
+  );
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
 
 // Simulate PEAK API Realtime Sync
-export async function syncToPEAKAPI(payload: PEAKExpensePayload): Promise<{ success: boolean; peakDocId: string }> {
+export async function syncToPEAKAPI(
+  payload: PEAKExpensePayload,
+): Promise<{ success: boolean; peakDocId: string }> {
   await new Promise((resolve) => setTimeout(resolve, 800)); // simulate network latency
   const mockPeakDocId = `PEAK-${Math.floor(100000 + Math.random() * 900000)}`;
 

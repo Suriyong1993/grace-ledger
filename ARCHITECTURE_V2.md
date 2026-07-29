@@ -30,6 +30,7 @@
 **Principle:** No business logic shall execute on the client. The browser is an untrusted execution environment.
 
 **Implementation:**
+
 - All financial calculations execute in server functions (TanStack Start server-side functions)
 - Every API request passes through authorization middleware before reaching domain logic
 - Client-side state is purely presentational — derived from server responses
@@ -40,6 +41,7 @@
 **Principle:** Every financial operation must produce a balanced journal entry. `Σ debits = Σ credits` is a system invariant enforced at the database level.
 
 **Implementation:**
+
 - Journal entries are created atomically within a single database transaction
 - The posting engine validates balance equality before committing
 - A CHECK constraint on the journal_entry table enforces `debit_total = credit_total`
@@ -50,6 +52,7 @@
 **Principle:** Once recorded, no audit record can be modified or deleted. Audit integrity is cryptographically verifiable.
 
 **Implementation:**
+
 - Audit log table has REVOKE INSERT, GRANT SELECT permissions — no UPDATE/DELETE possible
 - Each entry contains `sha256(previous_entry_hash || current_entry_json)`
 - External verification endpoint allows auditors to validate the hash chain independently
@@ -72,6 +75,7 @@
 **Principle:** Every piece of financial data has exactly one authoritative representation.
 
 **Implementation:**
+
 - Fund balances are stored in the `general_ledger` table, not computed ad-hoc
 - Period close snapshots are stored independently for historical audit
 - Cached balances are invalidated atomically with the transactions that update them
@@ -192,6 +196,7 @@ User Action → React Component → TanStack Query Mutation
 **Location:** `src/routes/`, `src/components/`
 
 **Responsibilities:**
+
 - Render UI components using shadcn/ui + Radix primitives
 - Handle user input and form state (React Hook Form)
 - Display data received from server functions
@@ -199,6 +204,7 @@ User Action → React Component → TanStack Query Mutation
 - Handle optimistic UI updates for non-financial operations only
 
 **Constraints:**
+
 - NEVER execute financial calculations
 - NEVER store financial data beyond UI cache
 - NEVER contain authorization logic beyond UI hiding
@@ -209,6 +215,7 @@ User Action → React Component → TanStack Query Mutation
 **Location:** `src/routes/api/` (TanStack Start server functions)
 
 **Responsibilities:**
+
 - Authenticate every request (session validation via httpOnly JWT cookie)
 - Authorize every request (permission check against role matrix)
 - Rate limit per user and per IP
@@ -216,18 +223,19 @@ User Action → React Component → TanStack Query Mutation
 - Transform domain errors to HTTP responses
 
 **Server Function Pattern:**
+
 ```typescript
 // src/routes/api/v1/journal.server.ts
 export const createJournalEntry = createServerFn(
-  'POST',
-  '/api/v1/journal',
+  "POST",
+  "/api/v1/journal",
   async (input: CreateJournalEntryInput) => {
     const session = await validateSession();
-    await authorize(session.userId, 'journal.write');
+    await authorize(session.userId, "journal.write");
     const validated = createJournalEntrySchema.parse(input);
     const result = await journalService.createEntry(validated, session.userId);
     return result;
-  }
+  },
 );
 ```
 
@@ -236,12 +244,14 @@ export const createJournalEntry = createServerFn(
 **Location:** `src/server/services/`
 
 **Responsibilities:**
+
 - Orchestrate complex operations spanning multiple domain objects
 - Manage transactions across multiple repositories
 - Coordinate approval workflows and event notifications
 - Generate report data from domain queries
 
 **Example — Journal Service:**
+
 ```typescript
 // src/server/services/journal.service.ts
 export class JournalService {
@@ -251,10 +261,7 @@ export class JournalService {
     private auditRepo: AuditRepository,
   ) {}
 
-  async createEntry(
-    input: CreateJournalEntryInput,
-    userId: string,
-  ): Promise<JournalEntry> {
+  async createEntry(input: CreateJournalEntryInput, userId: string): Promise<JournalEntry> {
     // 1. Validate debit/credit balance
     // 2. Validate all account IDs exist
     // 3. Validate period is open
@@ -271,11 +278,13 @@ export class JournalService {
 **Location:** `src/server/domain/`
 
 **Responsibilities:**
+
 - Define domain entities, value objects, and aggregates
 - Implement business rules and invariants
 - Define domain events
 
 **Key Aggregates:**
+
 - `JournalAggregate` — Journal entry + lines + balancing
 - `PeriodAggregate` — Period opening/closing, balance carrying
 - `ReconciliationAggregate` — Reconciliation with period chaining
@@ -286,11 +295,13 @@ export class JournalService {
 **Location:** `src/server/repositories/`
 
 **Responsibilities:**
+
 - Abstract database access behind interfaces
 - Implement CRUD operations with proper transaction handling
 - Implement Row-Level Security compliant queries
 
 **Pattern:**
+
 ```typescript
 // src/server/repositories/journal.repository.ts
 export interface JournalRepository {
@@ -310,6 +321,7 @@ export class PostgresJournalRepository implements JournalRepository {
 **Location:** `src/server/infrastructure/`
 
 **Responsibilities:**
+
 - Database connection management and pooling
 - File storage (receipts, attachments)
 - External integrations (email, SMS, SIEM forward)
@@ -321,31 +333,32 @@ export class PostgresJournalRepository implements JournalRepository {
 
 ### 4.1 Selected Technologies
 
-| Layer | Technology | Version | Justification |
-|-------|------------|--------|---------------|
-| Frontend Framework | React | 19.x | Current project base |
-| Meta Framework | TanStack Start | 1.x | Current project base; SSR + server functions |
-| Routing | TanStack Router | 1.x | File-based routing; type-safe |
-| Server State | TanStack Query | 5.x | Current project base |
-| Styling | Tailwind CSS | 4.x | Current project base |
-| UI Components | shadcn/ui + Radix | Latest | Current project base |
-| Forms | React Hook Form + Zod | Latest | Current project base |
-| Charts | Recharts | Latest | Current project base |
-| Icons | Lucide React | Latest | Current project base |
-| Build | Vite | 6.x | Current project base |
-| Package Manager | Bun | Latest | Current project base |
-| Database | PostgreSQL | 16.x | ACID; RLS; PITR; Supabase managed |
-| ORM | Drizzle ORM | Latest | Type-safe; SQL-like; migration support |
-| Auth | Supabase Auth (modified) | Latest | Managed; JWT; httpOnly cookies |
-| File Storage | Supabase Storage | Latest | S3-compatible; RLS |
-| Monitoring | Sentry | Latest | Error tracking |
-| Logging | Pino | Latest | Structured JSON logging |
-| CI/CD | GitHub Actions | — | Project hosted on GitHub |
-| Hosting | Supabase + Vercel/Railway | — | Managed; Edge functions |
+| Layer              | Technology                | Version | Justification                                |
+| ------------------ | ------------------------- | ------- | -------------------------------------------- |
+| Frontend Framework | React                     | 19.x    | Current project base                         |
+| Meta Framework     | TanStack Start            | 1.x     | Current project base; SSR + server functions |
+| Routing            | TanStack Router           | 1.x     | File-based routing; type-safe                |
+| Server State       | TanStack Query            | 5.x     | Current project base                         |
+| Styling            | Tailwind CSS              | 4.x     | Current project base                         |
+| UI Components      | shadcn/ui + Radix         | Latest  | Current project base                         |
+| Forms              | React Hook Form + Zod     | Latest  | Current project base                         |
+| Charts             | Recharts                  | Latest  | Current project base                         |
+| Icons              | Lucide React              | Latest  | Current project base                         |
+| Build              | Vite                      | 6.x     | Current project base                         |
+| Package Manager    | Bun                       | Latest  | Current project base                         |
+| Database           | PostgreSQL                | 16.x    | ACID; RLS; PITR; Supabase managed            |
+| ORM                | Drizzle ORM               | Latest  | Type-safe; SQL-like; migration support       |
+| Auth               | Supabase Auth (modified)  | Latest  | Managed; JWT; httpOnly cookies               |
+| File Storage       | Supabase Storage          | Latest  | S3-compatible; RLS                           |
+| Monitoring         | Sentry                    | Latest  | Error tracking                               |
+| Logging            | Pino                      | Latest  | Structured JSON logging                      |
+| CI/CD              | GitHub Actions            | —       | Project hosted on GitHub                     |
+| Hosting            | Supabase + Vercel/Railway | —       | Managed; Edge functions                      |
 
 ### 4.2 Technology Decision Rationale
 
 **Why PostgreSQL over Firebase/MongoDB:**
+
 - ACID transactions required for double-entry bookkeeping
 - Row-Level Security enables defense-in-depth authorization
 - Point-in-Time Recovery for audit compliance
@@ -353,12 +366,14 @@ export class PostgresJournalRepository implements JournalRepository {
 - DECIMAL type for exact financial calculations (no floating point)
 
 **Why Drizzle ORM over Prisma:**
+
 - Closer to SQL; easier to write complex financial queries
 - Lighter weight; fewer abstraction layers to debug
 - Better TypeScript type inference for financial aggregates
 - Migration approach is more explicit and auditable
 
 **Why TanStack Start over Next.js:**
+
 - Current project is already on TanStack Start
 - Server functions provide a natural boundary for server-side logic
 - Type-safe routing integrated with the router
@@ -614,20 +629,20 @@ src/
 
 ### 7.2 Environment Strategy
 
-| Environment | Purpose | Data |
-|-------------|---------|------|
-| Development | Local development | Docker PostgreSQL + seed data |
-| Staging | Pre-production testing | Anonymized copy of production (daily sync) |
-| Production | Live church operations | Real financial data |
+| Environment | Purpose                | Data                                       |
+| ----------- | ---------------------- | ------------------------------------------ |
+| Development | Local development      | Docker PostgreSQL + seed data              |
+| Staging     | Pre-production testing | Anonymized copy of production (daily sync) |
+| Production  | Live church operations | Real financial data                        |
 
 ### 7.3 Backup Strategy
 
-| Backup Type | Frequency | Retention |
-|-------------|-----------|-----------|
-| Full database backup | Daily | 30 days |
-| WAL archiving (PITR) | Continuous | 7 days |
-| Backup to secondary region | Weekly | 90 days |
-| Annual archive | Yearly | 7+ years (tax compliance) |
+| Backup Type                | Frequency  | Retention                 |
+| -------------------------- | ---------- | ------------------------- |
+| Full database backup       | Daily      | 30 days                   |
+| WAL archiving (PITR)       | Continuous | 7 days                    |
+| Backup to secondary region | Weekly     | 90 days                   |
+| Annual archive             | Yearly     | 7+ years (tax compliance) |
 
 ---
 
@@ -676,18 +691,18 @@ src/
 
 All server functions are organized under `/api/v1/`:
 
-| Resource | Create | Read (list) | Read (single) | Update | Delete/Void |
-|----------|--------|-------------|---------------|--------|-------------|
-| Journal Entries | POST `/journal` | GET `/journal?from=&to=` | GET `/journal/:id` | — | POST `/journal/:id/void` |
-| Accounts (COA) | POST `/accounts` | GET `/accounts` | GET `/accounts/:id` | PATCH `/accounts/:id` | DELETE `/accounts/:id` |
-| Funds | POST `/funds` | GET `/funds` | GET `/funds/:id` | PATCH `/funds/:id` | POST `/funds/:id/close` |
-| Offerings | POST `/offerings` | GET `/offerings` | GET `/offerings/:id` | PATCH `/offerings/:id` | POST `/offerings/:id/void` |
-| Expenses | POST `/expenses` | GET `/expenses` | GET `/expenses/:id` | — | POST `/expenses/:id/void` |
-| Periods | POST `/periods/:id/close` | GET `/periods` | GET `/periods/:id` | — | POST `/periods/:id/reopen` |
-| Reconciliations | POST `/reconciliations` | GET `/reconciliations` | GET `/reconciliations/:id` | — | — |
-| Budgets | POST `/budgets` | GET `/budgets` | GET `/budgets/:id` | PATCH `/budgets/:id` | DELETE `/budgets/:id` |
-| Reports | POST `/reports/balance-sheet` | — | — | — | — |
-| Members | POST `/members` | GET `/members` | GET `/members/:id` | PATCH `/members/:id` | DELETE `/members/:id` |
+| Resource        | Create                        | Read (list)              | Read (single)              | Update                 | Delete/Void                |
+| --------------- | ----------------------------- | ------------------------ | -------------------------- | ---------------------- | -------------------------- |
+| Journal Entries | POST `/journal`               | GET `/journal?from=&to=` | GET `/journal/:id`         | —                      | POST `/journal/:id/void`   |
+| Accounts (COA)  | POST `/accounts`              | GET `/accounts`          | GET `/accounts/:id`        | PATCH `/accounts/:id`  | DELETE `/accounts/:id`     |
+| Funds           | POST `/funds`                 | GET `/funds`             | GET `/funds/:id`           | PATCH `/funds/:id`     | POST `/funds/:id/close`    |
+| Offerings       | POST `/offerings`             | GET `/offerings`         | GET `/offerings/:id`       | PATCH `/offerings/:id` | POST `/offerings/:id/void` |
+| Expenses        | POST `/expenses`              | GET `/expenses`          | GET `/expenses/:id`        | —                      | POST `/expenses/:id/void`  |
+| Periods         | POST `/periods/:id/close`     | GET `/periods`           | GET `/periods/:id`         | —                      | POST `/periods/:id/reopen` |
+| Reconciliations | POST `/reconciliations`       | GET `/reconciliations`   | GET `/reconciliations/:id` | —                      | —                          |
+| Budgets         | POST `/budgets`               | GET `/budgets`           | GET `/budgets/:id`         | PATCH `/budgets/:id`   | DELETE `/budgets/:id`      |
+| Reports         | POST `/reports/balance-sheet` | —                        | —                          | —                      | —                          |
+| Members         | POST `/members`               | GET `/members`           | GET `/members/:id`         | PATCH `/members/:id`   | DELETE `/members/:id`      |
 
 ### 9.2 Response Format
 
@@ -715,21 +730,21 @@ All server functions are organized under `/api/v1/`:
 
 ### 9.3 Error Codes
 
-| Code | HTTP Status | Meaning |
-|------|-------------|---------|
-| VALIDATION_ERROR | 400 | Input validation failed |
-| UNAUTHORIZED | 401 | Missing or invalid session |
-| FORBIDDEN | 403 | Insufficient permissions |
-| NOT_FOUND | 404 | Entity not found |
-| CONFLICT | 409 | Optimistic lock conflict |
-| INSUFFICIENT_FUNDS | 422 | Fund balance too low |
-| PERIOD_CLOSED | 422 | Period is closed for transactions |
-| PERIOD_ALREADY_CLOSED | 422 | Period is already closed |
-| RECONCILIATION_REQUIRED | 422 | Prior period not reconciled |
-| SELF_APPROVAL | 422 | Cannot approve own transaction |
-| INVALID_TRANSITION | 422 | Status transition not allowed |
-| RATE_LIMITED | 429 | Too many requests |
-| INTERNAL_ERROR | 500 | Unexpected error |
+| Code                    | HTTP Status | Meaning                           |
+| ----------------------- | ----------- | --------------------------------- |
+| VALIDATION_ERROR        | 400         | Input validation failed           |
+| UNAUTHORIZED            | 401         | Missing or invalid session        |
+| FORBIDDEN               | 403         | Insufficient permissions          |
+| NOT_FOUND               | 404         | Entity not found                  |
+| CONFLICT                | 409         | Optimistic lock conflict          |
+| INSUFFICIENT_FUNDS      | 422         | Fund balance too low              |
+| PERIOD_CLOSED           | 422         | Period is closed for transactions |
+| PERIOD_ALREADY_CLOSED   | 422         | Period is already closed          |
+| RECONCILIATION_REQUIRED | 422         | Prior period not reconciled       |
+| SELF_APPROVAL           | 422         | Cannot approve own transaction    |
+| INVALID_TRANSITION      | 422         | Status transition not allowed     |
+| RATE_LIMITED            | 429         | Too many requests                 |
+| INTERNAL_ERROR          | 500         | Unexpected error                  |
 
 ---
 
@@ -747,7 +762,7 @@ export class InsufficientFundsError extends DomainError {
     public readonly requested: Money,
   ) {
     super(
-      'INSUFFICIENT_FUNDS',
+      "INSUFFICIENT_FUNDS",
       `Fund '${fundName}' has insufficient balance: ${available.format()} available, ${requested.format()} requested`,
     );
   }
@@ -756,14 +771,29 @@ export class InsufficientFundsError extends DomainError {
 // Server function catches domain errors and transforms to HTTP responses
 function handleServerError(error: unknown): APIErrorResponse {
   if (error instanceof DomainError) {
-    return { error: { code: error.code, message: error.message, correlationId: getCorrelationId() } };
+    return {
+      error: { code: error.code, message: error.message, correlationId: getCorrelationId() },
+    };
   }
   if (error instanceof ZodError) {
-    return { error: { code: 'VALIDATION_ERROR', message: 'Validation failed', correlationId: getCorrelationId(), details: error.flatten().fieldErrors } };
+    return {
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Validation failed",
+        correlationId: getCorrelationId(),
+        details: error.flatten().fieldErrors,
+      },
+    };
   }
   // Unexpected error
   Sentry.captureException(error);
-  return { error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred', correlationId: getCorrelationId() } };
+  return {
+    error: {
+      code: "INTERNAL_ERROR",
+      message: "An unexpected error occurred",
+      correlationId: getCorrelationId(),
+    },
+  };
 }
 ```
 
@@ -775,14 +805,14 @@ const createExpense = useMutation({
   mutationFn: (input: CreateExpenseInput) => api.createExpense(input),
   onError: (error: APIError) => {
     switch (error.code) {
-      case 'INSUFFICIENT_FUNDS':
+      case "INSUFFICIENT_FUNDS":
         toast.error(`กองทุนมียอดคงเหลือไม่เพียงพอ: ${error.message}`);
         break;
-      case 'PERIOD_CLOSED':
-        toast.error('ไม่สามารถบันทึกรายการได้: งวดบัญชีปิดแล้ว');
+      case "PERIOD_CLOSED":
+        toast.error("ไม่สามารถบันทึกรายการได้: งวดบัญชีปิดแล้ว");
         break;
       default:
-        toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่');
+        toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
     }
   },
 });
@@ -820,24 +850,24 @@ const createExpense = useMutation({
 
 ### 12.1 Metrics
 
-| Metric | Source | Alert Threshold |
-|--------|--------|-----------------|
-| API latency (p95) | Server | > 2s |
-| Database query time (p95) | Drizzle logs | > 500ms |
-| Error rate | Sentry | > 1% of requests |
-| Failed login attempts | Auth logs | > 10/min |
-| Fund overdraft events | Domain events | Any occurrence |
-| Period close failures | Domain events | Any occurrence |
-| Backup failures | Supabase | Any failure |
-| Reconciliation mismatches | Domain events | Any occurrence |
-| PITR lag | Supabase | > 1 hour |
+| Metric                    | Source        | Alert Threshold  |
+| ------------------------- | ------------- | ---------------- |
+| API latency (p95)         | Server        | > 2s             |
+| Database query time (p95) | Drizzle logs  | > 500ms          |
+| Error rate                | Sentry        | > 1% of requests |
+| Failed login attempts     | Auth logs     | > 10/min         |
+| Fund overdraft events     | Domain events | Any occurrence   |
+| Period close failures     | Domain events | Any occurrence   |
+| Backup failures           | Supabase      | Any failure      |
+| Reconciliation mismatches | Domain events | Any occurrence   |
+| PITR lag                  | Supabase      | > 1 hour         |
 
 ### 12.2 Logging
 
 ```typescript
 // Structured JSON logging with Pino
 logger.info({
-  event: 'journal_entry_created',
+  event: "journal_entry_created",
   journalId: entry.id,
   userId: userId,
   amount: entry.totalAmount.toNumber(),
@@ -864,6 +894,6 @@ GET /api/health
 
 ---
 
-*This architecture document is the authoritative reference for Grace Ledger v2 system design. All implementation decisions must align with the principles and patterns described here. Deviations require architecture review.*
+_This architecture document is the authoritative reference for Grace Ledger v2 system design. All implementation decisions must align with the principles and patterns described here. Deviations require architecture review._
 
-*Next: See DATABASE_V2.md for the database schema design, and ACCOUNTING_ENGINE.md for the double-entry accounting domain model.*
+_Next: See DATABASE_V2.md for the database schema design, and ACCOUNTING_ENGINE.md for the double-entry accounting domain model._

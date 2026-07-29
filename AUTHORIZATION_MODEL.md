@@ -20,14 +20,14 @@
 
 ## 1. Role Definitions
 
-| Role | Code | Description | Access Level |
-|------|------|-------------|-------------|
-| Super Admin | `super_admin` | Full system access; manages users and settings | All permissions |
-| Pastor | `pastor` | Senior church leader; approves transactions and views reports | Approval + view |
-| Treasurer | `treasurer` | Manages day-to-day finance; creates transactions | Write + cannot approve own |
-| Finance Staff | `finance_staff` | Data entry; creates transactions | Write (limited) |
-| Auditor | `auditor` | External/internal reviewer; read-only access to audit trail | Read-only |
-| Viewer | `viewer` | Read-only access to non-sensitive data | Read-only (limited) |
+| Role          | Code            | Description                                                   | Access Level               |
+| ------------- | --------------- | ------------------------------------------------------------- | -------------------------- |
+| Super Admin   | `super_admin`   | Full system access; manages users and settings                | All permissions            |
+| Pastor        | `pastor`        | Senior church leader; approves transactions and views reports | Approval + view            |
+| Treasurer     | `treasurer`     | Manages day-to-day finance; creates transactions              | Write + cannot approve own |
+| Finance Staff | `finance_staff` | Data entry; creates transactions                              | Write (limited)            |
+| Auditor       | `auditor`       | External/internal reviewer; read-only access to audit trail   | Read-only                  |
+| Viewer        | `viewer`        | Read-only access to non-sensitive data                        | Read-only (limited)        |
 
 ### 1.1 Role Hierarchy
 
@@ -48,132 +48,132 @@ super_admin
 
 ### 2.1 Full Matrix
 
-| Permission | super_admin | pastor | treasurer | finance_staff | auditor | viewer |
-|-----------|:----------:|:------:|:---------:|:------------:|:-------:|:------:|
-| **Journal & Transactions** | | | | | | |
-| `journal.write` | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
-| `journal.approve` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `journal.void` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `journal.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Offering** | | | | | | |
-| `offering.write` | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
-| `offering.approve` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `offering.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `offering.count_sheet` | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
-| `offering.count_sheet.lock` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **Expense** | | | | | | |
-| `expense.write` | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
-| `expense.approve` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `expense.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Income** | | | | | | |
-| `income.write` | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
-| `income.approve` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `income.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Funds** | | | | | | |
-| `fund.create` | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| `fund.transfer` | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| `fund.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Chart of Accounts** | | | | | | |
-| `coa.write` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `coa.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Period Management** | | | | | | |
-| `period.close` | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| `period.reopen` | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| `period.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Reconciliation** | | | | | | |
-| `reconciliation.write` | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| `reconciliation.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Budget** | | | | | | |
-| `budget.write` | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `budget.approve` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| `budget.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Reports** | | | | | | |
-| `reports.financial` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| `reports.member_giving` | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `reports.export` | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
-| **Members** | | | | | | |
-| `member.write` | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| `member.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `member.read_pii` | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **Projects** | | | | | | |
-| `project.write` | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `project.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Audit Trail** | | | | | | |
-| `audit.read` | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ |
-| `audit.export` | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| **Settings** | | | | | | |
-| `settings.write` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `settings.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **User Management** | | | | | | |
-| `user.create` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `user.update` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `user.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| **Profile** | | | | | | |
-| `profile.update_own` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `profile.update_own_password` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Permission                    | super_admin | pastor | treasurer | finance_staff | auditor | viewer |
+| ----------------------------- | :---------: | :----: | :-------: | :-----------: | :-----: | :----: |
+| **Journal & Transactions**    |             |        |           |               |         |        |
+| `journal.write`               |     ✅      |   ❌   |    ✅     |      ✅       |   ❌    |   ❌   |
+| `journal.approve`             |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `journal.void`                |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `journal.read`                |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Offering**                  |             |        |           |               |         |        |
+| `offering.write`              |     ✅      |   ❌   |    ✅     |      ✅       |   ❌    |   ❌   |
+| `offering.approve`            |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `offering.read`               |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| `offering.count_sheet`        |     ✅      |   ❌   |    ✅     |      ✅       |   ❌    |   ❌   |
+| `offering.count_sheet.lock`   |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| **Expense**                   |             |        |           |               |         |        |
+| `expense.write`               |     ✅      |   ❌   |    ✅     |      ✅       |   ❌    |   ❌   |
+| `expense.approve`             |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `expense.read`                |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Income**                    |             |        |           |               |         |        |
+| `income.write`                |     ✅      |   ❌   |    ✅     |      ✅       |   ❌    |   ❌   |
+| `income.approve`              |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `income.read`                 |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Funds**                     |             |        |           |               |         |        |
+| `fund.create`                 |     ✅      |   ❌   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `fund.transfer`               |     ✅      |   ❌   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `fund.read`                   |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Chart of Accounts**         |             |        |           |               |         |        |
+| `coa.write`                   |     ✅      |   ❌   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `coa.read`                    |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Period Management**         |             |        |           |               |         |        |
+| `period.close`                |     ✅      |   ❌   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `period.reopen`               |     ✅      |   ❌   |    ❌     |      ❌       |   ✅    |   ❌   |
+| `period.read`                 |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Reconciliation**            |             |        |           |               |         |        |
+| `reconciliation.write`        |     ✅      |   ❌   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `reconciliation.read`         |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Budget**                    |             |        |           |               |         |        |
+| `budget.write`                |     ✅      |   ✅   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `budget.approve`              |     ✅      |   ✅   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `budget.read`                 |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Reports**                   |             |        |           |               |         |        |
+| `reports.financial`           |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ❌   |
+| `reports.member_giving`       |     ✅      |   ✅   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `reports.export`              |     ✅      |   ✅   |    ✅     |      ❌       |   ✅    |   ❌   |
+| **Members**                   |             |        |           |               |         |        |
+| `member.write`                |     ✅      |   ✅   |    ✅     |      ✅       |   ❌    |   ❌   |
+| `member.read`                 |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| `member.read_pii`             |     ✅      |   ✅   |    ✅     |      ✅       |   ❌    |   ❌   |
+| **Projects**                  |             |        |           |               |         |        |
+| `project.write`               |     ✅      |   ✅   |    ✅     |      ❌       |   ❌    |   ❌   |
+| `project.read`                |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| **Audit Trail**               |             |        |           |               |         |        |
+| `audit.read`                  |     ✅      |   ✅   |    ❌     |      ❌       |   ✅    |   ❌   |
+| `audit.export`                |     ✅      |   ❌   |    ❌     |      ❌       |   ✅    |   ❌   |
+| **Settings**                  |             |        |           |               |         |        |
+| `settings.write`              |     ✅      |   ❌   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `settings.read`               |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ❌   |
+| **User Management**           |             |        |           |               |         |        |
+| `user.create`                 |     ✅      |   ❌   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `user.update`                 |     ✅      |   ❌   |    ❌     |      ❌       |   ❌    |   ❌   |
+| `user.read`                   |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ❌   |
+| **Profile**                   |             |        |           |               |         |        |
+| `profile.update_own`          |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
+| `profile.update_own_password` |     ✅      |   ✅   |    ✅     |      ✅       |   ✅    |   ✅   |
 
 ### 2.2 Permission Count by Role
 
-| Role | Permissions |
-|------|------------|
-| super_admin | 40 |
-| pastor | 20 |
-| treasurer | 17 |
-| finance_staff | 10 |
-| auditor | 9 |
-| viewer | 6 |
+| Role          | Permissions |
+| ------------- | ----------- |
+| super_admin   | 40          |
+| pastor        | 20          |
+| treasurer     | 17          |
+| finance_staff | 10          |
+| auditor       | 9           |
+| viewer        | 6           |
 
 ---
 
 ## 3. Permission Definitions
 
-| Permission | CRUD Mapping | Scope |
-|-----------|-------------|-------|
-| `journal.write` | Create journal entries (expenses, income, offerings, transfers) | All funds user can access |
-| `journal.approve` | Approve or reject pending journal entries | Entries created by others only |
-| `journal.void` | Void approved journal entries | Requires void reason |
-| `journal.read` | View journal entries and GL | All entries |
-| `offering.write` | Record individual offerings | All funds |
-| `offering.approve` | Approve/reject pending offerings | Offerings created by others |
-| `offering.read` | View offering records | All offerings |
-| `offering.count_sheet` | Create and edit Sunday count sheets | Count sheets |
-| `offering.count_sheet.lock` | Lock count sheets (generates journal entries) | Count sheets |
-| `expense.write` | Create expense records | All funds |
-| `expense.approve` | Approve/reject pending expenses | Expenses created by others |
-| `expense.read` | View expense records | All expenses |
-| `income.write` | Create income records | All funds |
-| `income.approve` | Approve/reject pending income | Income created by others |
-| `income.read` | View income records | All income |
-| `fund.create` | Create new funds | All funds |
-| `fund.transfer` | Transfer between funds | All active funds |
-| `fund.read` | View fund details and balances | All funds |
-| `coa.write` | Modify chart of accounts | All accounts |
-| `coa.read` | View chart of accounts | All accounts |
-| `period.close` | Close fiscal periods | All periods |
-| `period.reopen` | Reopen closed periods | Closed (not reconciled) periods |
-| `period.read` | View period status | All periods |
-| `reconciliation.write` | Create reconciliation records | All funds |
-| `reconciliation.read` | View reconciliation history | All records |
-| `budget.write` | Create and edit budgets | All budgets |
-| `budget.approve` | Approve/reject budget proposals | Budgets created by others |
-| `budget.read` | View budgets and utilization | All budgets |
-| `reports.financial` | Generate financial statements | All reports |
-| `reports.member_giving` | Generate member giving statements | All members |
-| `reports.export` | Export data (PDF, Excel, CSV) | All exportable data |
-| `member.write` | Create and edit member records | All members |
-| `member.read` | View member records (non-PII) | All members |
-| `member.read_pii` | View member PII (phone, email, address) | All members |
-| `project.write` | Create and edit projects | All projects |
-| `project.read` | View project details | All projects |
-| `audit.read` | View audit trail | All audit entries |
-| `audit.export` | Export audit trail | All audit entries |
-| `settings.write` | Modify system settings | Global |
-| `settings.read` | View system settings | Global |
-| `user.create` | Create new users | All users |
-| `user.update` | Modify user accounts (role, status) | All users |
-| `user.read` | View user list | All users |
-| `profile.update_own` | Update own profile (name, etc.) | Self |
-| `profile.update_own_password` | Change own password | Self |
+| Permission                    | CRUD Mapping                                                    | Scope                           |
+| ----------------------------- | --------------------------------------------------------------- | ------------------------------- |
+| `journal.write`               | Create journal entries (expenses, income, offerings, transfers) | All funds user can access       |
+| `journal.approve`             | Approve or reject pending journal entries                       | Entries created by others only  |
+| `journal.void`                | Void approved journal entries                                   | Requires void reason            |
+| `journal.read`                | View journal entries and GL                                     | All entries                     |
+| `offering.write`              | Record individual offerings                                     | All funds                       |
+| `offering.approve`            | Approve/reject pending offerings                                | Offerings created by others     |
+| `offering.read`               | View offering records                                           | All offerings                   |
+| `offering.count_sheet`        | Create and edit Sunday count sheets                             | Count sheets                    |
+| `offering.count_sheet.lock`   | Lock count sheets (generates journal entries)                   | Count sheets                    |
+| `expense.write`               | Create expense records                                          | All funds                       |
+| `expense.approve`             | Approve/reject pending expenses                                 | Expenses created by others      |
+| `expense.read`                | View expense records                                            | All expenses                    |
+| `income.write`                | Create income records                                           | All funds                       |
+| `income.approve`              | Approve/reject pending income                                   | Income created by others        |
+| `income.read`                 | View income records                                             | All income                      |
+| `fund.create`                 | Create new funds                                                | All funds                       |
+| `fund.transfer`               | Transfer between funds                                          | All active funds                |
+| `fund.read`                   | View fund details and balances                                  | All funds                       |
+| `coa.write`                   | Modify chart of accounts                                        | All accounts                    |
+| `coa.read`                    | View chart of accounts                                          | All accounts                    |
+| `period.close`                | Close fiscal periods                                            | All periods                     |
+| `period.reopen`               | Reopen closed periods                                           | Closed (not reconciled) periods |
+| `period.read`                 | View period status                                              | All periods                     |
+| `reconciliation.write`        | Create reconciliation records                                   | All funds                       |
+| `reconciliation.read`         | View reconciliation history                                     | All records                     |
+| `budget.write`                | Create and edit budgets                                         | All budgets                     |
+| `budget.approve`              | Approve/reject budget proposals                                 | Budgets created by others       |
+| `budget.read`                 | View budgets and utilization                                    | All budgets                     |
+| `reports.financial`           | Generate financial statements                                   | All reports                     |
+| `reports.member_giving`       | Generate member giving statements                               | All members                     |
+| `reports.export`              | Export data (PDF, Excel, CSV)                                   | All exportable data             |
+| `member.write`                | Create and edit member records                                  | All members                     |
+| `member.read`                 | View member records (non-PII)                                   | All members                     |
+| `member.read_pii`             | View member PII (phone, email, address)                         | All members                     |
+| `project.write`               | Create and edit projects                                        | All projects                    |
+| `project.read`                | View project details                                            | All projects                    |
+| `audit.read`                  | View audit trail                                                | All audit entries               |
+| `audit.export`                | Export audit trail                                              | All audit entries               |
+| `settings.write`              | Modify system settings                                          | Global                          |
+| `settings.read`               | View system settings                                            | Global                          |
+| `user.create`                 | Create new users                                                | All users                       |
+| `user.update`                 | Modify user accounts (role, status)                             | All users                       |
+| `user.read`                   | View user list                                                  | All users                       |
+| `profile.update_own`          | Update own profile (name, etc.)                                 | Self                            |
+| `profile.update_own_password` | Change own password                                             | Self                            |
 
 ---
 
@@ -212,85 +212,172 @@ super_admin
 // src/server/auth/permissions.ts
 export const PERMISSION_MATRIX: Record<Role, Permission[]> = {
   super_admin: [
-    'journal.write', 'journal.approve', 'journal.void', 'journal.read',
-    'offering.write', 'offering.approve', 'offering.read',
-    'offering.count_sheet', 'offering.count_sheet.lock',
-    'expense.write', 'expense.approve', 'expense.read',
-    'income.write', 'income.approve', 'income.read',
-    'fund.create', 'fund.transfer', 'fund.read',
-    'coa.write', 'coa.read',
-    'period.close', 'period.reopen', 'period.read',
-    'reconciliation.write', 'reconciliation.read',
-    'budget.write', 'budget.approve', 'budget.read',
-    'reports.financial', 'reports.member_giving', 'reports.export',
-    'member.write', 'member.read', 'member.read_pii',
-    'project.write', 'project.read',
-    'audit.read', 'audit.export',
-    'settings.write', 'settings.read',
-    'user.create', 'user.update', 'user.read',
-    'profile.update_own', 'profile.update_own_password',
+    "journal.write",
+    "journal.approve",
+    "journal.void",
+    "journal.read",
+    "offering.write",
+    "offering.approve",
+    "offering.read",
+    "offering.count_sheet",
+    "offering.count_sheet.lock",
+    "expense.write",
+    "expense.approve",
+    "expense.read",
+    "income.write",
+    "income.approve",
+    "income.read",
+    "fund.create",
+    "fund.transfer",
+    "fund.read",
+    "coa.write",
+    "coa.read",
+    "period.close",
+    "period.reopen",
+    "period.read",
+    "reconciliation.write",
+    "reconciliation.read",
+    "budget.write",
+    "budget.approve",
+    "budget.read",
+    "reports.financial",
+    "reports.member_giving",
+    "reports.export",
+    "member.write",
+    "member.read",
+    "member.read_pii",
+    "project.write",
+    "project.read",
+    "audit.read",
+    "audit.export",
+    "settings.write",
+    "settings.read",
+    "user.create",
+    "user.update",
+    "user.read",
+    "profile.update_own",
+    "profile.update_own_password",
   ],
   pastor: [
-    'journal.approve', 'journal.void', 'journal.read',
-    'offering.approve', 'offering.read', 'offering.count_sheet.lock',
-    'expense.approve', 'expense.read',
-    'income.approve', 'income.read',
-    'fund.read', 'coa.read', 'period.read',
-    'reconciliation.read',
-    'budget.write', 'budget.approve', 'budget.read',
-    'reports.financial', 'reports.member_giving', 'reports.export',
-    'member.write', 'member.read', 'member.read_pii',
-    'project.write', 'project.read',
-    'audit.read',
-    'settings.read', 'user.read',
-    'profile.update_own', 'profile.update_own_password',
+    "journal.approve",
+    "journal.void",
+    "journal.read",
+    "offering.approve",
+    "offering.read",
+    "offering.count_sheet.lock",
+    "expense.approve",
+    "expense.read",
+    "income.approve",
+    "income.read",
+    "fund.read",
+    "coa.read",
+    "period.read",
+    "reconciliation.read",
+    "budget.write",
+    "budget.approve",
+    "budget.read",
+    "reports.financial",
+    "reports.member_giving",
+    "reports.export",
+    "member.write",
+    "member.read",
+    "member.read_pii",
+    "project.write",
+    "project.read",
+    "audit.read",
+    "settings.read",
+    "user.read",
+    "profile.update_own",
+    "profile.update_own_password",
   ],
   treasurer: [
-    'journal.write', 'journal.read',
-    'offering.write', 'offering.read', 'offering.count_sheet',
-    'expense.write', 'expense.read',
-    'income.write', 'income.read',
-    'fund.create', 'fund.transfer', 'fund.read',
-    'coa.read', 'period.close', 'period.read',
-    'reconciliation.write', 'reconciliation.read',
-    'budget.write', 'budget.read',
-    'reports.financial', 'reports.member_giving', 'reports.export',
-    'member.write', 'member.read', 'member.read_pii',
-    'project.write', 'project.read',
-    'settings.read', 'user.read',
-    'profile.update_own', 'profile.update_own_password',
+    "journal.write",
+    "journal.read",
+    "offering.write",
+    "offering.read",
+    "offering.count_sheet",
+    "expense.write",
+    "expense.read",
+    "income.write",
+    "income.read",
+    "fund.create",
+    "fund.transfer",
+    "fund.read",
+    "coa.read",
+    "period.close",
+    "period.read",
+    "reconciliation.write",
+    "reconciliation.read",
+    "budget.write",
+    "budget.read",
+    "reports.financial",
+    "reports.member_giving",
+    "reports.export",
+    "member.write",
+    "member.read",
+    "member.read_pii",
+    "project.write",
+    "project.read",
+    "settings.read",
+    "user.read",
+    "profile.update_own",
+    "profile.update_own_password",
   ],
   finance_staff: [
-    'journal.write', 'journal.read',
-    'offering.write', 'offering.read', 'offering.count_sheet',
-    'expense.write', 'expense.read',
-    'income.write', 'income.read',
-    'fund.read', 'coa.read', 'period.read',
-    'reconciliation.read',
-    'budget.read',
-    'reports.financial',
-    'member.write', 'member.read', 'member.read_pii',
-    'project.read',
-    'settings.read',
-    'profile.update_own', 'profile.update_own_password',
+    "journal.write",
+    "journal.read",
+    "offering.write",
+    "offering.read",
+    "offering.count_sheet",
+    "expense.write",
+    "expense.read",
+    "income.write",
+    "income.read",
+    "fund.read",
+    "coa.read",
+    "period.read",
+    "reconciliation.read",
+    "budget.read",
+    "reports.financial",
+    "member.write",
+    "member.read",
+    "member.read_pii",
+    "project.read",
+    "settings.read",
+    "profile.update_own",
+    "profile.update_own_password",
   ],
   auditor: [
-    'journal.read', 'offering.read', 'expense.read', 'income.read',
-    'fund.read', 'coa.read', 'period.read', 'period.reopen',
-    'reconciliation.read',
-    'budget.read',
-    'reports.financial', 'reports.export',
-    'member.read',
-    'project.read',
-    'audit.read', 'audit.export',
-    'settings.read', 'user.read',
-    'profile.update_own', 'profile.update_own_password',
+    "journal.read",
+    "offering.read",
+    "expense.read",
+    "income.read",
+    "fund.read",
+    "coa.read",
+    "period.read",
+    "period.reopen",
+    "reconciliation.read",
+    "budget.read",
+    "reports.financial",
+    "reports.export",
+    "member.read",
+    "project.read",
+    "audit.read",
+    "audit.export",
+    "settings.read",
+    "user.read",
+    "profile.update_own",
+    "profile.update_own_password",
   ],
   viewer: [
-    'journal.read', 'offering.read', 'expense.read', 'income.read',
-    'fund.read',
-    'member.read',
-    'profile.update_own', 'profile.update_own_password',
+    "journal.read",
+    "offering.read",
+    "expense.read",
+    "income.read",
+    "fund.read",
+    "member.read",
+    "profile.update_own",
+    "profile.update_own_password",
   ],
 };
 
@@ -298,7 +385,7 @@ export const PERMISSION_MATRIX: Record<Role, Permission[]> = {
 export function authorize(userId: string, ...requiredPermissions: Permission[]): Promise<User> {
   const user = await userRepo.findById(userId);
   if (!user || !user.isActive) {
-    throw new ForbiddenError('User account is not active');
+    throw new ForbiddenError("User account is not active");
   }
 
   const userPermissions = PERMISSION_MATRIX[user.role];
@@ -306,7 +393,7 @@ export function authorize(userId: string, ...requiredPermissions: Permission[]):
   for (const perm of requiredPermissions) {
     if (!userPermissions.includes(perm)) {
       logger.warn({
-        event: 'authorization_denied',
+        event: "authorization_denied",
         userId,
         userRole: user.role,
         requiredPermission: perm,
@@ -336,10 +423,7 @@ export function usePermission() {
     [user],
   );
 
-  const cannot = useCallback(
-    (perm: Permission): boolean => !can(perm),
-    [can],
-  );
+  const cannot = useCallback((perm: Permission): boolean => !can(perm), [can]);
 
   return { can, cannot };
 }
@@ -403,14 +487,14 @@ export class ApprovalService {
   async approve(journalEntryId: string, approverId: string): Promise<void> {
     const entry = await this.journalRepo.findById(journalEntryId);
 
-    if (entry.status !== 'pending') {
-      throw new InvalidTransitionError('Entry is not pending approval');
+    if (entry.status !== "pending") {
+      throw new InvalidTransitionError("Entry is not pending approval");
     }
 
     // CRITICAL: Self-approval check
     if (entry.createdBy === approverId) {
       throw new SelfApprovalError(
-        `User cannot approve their own transaction. Entry was created by the same user.`
+        `User cannot approve their own transaction. Entry was created by the same user.`,
       );
     }
 
@@ -418,7 +502,7 @@ export class ApprovalService {
     const approver = await this.userRepo.findById(approverId);
     const amount = entry.totalDebit;
 
-    if (amount.toNumber() > 50000 && approver.role !== 'super_admin') {
+    if (amount.toNumber() > 50000 && approver.role !== "super_admin") {
       // Dual approval required — check if this is the second approver
       if (entry.approvedBy && entry.approvedBy !== approverId) {
         // This is the second approver
@@ -441,29 +525,29 @@ export class ApprovalService {
 
 ### 7.1 Approval Limits
 
-| Role | Max Single Transaction | Notes |
-|------|----------------------|-------|
-| super_admin | Unlimited | Single approval sufficient at any amount |
-| pastor | ฿50,000 | Above this → requires super_admin as co-approver |
-| treasurer | Cannot approve | Treasurer creates; pastor/super_admin approves |
+| Role        | Max Single Transaction | Notes                                            |
+| ----------- | ---------------------- | ------------------------------------------------ |
+| super_admin | Unlimited              | Single approval sufficient at any amount         |
+| pastor      | ฿50,000                | Above this → requires super_admin as co-approver |
+| treasurer   | Cannot approve         | Treasurer creates; pastor/super_admin approves   |
 
 ### 7.2 Transfer Limits
 
-| Role | Max Single Transfer | Max Daily Transfer |
-|------|-------------------|-------------------|
-| super_admin | Unlimited | Unlimited |
-| treasurer | ฿100,000 | ฿500,000 |
+| Role        | Max Single Transfer | Max Daily Transfer |
+| ----------- | ------------------- | ------------------ |
+| super_admin | Unlimited           | Unlimited          |
+| treasurer   | ฿100,000            | ฿500,000           |
 
 ### 7.3 Count Sheet Limits
 
-| Role | Can Count? | Can Lock? |
-|------|-----------|-----------|
-| super_admin | Yes | Yes |
-| pastor | Yes | Yes |
-| treasurer | Yes | No |
-| finance_staff | Yes | No |
-| auditor | No | No |
-| viewer | No | No |
+| Role          | Can Count? | Can Lock? |
+| ------------- | ---------- | --------- |
+| super_admin   | Yes        | Yes       |
+| pastor        | Yes        | Yes       |
+| treasurer     | Yes        | No        |
+| finance_staff | Yes        | No        |
+| auditor       | No         | No        |
+| viewer        | No         | No        |
 
 ---
 
@@ -480,12 +564,12 @@ All permission-related actions are logged to the immutable audit trail:
 
 ### 8.2 Periodic Review
 
-| Review | Frequency | Reviewer |
-|--------|-----------|----------|
-| User role audit | Quarterly | Super Admin + Auditor |
-| Permission matrix review | Annually | External Auditor |
-| Failed authorization log review | Monthly | Security review |
-| Self-approval attempt detection | Real-time | Alert → Auditor |
+| Review                          | Frequency | Reviewer              |
+| ------------------------------- | --------- | --------------------- |
+| User role audit                 | Quarterly | Super Admin + Auditor |
+| Permission matrix review        | Annually  | External Auditor      |
+| Failed authorization log review | Monthly   | Security review       |
+| Self-approval attempt detection | Real-time | Alert → Auditor       |
 
 ### 8.3 Authorization Failure Monitoring
 
@@ -512,4 +596,4 @@ onAuthorizationDenied(userId: string, requiredPermission: Permission): void {
 
 ---
 
-*This authorization model implements the principle of least privilege. Each role has exactly the permissions needed for their function, and no more. Authorization is enforced server-side at multiple layers, with the client-side UI visibility as UX convenience only.*
+_This authorization model implements the principle of least privilege. Each role has exactly the permissions needed for their function, and no more. Authorization is enforced server-side at multiple layers, with the client-side UI visibility as UX convenience only._

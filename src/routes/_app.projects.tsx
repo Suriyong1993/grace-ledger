@@ -167,4 +167,3 @@ function ProjectsPage() {
     </div>
   );
 }
-

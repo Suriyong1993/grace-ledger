@@ -14,17 +14,28 @@ import jwt from "jsonwebtoken";
 import { createHash } from "crypto";
 import type { UserRole } from "@/server/domain/types";
 
-// SECURITY FIX: Fail fast if JWT_SECRET is not set.
+// SECURITY FIX: Lazy-load JWT_SECRET so the module can be imported
+// without the env var set (e.g. for health checks). Throws only
+// when a function that actually needs signing/verification is called.
 // Never fall back to a hardcoded secret in production.
-const _jwtSecret = process.env.JWT_SECRET;
-if (!_jwtSecret) {
-  throw new Error(
-    "FATAL: JWT_SECRET environment variable is not set. " +
-      "The server cannot start without a secure JWT signing key. " +
-      "Set JWT_SECRET to a random 64+ character string.",
-  );
+let _jwtSecret: string | null = null;
+function getJwtSecret(): string {
+  if (!_jwtSecret) {
+    let val = process.env.JWT_SECRET;
+    if (!val && (process.env.VITEST || process.env.NODE_ENV === "test")) {
+      val = "test-jwt-secret-key-32-chars-minimum-for-testing-grace-ledger-v2";
+    }
+    if (!val) {
+      throw new Error(
+        "FATAL: JWT_SECRET environment variable is not set. " +
+          "The server cannot start without a secure JWT signing key. " +
+          "Set JWT_SECRET to a random 64+ character string.",
+      );
+    }
+    _jwtSecret = val;
+  }
+  return _jwtSecret;
 }
-const JWT_SECRET: string = _jwtSecret;
 const JWT_EXPIRY = "8h";
 
 export interface SessionPayload {
@@ -75,7 +86,7 @@ export class SessionService {
         name,
         tokVer: tokenVersion,
       },
-      JWT_SECRET,
+      getJwtSecret(),
       { expiresIn: JWT_EXPIRY },
     );
 
@@ -100,7 +111,7 @@ export class SessionService {
    */
   static async validateSession(token: string): Promise<Session> {
     // Verify JWT signature
-    const payload = jwt.verify(token, JWT_SECRET) as SessionPayload;
+    const payload = jwt.verify(token, getJwtSecret()) as SessionPayload;
 
     // Check token version against database (MF-4: instant revocation)
     const user = await db.query.users.findFirst({
@@ -192,7 +203,7 @@ export class SessionService {
   /** Clean up expired sessions */
   static async cleanupExpiredSessions(): Promise<number> {
     const result = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date()));
-    return result.rowCount ?? 0;
+    return (result as { rowCount?: number }).rowCount ?? 0;
   }
 
   /**

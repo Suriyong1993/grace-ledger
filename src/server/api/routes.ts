@@ -16,7 +16,13 @@ import { seedRoutes } from "./routes/seed.routes";
 import { offeringRoutes } from "./routes/offering.routes";
 import { settingsRoutes } from "./routes/settings.routes";
 import { chartRoutes } from "./routes/chart.routes";
-import { errorResponse } from "./middleware";
+import { aiProxyRoutes } from "./routes/ai-proxy.routes";
+import { healthRoutes } from "./routes/health.routes";
+import { incomeRoutes } from "./routes/income.routes";
+import { expenseRoutes } from "./routes/expense.routes";
+import { budgetRoutes } from "./routes/budget.routes";
+import { offeringFinancialRoutes } from "./routes/offering-financial.routes";
+import { errorResponse, rateLimitMiddleware, csrfProtectionMiddleware } from "./middleware";
 
 export interface RouteDefinition {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -41,6 +47,12 @@ const routes: RouteDefinition[] = [
   ...offeringRoutes,
   ...settingsRoutes,
   ...chartRoutes,
+  ...aiProxyRoutes,
+  ...healthRoutes,
+  ...incomeRoutes,
+  ...expenseRoutes,
+  ...budgetRoutes,
+  ...offeringFinancialRoutes,
 ];
 
 /**
@@ -73,6 +85,18 @@ function matchPath(pattern: string, pathname: string): Record<string, string> | 
 export async function handleApiRequest(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const method = request.method;
+
+  // Apply rate limiting to state-changing methods
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    const rateLimitResult = await rateLimitMiddleware(request);
+    if (rateLimitResult) return rateLimitResult; // 429 response
+
+    // Apply CSRF protection to state-changing methods (skip auth routes for login)
+    if (url.pathname !== "/api/auth/login") {
+      const csrfResult = await csrfProtectionMiddleware(request);
+      if (csrfResult) return csrfResult; // 403 response
+    }
+  }
 
   for (const route of routes) {
     if (route.method !== method) continue;

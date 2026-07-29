@@ -177,25 +177,39 @@
 @utility glass-card {
   background: var(--color-card);
   border: 1px solid var(--color-border);
-  box-shadow: none;
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.03),
+    0 4px 16px -4px rgb(0 0 0 / 0.02);
+  backdrop-filter: blur(12px);
 }
 
 @utility glass-topbar {
-  background: var(--color-background);
+  background: color-mix(in sgb, var(--color-background) 85%, transparent);
   border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(16px);
 }
 
 @utility shadow-craft {
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.04),
+    0 1px 2px -1px rgb(0 0 0 / 0.02);
 }
 
 @utility shadow-elegant {
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 4px 12px -2px rgb(0 0 0 / 0.04);
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.05),
+    0 6px 20px -4px rgb(0 0 0 / 0.04);
+}
+
+@utility shadow-gold-glow {
+  box-shadow: 0 0 20px -4px oklch(0.64 0.135 75 / 0.25);
 }
 
 /* Micro-interaction helpers — functional, not decorative */
 .active-press {
-  transition: transform 120ms var(--ease-out), background-color 120ms ease;
+  transition:
+    transform 120ms var(--ease-out),
+    background-color 120ms ease;
 }
 .active-press:active {
   transform: scale(0.98);
@@ -228,7 +242,6 @@
 @utility animate-shake {
   animation: shake 0.4s ease-in-out;
 }
-
 
 /* ——— Grace Ledger · editorial utilities ——— */
 
@@ -294,4 +307,3 @@
     }
   }
 }
-
