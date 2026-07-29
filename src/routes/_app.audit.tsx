@@ -65,26 +65,34 @@ function AuditPage() {
           {groups.map((g) => (
             <section
               key={g.key}
-              className="rounded-xl border border-border/80 bg-card shadow-2xs overflow-hidden"
+              className="rounded-sm border border-border/80 bg-card shadow-2xs overflow-hidden"
             >
-              <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
-                <p className="kicker font-medium text-muted-foreground/80">{g.label}</p>
-                <span className="num-display text-xs font-semibold text-muted-foreground">
+              <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-5 py-3">
+                <p className="kicker text-muted-foreground/80">{g.label}</p>
+                <span className="num-display text-[11px] font-semibold text-muted-foreground">
                   {g.items.length} รายการ
                 </span>
               </div>
-              <ul className="divide-y divide-border">
-                {g.items.map((a) => (
-                  <li key={a.id} className="flex gap-4 px-5 py-3">
-                    <span className="num-display w-10 shrink-0 pt-0.5 text-xs text-muted-foreground">
+              {/* Timeline feed */}
+              <ul className="relative divide-y divide-border/40 pl-14">
+                {/* Vertical connector line */}
+                <div className="pointer-events-none absolute inset-y-0 left-[2.75rem] w-px bg-border/40" />
+                {g.items.map((a, idx) => (
+                  <li key={a.id} className="relative flex gap-4 py-3 pr-5">
+                    {/* Timeline dot */}
+                    <div className="absolute -left-[1.625rem] top-[1.125rem] flex h-3 w-3 items-center justify-center">
+                      <div className="h-2 w-2 rounded-full border border-primary/40 bg-primary/20" />
+                    </div>
+                    {/* Time */}
+                    <span className="num-display absolute left-[-3.25rem] top-[0.875rem] w-10 text-right text-[10px] font-medium text-muted-foreground/60">
                       {dayjs(a.at).format("HH:mm")}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm leading-snug">
-                        <span className="font-medium text-foreground">{a.userName}</span>{" "}
+                      <p className="text-[13px] leading-snug">
+                        <span className="font-semibold text-foreground">{a.userName}</span>{" "}
                         <span className="text-muted-foreground">{a.action}</span>
                       </p>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      <p className="mt-0.5 truncate text-[11px] text-muted-foreground/70">
                         {a.entity}
                         {a.details ? ` · ${a.details}` : ""}
                       </p>

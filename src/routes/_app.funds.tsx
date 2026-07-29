@@ -101,22 +101,37 @@ function FundsPage() {
           {/* Fund ledger cards */}
           <div className="stagger grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {rows.map(({ fund: f, income, offering, expense, balance }, i) => (
-              <article key={f.id} className="card-ledger flex flex-col">
-                <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
-                  <p className="truncate text-sm font-medium text-foreground">{f.name}</p>
+              <article
+                key={f.id}
+                className={cn(
+                  "card-ledger rounded-sm flex flex-col overflow-hidden",
+                  balance < 0 && "border-destructive/30",
+                )}
+              >
+                {/* Left accent — gold positive, red negative */}
+                <div
+                  className={cn(
+                    "h-0.5 w-full",
+                    balance >= 0
+                      ? "bg-gradient-to-r from-primary/60 to-transparent"
+                      : "bg-gradient-to-r from-destructive/60 to-transparent",
+                  )}
+                />
+                <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3.5">
+                  <p className="truncate text-[13px] font-semibold text-foreground">{f.name}</p>
                   <span
                     aria-hidden
-                    className="num-display shrink-0 text-[11px] text-muted-foreground/70"
+                    className="num-display shrink-0 text-[10px] font-medium text-muted-foreground/50"
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
 
                 <div className="px-5 py-4">
-                  <p className="kicker">ยอดคงเหลือปัจจุบัน</p>
+                  <p className="kicker text-muted-foreground/70">ยอดคงเหลือปัจจุบัน</p>
                   <p
                     className={cn(
-                      "num-display mt-2 text-[28px] font-semibold tracking-tight",
+                      "num-display font-display mt-2 text-[32px] font-bold leading-none tracking-tight",
                       balance >= 0 ? "text-foreground" : "text-destructive",
                     )}
                   >
@@ -124,23 +139,23 @@ function FundsPage() {
                   </p>
                 </div>
 
-                <div className="mt-auto divide-y divide-border border-t border-border">
+                <div className="mt-auto divide-y divide-border/60 border-t border-border/60">
                   <div className="flex items-center justify-between gap-3 px-5 py-2.5">
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <TrendingUp className="h-3.5 w-3.5 text-success" strokeWidth={1.75} />
+                    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <TrendingUp className="h-3 w-3 text-success" strokeWidth={2} />
                       รายรับ
                     </span>
-                    <MoneyText value={income + offering} tone="income" className="text-sm" />
+                    <MoneyText value={income + offering} tone="income" className="text-sm font-semibold" />
                   </div>
                   <div className="flex items-center justify-between gap-3 px-5 py-2.5">
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <TrendingDown className="h-3.5 w-3.5 text-destructive" strokeWidth={1.75} />
+                    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <TrendingDown className="h-3 w-3 text-destructive" strokeWidth={2} />
                       รายจ่าย
                     </span>
-                    <MoneyText value={expense} tone="expense" className="text-sm" />
+                    <MoneyText value={expense} tone="expense" className="text-sm font-semibold" />
                   </div>
                   <div className="flex items-center justify-between gap-3 px-5 py-2.5">
-                    <span className="text-xs text-muted-foreground">ยอดตั้งต้น</span>
+                    <span className="text-[11px] text-muted-foreground">ยอดตั้งต้น</span>
                     <span className="num-display text-sm text-muted-foreground">
                       {thb(f.openingBalance)}
                     </span>

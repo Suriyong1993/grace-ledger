@@ -95,45 +95,56 @@ function BudgetPage() {
               const alert = pct >= 90;
               const remaining = b.amount - b.used;
               return (
-                <article key={b.id} className="card-ledger">
-                  <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-3.5">
+                <article
+                  key={b.id}
+                  className={cn(
+                    "card-ledger rounded-sm overflow-hidden",
+                    alert && "border-destructive/30",
+                  )}
+                >
+                  {/* Top accent strip for over-budget items */}
+                  {alert && (
+                    <div className="h-0.5 w-full bg-gradient-to-r from-destructive to-destructive/30" />
+                  )}
+                  <div className="flex items-start justify-between gap-3 border-b border-border/60 px-5 py-3.5">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{b.name}</p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
+                      <p className="truncate text-[13px] font-semibold text-foreground">{b.name}</p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
                         {PERIOD_LABEL[b.period]} · ปี {b.year}
                       </p>
                     </div>
                     {alert && (
-                      <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs font-medium text-destructive">
-                        <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm bg-destructive/10 px-2 py-0.5 text-[11px] font-semibold text-destructive">
+                        <AlertTriangle className="h-3 w-3" strokeWidth={2} />
                         ใกล้เต็ม
                       </span>
                     )}
                   </div>
 
                   <div className="px-5 py-4">
-                    <div className="mb-1.5 flex items-baseline justify-between gap-3">
-                      <span className="text-xs text-muted-foreground">ใช้ไป</span>
-                      <span className="num-display text-sm font-semibold text-foreground">
+                    <div className="mb-2.5 flex items-baseline justify-between gap-3">
+                      <span className="text-[11px] text-muted-foreground">ใช้ไป</span>
+                      <span className="num-display text-sm font-bold text-foreground">
                         {thb(b.used)}{" "}
                         <span className="font-normal text-muted-foreground">/ {thb(b.amount)}</span>
                       </span>
                     </div>
-                    <div className="h-1 bg-muted">
+                    {/* Progress bar — thicker, with % label */}
+                    <div className="relative h-1.5 overflow-hidden rounded-full bg-muted">
                       <div
                         className={cn(
-                          "h-full transition-all duration-500",
-                          alert ? "bg-destructive" : "bg-primary",
+                          "h-full rounded-full transition-all duration-700",
+                          alert ? "bg-destructive" : pct >= 70 ? "bg-warning" : "bg-primary",
                         )}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <div className="mt-2 flex items-baseline justify-between gap-3 text-xs">
-                      <span className="num-display text-muted-foreground">{pct}% ของงบ</span>
+                    <div className="mt-2 flex items-baseline justify-between gap-3 text-[11px]">
+                      <span className="num-display font-semibold text-muted-foreground">{pct}%</span>
                       <span
                         className={cn(
                           "num-display",
-                          remaining < 0 ? "font-medium text-destructive" : "text-muted-foreground",
+                          remaining < 0 ? "font-semibold text-destructive" : "text-muted-foreground",
                         )}
                       >
                         {remaining < 0

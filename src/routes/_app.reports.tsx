@@ -88,24 +88,28 @@ function ReportsPage() {
           value={thb(totalIncome)}
           hint={`${incomes.length} รายการ`}
           icon={TrendingUp}
+          tone="success"
         />
         <StatCard
           label="รายจ่ายรวม"
           value={thb(totalExpense)}
           hint={`${expenses.length} รายการ`}
           icon={TrendingDown}
+          tone="danger"
         />
         <StatCard
           label="เงินถวายรวม"
           value={thb(totalOffering)}
           hint={`${offerings.length} สัปดาห์`}
           icon={PieIcon}
+          tone="primary"
         />
         <StatCard
           label="ยอดคงเหลือสุทธิ"
           value={thb(netBalance)}
-          hint={netBalance >= 0 ? "เกินงบ / ดุลบวก" : "ติดลบ / ดุลลบ"}
+          hint={netBalance >= 0 ? "ดุลบวก" : "ดุลลบ"}
           icon={FileBarChart2}
+          tone={netBalance >= 0 ? "success" : "danger"}
         />
       </div>
 
@@ -118,72 +122,68 @@ function ReportsPage() {
         </TabsList>
 
         <TabsContent value="statement" className="mt-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-medium">
-                งบสรุปรายรับ-รายจ่ายประจำคริสตจักร
-              </CardTitle>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Calendar className="h-4 w-4" />
+          <section className="card-ledger rounded-sm overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-5 py-3">
+              <p className="kicker text-muted-foreground/80">งบสรุปรายรับ-รายจ่าย</p>
+              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <Calendar className="h-3.5 w-3.5" />
                 <span>ข้อมูลอัปเดตล่าสุดเรียลไทม์</span>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-sm font-semibold mb-3 text-emerald-600 dark:text-emerald-400">
-                    รายการรายรับ ({incomes.length} รายการ)
-                  </h4>
-                  {incomes.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
-                  ) : (
-                    <div className="border border-border divide-y divide-border rounded-md text-xs">
-                      {incomes.map((inc) => (
-                        <div key={inc.id} className="flex justify-between p-3">
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {inc.description || "รายรับ"}
-                            </p>
-                            <p className="text-[11px] text-muted-foreground">{inc.date}</p>
-                          </div>
-                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                            +{thb(inc.amount)}
-                          </span>
+            </div>
+            <div className="p-5 space-y-6">
+              <div>
+                <h4 className="kicker mb-3 text-success">
+                  รายการรายรับ ({incomes.length} รายการ)
+                </h4>
+                {incomes.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
+                ) : (
+                  <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
+                    {incomes.map((inc) => (
+                      <div key={inc.id} className="flex justify-between p-3 hover:bg-muted/30 transition-colors">
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {inc.description || "รายรับ"}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">{inc.date}</p>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold mb-3 text-rose-600 dark:text-rose-400">
-                    รายการรายจ่าย ({expenses.length} รายการ)
-                  </h4>
-                  {expenses.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายจ่าย</p>
-                  ) : (
-                    <div className="border border-border divide-y divide-border rounded-md text-xs">
-                      {expenses.map((exp) => (
-                        <div key={exp.id} className="flex justify-between p-3">
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {exp.description || "รายจ่าย"}
-                            </p>
-                            <p className="text-[11px] text-muted-foreground">
-                              {exp.date} · หมวดหมู่ {exp.categoryId}
-                            </p>
-                          </div>
-                          <span className="font-semibold text-rose-600 dark:text-rose-400">
-                            -{thb(exp.amount)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                        <span className="num-display font-semibold text-success">
+                          +{thb(inc.amount)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </CardContent>
-          </Card>
+
+              <div>
+                <h4 className="kicker mb-3 text-destructive">
+                  รายการรายจ่าย ({expenses.length} รายการ)
+                </h4>
+                {expenses.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายจ่าย</p>
+                ) : (
+                  <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
+                    {expenses.map((exp) => (
+                      <div key={exp.id} className="flex justify-between p-3 hover:bg-muted/30 transition-colors">
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {exp.description || "รายจ่าย"}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            {exp.date} · หมวดหมู่ {exp.categoryId}
+                          </p>
+                        </div>
+                        <span className="num-display font-semibold text-destructive">
+                          −{thb(exp.amount)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
         </TabsContent>
 
         <TabsContent value="offering" className="mt-4">

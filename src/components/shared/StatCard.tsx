@@ -25,11 +25,20 @@ const VALUE_TONE: Record<NonNullable<Props["tone"]>, string> = {
 };
 
 const ICON_BG: Record<NonNullable<Props["tone"]>, string> = {
-  primary: "bg-primary/10 text-primary border-primary/20",
-  secondary: "bg-muted text-muted-foreground border-border/40",
-  accent: "bg-accent text-accent-foreground border-accent-foreground/10",
-  success: "bg-success/10 text-success border-success/20",
-  danger: "bg-destructive/10 text-destructive border-destructive/20",
+  primary: "bg-primary/8 text-primary",
+  secondary: "bg-muted/60 text-muted-foreground",
+  accent: "bg-accent text-accent-foreground",
+  success: "bg-success/8 text-success",
+  danger: "bg-destructive/8 text-destructive",
+};
+
+/** Left accent strip per tone — financial terminal style */
+const ACCENT_BAR: Record<NonNullable<Props["tone"]>, string> = {
+  primary: "bg-primary",
+  secondary: "bg-border",
+  accent: "bg-muted-foreground/30",
+  success: "bg-success",
+  danger: "bg-destructive",
 };
 
 export function StatCard({
@@ -44,64 +53,78 @@ export function StatCard({
   const cardRef = useGSAPAnimation<HTMLDivElement>((el) => {
     gsap.fromTo(
       el,
-      { opacity: 0, y: 15, scale: 0.98 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power2.out" },
+      { opacity: 0, y: 12, scale: 0.99 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out" },
     );
   });
 
   return (
     <div
       ref={cardRef}
-      className="group relative overflow-hidden rounded-xl border border-border/80 bg-card p-5 shadow-2xs transition-all duration-200 hover:border-border hover:shadow-xs"
+      className="group relative flex overflow-hidden rounded-sm border border-border/60 bg-card shadow-2xs transition-all duration-200 hover:border-border hover:shadow-xs"
     >
-      <div className="flex items-center justify-between gap-3">
-        <p className="kicker font-medium tracking-wider text-muted-foreground/80">{label}</p>
-        {Icon && (
-          <div
-            className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-transform duration-200 group-hover:scale-105",
-              ICON_BG[tone],
+      {/* Left accent strip — financial terminal style */}
+      <div
+        className={cn(
+          "w-0.5 shrink-0 transition-[width] duration-200 group-hover:w-1",
+          ACCENT_BAR[tone],
+        )}
+      />
+
+      <div className="flex-1 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <p className="kicker text-muted-foreground/70">{label}</p>
+          {Icon && (
+            <div
+              className={cn(
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-transform duration-200 group-hover:scale-110",
+                ICON_BG[tone],
+              )}
+            >
+              <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+            </div>
+          )}
+        </div>
+
+        <p
+          className={cn(
+            "num-display font-display mt-3 text-[28px] md:text-[32px] font-bold leading-none tracking-tight",
+            VALUE_TONE[tone],
+          )}
+        >
+          {typeof value === "number" ? (
+            <NumberTicker value={value} decimalPlaces={decimals} />
+          ) : (
+            value
+          )}
+        </p>
+
+        {(hint || typeof trend === "number") && (
+          <div className="mt-3.5 flex items-center gap-2 border-t border-border/40 pt-3 text-xs text-muted-foreground">
+            {typeof trend === "number" && (
+              <span
+                className={cn(
+                  "num-display inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[11px] font-semibold",
+                  trend >= 0
+                    ? "bg-success/10 text-success"
+                    : "bg-destructive/10 text-destructive",
+                )}
+              >
+                {trend >= 0 ? (
+                  <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
+                ) : (
+                  <TrendingDown className="h-3 w-3" strokeWidth={2.5} />
+                )}
+                {trend >= 0 ? "+" : ""}
+                {trend.toFixed(1)}%
+              </span>
             )}
-          >
-            <Icon className="h-4 w-4" strokeWidth={2} />
+            {hint && (
+              <span className="truncate text-muted-foreground/80">{hint}</span>
+            )}
           </div>
         )}
       </div>
-      <p
-        className={cn(
-          "num-display mt-3 text-2xl font-bold tracking-tight md:text-[28px]",
-          VALUE_TONE[tone],
-        )}
-      >
-        {typeof value === "number" ? (
-          <NumberTicker value={value} decimalPlaces={decimals} />
-        ) : (
-          value
-        )}
-      </p>
-      {(hint || typeof trend === "number") && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          {typeof trend === "number" && (
-            <span
-              className={cn(
-                "num-display inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold transition-colors",
-                trend >= 0
-                  ? "bg-success/10 text-success border border-success/20"
-                  : "bg-destructive/10 text-destructive border border-destructive/20",
-              )}
-            >
-              {trend >= 0 ? (
-                <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
-              ) : (
-                <TrendingDown className="h-3 w-3" strokeWidth={2.5} />
-              )}
-              {trend >= 0 ? "+" : ""}
-              {trend.toFixed(1)}%
-            </span>
-          )}
-          {hint && <span className="truncate font-normal text-muted-foreground/90">{hint}</span>}
-        </div>
-      )}
     </div>
   );
 }

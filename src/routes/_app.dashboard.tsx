@@ -258,21 +258,21 @@ export function Dashboard() {
       {isLoading ? (
         <Skeleton className="h-40 w-full rounded-xl" />
       ) : (
-        <section className="rounded-xl border border-border/80 bg-card shadow-2xs divide-y divide-border/60 md:divide-y-0 md:divide-x grid grid-cols-1 md:grid-cols-4 overflow-hidden">
-          {/* Net Balance */}
-          <div className="p-5 flex flex-col justify-between hover:bg-muted/30 transition-colors">
+        <section className="rounded-sm border border-border/80 bg-card shadow-2xs divide-y divide-border/60 md:divide-y-0 md:divide-x grid grid-cols-1 md:grid-cols-4 overflow-hidden">
+          {/* Net Balance — hero cell */}
+          <div className="relative p-5 flex flex-col justify-between hover:bg-muted/20 transition-colors md:col-span-1">
+            {/* Gold gradient top strip — marks this as the primary metric */}
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary via-primary/60 to-transparent" />
             <div>
               <div className="flex items-center justify-between">
                 <span className="kicker font-medium text-muted-foreground/80">
                   ยอดคงเหลือสุทธิ · {PERIOD_LABELS[period]}
                 </span>
-                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary">
-                  <TrendingUp className="h-3.5 w-3.5" strokeWidth={2} />
-                </div>
+                <TrendingUp className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
               </div>
               <p
                 className={cn(
-                  "num-display font-display mt-3 text-3xl font-bold tracking-tight",
+                  "num-display font-display mt-3 text-[36px] font-bold leading-none tracking-tight",
                   balance >= 0 ? "text-foreground" : "text-destructive",
                 )}
               >
@@ -552,45 +552,50 @@ export function Dashboard() {
               <div
                 key={tx.id}
                 onClick={() => setSelectedTx(tx)}
-                className="flex items-center justify-between gap-4 px-5 py-3 transition-colors hover:bg-muted/40 cursor-pointer group"
+                className="group relative flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-muted/30 cursor-pointer"
               >
-                <div className="flex items-center gap-3 min-w-0">
+                {/* Left accent line — income green / expense red */}
+                <div
+                  className={cn(
+                    "absolute inset-y-0 left-0 w-0.5 transition-[width] duration-150 group-hover:w-1",
+                    tx.kind === "income" ? "bg-success/60" : "bg-destructive/40",
+                  )}
+                />
+                <div className="flex items-center gap-3.5 min-w-0 pl-1">
                   <div
                     className={cn(
-                      "grid h-8 w-8 shrink-0 place-items-center rounded-sm text-xs font-semibold",
-                      tx.kind === "income"
-                        ? "bg-success/10 text-success"
-                        : "bg-destructive/10 text-destructive",
+                      "shrink-0 transition-colors",
+                      tx.kind === "income" ? "text-success" : "text-destructive/70",
                     )}
                   >
                     {tx.kind === "income" ? (
-                      <ArrowDownLeft className="h-4 w-4" />
+                      <ArrowDownLeft className="h-3.5 w-3.5" strokeWidth={2} />
                     ) : (
-                      <ArrowUpRight className="h-4 w-4" />
+                      <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                    <p className="truncate text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">
                       {tx.description ||
                         tx.vendor ||
                         (tx.kind === "income" ? "รายรับทั่วไป" : "รายจ่ายทั่วไป")}
                     </p>
-                    <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
                       <span>{fmtDate(tx.date)}</span>
-                      <span>•</span>
+                      <span className="text-border">·</span>
                       <span>{catName(tx.categoryId)}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-4">
+                <div className="flex shrink-0 items-center gap-3">
                   <StatusBadge status={tx.status || "approved"} />
                   <MoneyText
                     value={tx.amount}
                     tone={tx.kind === "income" ? "income" : "expense"}
-                    className="text-sm font-semibold num-display"
+                    className="text-sm font-bold num-display"
                   />
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-foreground transition-colors" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors" />
                 </div>
               </div>
             ))
