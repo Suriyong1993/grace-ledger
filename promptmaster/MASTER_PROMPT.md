@@ -1,89 +1,134 @@
-# Master Prompt — Grace Ledger v2 AI Development Guide
+﻿# MASTER PROMPT — Grace Ledger Product Constitution
 
-> **Important for AI Agents:** Read this file carefully before modifying any code in this repository.
-
----
-
-## 🎯 Role & Objective
-
-You are a **Principal Software Engineer, Senior Financial Systems Architect, and Senior UX Engineer** working on **Grace Ledger v2** — a high-integrity, multi-tenant church accounting and financial controls platform.
-
-Your objective is to extend, maintain, and optimize this application while ensuring **100% production readiness**, **zero AI slop**, strict double-entry financial controls, and premium design standards.
+> **สำหรับ AI ทุกตัวที่ทำงานกับ repository นี้:**
+> อ่านเอกสารนี้ทั้งหมดก่อนเริ่มงานทุกครั้ง
+> เอกสารนี้คือ **กฎสูงสุด** — หากมีความขัดแย้งระหว่างเอกสารอื่น ให้ยึดเอกสารนี้เป็นหลัก
 
 ---
 
-## 🛑 NON-NEGOTIABLE RULES (AI SLOP PREVENTION)
+## ตัวตนของ Grace Ledger
 
-1. **NO CODE PLACEHOLDERS / NO TODOs:**
-   Never leave incomplete functions, dummy fallbacks, empty handlers, or `// TODO` comments. Every implemented feature must be fully functional end-to-end.
-2. **NO FLOATING POINT MONEY:**
-   Never use native JavaScript numbers or floats for money calculations. You MUST use the `Money` domain class from `src/server/domain/money.ts`.
-3. **MANDATORY TENANT ISOLATION:**
-   Every database query, API route, and domain function MUST enforce explicit `church_id` filtering and Row Level Security (RLS) scoping.
-4. **NO API SECRETS IN CLIENT BUNDLE:**
-   Client code must never contain server API keys (`FIREWORKS_API_KEY`, `JWT_SECRET`, etc.). Use the server-side API proxy endpoints under `src/server/api/routes/ai-proxy.routes.ts`.
-5. **MANDATORY VERIFICATION BEFORE DECLARING DONE:**
-   You MUST execute all four verification commands and ensure 0 errors before reporting completion to the user:
-   ```bash
-   npm run lint       # Must pass with 0 errors
-   npm run typecheck  # Must pass with 0 errors
-   npm test           # Must pass with 100% tests passing (51/51 assertions)
-   npm run build      # Must build production bundle successfully
-   ```
+Grace Ledger **ไม่ใช่โปรแกรมบัญชี**
+
+Grace Ledger คือ:
+
+> **The Intelligent Financial Management Platform for Churches**
+> แพลตฟอร์มบริหารการเงินคริสตจักร ที่เน้นความโปร่งใส ความน่าเชื่อถือ และ Workflow ที่ชัดเจน
 
 ---
 
-## 📐 CORE ARCHITECTURE MAP
+## ชุดเอกสาร Product Constitution
 
-Before making edits, inspect the relevant architectural reference files in this project:
+เอกสารชุดนี้ใน `promptmaster/` คือ "รัฐธรรมนูญ" ของ Grace Ledger:
 
-| Domain Layer | Key Authoritative File | Description |
-|---|---|---|
-| **Database Schema** | `src/db/schema.ts` | Drizzle ORM schemas for all 22 database tables |
-| **Monetary Precision** | `src/server/domain/money.ts` | Immutable `Money` class handling THB rounding & SQL decimal conversion |
-| **Double-Entry Engine** | `src/server/domain/journal.ts` | Journal entries, debit/credit validation, period locks & fund balances |
-| **Permissions & Thresholds** | `src/server/auth/permissions.ts` | Dual-approval rules (> ฿50,000) and role-based access control (RBAC) |
-| **Audit Trail Chain** | `src/server/services/audit.service.ts` | Per-church SHA-256 hash chaining for tamper prevention |
-| **AI Vision OCR Proxy** | `src/server/api/routes/ai-proxy.routes.ts` | Server proxy for Fireworks AI (Kimi-K3) & Gemini slip parsing |
-| **Embedded Test Engine** | `src/server/infrastructure/db.ts` | In-memory PGlite WebAssembly Postgres engine for instant test execution |
-| **Production Deployment** | `promptmaster/DEPLOYMENT_GUIDE.md` | Vercel production URL, GitHub repo, Docker & environment variables |
+| ไฟล์ | บทบาท |
+|------|--------|
+| `MASTER_PROMPT.md` (นี่) | Index + กฎสูงสุด + วิธีใช้งาน |
+| `PRODUCT_BIBLE.md` | Vision, Positioning, Users, Features, Roadmap |
+| `DESIGN_BIBLE.md` | Design DNA, UI Language, Components, Tokens |
+| `ENGINEERING_BIBLE.md` | Architecture, Code Rules, Git, Testing, Verification |
+| `AI_BIBLE.md` | Grace AI Agents, Hermes, RAG, LINE, Personality |
 
 ---
 
-## 🎨 UI/UX DESIGN LANGUAGE (NON-GENERIC)
+## Non-Negotiable Rules (กฎที่ทำลายไม่ได้ — 10 ข้อ)
 
-Grace Ledger v2 uses an editorial, modern design system inspired by Linear, Stripe Dashboard, and Mercury:
+กฎทั้ง 10 ข้อนี้มีสถานะสูงกว่าทุกสิ่ง ไม่มีข้อยกเว้น:
 
-- **Typography:** `Kanit` (Display headers) + `Prompt` / `Inter` (Body).
-- **Tabular Numbers:** Always use `num-display` class for financial figures to align decimal digits.
-- **Color Palette:** OKLCH Warm Ivory (`#FAF7F2`), Dark Obsidian, Gold Amber accent (`--primary`), Emerald (`--success`), Coral (`--destructive`).
-- **Container Styling:** Cards must use `rounded-xl border border-border/80 bg-card shadow-2xs`.
-- **Buttons:** Use active press scale `active:scale-[0.98]` and smooth transitions (`transition-all duration-150`).
+### Business Logic Rules
+
+1. **ห้ามทำลาย Business Logic** — ทุก Business Rule ใน BUSINESS_RULES.md คือ Law ไม่ใช่ Suggestion
+2. **ทุกธุรกรรมต้องตรวจสอบย้อนหลังได้** — Audit Trail + SHA-256 Hash Chain ต้องครบทุกรายการ
+3. **ห้ามลบข้อมูลจริง** — ใช้ Soft Delete (deletedAt) เสมอ ห้าม Hard Delete
+4. **ห้ามใช้ Floating Point กับเงิน** — ใช้ Money class จาก src/server/domain/money.ts เท่านั้น
+5. **Tenant Isolation บังคับ** — ทุก Query ต้องมี church_id filter และ RLS Policy
+
+### AI Rules
+
+6. **AI ไม่มีสิทธิ์อนุมัติธุรกรรม** — Human Approval เสมอ ไม่มีข้อยกเว้น
+7. **ทุกคำแนะนำของ AI ต้องอธิบายเหตุผล** — Explainable AI เท่านั้น ห้ามตอบแค่ผลลัพธ์
+8. **ระบบหลักต้องทำงานได้แม้ AI ใช้งานไม่ได้** — AI เป็น Enhancement ไม่ใช่ Dependency
+9. **AI ไม่สามารถ override Business Rule ใดได้** — แม้ผู้ใช้จะขอก็ตาม
+10. **ห้าม AI Slop** — ทุก Feature ต้องมีเหตุผล ห้ามสร้างเพราะ "AI ควรมี"
 
 ---
 
-## 🚀 PROMPT TEMPLATE FOR FUTURE AI TURNS
+## Core Architecture Map (Quick Reference)
 
-Copy and paste the following prompt when instructing an AI to work on new features:
+| Layer | ไฟล์สำคัญ | หน้าที่ |
+|-------|-----------|---------|
+| Database Schema | `src/db/schema.ts` | Drizzle ORM — 22 tables |
+| Money Precision | `src/server/domain/money.ts` | THB rounding, no float |
+| Double-Entry Engine | `src/server/domain/journal.ts` | Journal entries, debit/credit |
+| Permissions | `src/server/auth/permissions.ts` | RBAC, dual-approval >50K THB |
+| Audit Trail | `src/server/services/audit.service.ts` | SHA-256 hash chain |
+| AI Proxy | `src/server/api/routes/ai-proxy.routes.ts` | Server-side AI, no key leaks |
+| Test Engine | `src/server/infrastructure/db.ts` | PGlite WebAssembly |
 
-```text
+---
+
+## Template สำหรับสั่งงาน AI (Copy-Paste ทุกครั้ง)
+
+```
 [CONTEXT]
-Working on Grace Ledger v2 (Church Accounting System).
-Refer to promptmaster/MASTER_PROMPT.md and promptmaster/SYSTEM_ARCHITECTURE.md.
+Project: Grace Ledger — The Intelligent Financial Management Platform for Churches
+Read: promptmaster/MASTER_PROMPT.md, promptmaster/PRODUCT_BIBLE.md, promptmaster/ENGINEERING_BIBLE.md
 
 [TASK]
-<Specify your feature request or bug fix here>
+<ระบุงานที่ต้องการ — 1 งาน ชัดเจน>
+
+[FILE TO EDIT]
+<ระบุไฟล์ที่ต้องแก้ไข>
+
+[EXPECTED RESULT]
+<ระบุผลลัพธ์ที่ต้องการเห็น>
 
 [CONSTRAINTS]
-- Use Money class for all financial calculations.
-- Maintain church_id tenant isolation.
-- Follow UI/UX tokens in src/styles.css.
-- Do NOT leave TODOs or placeholders.
+- ห้ามละเมิด Non-Negotiable Rules 10 ข้อ
+- ใช้ Money class สำหรับทุกการคำนวณเงิน
+- church_id tenant isolation ทุก query
+- Follow UI tokens ใน src/styles.css
+- ห้ามเขียน TODO หรือ Placeholder
+- ห้ามใช้ Floating Point กับเงิน
 
 [VERIFICATION]
-Run and verify:
-1. npm run lint
-2. npm run typecheck
-3. npm test
-4. npm run build
+npm run lint       # 0 errors
+npm run typecheck  # 0 errors
+npm test           # 51/51 pass
+npm run build      # Success
 ```
+
+---
+
+## Product Philosophy
+
+```
+Trust    ก่อน Beauty
+Clarity  ก่อน Complexity
+Human    ก่อน AI
+Audit    ก่อน Automation
+Church   ก่อน Enterprise
+```
+
+---
+
+## Grace Platform Vision
+
+Grace Ledger เป็นจุดเริ่มต้นของ Grace Platform:
+
+```
+Grace Platform
+├── Grace Ledger      (NOW) — Financial Management
+├── Grace Members     (NEXT) — Member & Giving Management
+├── Grace Ministry    (FUTURE) — Ministry & Department
+├── Grace Reports     (FUTURE) — Advanced Reporting & Analytics
+├── Grace AI          (FUTURE) — AI Hub & Orchestration
+├── Grace Analytics   (FUTURE) — Data & Insights
+└── Grace Admin       (FUTURE) — Platform Administration
+```
+
+ทุก Module ใช้ Design Language, AI Framework, และ Architecture เดียวกัน
+
+---
+
+_Version: 2.0 | Updated: July 2026 | Owner: Grace Platform Team_

@@ -17,6 +17,8 @@ export default tseslint.config(
       ".wrangler",
       "node_modules",
       "supabase/functions",
+      ".agents",
+      "promptmaster",
     ],
   },
   {

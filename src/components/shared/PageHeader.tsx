@@ -33,9 +33,7 @@ export function PageHeader({
             </p>
           )}
         </div>
-        {actions && (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
-        )}
+        {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
       </div>
       {/* Editorial gradient rule — gold → transparent */}
       <div className="h-px w-full bg-gradient-to-r from-primary/40 via-border/80 to-transparent" />

@@ -140,11 +140,15 @@ function BudgetPage() {
                       />
                     </div>
                     <div className="mt-2 flex items-baseline justify-between gap-3 text-[11px]">
-                      <span className="num-display font-semibold text-muted-foreground">{pct}%</span>
+                      <span className="num-display font-semibold text-muted-foreground">
+                        {pct}%
+                      </span>
                       <span
                         className={cn(
                           "num-display",
-                          remaining < 0 ? "font-semibold text-destructive" : "text-muted-foreground",
+                          remaining < 0
+                            ? "font-semibold text-destructive"
+                            : "text-muted-foreground",
                         )}
                       >
                         {remaining < 0

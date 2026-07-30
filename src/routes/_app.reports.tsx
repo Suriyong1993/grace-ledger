@@ -132,15 +132,16 @@ function ReportsPage() {
             </div>
             <div className="p-5 space-y-6">
               <div>
-                <h4 className="kicker mb-3 text-success">
-                  รายการรายรับ ({incomes.length} รายการ)
-                </h4>
+                <h4 className="kicker mb-3 text-success">รายการรายรับ ({incomes.length} รายการ)</h4>
                 {incomes.length === 0 ? (
                   <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
                 ) : (
                   <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
                     {incomes.map((inc) => (
-                      <div key={inc.id} className="flex justify-between p-3 hover:bg-muted/30 transition-colors">
+                      <div
+                        key={inc.id}
+                        className="flex justify-between p-3 hover:bg-muted/30 transition-colors"
+                      >
                         <div>
                           <p className="font-semibold text-foreground">
                             {inc.description || "รายรับ"}
@@ -165,7 +166,10 @@ function ReportsPage() {
                 ) : (
                   <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
                     {expenses.map((exp) => (
-                      <div key={exp.id} className="flex justify-between p-3 hover:bg-muted/30 transition-colors">
+                      <div
+                        key={exp.id}
+                        className="flex justify-between p-3 hover:bg-muted/30 transition-colors"
+                      >
                         <div>
                           <p className="font-semibold text-foreground">
                             {exp.description || "รายจ่าย"}

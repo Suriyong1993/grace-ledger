@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Level-Up System — Hermes Agent Playbook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: oklch(0.65 0.16 70);
+    --primary-soft: oklch(0.72 0.12 70 / 0.15);
+    --bg: oklch(0.98 0.01 80);
+    --card: oklch(1 0 0);
+    --success: oklch(0.62 0.17 155);
+    --destructive: oklch(0.55 0.22 25);
+    --text: oklch(0.15 0.02 70);
+    --text-muted: oklch(0.45 0.03 70);
+    --border: oklch(0.88 0.02 70);
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Prompt', 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 2rem;
+  }
+
+  /* === LAYOUT === */
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* === HEADER === */
+  .hero {
+    text-align: center;
+    padding: 3rem 2rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 {
+    font-family: 'Kanit', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .hero .accent { color: var(--primary); }
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* === CARDS === */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px oklch(0 0 0 / 0.04);
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 12px oklch(0 0 0 / 0.06); }
+
+  .card h2 {
+    font-family: 'Kanit', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card h2 .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    letter-spacing: 0.03em;
+  }
+
+  .card h3 {
+    font-family: 'Kanit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 1rem 0 0.4rem;
+  }
+
+  /* === LADDER === */
+  .ladder {
+    counter-reset: rung;
+  }
+  .rung {
+    counter-increment: rung;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .rung:last-child { border-bottom: none; }
+  .rung-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+    min-width: 2rem;
+    text-align: right;
+    color: var(--text-muted);
+  }
+  .rung-content { flex: 1; }
+  .rung-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+  .rung-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  .rung-status {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.1rem 0.5rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+  }
+  .status-done { background: oklch(0.62 0.17 155 / 0.15); color: var(--success); }
+  .status-current { background: oklch(0.65 0.16 70 / 0.15); color: var(--primary); }
+  .status-next { background: oklch(0.45 0.03 70 / 0.1); color: var(--text-muted); }
+
+  /* === CHECKLIST === */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .checklist li::before {
+    content: "⬜";
+    font-size: 0.9rem;
+    margin-top: 0.1rem;
+  }
+  .checklist li.done::before { content: "✅"; }
+  .checklist li.partial::before { content: "◻️"; }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    margin-right: 0.3rem;
+  }
+  .tag-green { background: oklch(0.62 0.17 155 / 0.12); color: var(--success); }
+  .tag-red { background: oklch(0.55 0.22 25 / 0.1); color: var(--destructive); }
+
+  /* === METRICS === */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .metric {
+    text-align: center;
+    padding: 1.2rem;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  .metric-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+
+  /* === DECISION LOG ENTRY === */
+  .decision { border-left: 3px solid var(--primary); padding-left: 1rem; margin: 1rem 0; }
+  .decision .date { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+  .decision .why { color: var(--text-muted); font-size: 0.9rem; }
+
+  .rejected { text-decoration: line-through; color: var(--destructive); opacity: 0.6; }
+
+  /* === TABLE === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  th {
+    text-align: left;
+    font-family: 'Kanit', sans-serif;
+    font-weight: 600;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  td.num {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem; }
+    .hero h1 { font-size: 2rem; }
+    .card { padding: 1rem; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>🏗️ <span class="accent">Level-Up</span> System</h1>
+  <p>คู่มือประเมินและยกระดับการทำงานกับ AI Agent — อ่านคนเดียวได้ ไม่ต้องมีเจ้าของโปรเจกต์อยู่ในห้อง</p>
+</div>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">Level 4</div>
+    <div class="metric-label">ตำแหน่งปัจจุบัน</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">Level 5</div>
+    <div class="metric-label">เป้าหมายถัดไป</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">17</div>
+    <div class="metric-label">Sessions (2 สัปดาห์)</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">162</div>
+    <div class="metric-label">Skills ในคลัง</div>
+  </div>
+</div>
+
+<!-- LEVEL ASSESSMENT -->
+<div class="card">
+  <h2>📊 การประเมินระดับจริง <span class="badge">LAST UPDATED: 2026-07-30</span></h2>
+  <p>อ้างอิงจาก <strong>Eric Siu's 8-Level Hermes Ladder</strong> — ประเมินจากงานที่ทำจริงใน 2 สัปดาห์ที่ผ่านมา ไม่ใช่จากสิ่งที่ "ตั้งใจจะทำ"</p>
+
+  <div class="ladder">
+    <div class="rung">
+      <div class="rung-num">8</div>
+      <div class="rung-content">
+        <div class="rung-title">Company Brain, Compounding <span class="rung-status status-next">❌ ยังไม่เริ่ม</span></div>
+        <div class="rung-desc">Agent จำการตัดสินใจของตัวเองได้ — ทุก session เริ่มฉลาดกว่า session ก่อน</div>
+      </div>
+    </div>
+    <div class="rung">
+      <div class="rung-num">7</div>
+      <div class="rung-content">
+        <div class="rung-title">Permissioning + Governance <span class="rung-status status-next">❌ ยังไม่เริ่ม</span></div>
+        <div class="rung-desc">กำหนดสิทธิ์อ่าน/เขียน/execute สำหรับคนในทีม — ปลอดภัยก่อน scale</div>
+      </div>
+    </div>
+    <div class="rung">
+      <div class="rung-num">6</div>
+      <div class="rung-content">
+        <div class="rung-title">Connected Company Data <span class="rung-status status-next">❌ ยังไม่เริ่ม</span></div>
+        <div class="rung-desc">CRM, analytics, docs, revenue intelligence — ต่อถึงกันหมด</div>
+      </div>
+    </div>
+    <div class="rung">
+      <div class="rung-num">5</div>
+      <div class="rung-content">
+        <div class="rung-title">Recurring Checks as Crons <span class="rung-status status-next">🚀 เป้าหมายถัดไป</span></div>
+        <div class="rung-desc">งานที่ตรวจตราอัตโนมัติตามเวลา — เริ่มแล้ววันนี้</div>
+      </div>
+    </div>
+    <div class="rung" style="background: var(--primary-soft); border-radius: 8px; margin: 0.3rem 0; padding: 0.8rem 1rem;">
+      <div class="rung-num">4</div>
+      <div class="rung-content">
+        <div class="rung-title">Repeatable Work as Skills <span class="rung-status status-current">✅ ระดับปัจจุบัน</span></div>
+        <div class="rung-desc"><strong>หลักฐาน:</strong> สร้าง skill-index, hermes-identity, engineering-manager-workflow — มี 162 skills ใน ~/.ai-skills/</div>
+      </div>
+    </div>
+    <div class="rung">
+      <div class="rung-num">3</div>
+      <div class="rung-content">
+        <div class="rung-title">Shareable Artifacts <span class="rung-status status-done">✅ มีประจำ</span></div>
+        <div class="rung-desc">SOUL.md, Grace Ledger vision docs, design prompts collection, skill-index artifact</div>
+      </div>
+    </div>
+    <div class="rung">
+      <div class="rung-num">2</div>
+      <div class="rung-content">
+        <div class="rung-title">Delegate One-Off Tasks <span class="rung-status status-done">✅ มีประจำ</span></div>
+        <div class="rung-desc">"hermes update", "เช็ค FCC", วิเคราะห์ codebase, สร้าง landing pages</div>
+      </div>
+    </div>
+    <div class="rung">
+      <div class="rung-num">1</div>
+      <div class="rung-content">
+        <div class="rung-title">Ask Questions <span class="rung-status status-done">✅ มีประจำ</span></div>
+        <div class="rung-desc">ถาม-ตอบทั่วไป, ศึกษาคู่มือ, วิเคราะห์ข้อมูล</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY LEVEL 4? -->
+<div class="card">
+  <h2>🔍 ทำไมถึงเป็น Level 4 (ไม่ใช่ 3, ไม่ใช่ 5)</h2>
+
+  <h3>สิ่งที่ทำได้ดี (Level 4+)</h3>
+  <ul class="checklist">
+    <li class="done">สร้าง skills จากงานซ้ำ — skill-index, hermes-identity, engineering-manager-workflow</li>
+    <li class="done">มีคลัง skills กลางที่ ~/.ai-skills/ (162 skills)</li>
+    <li class="done">skillify งานที่ทำ 3-4 ครั้งเป็นระบบอัตโนมัติ — skill authoring skill มีแล้ว</li>
+    <li class="done">สร้าง artifacts ที่ทีมเปิดดูได้ — SOUL.md, vision docs, index</li>
+    <li class="done">ใช้ Hermes สำหรับ one-shot delegated builds — landing pages, dashboards, apps</li>
+    <li class="done">ศึกษา prompts อย่างเป็นระบบ ก่อน skillify — behavior ของ Level 4 จริง</li>
+  </ul>
+
+  <h3 style="margin-top: 1.5rem;">สิ่งที่ยังขาด (Level 5+)</h3>
+  <ul class="checklist">
+    <li class="partial">สร้าง cron job: <strong>zero cron jobs</strong> ตั้งอยู่</li>
+    <li class="partial">Decision Log: <strong>พึ่งสร้างวันนี้</strong></li>
+    <li class="partial">Data connectors: ยังไม่มี CRM, analytics, หรือ data source ใดต่อกับ Hermes</li>
+    <li class="partial">Permissions: ยังไม่มีระบบสิทธิ์สำหรับ multi-user</li>
+  </ul>
+</div>
+
+<!-- LEVEL-UP ROADMAP -->
+<div class="card">
+  <h2>🧭 Level-Up Roadmap <span class="badge">NEXT: Level 5</span></h2>
+
+  <h3>Level 5 → Recurring Checks as Crons</h3>
+  <ol style="padding-left: 1.2rem; color: var(--text-muted);">
+    <li><strong>Daily Decision Digest</strong> — Cron ทวน DECISION_LOG.md ทุกเช้า ✅ <em>ตั้งแล้ว</em></li>
+    <li>Cron ตรวจสอบสถานะ LINE Bridge / FCC Proxy</li>
+    <li>Cron สรุปท้ายวัน: "วันนี้ทำอะไรไปบ้าง"</li>
+  </ol>
+
+  <h3 style="margin-top: 1.2rem;">Level 6 → Connected Company Data</h3>
+  <ol style="padding-left: 1.2rem; color: var(--text-muted);">
+    <li>ต่อ Google Sheets / AppFlowy เป็น data source</li>
+    <li>ให้ cron อ่าน data source แล้วสรุปให้</li>
+    <li>สร้าง "dashboard" ที่ agent อ่านได้</li>
+  </ol>
+</div>
+
+<!-- DECISION LOG TEMPLATE -->
+<div class="card">
+  <h2>📝 Decision Log — สำหรับทีม (Latest First)</h2>
+  <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">บันทึกการตัดสินใจทุกครั้งที่ทำงานกับ AI — ใครๆ ในทีมก็เปิดดูและเข้าใจได้</p>
+
+  <div class="decision">
+    <div class="date">2026-07-30 — 15:42 UTC+7</div>
+    <strong>สร้าง Decision Log ถาวร</strong>
+    <div class="why">เหตุผล: Eric's Level 8 (Company Brain) ต้องการให้ Agent จำการตัดสินใจของตัวเองได้ — ไม่มี Decision Log = ไม่มี compounding</div>
+    <div style="margin-top: 0.3rem;">
+      <span class="tag">✅ เลือก: Markdown file ที่ ~/DECISION_LOG.md</span>
+      <span class="tag tag-green">ข้อดี: portable, git ได้, ใช้กับ agent อื่นได้</span>
+      <span class="tag tag-red">❌ ปฏิเสธ: Hermes Memory (พื้นที่จำกัด)</span>
+      <span class="tag tag-red">❌ ปฏิเสธ: Session DB (search ไม่สะดวก)</span>
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="date">2026-07-30 — 15:30 UTC+7</div>
+    <strong>ประเมิน Level — Solid Level 4</strong>
+    <div class="why">เหตุผล: หลักฐาน 2 สัปดาห์แสดง skills, systemizing, artifacts — แต่ <strong>zero crons</strong></div>
+    <div style="margin-top: 0.3rem;">
+      <span class="tag tag-green">ยอมรับว่าเป็น Level 4 จริง — ไม่ขอ Level 5</span>
+    </div>
+  </div>
+
+  <div style="margin-top: 1.5rem;">
+    <h3>วิธีใช้ Decision Log (สำหรับทีม)</h3>
+    <ol style="padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-muted);">
+      <li>เปิด <code>~/DECISION_LOG.md</code> ก่อนเริ่มทำงาน session ใหม่</li>
+      <li>เพิ่ม decision ใหม่ <strong>ก่อน</strong> เริ่ม implement</li>
+      <li>บันทึก: (1) การตัดสินใจ (2) เหตุผล (3) สิ่งที่ปฏิเสธ</li>
+      <li>ข้อมูลล่าสุดอยู่ <strong>ด้านบนสุด</strong> เสมอ</li>
+      <li>ใช้ template:
+<pre style="background: var(--bg); padding: 0.8rem; border-radius: 8px; font-size: 0.8rem; margin-top: 0.5rem;">
+## [YYYY-MM-DD] หัวข้อ
+**การตัดสินใจ:** ...
+**เหตุผล:** ...
+**สิ่งที่ปฏิเสธ:**
+- ❌ ทางเลือก A (เหตุผล)
+- ❌ ทางเลือก B (เหตุผล)
+- ✅ เลือกทางเลือกนี้ (เพราะ...)
+</pre>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<!-- PORTABLE SYSTEM: IDEA → APP -->
+<div class="card">
+  <h2>⚡ Portable System: Idea → App Workflow <span class="badge">MOST USED</span></h2>
+  <p>สกัดจาก workflow จริงที่ใช้ซ้ำที่สุด: "เปลี่ยน idea คร่าวๆ → working app พร้อม UI"<br>
+  <span style="color: var(--text-muted); font-size: 0.85rem;">✅ ใช้งานกับ Hermes, Claude Code, Codex, Cursor, หรือ ChatGPT ก็ได้</span></p>
+
+  <h3>Template Prompt (copy ไปใช้กับ agent ไหนก็ได้)</h3>
+  <pre style="background: var(--bg); padding: 1rem; border-radius: 8px; font-size: 0.85rem; overflow-x: auto; margin: 1rem 0;">
+[CONTEXT]
+You are a Senior Engineer + Senior UX Designer. Build complete, production-ready apps.
+Use the design system below. NEVER leave placeholders or TODOs.
+
+[DESIGN SYSTEM]
+- Background: Warm Ivory (#FAF7F2, oklch(0.98 0.01 80))
+- Primary: Gold Amber (oklch(0.65 0.16 70))
+- Cards: Pure White (oklch(1 0 0)), rounded-xl, border, subtle shadow
+- Heading font: Kanit / Prompt, sans-serif
+- Number font: monospace / tabular
+- Success: Mint Emerald, Destructive: Crimson Red
+
+[IDEA]
+<describe your rough idea in 2-3 sentences>
+
+[CONSTRAINTS]
+- Must be a standalone working project
+- Full UI (not just API/backend)
+- Responsive layout
+- No placeholder code
+- Verification commands defined
+
+[VERIFICATION]
+Run: [lint] [typecheck] [build] [test]
+  </pre>
+
+  <h3>Eval Checklist ("เสร็จ" เมื่อไหร่)</h3>
+  <table>
+    <tr>
+      <th>เกณฑ์</th>
+      <th>คำอธิบาย</th>
+      <th>Pass/Fail</th>
+    </tr>
+    <tr>
+      <td><strong>Buildable</strong></td>
+      <td>รัน build แล้วไม่ error (0 errors)</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td><strong>No Placeholders</strong></td>
+      <td>ไม่มี TODO, FIXME, console.log("test"), stub functions</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td><strong>Full UI</strong></td>
+      <td>ทุกหน้าจอที่ spec ระบุมีของจริง ไม่ใช่ wireframe</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td><strong>Design Match</strong></td>
+      <td>ใช้สี/font/radius ตามที่กำหนด — ดูแล้วไม่ใช่ generic</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td><strong>Error States</strong></td>
+      <td>loading, empty, error, network fail — ทุก state มี UI</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td><strong>Responsive</strong></td>
+      <td>ดูดีทั้ง desktop และ mobile (320px-1440px)</td>
+      <td>⬜</td>
+    </tr>
+    <tr>
+      <td><strong>Self-contained</strong></td>
+      <td>เปิดด้วย `npm run dev` หรือเปิด HTML ตรงๆ ได้เลย</td>
+      <td>⬜</td>
+    </tr>
+  </table>
+
+  <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.8rem;">
+    💡 <strong>เคล็ดลับ:</strong> ส่ง checklist นี้ให้ agent ก่อนเริ่ม — จะได้รู้ว่าต้องทำถึงไหนถึง "เสร็จ"
+  </p>
+</div>
+
+<!-- LEVEL 5 SETUP GUIDE -->
+<div class="card">
+  <h2>⏰ Level 5 Setup Guide <span class="badge">SET UP: 2026-07-30</span></h2>
+
+  <h3>Step 1: Decision Digest Cron ✅ <em>ตั้งแล้ว</em></h3>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">รันทุก 24 ชม. — อ่าน DECISION_LOG.md และสรุปให้รู้ว่าตัดสินใจอะไรไปบ้าง</p>
+
+  <h3 style="margin-top: 1rem;">Step 2: Infrastructure Health Cron</h3>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">ตรวจ LINE Bridge / FCC Proxy ว่า online หรือไม่ — แจ้งเตือนถ้า down</p>
+
+  <h3 style="margin-top: 1rem;">Step 3: Service Monitor</h3>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">เช็ค ngrok tunnel, port 8082, Grace Ledger deployment</p>
+
+  <p style="margin-top: 1.5rem; background: var(--primary-soft); padding: 1rem; border-radius: 8px; font-size: 0.9rem;">
+    ⚠️ <strong>Cron Safety Rule:</strong> cron session ไม่มี user ดูอยู่ — ห้าม cron ทำการเปลี่ยนแปลงที่อันตราย (ลบข้อมูล, ส่ง external publish) โดยไม่ได้รับอนุญาต
+  </p>
+</div>
+
+<div class="footer">
+  <p>Generated from Hermes Agent — <strong>Level-Up System v1.0</strong></p>
+  <p>ดีไซน์: Warm Ivory & Gold Amber (Grace Ledger DESIGN_SYSTEM.md)</p>
+  <p style="font-size: 0.75rem; margin-top: 0.5rem;">Open with any browser — no login required</p>
+</div>
+
+</div>
+</body>
+</html>

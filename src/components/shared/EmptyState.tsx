@@ -18,10 +18,7 @@ export function EmptyState({
       <div className="relative flex h-14 w-14 items-center justify-center">
         <div className="absolute inset-0 rounded-xl border border-border/40 bg-muted/40" />
         <div className="absolute inset-1.5 rounded-lg border border-border/20 bg-muted/20" />
-        <Icon
-          className="relative h-5 w-5 text-muted-foreground/40"
-          strokeWidth={1.25}
-        />
+        <Icon className="relative h-5 w-5 text-muted-foreground/40" strokeWidth={1.25} />
       </div>
 
       <div className="max-w-xs">

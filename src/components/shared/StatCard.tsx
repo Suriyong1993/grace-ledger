@@ -105,9 +105,7 @@ export function StatCard({
               <span
                 className={cn(
                   "num-display inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[11px] font-semibold",
-                  trend >= 0
-                    ? "bg-success/10 text-success"
-                    : "bg-destructive/10 text-destructive",
+                  trend >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
                 )}
               >
                 {trend >= 0 ? (
@@ -119,9 +117,7 @@ export function StatCard({
                 {trend.toFixed(1)}%
               </span>
             )}
-            {hint && (
-              <span className="truncate text-muted-foreground/80">{hint}</span>
-            )}
+            {hint && <span className="truncate text-muted-foreground/80">{hint}</span>}
           </div>
         )}
       </div>

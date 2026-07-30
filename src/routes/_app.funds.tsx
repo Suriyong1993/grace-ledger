@@ -145,7 +145,11 @@ function FundsPage() {
                       <TrendingUp className="h-3 w-3 text-success" strokeWidth={2} />
                       รายรับ
                     </span>
-                    <MoneyText value={income + offering} tone="income" className="text-sm font-semibold" />
+                    <MoneyText
+                      value={income + offering}
+                      tone="income"
+                      className="text-sm font-semibold"
+                    />
                   </div>
                   <div className="flex items-center justify-between gap-3 px-5 py-2.5">
                     <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
