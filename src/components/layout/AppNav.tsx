@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
+  ClipboardCheck,
   ArrowDownCircle,
   ArrowUpCircle,
   HandHeart,
@@ -32,7 +33,10 @@ export interface NavGroup {
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "ภาพรวม",
-    items: [{ to: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard }],
+    items: [
+      { to: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
+      { to: "/approvals", label: "ศูนย์อนุมัติ", icon: ClipboardCheck },
+    ],
   },
   {
     label: "รายการเงิน",
