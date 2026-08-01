@@ -207,6 +207,10 @@ export interface AuditChainVerificationResult {
   firstBreakAt?: string;
 }
 
+export async function apiVerifyAuditChain(): Promise<AuditChainVerificationResult> {
+  return apiRequest("POST", "/audit/verify");
+}
+
 // ============================================================================
 // Project API
 // ============================================================================
