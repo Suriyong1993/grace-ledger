@@ -29,8 +29,8 @@ import { cn } from "@/lib/utils";
 
 /* Palette of avatar colors — indigo-aligned, no gold */
 const AVATAR_COLORS: Record<string, string> = {
-  super_admin: "oklch(0.54 0.22 277)",   // Indigo — Super Admin
-  admin: "oklch(0.52 0.16 155)",          // Emerald — Admin
+  super_admin: "oklch(0.54 0.22 277)", // Indigo — Super Admin
+  admin: "oklch(0.52 0.16 155)", // Emerald — Admin
 };
 
 /* Role badge variant mapping */
@@ -46,13 +46,14 @@ export function AppTopbar() {
   const { isDark, toggleTheme } = useTheme();
 
   const initial = user?.name?.trim()?.[0] ?? "?";
-  const avatarBg = user?.role ? (AVATAR_COLORS[user.role] ?? "oklch(0.54 0.22 277)") : "oklch(0.54 0.22 277)";
+  const avatarBg = user?.role
+    ? (AVATAR_COLORS[user.role] ?? "oklch(0.54 0.22 277)")
+    : "oklch(0.54 0.22 277)";
   const roleBadge = user?.role ? (ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.auditor) : "";
 
   return (
     <header className="glass-topbar sticky top-0 z-30">
       <div className="grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 md:px-6">
-
         {/* Left: Sidebar trigger */}
         <div className="flex items-center gap-1">
           <SidebarTrigger className="rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
@@ -69,9 +70,7 @@ export function AppTopbar() {
             className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
             strokeWidth={2}
           />
-          <span className="flex-1 truncate text-left text-xs">
-            ค้นหารายการ, สมาชิก, กองทุน…
-          </span>
+          <span className="flex-1 truncate text-left text-xs">ค้นหารายการ, สมาชิก, กองทุน…</span>
           <kbd className="hidden items-center gap-0.5 rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:inline-flex">
             <CommandIcon className="h-2.5 w-2.5" /> K
           </kbd>
@@ -79,7 +78,6 @@ export function AppTopbar() {
 
         {/* Right: Actions + User */}
         <div className="flex items-center gap-1.5 justify-self-end">
-
           {/* Mobile search */}
           <Button
             variant="ghost"
@@ -114,10 +112,7 @@ export function AppTopbar() {
             aria-label={isDark ? "เปลี่ยนเป็นโหมดสว่าง" : "เปลี่ยนเป็นโหมดมืด"}
             onClick={toggleTheme}
           >
-            {isDark
-              ? <Sun className="h-4 w-4 text-offering" />
-              : <Moon className="h-4 w-4" />
-            }
+            {isDark ? <Sun className="h-4 w-4 text-offering" /> : <Moon className="h-4 w-4" />}
           </Button>
 
           {/* User menu */}
@@ -143,10 +138,7 @@ export function AppTopbar() {
                   <p className="max-w-[100px] truncate text-xs font-semibold leading-tight text-foreground">
                     {user?.name}
                   </p>
-                  <p className={cn(
-                    "truncate text-[10px] font-medium px-1 rounded",
-                    roleBadge,
-                  )}>
+                  <p className={cn("truncate text-[10px] font-medium px-1 rounded", roleBadge)}>
                     {user ? ROLE_LABEL[user.role] : ""}
                   </p>
                 </div>
@@ -157,19 +149,15 @@ export function AppTopbar() {
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuLabel className="pb-1">
                 <p className="text-xs font-semibold text-foreground">{user?.name}</p>
-                <p className="text-[10px] text-muted-foreground">{user ? ROLE_LABEL[user.role] : ""}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {user ? ROLE_LABEL[user.role] : ""}
+                </p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => navigate({ to: "/profile" })}
-                className="text-sm"
-              >
+              <DropdownMenuItem onClick={() => navigate({ to: "/profile" })} className="text-sm">
                 โปรไฟล์
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => navigate({ to: "/settings" })}
-                className="text-sm"
-              >
+              <DropdownMenuItem onClick={() => navigate({ to: "/settings" })} className="text-sm">
                 ตั้งค่า
               </DropdownMenuItem>
               <DropdownMenuSeparator />

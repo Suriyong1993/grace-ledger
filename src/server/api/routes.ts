@@ -22,6 +22,11 @@ import { incomeRoutes } from "./routes/income.routes";
 import { expenseRoutes } from "./routes/expense.routes";
 import { budgetRoutes } from "./routes/budget.routes";
 import { offeringFinancialRoutes } from "./routes/offering-financial.routes";
+import { projectRoutes } from "./routes/projects.routes";
+import { memberRoutes } from "./routes/members.routes";
+import { offeringCategoryRoutes } from "./routes/offering-categories.routes";
+import { offeringSubcategoryRoutes } from "./routes/offering-subcategories.routes";
+import { lineUserRoutes } from "./routes/line-users.routes";
 import { errorResponse, rateLimitMiddleware, csrfProtectionMiddleware } from "./middleware";
 
 export interface RouteDefinition {
@@ -53,6 +58,11 @@ const routes: RouteDefinition[] = [
   ...expenseRoutes,
   ...budgetRoutes,
   ...offeringFinancialRoutes,
+  ...projectRoutes,
+  ...memberRoutes,
+  ...offeringCategoryRoutes,
+  ...offeringSubcategoryRoutes,
+  ...lineUserRoutes,
 ];
 
 /**

@@ -357,7 +357,9 @@ function AuditPage() {
                           <SeverityBadge severity={severity} />
                         </div>
                         <p className="truncate text-xs text-muted-foreground">
-                          <span className="font-mono text-[11px] text-foreground/80">{a.entity}</span>
+                          <span className="font-mono text-[11px] text-foreground/80">
+                            {a.entity}
+                          </span>
                           {a.details ? ` · ${a.details}` : ""}
                         </p>
                       </div>

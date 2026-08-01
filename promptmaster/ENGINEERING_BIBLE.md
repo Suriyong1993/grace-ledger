@@ -7,18 +7,18 @@
 
 ## 1. Tech Stack (สิ่งที่ใช้)
 
-| Layer | Technology | ห้ามเปลี่ยน |
-|-------|-----------|------------|
-| Frontend | React 19 + TypeScript | ✅ |
-| Router | TanStack Router | ✅ |
-| SSR Framework | TanStack Start | ✅ |
-| Styling | Tailwind CSS v4 | ✅ |
-| UI Components | shadcn/ui | ✅ |
-| ORM | Drizzle ORM | ✅ |
-| Database | PostgreSQL 16 / Supabase | ✅ |
-| Auth | JWT Sessions + Supabase Auth | ✅ |
-| Test Engine | PGlite (WebAssembly Postgres) | ✅ |
-| AI OCR | Fireworks AI (Kimi-K3) + Gemini | ✅ |
+| Layer         | Technology                      | ห้ามเปลี่ยน |
+| ------------- | ------------------------------- | ----------- |
+| Frontend      | React 19 + TypeScript           | ✅          |
+| Router        | TanStack Router                 | ✅          |
+| SSR Framework | TanStack Start                  | ✅          |
+| Styling       | Tailwind CSS v4                 | ✅          |
+| UI Components | shadcn/ui                       | ✅          |
+| ORM           | Drizzle ORM                     | ✅          |
+| Database      | PostgreSQL 16 / Supabase        | ✅          |
+| Auth          | JWT Sessions + Supabase Auth    | ✅          |
+| Test Engine   | PGlite (WebAssembly Postgres)   | ✅          |
+| AI OCR        | Fireworks AI (Kimi-K3) + Gemini | ✅          |
 
 ---
 
@@ -50,14 +50,14 @@ src/
 
 ## 3. Critical Domain Files (อย่าแตะโดยไม่เข้าใจ)
 
-| ไฟล์ | ทำอะไร | ระดับความเสี่ยง |
-|------|--------|----------------|
-| `src/db/schema.ts` | Database schema ทั้งหมด | 🔴 Critical |
-| `src/server/domain/money.ts` | Money class — no float | 🔴 Critical |
-| `src/server/domain/journal.ts` | Double-entry engine | 🔴 Critical |
-| `src/server/auth/permissions.ts` | RBAC + thresholds | 🔴 Critical |
-| `src/server/services/audit.service.ts` | SHA-256 audit chain | 🔴 Critical |
-| `src/server/api/routes/ai-proxy.routes.ts` | AI proxy (no key leaks) | 🟡 High |
+| ไฟล์                                       | ทำอะไร                  | ระดับความเสี่ยง |
+| ------------------------------------------ | ----------------------- | --------------- |
+| `src/db/schema.ts`                         | Database schema ทั้งหมด | 🔴 Critical     |
+| `src/server/domain/money.ts`               | Money class — no float  | 🔴 Critical     |
+| `src/server/domain/journal.ts`             | Double-entry engine     | 🔴 Critical     |
+| `src/server/auth/permissions.ts`           | RBAC + thresholds       | 🔴 Critical     |
+| `src/server/services/audit.service.ts`     | SHA-256 audit chain     | 🔴 Critical     |
+| `src/server/api/routes/ai-proxy.routes.ts` | AI proxy (no key leaks) | 🟡 High         |
 
 ---
 
@@ -72,8 +72,8 @@ const amount = Money.fromTHB("1234.50");
 const total = amount.add(Money.fromTHB("500.00"));
 
 // ❌ WRONG — ห้ามเด็ดขาด
-const amount = 1234.50;  // FLOAT = BUG
-const amount = parseFloat("1234.50");  // BUG
+const amount = 1234.5; // FLOAT = BUG
+const amount = parseFloat("1234.50"); // BUG
 ```
 
 ### 4.2 Database — Tenant Isolation
@@ -82,14 +82,14 @@ const amount = parseFloat("1234.50");  // BUG
 // ✅ CORRECT — church_id บังคับทุก query
 const entries = await db.query.journalEntries.findMany({
   where: and(
-    eq(journalEntries.churchId, ctx.churchId),  // บังคับ
-    eq(journalEntries.status, "pending")
-  )
+    eq(journalEntries.churchId, ctx.churchId), // บังคับ
+    eq(journalEntries.status, "pending"),
+  ),
 });
 
 // ❌ WRONG — ไม่มี church_id filter = security breach
 const entries = await db.query.journalEntries.findMany({
-  where: eq(journalEntries.status, "pending")
+  where: eq(journalEntries.status, "pending"),
 });
 ```
 
@@ -120,9 +120,7 @@ throw new Error("Not enough funds");
 
 ```typescript
 // ✅ CORRECT — Soft delete เสมอ
-await db.update(funds)
-  .set({ deletedAt: new Date() })
-  .where(eq(funds.id, fundId));
+await db.update(funds).set({ deletedAt: new Date() }).where(eq(funds.id, fundId));
 
 // ❌ WRONG — ห้ามเด็ดขาด
 await db.delete(funds).where(eq(funds.id, fundId));
@@ -137,7 +135,7 @@ const response = await fireworksAI.parse(document, process.env.FIREWORKS_API_KEY
 
 // ❌ WRONG — ห้ามเด็ดขาด
 const response = await fetch("https://api.fireworks.ai/...", {
-  headers: { "Authorization": import.meta.env.VITE_FIREWORKS_KEY }  // EXPOSED!
+  headers: { Authorization: import.meta.env.VITE_FIREWORKS_KEY }, // EXPOSED!
 });
 ```
 
@@ -172,8 +170,8 @@ await auditService.log({
   action: "JOURNAL_ENTRY_APPROVED",
   entityType: "journal_entry",
   entityId: entry.id,
-  before: previousState,  // snapshot ก่อนเปลี่ยน
-  after: newState,         // snapshot หลังเปลี่ยน
+  before: previousState, // snapshot ก่อนเปลี่ยน
+  after: newState, // snapshot หลังเปลี่ยน
 });
 ```
 
@@ -189,6 +187,7 @@ DRAFT ──submit──→ PENDING ──approve──→ APPROVED ──void�
 ```
 
 กฎ State Machine (ห้ามละเมิด):
+
 - `approved` → `draft` = ILLEGAL (ต้อง void ก่อน)
 - `approved` → `deleted` = ILLEGAL (ห้ามลบ approved)
 - `voided` → any = ILLEGAL (terminal state)
@@ -245,7 +244,7 @@ test: add edge cases for period closing validation
 
 ## 10. Environment Variables
 
-### 10.1 Server-only (ห้ามใช้ VITE_ prefix)
+### 10.1 Server-only (ห้ามใช้ VITE\_ prefix)
 
 ```env
 FIREWORKS_API_KEY=...      # AI OCR — server only
@@ -253,7 +252,7 @@ JWT_SECRET=...             # Session signing — server only
 DATABASE_URL=...           # DB connection — server only
 ```
 
-### 10.2 Client-safe (ใช้ VITE_ prefix ได้)
+### 10.2 Client-safe (ใช้ VITE\_ prefix ได้)
 
 ```env
 VITE_SUPABASE_URL=...      # Public Supabase URL
@@ -304,13 +303,13 @@ VITE_SUPABASE_ANON_KEY=... # Public anon key
 
 ## 13. Performance Budget
 
-| Metric | Target |
-|--------|--------|
-| First Contentful Paint | < 1.5s |
-| Time to Interactive | < 3s |
-| Bundle size (initial) | < 300KB gzip |
-| API response time | < 500ms (p95) |
-| DB query time | < 100ms |
+| Metric                 | Target        |
+| ---------------------- | ------------- |
+| First Contentful Paint | < 1.5s        |
+| Time to Interactive    | < 3s          |
+| Bundle size (initial)  | < 300KB gzip  |
+| API response time      | < 500ms (p95) |
+| DB query time          | < 100ms       |
 
 ---
 

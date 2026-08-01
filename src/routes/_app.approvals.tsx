@@ -38,11 +38,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { listIncome, listExpense } from "@/services/church";
 import {
   apiApproveIncome,
@@ -131,12 +127,9 @@ function RejectDialog({ open, item, onClose, onConfirm }: RejectDialogProps) {
         {item && (
           <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm">
             <p className="font-medium text-foreground">
-              {item.kind === "income" ? "รายรับ" : "รายจ่าย"} —{" "}
-              <MoneyText value={item.amount} />
+              {item.kind === "income" ? "รายรับ" : "รายจ่าย"} — <MoneyText value={item.amount} />
             </p>
-            {item.description && (
-              <p className="mt-0.5 text-muted-foreground">{item.description}</p>
-            )}
+            {item.description && <p className="mt-0.5 text-muted-foreground">{item.description}</p>}
           </div>
         )}
 
@@ -208,15 +201,12 @@ function ApproveDialog({ open, item, onClose, onConfirm }: ApproveDialogProps) {
         {item && (
           <div className="rounded-lg border border-approved/20 bg-approved-muted/50 p-3 text-sm">
             <p className="font-semibold text-foreground">
-              {item.kind === "income" ? "รายรับ" : "รายจ่าย"} — วันที่{" "}
-              {fmtDate(item.date)}
+              {item.kind === "income" ? "รายรับ" : "รายจ่าย"} — วันที่ {fmtDate(item.date)}
             </p>
             <p className="mt-1 num-display text-lg font-bold amount-income">
               <MoneyText value={item.amount} />
             </p>
-            {item.description && (
-              <p className="mt-1 text-muted-foreground">{item.description}</p>
-            )}
+            {item.description && <p className="mt-1 text-muted-foreground">{item.description}</p>}
           </div>
         )}
 
@@ -252,10 +242,7 @@ function PendingRow({ item, onApprove, onReject, index }: PendingRowProps) {
 
   return (
     <div
-      className={cn(
-        "card-ledger overflow-hidden transition-all duration-200",
-        "animate-fade-up",
-      )}
+      className={cn("card-ledger overflow-hidden transition-all duration-200", "animate-fade-up")}
       style={{ animationDelay: `${index * 40}ms` }}
     >
       {/* Main row */}
@@ -280,14 +267,10 @@ function PendingRow({ item, onApprove, onReject, index }: PendingRowProps) {
             <span className="text-sm font-semibold text-foreground">
               {isIncome ? "รายรับ" : "รายจ่าย"}
             </span>
-            {item.vendor && (
-              <span className="text-xs text-muted-foreground">{item.vendor}</span>
-            )}
+            {item.vendor && <span className="text-xs text-muted-foreground">{item.vendor}</span>}
           </div>
           {item.description && (
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
-              {item.description}
-            </p>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.description}</p>
           )}
           <p className="mt-0.5 text-[11px] text-muted-foreground/70">
             {fmtDate(item.date)} · บันทึกโดย {item.createdBy}
@@ -314,11 +297,7 @@ function PendingRow({ item, onApprove, onReject, index }: PendingRowProps) {
           className="ml-1 rounded-lg p-1.5 text-muted-foreground hover:bg-muted transition-colors"
           aria-label={expanded ? "ซ่อนรายละเอียด" : "ดูรายละเอียด"}
         >
-          {expanded ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
+          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
       </div>
 
@@ -498,9 +477,7 @@ function ApprovalsPage() {
           </div>
           <div>
             <p className="font-semibold text-foreground">ทุกอย่างเรียบร้อยแล้ว!</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              ไม่มีรายการที่รอการอนุมัติในขณะนี้
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">ไม่มีรายการที่รอการอนุมัติในขณะนี้</p>
           </div>
         </div>
       )}

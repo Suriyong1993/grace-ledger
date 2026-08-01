@@ -840,6 +840,34 @@ export const entryNumberCounters = pgTable(
 );
 
 // ============================================================================
+// Offering Subcategories
+// ============================================================================
+
+export const offeringSubcategories = pgTable(
+  "offering_subcategories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    churchId: uuid("church_id")
+      .notNull()
+      .references(() => churches.id),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => offeringCategories.id),
+    name: varchar("name", { length: 100 }).notNull(),
+    description: text("description"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+  },
+  (table) => [
+    index("idx_os_category").on(table.categoryId),
+    index("idx_os_active").on(table.isActive).where(sql`${table.isActive} = true`),
+  ],
+);
+
+// ============================================================================
 // LINE Users (AI Expense Tracker: LINE integration mapping)
 // ============================================================================
 

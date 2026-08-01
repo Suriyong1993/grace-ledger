@@ -1,6 +1,7 @@
 # Shared Project Brain — Architecture Specification
 
 ## Technology Stack
+
 - **Framework**: TanStack Start / TanStack Router + React 19
 - **State & Data**: TanStack Query + Drizzle ORM
 - **Database**: SQLite / Supabase PostgreSQL compatible engine
@@ -8,6 +9,7 @@
 - **Type Safety**: TypeScript strict mode + Zod validation
 
 ## Layer Boundaries
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Presentation Layer (React 19, TanStack Router, UI)      │

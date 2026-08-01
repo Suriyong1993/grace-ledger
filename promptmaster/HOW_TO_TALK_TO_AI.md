@@ -1,4 +1,5 @@
 ﻿# วิธีสั่ง AI สำหรับ Grace Ledger
+
 ## กระดาษโกง — Copy-Paste ได้เลย
 
 ---
@@ -12,6 +13,7 @@
 คุณกำลังทำงานกับโปรเจกต์ Grace Ledger
 
 อ่านไฟล์เหล่านี้ก่อน แล้วยืนยันว่าเข้าใจแล้ว:
+
 1. promptmaster/MASTER_PROMPT.md
 2. promptmaster/ENGINEERING_BIBLE.md
 
@@ -33,12 +35,13 @@ Copy แล้วเติมส่วนที่เป็นวงเล็บ
 (เขียนงานที่ต้องการที่นี่ — 1 งาน ชัดเจน)
 
 [ไฟล์ที่ต้องแก้]
-(ระบุไฟล์ที่เกี่ยวข้อง เช่น src/routes/_app.dashboard.tsx)
+(ระบุไฟล์ที่เกี่ยวข้อง เช่น src/routes/\_app.dashboard.tsx)
 
 [ผลลัพธ์ที่ต้องการ]
 (บอกว่าอยากเห็นอะไร เช่น "ปุ่มนี้ทำงานได้" หรือ "ตัวเลขแสดงถูก")
 
 [ข้อห้าม]
+
 - ห้ามแก้ไฟล์อื่นที่ไม่เกี่ยวข้อง
 - ห้ามใช้ตัวเลขทศนิยม (float) กับเงิน
 - ห้าม TODO หรือ Placeholder
@@ -80,7 +83,7 @@ Dashboard แสดง "รออนุมัติ" แค่รายการ
 อยากให้รวม รายรับ (income) และ เงินถวาย (offering) ด้วย
 
 [ไฟล์ที่ต้องแก้]
-src/routes/_app.dashboard.tsx
+src/routes/\_app.dashboard.tsx
 บรรทัดประมาณ 139 (ตรง pendingExpenses)
 
 [ผลลัพธ์ที่ต้องการ]
@@ -88,6 +91,7 @@ src/routes/_app.dashboard.tsx
 ทั้ง income, expense, และ offering
 
 [ข้อห้าม]
+
 - ห้ามแก้ไฟล์อื่น
 - ห้าม float กับเงิน
 
@@ -103,9 +107,9 @@ npm run lint && npm run typecheck && npm test
 แก้ปัญหานี้ใน Grace Ledger:
 
 ปัญหา: ตัวเลขเงินบาง ๆ ใน Dashboard ใช้ .toLocaleString() โดยตรง
-        ซึ่งผิดกฎ ต้องใช้ thb() หรือ MoneyText component
+ซึ่งผิดกฎ ต้องใช้ thb() หรือ MoneyText component
 
-หน้าที่มีปัญหา: src/routes/_app.dashboard.tsx
+หน้าที่มีปัญหา: src/routes/\_app.dashboard.tsx
 บรรทัดที่ผิด: 291, 355, 634
 
 สิ่งที่ควรเป็น: เปลี่ยน .toLocaleString("th-TH") เป็น thb() ทุกที่ในไฟล์นี้
@@ -137,12 +141,12 @@ npm run lint && npm run typecheck && npm test
 
 ## ไฟล์ Bible ที่ AI ต้องอ่าน
 
-ทำงานทั่วไป        -> promptmaster/MASTER_PROMPT.md
-แก้ UI/Design       -> promptmaster/DESIGN_BIBLE.md
-แก้โค้ด/Logic      -> promptmaster/ENGINEERING_BIBLE.md
-เรื่อง AI Feature   -> promptmaster/AI_BIBLE.md
+ทำงานทั่วไป -> promptmaster/MASTER_PROMPT.md
+แก้ UI/Design -> promptmaster/DESIGN_BIBLE.md
+แก้โค้ด/Logic -> promptmaster/ENGINEERING_BIBLE.md
+เรื่อง AI Feature -> promptmaster/AI_BIBLE.md
 ดู Feature ที่ต้องมี -> promptmaster/PRODUCT_BIBLE.md
-ดูลำดับงาน          -> promptmaster/ROADMAP.md
+ดูลำดับงาน -> promptmaster/ROADMAP.md
 
 ---
 

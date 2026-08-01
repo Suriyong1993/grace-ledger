@@ -21,13 +21,13 @@ Grace Ledger คือ:
 
 เอกสารชุดนี้ใน `promptmaster/` คือ "รัฐธรรมนูญ" ของ Grace Ledger:
 
-| ไฟล์ | บทบาท |
-|------|--------|
-| `MASTER_PROMPT.md` (นี่) | Index + กฎสูงสุด + วิธีใช้งาน |
-| `PRODUCT_BIBLE.md` | Vision, Positioning, Users, Features, Roadmap |
-| `DESIGN_BIBLE.md` | Design DNA, UI Language, Components, Tokens |
-| `ENGINEERING_BIBLE.md` | Architecture, Code Rules, Git, Testing, Verification |
-| `AI_BIBLE.md` | Grace AI Agents, Hermes, RAG, LINE, Personality |
+| ไฟล์                     | บทบาท                                                |
+| ------------------------ | ---------------------------------------------------- |
+| `MASTER_PROMPT.md` (นี่) | Index + กฎสูงสุด + วิธีใช้งาน                        |
+| `PRODUCT_BIBLE.md`       | Vision, Positioning, Users, Features, Roadmap        |
+| `DESIGN_BIBLE.md`        | Design DNA, UI Language, Components, Tokens          |
+| `ENGINEERING_BIBLE.md`   | Architecture, Code Rules, Git, Testing, Verification |
+| `AI_BIBLE.md`            | Grace AI Agents, Hermes, RAG, LINE, Personality      |
 
 ---
 
@@ -55,15 +55,15 @@ Grace Ledger คือ:
 
 ## Core Architecture Map (Quick Reference)
 
-| Layer | ไฟล์สำคัญ | หน้าที่ |
-|-------|-----------|---------|
-| Database Schema | `src/db/schema.ts` | Drizzle ORM — 22 tables |
-| Money Precision | `src/server/domain/money.ts` | THB rounding, no float |
-| Double-Entry Engine | `src/server/domain/journal.ts` | Journal entries, debit/credit |
-| Permissions | `src/server/auth/permissions.ts` | RBAC, dual-approval >50K THB |
-| Audit Trail | `src/server/services/audit.service.ts` | SHA-256 hash chain |
-| AI Proxy | `src/server/api/routes/ai-proxy.routes.ts` | Server-side AI, no key leaks |
-| Test Engine | `src/server/infrastructure/db.ts` | PGlite WebAssembly |
+| Layer               | ไฟล์สำคัญ                                  | หน้าที่                       |
+| ------------------- | ------------------------------------------ | ----------------------------- |
+| Database Schema     | `src/db/schema.ts`                         | Drizzle ORM — 22 tables       |
+| Money Precision     | `src/server/domain/money.ts`               | THB rounding, no float        |
+| Double-Entry Engine | `src/server/domain/journal.ts`             | Journal entries, debit/credit |
+| Permissions         | `src/server/auth/permissions.ts`           | RBAC, dual-approval >50K THB  |
+| Audit Trail         | `src/server/services/audit.service.ts`     | SHA-256 hash chain            |
+| AI Proxy            | `src/server/api/routes/ai-proxy.routes.ts` | Server-side AI, no key leaks  |
+| Test Engine         | `src/server/infrastructure/db.ts`          | PGlite WebAssembly            |
 
 ---
 

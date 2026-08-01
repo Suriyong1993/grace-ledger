@@ -1,12 +1,16 @@
 /**
  * RecentTransactionsTable.tsx
  *
- * Adapted from the "Recent Files" table in the 3-column reference design.
- * Renders recent financial entries with status badges, category icons, and drawer inspection.
+ * Renders recent financial entries with premium row design:
+ * - Left border flash on hover (color per transaction type)
+ * - Pending rows: amber left border persistent + background tint
+ * - Stagger entrance animation per row
+ * - Right-aligned tabular amounts with min-width for alignment
+ * - Category pill tag in meta line
  */
 
 import { useState } from "react";
-import { ArrowDownLeft, ArrowUpLeft, ChevronRight, FileText } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { fmtDate } from "@/lib/format";
@@ -75,12 +79,21 @@ const DEFAULT_TXS: TransactionRow[] = [
   },
 ];
 
+type FilterTab = "all" | "income" | "expense" | "pending";
+
+const FILTER_LABELS: Record<FilterTab, string> = {
+  all: "ทั้งหมด",
+  income: "รายรับ",
+  expense: "รายจ่าย",
+  pending: "รออนุมัติ",
+};
+
 export function RecentTransactionsTable({
   transactions = DEFAULT_TXS,
   onSelectTx,
 }: RecentTransactionsTableProps) {
   const displayTxs = transactions.length > 0 ? transactions : DEFAULT_TXS;
-  const [filter, setFilter] = useState<"all" | "income" | "expense" | "pending">("all");
+  const [filter, setFilter] = useState<FilterTab>("all");
 
   const filtered = displayTxs.filter((tx) => {
     if (filter === "income") return tx.kind === "income";
@@ -89,58 +102,76 @@ export function RecentTransactionsTable({
     return true;
   });
 
+  const pendingCount = displayTxs.filter((t) => t.status === "pending").length;
+
   return (
-    <div className="card-ledger space-y-3 p-5">
-      {/* Table Header & Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-border/50">
+    <div className="card-ledger overflow-hidden">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 px-5 py-4">
         <div>
-          <h3 className="font-semibold text-sm text-foreground">รายการการเงินล่าสุด</h3>
+          <h3 className="text-sm font-semibold text-foreground">รายการการเงินล่าสุด</h3>
           <p className="text-xs text-muted-foreground">บันทึกรับ-จ่าย และสถานะการอนุมัติ</p>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-lg">
-          {(["all", "income", "expense", "pending"] as const).map((tab) => {
-            const labels = {
-              all: "ทั้งหมด",
-              income: "รายรับ",
-              expense: "รายจ่าย",
-              pending: "รออนุมัติ",
-            };
-            return (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                className={cn(
-                  "px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors",
-                  filter === tab
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {labels[tab]}
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-0.5 rounded-lg bg-muted/60 p-1">
+          {(Object.keys(FILTER_LABELS) as FilterTab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setFilter(tab)}
+              className={cn(
+                "relative px-2.5 py-1 text-[11px] font-medium rounded-md transition-all duration-150",
+                filter === tab
+                  ? "bg-card text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {FILTER_LABELS[tab]}
+              {tab === "pending" && pendingCount > 0 && (
+                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-pending px-1 text-[9px] font-bold text-pending-foreground">
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Rows Table */}
-      <div className="space-y-1.5 pt-1">
-        {filtered.map((tx, index) => {
-          const isIncome = tx.kind === "income";
-          return (
-            <div
-              key={tx.id}
-              onClick={() => onSelectTx?.(tx)}
-              className={cn(
-                "flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group border border-transparent hover:border-border/60",
-                "animate-fade-up",
-              )}
-              style={{ animationDelay: `${index * 40}ms` }}
-            >
-              {/* Kind Icon + Details */}
-              <div className="flex items-center gap-3 min-w-0">
+      {/* Rows */}
+      <div className="divide-y divide-border/40">
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground">
+              <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">ไม่พบรายการ</p>
+            <p className="mt-0.5 text-xs text-muted-foreground/70">ลองเปลี่ยนตัวกรอง</p>
+          </div>
+        ) : (
+          filtered.map((tx, index) => {
+            const isIncome = tx.kind === "income";
+            const isPending = tx.status === "pending";
+
+            return (
+              <div
+                key={tx.id}
+                onClick={() => onSelectTx?.(tx)}
+                className={cn(
+                  "group relative flex cursor-pointer items-center gap-3 px-5 py-3.5",
+                  "transition-colors duration-150 hover:bg-muted/40",
+                  // Left border accent
+                  "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-r before:transition-all before:duration-150",
+                  isPending
+                    ? "before:bg-pending"
+                    : isIncome
+                      ? "before:bg-income before:opacity-0 hover:before:opacity-100"
+                      : "before:bg-expense before:opacity-0 hover:before:opacity-100",
+                  isPending && "bg-pending/[0.025]",
+                  "animate-fade-up",
+                )}
+                style={{ animationDelay: `${index * 35}ms` }}
+              >
+                {/* Kind icon */}
                 <div
                   className={cn(
                     "grid h-9 w-9 shrink-0 place-items-center rounded-xl",
@@ -150,41 +181,48 @@ export function RecentTransactionsTable({
                   {isIncome ? (
                     <ArrowDownLeft className="h-4 w-4" strokeWidth={2} />
                   ) : (
-                    <ArrowUpLeft className="h-4 w-4" strokeWidth={2} />
+                    <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
                   )}
                 </div>
 
-                <div className="min-w-0">
-                  <p className="font-semibold text-xs text-foreground truncate group-hover:text-primary transition-colors">
+                {/* Description + meta */}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-foreground transition-colors group-hover:text-primary">
                     {tx.description || tx.categoryName || (isIncome ? "รายรับ" : "รายจ่าย")}
                   </p>
-                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                    {fmtDate(tx.date)}
-                    {tx.vendor && ` · ${tx.vendor}`}
-                    {tx.createdBy && ` · โดย ${tx.createdBy}`}
-                  </p>
+                  <div className="mt-0.5 flex items-center gap-1.5 overflow-hidden">
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
+                      {fmtDate(tx.date)}
+                    </span>
+                    {tx.categoryName && (
+                      <>
+                        <span className="text-muted-foreground/40">·</span>
+                        <span className="truncate rounded bg-muted px-1.5 py-px text-[10px] font-medium text-muted-foreground">
+                          {tx.categoryName}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Status & Amount */}
-              <div className="shrink-0 text-right flex items-center gap-3">
-                <StatusBadge status={tx.status} variant="dot" />
-                <div>
+                {/* Status + amount */}
+                <div className="flex shrink-0 items-center gap-3">
+                  <StatusBadge status={tx.status} variant="dot" />
                   <p
                     className={cn(
-                      "num-display text-sm font-bold",
+                      "num-display min-w-[88px] text-right text-sm font-bold",
                       isIncome ? "amount-income" : "amount-expense",
                     )}
                   >
-                    {isIncome ? "+" : "-"}
+                    {isIncome ? "+" : "−"}
                     <MoneyText value={tx.amount} />
                   </p>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30 transition-colors group-hover:text-foreground" />
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-foreground transition-colors" />
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

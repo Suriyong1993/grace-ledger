@@ -1,6 +1,7 @@
 # Shared Project Brain — Business Rules
 
 ## Financial Rules
+
 1. **Net Balance**: `Net Balance = Total Approved Income + Sunday Offerings - Total Approved Expenses`.
 2. **Fund Balance**: `Fund Balance = Opening Balance + Fund Incomes + Fund Offerings - Fund Expenses`.
 3. **Approval Thresholds**:

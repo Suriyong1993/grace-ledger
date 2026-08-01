@@ -22,6 +22,20 @@ import {
   apiDeleteOfferingFinancial,
   apiCreateFund,
   apiCreateTransfer,
+  apiCreateProject,
+  apiDeleteProject,
+  apiCreateMember,
+  apiCreateOfferingCategory,
+  apiUpdateOfferingCategory,
+  apiDeleteOfferingCategory,
+  apiReorderOfferingCategories,
+  apiCreateOfferingSubcategory,
+  apiUpdateOfferingSubcategory,
+  apiDeleteOfferingSubcategory,
+  apiUpdateSettings,
+  apiLinkLineUser,
+  apiUnlinkLineUser,
+  apiGetLineUserStatus,
 } from "./api";
 import type {
   AuditLog,
@@ -319,21 +333,13 @@ export async function createOfferingCategory(
   input: Pick<OfferingCategory, "name" | "color" | "icon"> & { description?: string },
   by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("offering_categories")
-    .insert({
-      church_id: churchId,
-      ...input,
-      sort_order: 0,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "create", "category", data.id, input.name);
-  return data as OfferingCategory;
+  const result = await apiCreateOfferingCategory({
+    name: input.name,
+    color: input.color,
+    icon: input.icon,
+    description: input.description,
+  });
+  return result as OfferingCategory;
 }
 
 export async function updateOfferingCategory(
@@ -343,56 +349,24 @@ export async function updateOfferingCategory(
   >,
   by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const updateData: Record<string, unknown> = {};
-  if (input.name !== undefined) updateData.name = input.name;
-  if (input.color !== undefined) updateData.color = input.color;
-  if (input.icon !== undefined) updateData.icon = input.icon;
-  if (input.description !== undefined) updateData.description = input.description;
-  if (input.sortOrder !== undefined) updateData.sort_order = input.sortOrder;
-  if (input.isActive !== undefined) updateData.is_active = input.isActive;
-
-  const { data, error } = await supabase
-    .from("offering_categories")
-    .update(updateData)
-    .eq("id", id)
-    .eq("church_id", churchId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "update", "category", id);
-  return data;
+  const result = await apiUpdateOfferingCategory({
+    categoryId: id,
+    name: input.name,
+    color: input.color,
+    icon: input.icon,
+    description: input.description,
+    sortOrder: input.sortOrder,
+    isActive: input.isActive,
+  });
+  return result;
 }
 
 export async function deleteOfferingCategory(id: string, by: User) {
-  const churchId = await getChurchId();
-
-  const { error } = await supabase
-    .from("offering_categories")
-    .delete()
-    .eq("id", id)
-    .eq("church_id", churchId);
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "delete", "category", id);
+  await apiDeleteOfferingCategory(id);
 }
 
 export async function reorderOfferingCategories(orderedIds: string[], by: User) {
-  const churchId = await getChurchId();
-
-  for (let i = 0; i < orderedIds.length; i++) {
-    const { error } = await supabase
-      .from("offering_categories")
-      .update({ sort_order: i + 1 })
-      .eq("id", orderedIds[i])
-      .eq("church_id", churchId);
-
-    if (error) throw error;
-  }
-
-  await logAudit(by.id, by.name, "reorder", "category");
+  await apiReorderOfferingCategories(orderedIds);
 }
 
 // ── Offering Subcategories ────────────────────────────────────────
@@ -417,23 +391,12 @@ export async function createOfferingSubcategory(
   input: Pick<OfferingSubcategory, "categoryId" | "name"> & { description?: string },
   by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("offering_subcategories")
-    .insert({
-      church_id: churchId,
-      category_id: input.categoryId,
-      name: input.name,
-      description: input.description ?? "",
-      sort_order: 0,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "create", "subcategory", data.id, input.name);
-  return data as OfferingSubcategory;
+  const result = await apiCreateOfferingSubcategory({
+    categoryId: input.categoryId,
+    name: input.name,
+    description: input.description,
+  });
+  return result as OfferingSubcategory;
 }
 
 export async function updateOfferingSubcategory(
@@ -441,38 +404,18 @@ export async function updateOfferingSubcategory(
   input: Partial<Pick<OfferingSubcategory, "name" | "description" | "sortOrder" | "isActive">>,
   by: User,
 ) {
-  const churchId = await getChurchId();
-
-  const updateData: Record<string, unknown> = {};
-  if (input.name !== undefined) updateData.name = input.name;
-  if (input.description !== undefined) updateData.description = input.description;
-  if (input.sortOrder !== undefined) updateData.sort_order = input.sortOrder;
-  if (input.isActive !== undefined) updateData.is_active = input.isActive;
-
-  const { data, error } = await supabase
-    .from("offering_subcategories")
-    .update(updateData)
-    .eq("id", id)
-    .eq("church_id", churchId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "update", "subcategory", id);
-  return data;
+  const result = await apiUpdateOfferingSubcategory({
+    subcategoryId: id,
+    name: input.name,
+    description: input.description,
+    sortOrder: input.sortOrder,
+    isActive: input.isActive,
+  });
+  return result;
 }
 
 export async function deleteOfferingSubcategory(id: string, by: User) {
-  const churchId = await getChurchId();
-
-  const { error } = await supabase
-    .from("offering_subcategories")
-    .delete()
-    .eq("id", id)
-    .eq("church_id", churchId);
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "delete", "subcategory", id);
+  await apiDeleteOfferingSubcategory(id);
 }
 
 // ── Budget ────────────────────────────────────────────────────────

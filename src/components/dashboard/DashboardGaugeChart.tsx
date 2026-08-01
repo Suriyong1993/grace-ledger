@@ -12,14 +12,7 @@
 import { MoneyText } from "@/components/shared/MoneyText";
 import { cn } from "@/lib/utils";
 import { calculateGaugeArc, getGaugeStatusLabel } from "@/lib/gauge-utils";
-import {
-  Zap,
-  HeartHandshake,
-  Wrench,
-  GraduationCap,
-  Sparkles,
-  PieChart,
-} from "lucide-react";
+import { Zap, HeartHandshake, Wrench, GraduationCap, Sparkles, PieChart } from "lucide-react";
 
 interface CategorySpending {
   name: string;
@@ -159,12 +152,15 @@ export function DashboardGaugeChart({
                 className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-md", cat.bgClass)}>
+                  <div
+                    className={cn(
+                      "grid h-7 w-7 shrink-0 place-items-center rounded-md",
+                      cat.bgClass,
+                    )}
+                  >
                     <Icon className={cn("h-3.5 w-3.5", cat.colorClass)} />
                   </div>
-                  <span className="text-xs font-medium text-foreground truncate">
-                    {cat.name}
-                  </span>
+                  <span className="text-xs font-medium text-foreground truncate">{cat.name}</span>
                 </div>
                 <div className="shrink-0 text-right">
                   <span className="num-display text-xs font-semibold text-foreground">

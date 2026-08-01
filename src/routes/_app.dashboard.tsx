@@ -9,14 +9,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useRef, useEffect } from "react";
-import {
-  Plus,
-  RefreshCw,
-  Search,
-  Download,
-  Filter,
-  Calendar,
-} from "lucide-react";
+import { Plus, RefreshCw, Search, Download, Filter, Calendar } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +38,10 @@ import { useRealtime } from "@/hooks/useRealtime";
 // New 3-Column Dashboard Components
 import { QuickAccessCards } from "@/components/dashboard/QuickAccessCards";
 import { FundsGrid } from "@/components/dashboard/FundsGrid";
-import { RecentTransactionsTable, type TransactionRow } from "@/components/dashboard/RecentTransactionsTable";
+import {
+  RecentTransactionsTable,
+  type TransactionRow,
+} from "@/components/dashboard/RecentTransactionsTable";
 import { DashboardGaugeChart } from "@/components/dashboard/DashboardGaugeChart";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -89,7 +85,9 @@ export function Dashboard() {
   const [churchId, setChurchId] = useState("");
 
   useEffect(() => {
-    getChurchId().then(setChurchId).catch(() => {});
+    getChurchId()
+      .then(setChurchId)
+      .catch(() => {});
   }, []);
 
   // When incomes table changes (INSERT/UPDATE/DELETE), refetch income query

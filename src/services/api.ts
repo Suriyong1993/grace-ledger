@@ -207,6 +207,82 @@ export interface AuditChainVerificationResult {
   firstBreakAt?: string;
 }
 
-export async function apiVerifyAuditChain(): Promise<AuditChainVerificationResult> {
-  return apiRequest<AuditChainVerificationResult>("POST", "/audit/verify");
+// ============================================================================
+// Project API
+// ============================================================================
+
+export async function apiCreateProject(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("POST", "/projects", input);
+}
+
+export async function apiDeleteProject(id: string): Promise<unknown> {
+  return apiRequest("DELETE", `/projects/${id}`);
+}
+
+// ============================================================================
+// Member API
+// ============================================================================
+
+export async function apiCreateMember(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("POST", "/members", input);
+}
+
+// ============================================================================
+// Offering Category API
+// ============================================================================
+
+export async function apiCreateOfferingCategory(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("POST", "/offering-categories", input);
+}
+
+export async function apiUpdateOfferingCategory(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("PUT", "/offering-categories", input);
+}
+
+export async function apiDeleteOfferingCategory(id: string): Promise<unknown> {
+  return apiRequest("DELETE", `/offering-categories/${id}`);
+}
+
+export async function apiReorderOfferingCategories(orderedIds: string[]): Promise<unknown> {
+  return apiRequest("POST", "/offering-categories/reorder", { orderedIds });
+}
+
+// ============================================================================
+// Offering Subcategory API
+// ============================================================================
+
+export async function apiCreateOfferingSubcategory(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("POST", "/offering-subcategories", input);
+}
+
+export async function apiUpdateOfferingSubcategory(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("PUT", "/offering-subcategories", input);
+}
+
+export async function apiDeleteOfferingSubcategory(id: string): Promise<unknown> {
+  return apiRequest("DELETE", `/offering-subcategories/${id}`);
+}
+
+// ============================================================================
+// Settings API
+// ============================================================================
+
+export async function apiUpdateSettings(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("PUT", "/settings", input);
+}
+
+// ============================================================================
+// LINE User API
+// ============================================================================
+
+export async function apiLinkLineUser(lineUserId: string): Promise<unknown> {
+  return apiRequest("POST", "/line-users/link", { lineUserId });
+}
+
+export async function apiUnlinkLineUser(): Promise<unknown> {
+  return apiRequest("DELETE", "/line-users/unlink");
+}
+
+export async function apiGetLineUserStatus(): Promise<unknown> {
+  return apiRequest("GET", "/line-users/status");
 }

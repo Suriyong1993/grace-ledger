@@ -53,38 +53,43 @@ function NavRow({
   compact?: boolean;
 }) {
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem className="relative">
+      {/* Active left border indicator */}
+      {active && (
+        <span className="absolute inset-y-1 left-0 w-0.5 rounded-r-full bg-primary" aria-hidden />
+      )}
+
       <SidebarMenuButton
         asChild
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "group/nav-row px-3 transition-all duration-150 rounded-lg",
+          "group/nav-row relative pl-3 transition-all duration-150 rounded-lg",
           compact ? "h-8 text-xs" : "h-9 text-[13px]",
           active
-            ? [
-                "bg-primary/8 font-semibold text-primary",
-                "border border-primary/15 shadow-xs",
-                "dark:bg-primary/12 dark:border-primary/20",
-              ]
+            ? ["bg-primary/8 font-semibold text-primary", "dark:bg-primary/12"]
             : [
                 "text-muted-foreground font-medium",
-                "hover:bg-muted hover:text-foreground",
-                "border border-transparent",
+                "hover:translate-x-px hover:bg-muted hover:text-foreground",
               ],
         )}
       >
         <Link to={item.to} className="flex items-center gap-2.5">
-          <item.icon
+          {/* Icon with subtle background when active */}
+          <span
             className={cn(
-              "shrink-0 transition-all duration-150",
-              compact ? "h-3.5 w-3.5" : "h-4 w-4",
+              "grid shrink-0 place-items-center rounded-md transition-all duration-150",
+              compact ? "h-5 w-5" : "h-6 w-6",
               active
-                ? "text-primary"
+                ? "bg-primary/12 text-primary"
                 : "text-muted-foreground/60 group-hover/nav-row:text-foreground",
             )}
-            strokeWidth={active ? 2.25 : 1.75}
-          />
+          >
+            <item.icon
+              className={compact ? "h-3 w-3" : "h-3.5 w-3.5"}
+              strokeWidth={active ? 2.25 : 1.75}
+            />
+          </span>
           <span className="truncate">{item.label}</span>
         </Link>
       </SidebarMenuButton>
@@ -99,17 +104,15 @@ export function AppSidebar() {
   const isActive = (to: string) => path === to || path.startsWith(to + "/");
 
   return (
-    <Sidebar
-      collapsible="icon"
-      className="border-r border-border/60 bg-sidebar"
-    >
+    <Sidebar collapsible="icon" className="border-r border-border/60 bg-sidebar">
       {/* ── Header: Wordmark ── */}
       <SidebarHeader className="border-b border-border/60 px-3 py-3">
         <Link
           to="/dashboard"
-          className="flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-muted/60 group"
+          className="group flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-muted/60"
         >
-          <div className="shrink-0 transition-transform duration-200 group-hover:scale-105">
+          {/* Logo with drop-shadow glow on hover */}
+          <div className="shrink-0 transition-all duration-200 group-hover:scale-105 group-hover:[filter:drop-shadow(0_0_8px_oklch(0.54_0.22_277_/_0.4))]">
             <GraceLedgerMark size={34} />
           </div>
 
@@ -130,9 +133,7 @@ export function AppSidebar() {
       <SidebarContent className="pt-2 pb-2">
         {NAV_GROUPS.map((group) => (
           <SidebarGroup key={group.label} className="py-1">
-            {!collapsed && (
-              <p className="kicker px-3 pb-1.5 pt-0.5">{group.label}</p>
-            )}
+            {!collapsed && <p className="kicker px-3 pb-1.5 pt-0.5">{group.label}</p>}
             <SidebarGroupContent>
               <SidebarMenu className="gap-0.5">
                 {group.items.map((item) => (
@@ -146,9 +147,7 @@ export function AppSidebar() {
 
       {/* ── Footer: System nav ── */}
       <SidebarFooter className="border-t border-border/60 py-2">
-        {!collapsed && (
-          <p className="kicker px-3 pb-1.5">ระบบ</p>
-        )}
+        {!collapsed && <p className="kicker px-3 pb-1.5">ระบบ</p>}
         <SidebarMenu className="gap-0.5">
           {NAV_SYSTEM.map((item) => (
             <NavRow key={item.to} item={item} active={isActive(item.to)} compact />

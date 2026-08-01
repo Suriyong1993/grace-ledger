@@ -16,15 +16,15 @@
 
 ### 1.2 Product Positioning
 
-| Grace Ledger คือ | Grace Ledger ไม่ใช่ |
-|-----------------|---------------------|
-| Premium | Cheap / Generic |
-| Modern | Legacy / Outdated |
-| Fast | Slow / Bloated |
-| Trustworthy | Risky / Opaque |
-| Explainable | Black Box |
-| Church-first | One-size-fits-all |
-| Financial-first | Everything-in-one ERP |
+| Grace Ledger คือ | Grace Ledger ไม่ใช่   |
+| ---------------- | --------------------- |
+| Premium          | Cheap / Generic       |
+| Modern           | Legacy / Outdated     |
+| Fast             | Slow / Bloated        |
+| Trustworthy      | Risky / Opaque        |
+| Explainable      | Black Box             |
+| Church-first     | One-size-fits-all     |
+| Financial-first  | Everything-in-one ERP |
 
 ### 1.3 ประโยคอธิบาย
 
@@ -35,30 +35,35 @@ Grace Ledger ช่วยให้คริสตจักรบริหาร�
 ## 2. ผู้ใช้งานหลัก (User Personas)
 
 ### 2.1 เหรัญญิก (Treasurer)
+
 - **บทบาท:** บริหารการเงินประจำวัน บันทึกรายรับ-รายจ่าย
 - **สิ่งที่ต้องการ:** ใช้งานง่าย บันทึกได้เร็ว ไม่ต้องรู้บัญชีลึก
 - **ปัญหาปัจจุบัน:** ระบบซับซ้อน, กลัวทำผิด, ไม่มั่นใจตัวเลข
 - **Permission:** `journal.write`, `offering.write`, `expense.write`, `fund.transfer`
 
 ### 2.2 ศิษยาภิบาล (Pastor)
+
 - **บทบาท:** อนุมัติธุรกรรม ดูภาพรวมการเงินคริสตจักร
 - **สิ่งที่ต้องการ:** เห็นสรุปชัด อนุมัติรวดเร็ว ไม่ต้องลงรายละเอียดมาก
 - **ปัญหาปัจจุบัน:** ต้องรอข้อมูล, ไม่เห็น Big Picture, workflow ไม่ชัด
 - **Permission:** `journal.approve`, `offering.approve`, `expense.approve`
 
 ### 2.3 คณะกรรมการ (Committee)
+
 - **บทบาท:** ติดตามการเงิน ดูรายงาน ไม่ Edit
 - **สิ่งที่ต้องการ:** รายงานเข้าใจง่าย Export ได้ ดูได้บน iPad
 - **ปัญหาปัจจุบัน:** ข้อมูลกระจัดกระจาย, ไม่รู้จะดูตรงไหน
 - **Permission:** `*.read` (read-only)
 
 ### 2.4 ผู้ตรวจสอบบัญชี (Auditor)
+
 - **บทบาท:** ตรวจสอบย้อนหลัง ดู Audit Trail
 - **สิ่งที่ต้องการ:** ข้อมูลครบ ย้อนหลังได้ Export ได้ ไม่แก้ไข
 - **ปัญหาปัจจุบัน:** ไม่มี Audit Trail ที่น่าเชื่อถือ
 - **Permission:** `audit.read`, `*.read` (read-only + audit access)
 
 ### 2.5 Super Admin
+
 - **บทบาท:** จัดการระบบ สร้าง User กำหนด Permission
 - **สิ่งที่ต้องการ:** ควบคุมได้ทุกอย่าง ไม่มี Blocker
 - **Permission:** All permissions
@@ -70,6 +75,7 @@ Grace Ledger ช่วยให้คริสตจักรบริหาร�
 ### 3.1 Financial Management (หัวใจหลัก)
 
 #### Dashboard
+
 - เงินสดคงเหลือ (Current Balance) — ตัวเลขชัด ใหญ่
 - เงินถวายวันนี้ — Real-time
 - รายรับ/รายจ่ายเดือนนี้
@@ -78,11 +84,13 @@ Grace Ledger ช่วยให้คริสตจักรบริหาร�
 - ยอดยกมา (Opening Balance)
 
 #### Transaction Workflow
+
 ```
 DRAFT → PENDING → APPROVED → (VOIDED)
                 ↓
             REJECTED → DRAFT (แก้แล้ว resubmit)
 ```
+
 - บันทึกรายการ (Draft)
 - ส่งอนุมัติ (Submit → Pending)
 - อนุมัติ / ปฏิเสธ (Approve / Reject)
@@ -90,22 +98,26 @@ DRAFT → PENDING → APPROVED → (VOIDED)
 - ทุก State มี Audit Log
 
 #### Offering & Collection
+
 - บันทึกเงินถวายรายวัน
 - ใบนับเงิน (Count Sheet) — ต้องมี 2 คนขึ้นไปนับ
 - ยืนยันยอด / ล็อค
 - สร้าง Journal Entry อัตโนมัติ
 
 #### Expense Management
+
 - บันทึกค่าใช้จ่าย พร้อมแนบใบเสร็จ (AI OCR)
 - จัดหมวดหมู่ด้วย Chart of Accounts
 - Approval Workflow ตาม Amount Threshold
 
 #### Fund Management
+
 - หลาย Fund ในคริสตจักรเดียว (กองทุนทั่วไป, กองทุนมิชชัน, ฯลฯ)
 - โอนระหว่าง Fund พร้อม Audit
 - ยอดคงเหลือแต่ละ Fund
 
 #### Approval Thresholds
+
 ```
 < ฿5,000      → Treasurer หรือ Pastor อนุมัติได้
 ฿5,000–50,000 → Pastor อนุมัติ

@@ -9,13 +9,14 @@
 
 UI ของ Grace Ledger ได้รับแรงบันดาลใจจาก 3 แหล่ง:
 
-| แรงบันดาลใจ | เอามาจาก |
-|-------------|----------|
-| **Apple** | ความประณีต, Simplicity, ความสงบของ Layout |
+| แรงบันดาลใจ          | เอามาจาก                                  |
+| -------------------- | ----------------------------------------- |
+| **Apple**            | ความประณีต, Simplicity, ความสงบของ Layout |
 | **Stripe Dashboard** | Financial Data Display, Typography, Trust |
-| **Linear** | Productivity UI, Navigation, Fast Feel |
+| **Linear**           | Productivity UI, Navigation, Fast Feel    |
 
 สิ่งที่ต้องรู้สึกได้เมื่อเปิดแอป:
+
 - **Premium** — ไม่ใช่ของฟรี
 - **Trustworthy** — ไว้วางใจได้กับเงิน
 - **Clear** — เข้าใจทันทีว่าตอนนี้อยู่ที่ไหน ทำอะไรได้
@@ -29,15 +30,12 @@ UI ของ Grace Ledger ได้รับแรงบันดาลใจจ
 ### 2.1 Light Mode Palette
 
 ```css
---background: oklch(0.978 0.01 85)     /* Warm Ivory #FAF7F2 */
---foreground: oklch(0.2 0.015 60)      /* Warm Dark Charcoal */
---primary: oklch(0.72 0.15 65)         /* Gold Amber — main brand */
---card: oklch(1 0 0)                   /* White cards */
---border: oklch(0.9 0.01 85)           /* Subtle warm border */
---success: oklch(0.65 0.15 150)        /* Emerald green */
---destructive: oklch(0.6 0.2 25)       /* Coral red */
---warning: oklch(0.75 0.15 85)         /* Amber warning */
---muted: oklch(0.95 0.008 85)          /* Muted background */
+--background: oklch(0.978 0.01 85) /* Warm Ivory #FAF7F2 */ --foreground: oklch(0.2 0.015 60)
+  /* Warm Dark Charcoal */ --primary: oklch(0.72 0.15 65) /* Gold Amber — main brand */
+  --card: oklch(1 0 0) /* White cards */ --border: oklch(0.9 0.01 85) /* Subtle warm border */
+  --success: oklch(0.65 0.15 150) /* Emerald green */ --destructive: oklch(0.6 0.2 25)
+  /* Coral red */ --warning: oklch(0.75 0.15 85) /* Amber warning */ --muted: oklch(0.95 0.008 85)
+  /* Muted background */;
 ```
 
 ### 2.2 กฎการใช้สี
@@ -54,20 +52,21 @@ UI ของ Grace Ledger ได้รับแรงบันดาลใจจ
 ### 3.1 Font Stack
 
 ```css
---font-display: "Kanit", "Prompt"   /* Headers, Numbers, Display */
---font-sans: "Prompt", "Inter"      /* Body, Labels, UI Text */
+--font-display:
+  "Kanit", "Prompt" /* Headers, Numbers, Display */ --font-sans: "Prompt",
+  "Inter" /* Body, Labels, UI Text */;
 ```
 
 ### 3.2 ขนาด Text
 
-| ใช้กับ | ขนาด | Font | Weight |
-|--------|------|------|--------|
-| Dashboard Number (Balance) | 2.5rem–4rem | Kanit | 700 |
-| Page Title (h1) | 1.5rem | Kanit | 600 |
-| Section Header (h2) | 1.125rem | Prompt | 600 |
-| Body Text | 0.9375rem | Prompt | 400 |
-| Label | 0.8125rem | Prompt | 500 |
-| Caption / Help | 0.75rem | Prompt | 400 |
+| ใช้กับ                     | ขนาด        | Font   | Weight |
+| -------------------------- | ----------- | ------ | ------ |
+| Dashboard Number (Balance) | 2.5rem–4rem | Kanit  | 700    |
+| Page Title (h1)            | 1.5rem      | Kanit  | 600    |
+| Section Header (h2)        | 1.125rem    | Prompt | 600    |
+| Body Text                  | 0.9375rem   | Prompt | 400    |
+| Label                      | 0.8125rem   | Prompt | 500    |
+| Caption / Help             | 0.75rem     | Prompt | 400    |
 
 ### 3.3 กฎ Typography
 
@@ -150,7 +149,7 @@ bg-primary text-primary-foreground active:scale-[0.98] transition-all duration-1
 
 - Label อยู่เหนือ Input เสมอ (ไม่ใช่ Placeholder)
 - ข้อความ Error แสดงใต้ Input ทันที (real-time validation)
-- Required fields มี * สีแดง
+- Required fields มี \* สีแดง
 - Input height minimum 44px (touch-friendly)
 - Focus state ต้องชัดเจน (ring + color)
 

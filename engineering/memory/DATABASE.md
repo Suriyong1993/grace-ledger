@@ -1,6 +1,7 @@
 # Shared Project Brain — Database Specification
 
 ## Primary Entities
+
 - `churches`: Church tenant scope (`id`, `name`, `tax_id`, `created_at`)
 - `users`: User identity & role (`id`, `email`, `role`, `name`, `pin_hash`)
 - `funds`: Financial funds (`id`, `church_id`, `name`, `opening_balance`)

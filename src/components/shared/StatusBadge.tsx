@@ -9,7 +9,7 @@ import { Clock, CheckCircle2, XCircle, FileEdit, Ban } from "lucide-react";
  */
 
 interface StatusConfig {
-  pill: string;       // Tailwind utility class for the pill background+border+text
+  pill: string; // Tailwind utility class for the pill background+border+text
   icon: React.ElementType;
   iconClass: string;
   muted?: boolean;
@@ -104,11 +104,7 @@ export function StatusBadge({
       )}
     >
       {showIcon && (
-        <Icon
-          className={cn("h-3 w-3 shrink-0", s.iconClass)}
-          strokeWidth={2.5}
-          aria-hidden
-        />
+        <Icon className={cn("h-3 w-3 shrink-0", s.iconClass)} strokeWidth={2.5} aria-hidden />
       )}
       {STATUS_LABEL[status]}
     </span>

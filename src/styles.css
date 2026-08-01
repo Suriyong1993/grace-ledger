@@ -321,12 +321,13 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Headings — Sarabun semi-bold, tight tracking */
+  /* Headings — Sarabun semi-bold, tight tracking, balanced line breaks */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.25;
+    text-wrap: balance;
   }
 
   /* Focus visible — accessible but not ugly */
@@ -433,8 +434,8 @@
 
 /* Numeric display — critical for financial data */
 @utility num-display {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1, "ss01" 1;
+  font-variant-numeric: lining-nums tabular-nums slashed-zero;
+  font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1, "ss01" 1;
   letter-spacing: -0.01em;
   font-family: "Inter", var(--font-sans);  /* Inter has excellent numerals */
 }

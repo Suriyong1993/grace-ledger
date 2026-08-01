@@ -3,6 +3,7 @@
 ## Table Name: `table_name`
 
 ### Schema Definition (Drizzle ORM)
+
 ```typescript
 export const tableName = sqliteTable("table_name", {
   id: text("id").primaryKey(),
@@ -12,7 +13,9 @@ export const tableName = sqliteTable("table_name", {
 ```
 
 ### Indexes & Foreign Keys
+
 - Index 1: `idx_church_id` on `church_id`
 
 ### Migration Risk Assessment
+
 - Zero-downtime safety check: [Pass / Fail]

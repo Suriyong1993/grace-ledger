@@ -1,12 +1,12 @@
 /**
  * FundsGrid.tsx
  *
- * Adapted from the "Folders" grid in the 3-column reference design.
- * Displays interactive cards for Church Funds (กองทุนต่างๆ) with balance,
- * transaction counts, and visual status indicators.
+ * Church fund cards with distinct visual identity per fund.
+ * Each card shows: icon (color-coded by index), fund name, description,
+ * balance hero metric, and a subtle progress bar (balance vs opening).
  */
 
-import { Folder, ArrowUpRight, MoreVertical } from "lucide-react";
+import { Landmark, Home, Users, BookOpen, MoreVertical, TrendingUp } from "lucide-react";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { cn } from "@/lib/utils";
 import type { Fund } from "@/lib/types";
@@ -14,6 +14,36 @@ import type { Fund } from "@/lib/types";
 interface FundsGridProps {
   funds?: Fund[];
 }
+
+/* Icon + color per fund index — gives each card a unique identity */
+const FUND_PALETTES = [
+  {
+    icon: Landmark,
+    iconBg: "bg-primary/10 group-hover:bg-primary",
+    iconColor: "text-primary group-hover:text-white",
+    hoverBorder: "hover:border-primary/30",
+  },
+  {
+    icon: Home,
+    iconBg: "bg-income-muted group-hover:bg-income",
+    iconColor: "text-income group-hover:text-white",
+    hoverBorder: "hover:border-income/30",
+  },
+  {
+    icon: Users,
+    iconBg: "bg-offering-muted group-hover:bg-offering",
+    iconColor: "text-offering group-hover:text-white",
+    hoverBorder: "hover:border-offering/30",
+  },
+  {
+    icon: BookOpen,
+    iconBg: "bg-accent group-hover:bg-primary",
+    iconColor: "text-accent-foreground group-hover:text-white",
+    hoverBorder: "hover:border-primary/20",
+  },
+];
+
+const PROGRESS_COLORS = ["bg-primary", "bg-income", "bg-offering", "bg-primary/70"] as const;
 
 const DEFAULT_FUNDS: Fund[] = [
   {
@@ -50,55 +80,101 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
 
   return (
     <div className="space-y-3">
+      {/* Section header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-sm text-foreground">กองทุน & บัญชีแยกประเภท</h3>
+          <h3 className="text-sm font-semibold text-foreground">กองทุน & บัญชีแยกประเภท</h3>
           <p className="text-xs text-muted-foreground">สรุปสถานะเงินทุนรายหมวด</p>
         </div>
-        <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
+        <button
+          className="text-xs font-medium text-primary transition-colors hover:text-primary/80"
+          type="button"
+          aria-label="ดูกองทุนทั้งหมด"
+        >
           ดูทั้งหมด ({displayFunds.length})
-        </span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {displayFunds.map((fund, i) => {
           const balance = fund.currentBalance ?? fund.openingBalance;
+          const opening = fund.openingBalance ?? 0;
+          const growthRatio = opening > 0 ? Math.min(balance / opening, 2) : 1;
+          const progressPercent = Math.round(Math.min(growthRatio * 50, 100));
+          const growthDisplay = opening > 0 ? Math.round((growthRatio - 1) * 100) : 0;
+
+          const palette = FUND_PALETTES[i % FUND_PALETTES.length];
+          const Icon = palette.icon;
+          const barColor = PROGRESS_COLORS[i % PROGRESS_COLORS.length];
+
           return (
             <div
               key={fund.id}
               className={cn(
-                "card-ledger p-4 flex flex-col justify-between space-y-3 hover:border-primary/30 transition-all cursor-pointer group",
+                "card-ledger group flex cursor-pointer flex-col gap-3 p-4",
+                "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card",
+                palette.hoverBorder,
                 "animate-fade-up",
               )}
               style={{ animationDelay: `${i * 60}ms` }}
             >
+              {/* Top row: icon + menu */}
               <div className="flex items-start justify-between">
-                <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  <Folder className="h-4 w-4" strokeWidth={2} />
+                <div
+                  className={cn(
+                    "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors duration-200",
+                    palette.iconBg,
+                    palette.iconColor,
+                  )}
+                >
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
                 </div>
                 <button
-                  className="text-muted-foreground/60 hover:text-foreground p-1 rounded transition-colors"
+                  className="rounded p-1 text-muted-foreground/50 transition-colors hover:text-foreground"
                   aria-label="เมนูกองทุน"
+                  type="button"
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreVertical className="h-3.5 w-3.5" />
                 </button>
               </div>
 
-              <div>
-                <p className="font-semibold text-xs text-foreground truncate">{fund.name}</p>
-                <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+              {/* Fund info */}
+              <div className="min-w-0">
+                <p className="truncate text-xs font-semibold text-foreground">{fund.name}</p>
+                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
                   {fund.description || fund.fundCode || "กองทุนดำเนินงาน"}
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs">
-                <span className="num-display font-bold text-foreground">
-                  <MoneyText value={balance} />
-                </span>
-                <div className="flex items-center text-[10px] text-income font-medium">
-                  <ArrowUpRight className="h-3 w-3" />
-                  ปกติ
+              {/* Balance + progress */}
+              <div className="mt-auto space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="num-display text-sm font-bold text-foreground">
+                    <MoneyText value={balance} />
+                  </span>
+                  {growthDisplay >= 0 ? (
+                    <div className="flex items-center gap-0.5 text-income">
+                      <TrendingUp className="h-3 w-3" strokeWidth={2} />
+                      <span className="text-[10px] font-semibold">+{growthDisplay}%</span>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] font-semibold text-expense">{growthDisplay}%</span>
+                  )}
                 </div>
+
+                {/* Subtle progress bar */}
+                <div className="h-1 w-full overflow-hidden rounded-full bg-border/60">
+                  <div
+                    className={cn("h-full rounded-full transition-all duration-700", barColor)}
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  เริ่มต้น{" "}
+                  <span className="num-display font-medium">
+                    <MoneyText value={opening} />
+                  </span>
+                </p>
               </div>
             </div>
           );

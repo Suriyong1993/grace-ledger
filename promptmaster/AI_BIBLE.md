@@ -44,67 +44,82 @@ Consent  ก่อนใช้ข้อมูล — ถามก่อนดึ
 ## 2. Grace AI Agents
 
 ### 2.1 Grace Assistant
+
 **บทบาท:** ผู้ช่วยทั่วไป ตอบคำถาม อธิบายระบบ
 
 **ตัวอย่างการใช้:**
+
 - "วิธีบันทึกเงินถวายทำอย่างไร?"
 - "ทำไมรายการนี้ถึงถูก reject?"
 - "อธิบาย workflow การอนุมัติให้หน่อย"
 
 **Personality:**
+
 - สุภาพ ชัดเจน
 - พูดเป็นขั้นตอน
 - อธิบายด้วยภาษาที่คนไม่รู้บัญชีเข้าใจได้
 
 ### 2.2 Grace Analyst
+
 **บทบาท:** วิเคราะห์ข้อมูลการเงิน หาแนวโน้ม
 
 **ตัวอย่างการใช้:**
+
 - "ค่าใช้จ่ายเดือนนี้เพิ่มขึ้นจากเดือนก่อนเท่าไหร่?"
 - "หมวดไหนใช้งบเกินแผน?"
 - "สรุปรายรับรายจ่าย 6 เดือนที่ผ่านมา"
 
 **Personality:**
+
 - Data-driven
 - แสดงตัวเลขชัดเจน
 - ระบุ source ที่ใช้วิเคราะห์
 - บอก confidence level
 
 ### 2.3 Grace Auditor
+
 **บทบาท:** ช่วยตรวจสอบ Audit Trail, หา anomaly
 
 **ตัวอย่างการใช้:**
+
 - "มีรายการผิดปกติในเดือนนี้ไหม?"
 - "ใครอนุมัติรายการเกิน 50,000 บาทบ้าง?"
 - "Export Audit Log สำหรับผู้ตรวจสอบภายนอก"
 
 **Personality:**
+
 - Precise, formal
 - ไม่ interpret นอกเหนือข้อมูล
 - แสดง raw data เสมอ
 
 ### 2.4 Grace Secretary
+
 **บทบาท:** จัดการงานเอกสาร แจ้งเตือน สรุป
 
 **ตัวอย่างการใช้:**
+
 - "สรุปรายการรออนุมัติทั้งหมด"
 - "ส่งรายงานประจำเดือนให้คณะกรรมการ"
 - "แจ้งเตือนเมื่อถึงเวลาปิดบัญชี"
 
 **Personality:**
+
 - Proactive
 - Summary-focused
 - Action-oriented
 
 ### 2.5 Grace Admin
+
 **บทบาท:** ช่วย Super Admin จัดการระบบ
 
 **ตัวอย่างการใช้:**
+
 - "สร้าง User ใหม่"
 - "ตรวจสอบสถานะระบบ"
 - "Config ค่า system settings"
 
 **Personality:**
+
 - Technical
 - Precise
 - Security-conscious
@@ -116,11 +131,13 @@ Consent  ก่อนใช้ข้อมูล — ถามก่อนดึ
 ### 3.1 บทบาทของ Hermes
 
 Hermes ไม่ใช่:
+
 - ❌ ฐานข้อมูล
 - ❌ Business Logic Engine
 - ❌ AI Agent
 
 Hermes คือ:
+
 - ✅ **AI Orchestrator** — รับ request และส่งต่อให้ Agent ที่เหมาะสม
 - ✅ **Context Manager** — รักษา conversation context ข้าม Agent
 - ✅ **Router** — ตัดสินใจว่าควรใช้ Agent ไหน

@@ -7,13 +7,14 @@
 
 ## 1. DNA
 
-| แกน | ความหมาย | ตัวอย่างที่อ้างอิง |
-|---|---|---|
-| **Apple** | Whitespace หายใจ, Typography น้ำหนักดี, ไม่รก | SF Pro, iCloud.com |
-| **Stripe** | Trust signal, ตัวเลขอ่านได้ชัด, Data dense แต่ไม่หนัก | dashboard.stripe.com |
-| **Linear** | Dark-first option, Clean geometric, Purposeful animation | linear.app |
+| แกน        | ความหมาย                                                 | ตัวอย่างที่อ้างอิง   |
+| ---------- | -------------------------------------------------------- | -------------------- |
+| **Apple**  | Whitespace หายใจ, Typography น้ำหนักดี, ไม่รก            | SF Pro, iCloud.com   |
+| **Stripe** | Trust signal, ตัวเลขอ่านได้ชัด, Data dense แต่ไม่หนัก    | dashboard.stripe.com |
+| **Linear** | Dark-first option, Clean geometric, Purposeful animation | linear.app           |
 
 **สิ่งที่ต้องรักษา:**
+
 - ตัวเลขเงินทุกตัว: `tabular-nums`, `font-family: Inter`
 - ทุก status ต้องมี color coding ชัดเจน (ไม่ใช่ text อย่างเดียว)
 - Animation ต้องมีประโยชน์ — ไม่ใช่แค่สวย
@@ -26,42 +27,42 @@
 
 ### 2.1 Base Palette
 
-| Token | Light Value | Dark Value | ใช้เมื่อ |
-|---|---|---|---|
-| `--color-background` | Cool near-white #F8F9FC | Deep slate #111827 | Page background |
-| `--color-foreground` | Deep slate #1C1E2E | Near-white #F0F3FF | Body text |
-| `--color-card` | Pure white | #1E2235 | Card backgrounds |
-| `--color-muted` | #F1F3FA | #262B40 | Subtle backgrounds |
-| `--color-muted-foreground` | #6B7280 | #8B91A8 | Secondary text |
-| `--color-border` | #E2E5F1 | 8% white | Dividers, card borders |
+| Token                      | Light Value             | Dark Value         | ใช้เมื่อ               |
+| -------------------------- | ----------------------- | ------------------ | ---------------------- |
+| `--color-background`       | Cool near-white #F8F9FC | Deep slate #111827 | Page background        |
+| `--color-foreground`       | Deep slate #1C1E2E      | Near-white #F0F3FF | Body text              |
+| `--color-card`             | Pure white              | #1E2235            | Card backgrounds       |
+| `--color-muted`            | #F1F3FA                 | #262B40            | Subtle backgrounds     |
+| `--color-muted-foreground` | #6B7280                 | #8B91A8            | Secondary text         |
+| `--color-border`           | #E2E5F1                 | 8% white           | Dividers, card borders |
 
 ### 2.2 Primary
 
-| Token | Value | หมายเหตุ |
-|---|---|---|
-| `--color-primary` | Indigo-600 #4F46E5 | Trust, authority, CTAs |
-| `--color-primary-foreground` | White | Text บน primary bg |
+| Token                        | Value              | หมายเหตุ               |
+| ---------------------------- | ------------------ | ---------------------- |
+| `--color-primary`            | Indigo-600 #4F46E5 | Trust, authority, CTAs |
+| `--color-primary-foreground` | White              | Text บน primary bg     |
 
 **ห้ามใช้ Tailwind `blue-*` generic — ใช้ `primary` เสมอ**
 
 ### 2.3 Finance Colors (สำคัญมาก)
 
-| Token | สี | ใช้เมื่อ |
-|---|---|---|
-| `--color-income` | Emerald | รายรับ — positive |
-| `--color-income-muted` | Emerald-100 | badge bg สำหรับ รายรับ |
-| `--color-expense` | Rose | รายจ่าย — outflow |
-| `--color-expense-muted` | Rose-100 | badge bg สำหรับ รายจ่าย |
-| `--color-offering` | Amber | เงินถวาย — sacred |
-| `--color-offering-muted` | Amber-100 | badge bg สำหรับ เงินถวาย |
+| Token                    | สี          | ใช้เมื่อ                 |
+| ------------------------ | ----------- | ------------------------ |
+| `--color-income`         | Emerald     | รายรับ — positive        |
+| `--color-income-muted`   | Emerald-100 | badge bg สำหรับ รายรับ   |
+| `--color-expense`        | Rose        | รายจ่าย — outflow        |
+| `--color-expense-muted`  | Rose-100    | badge bg สำหรับ รายจ่าย  |
+| `--color-offering`       | Amber       | เงินถวาย — sacred        |
+| `--color-offering-muted` | Amber-100   | badge bg สำหรับ เงินถวาย |
 
 ### 2.4 Workflow Status Colors
 
-| Token | สี | ใช้เมื่อ |
-|---|---|---|
-| `--color-pending` | Amber | รอการอนุมัติ |
-| `--color-approved` | Emerald | อนุมัติแล้ว |
-| `--color-rejected` | Rose | ปฏิเสธ |
+| Token              | สี      | ใช้เมื่อ     |
+| ------------------ | ------- | ------------ |
+| `--color-pending`  | Amber   | รอการอนุมัติ |
+| `--color-approved` | Emerald | อนุมัติแล้ว  |
+| `--color-rejected` | Rose    | ปฏิเสธ       |
 
 ---
 
@@ -79,21 +80,22 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 
 ### 3.2 Type Scale
 
-| Class | Size | Weight | ใช้เมื่อ |
-|---|---|---|---|
-| `.kicker` | 11px | 600 | Label section, category |
-| `text-xs` | 12px | 400/500 | Meta, timestamp, helper |
-| `text-sm` | 14px | 400/500 | Body text, table rows |
-| `text-base` | 15px | 400 | Default body |
-| `text-lg` | 18px | 500/600 | Sub-headings |
-| `text-xl` | 20px | 600 | Page section headers |
-| `text-2xl` | 24px | 600/700 | Page titles |
-| `text-3xl` | 30px | 700 | KPI numbers, hero stats |
-| `text-4xl+` | 36px+ | 700 | Dashboard big numbers only |
+| Class       | Size  | Weight  | ใช้เมื่อ                   |
+| ----------- | ----- | ------- | -------------------------- |
+| `.kicker`   | 11px  | 600     | Label section, category    |
+| `text-xs`   | 12px  | 400/500 | Meta, timestamp, helper    |
+| `text-sm`   | 14px  | 400/500 | Body text, table rows      |
+| `text-base` | 15px  | 400     | Default body               |
+| `text-lg`   | 18px  | 500/600 | Sub-headings               |
+| `text-xl`   | 20px  | 600     | Page section headers       |
+| `text-2xl`  | 24px  | 600/700 | Page titles                |
+| `text-3xl`  | 30px  | 700     | KPI numbers, hero stats    |
+| `text-4xl+` | 36px+ | 700     | Dashboard big numbers only |
 
 ### 3.3 Number Display Rule
 
 **ทุกตัวเลขเงิน ทุกตัวเลข status count:**
+
 ```tsx
 <span className="num-display">1,234,567</span>
 // หรือใช้ MoneyText component
@@ -105,17 +107,18 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 
 ## 4. Spacing & Layout
 
-| ระดับ | Value | ใช้เมื่อ |
-|---|---|---|
-| `gap-1` / `p-1` | 4px | Internal micro spacing |
-| `gap-2` / `p-2` | 8px | Badge padding, icon gap |
-| `gap-3` / `p-3` | 12px | Card internal tight |
-| `gap-4` / `p-4` | 16px | Standard card padding |
-| `gap-6` / `p-6` | 24px | Card comfortable padding |
-| `gap-8` / `p-8` | 32px | Section spacing |
-| `gap-12` | 48px | Major section breaks |
+| ระดับ           | Value | ใช้เมื่อ                 |
+| --------------- | ----- | ------------------------ |
+| `gap-1` / `p-1` | 4px   | Internal micro spacing   |
+| `gap-2` / `p-2` | 8px   | Badge padding, icon gap  |
+| `gap-3` / `p-3` | 12px  | Card internal tight      |
+| `gap-4` / `p-4` | 16px  | Standard card padding    |
+| `gap-6` / `p-6` | 24px  | Card comfortable padding |
+| `gap-8` / `p-8` | 32px  | Section spacing          |
+| `gap-12`        | 48px  | Major section breaks     |
 
 ### Layout Constants
+
 - **Sidebar width**: 240px (collapsed: 56px)
 - **Topbar height**: 56px
 - **Main content max-width**: 1200px
@@ -142,19 +145,17 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 ## 6. Component Patterns
 
 ### 6.1 Stat/KPI Card
+
 ```tsx
 <div className="card-ledger p-6 shadow-sm-card">
   <p className="kicker">รายรับเดือนนี้</p>
-  <p className="mt-2 text-3xl font-bold num-display amount-income">
-    1,234,567
-  </p>
-  <p className="mt-1 text-xs text-muted-foreground">
-    +12% จากเดือนก่อน
-  </p>
+  <p className="mt-2 text-3xl font-bold num-display amount-income">1,234,567</p>
+  <p className="mt-1 text-xs text-muted-foreground">+12% จากเดือนก่อน</p>
 </div>
 ```
 
 ### 6.2 Status Badge
+
 ใช้ component `StatusBadge` เสมอ — ห้าม hard-code สีเอง
 
 ```tsx
@@ -164,6 +165,7 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 ```
 
 ### 6.3 Transaction Row
+
 ```tsx
 <div className="flex items-center gap-3 py-3 border-b border-border hover-lift">
   <div className="h-9 w-9 rounded-lg grid place-items-center bg-income-muted">
@@ -178,6 +180,7 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 ```
 
 ### 6.4 Primary Button
+
 ```tsx
 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 active-press">
   บันทึก
@@ -185,6 +188,7 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 ```
 
 ### 6.5 Danger/Reject Action
+
 ```tsx
 <Button variant="destructive" className="active-press">
   ปฏิเสธ
@@ -197,12 +201,12 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 
 ใช้ **Lucide React** เท่านั้น — ห้ามนำ icon library อื่นมาผสม
 
-| ขนาด | Class | ใช้เมื่อ |
-|---|---|---|
-| 16px | `h-4 w-4` | Inline, nav items |
+| ขนาด | Class     | ใช้เมื่อ            |
+| ---- | --------- | ------------------- |
+| 16px | `h-4 w-4` | Inline, nav items   |
 | 20px | `h-5 w-5` | Buttons, list items |
-| 24px | `h-6 w-6` | Feature icons |
-| 32px | `h-8 w-8` | Empty state, hero |
+| 24px | `h-6 w-6` | Feature icons       |
+| 32px | `h-8 w-8` | Empty state, hero   |
 
 `strokeWidth` ควรเป็น `1.5` (default) — ใช้ `2` สำหรับ active state เท่านั้น
 
@@ -210,14 +214,15 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 
 ## 8. Motion Guidelines
 
-| ประเภท | Duration | Easing | ใช้เมื่อ |
-|---|---|---|---|
-| Micro (press, hover) | 100-150ms | `ease` | Button press, hover bg |
-| Component (modal, sheet) | 200-250ms | `--ease-out` | Dialog open/close |
-| Page transition | 250-300ms | `--ease-out` | Route change |
-| Stagger list | 40ms delay each | `--ease-out` | List mount |
+| ประเภท                   | Duration        | Easing       | ใช้เมื่อ               |
+| ------------------------ | --------------- | ------------ | ---------------------- |
+| Micro (press, hover)     | 100-150ms       | `ease`       | Button press, hover bg |
+| Component (modal, sheet) | 200-250ms       | `--ease-out` | Dialog open/close      |
+| Page transition          | 250-300ms       | `--ease-out` | Route change           |
+| Stagger list             | 40ms delay each | `--ease-out` | List mount             |
 
 **ห้าม:**
+
 - Animation ที่นานกว่า 400ms สำหรับ UI interaction
 - `bounce` หรือ `elastic` easing สำหรับ business UI
 - `animate-spin` หรือ `animate-bounce` (ดู amateur)
@@ -227,6 +232,7 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 ## 9. Dos and Don'ts
 
 ### ทำ
+
 - ใช้ semantic color tokens เสมอ (`text-primary`, `text-income`, `bg-expense-muted`)
 - ทุกตัวเลขเงิน: `.num-display` + Inter font
 - Cards ใช้ `.card-ledger` หรือ `.card-subtle`
@@ -235,6 +241,7 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 - ทุก destructive action ต้องมี confirm
 
 ### ห้ามทำ
+
 - Hard-code hex color เช่น `text-[#C08233]` หรือ `bg-[#4F46E5]`
 - ใช้ `tailwind blue-*`, `green-*`, `red-*` แทน semantic tokens
 - ทำ gradient ซับซ้อนโดยไม่จำเป็น
@@ -245,13 +252,13 @@ Numbers:     Inter + tabular-nums (ตัวเลขเงินทุกตั
 
 ## 10. Role-Based UI
 
-| Role | ความสามารถพิเศษ |
-|---|---|
-| เหรัญญิก | อนุมัติ/ปฏิเสธ, Export |
-| ศิษยาภิบาล | View all, ไม่สามารถแก้ไข |
-| คณะกรรมการ | View reports, Approve งบประมาณ |
-| ผู้ตรวจสอบ | Read-only, Audit trail |
-| Super Admin | ทุกอย่าง |
+| Role        | ความสามารถพิเศษ                |
+| ----------- | ------------------------------ |
+| เหรัญญิก    | อนุมัติ/ปฏิเสธ, Export         |
+| ศิษยาภิบาล  | View all, ไม่สามารถแก้ไข       |
+| คณะกรรมการ  | View reports, Approve งบประมาณ |
+| ผู้ตรวจสอบ  | Read-only, Audit trail         |
+| Super Admin | ทุกอย่าง                       |
 
 ใช้ `RoleGuard` component ห่อ element ที่ต้องการ permission
 
@@ -264,12 +271,12 @@ draft → pending → approved
                 → rejected → (แก้ไข) → pending
 ```
 
-| State | Badge | Icon | Action Available |
-|---|---|---|---|
-| `draft` | Gray | FileEdit | Edit, Submit |
-| `pending` | Amber | Clock | Approve, Reject (เหรัญญิก+) |
-| `approved` | Emerald | CheckCircle2 | View, Export |
-| `rejected` | Rose | XCircle | View reason, Re-submit |
+| State      | Badge   | Icon         | Action Available            |
+| ---------- | ------- | ------------ | --------------------------- |
+| `draft`    | Gray    | FileEdit     | Edit, Submit                |
+| `pending`  | Amber   | Clock        | Approve, Reject (เหรัญญิก+) |
+| `approved` | Emerald | CheckCircle2 | View, Export                |
+| `rejected` | Rose    | XCircle      | View reason, Re-submit      |
 
 ---
 
@@ -288,4 +295,4 @@ src/
 
 ---
 
-*อัปเดตล่าสุด: 2026-07-31 | Version 2.0*
+_อัปเดตล่าสุด: 2026-07-31 | Version 2.0_
