@@ -5,305 +5,619 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  GRACE LEDGER — DESIGN SYSTEM                               ║
+ * ║  DNA: Apple × Stripe × Linear                               ║
+ * ║  Version: 2.0                                               ║
+ * ║                                                              ║
+ * ║  GROUND TRUTH — ทุก AI session ต้อง follow ไฟล์นี้         ║
+ * ║  ห้ามเปลี่ยน token โดยไม่มีเหตุผล                          ║
+ * ╚══════════════════════════════════════════════════════════════╝
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
+ * COLOR SYSTEM:
+ *  --primary        : Violet-Indigo (trust, authority, FinTech)
+ *  --color-income   : Emerald (รายรับ — positive money flow)
+ *  --color-expense  : Rose (รายจ่าย — outflow)
+ *  --color-offering : Amber (เงินถวาย — special/sacred)
+ *  --color-pending  : Amber (รอการอนุมัติ)
+ *  --color-approved : Emerald (อนุมัติแล้ว)
+ *  --color-rejected : Rose (ปฏิเสธ)
  *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
+ * FONT SYSTEM:
+ *  Body/UI  : "Sarabun" (Thai), "Inter" (Latin/numbers)
+ *  Display  : "Sarabun" heavy weight (headings)
+ *  Numeric  : tabular-nums via .num-display utility
+ *
+ * SPACING:
+ *  --radius : 0.375rem — slightly rounded, not pill-shaped
  *
  * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * 1. Add variable to :root (light) and .dark (dark)
+ * 2. Register in @theme inline as --color-<name>: var(--<name>)
  */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
+  /* ── Radius ── */
+  --radius-sm:  calc(var(--radius) - 2px);
+  --radius-md:  var(--radius);
+  --radius-lg:  calc(var(--radius) + 4px);
+  --radius-xl:  calc(var(--radius) + 8px);
+  --radius-2xl: calc(var(--radius) + 12px);
+  --radius-full: 9999px;
+
+  /* ── Base semantic colors ── */
+  --color-background:        var(--background);
+  --color-foreground:        var(--foreground);
+  --color-card:              var(--card);
+  --color-card-foreground:   var(--card-foreground);
+  --color-popover:           var(--popover);
+  --color-popover-foreground:var(--popover-foreground);
+  --color-primary:           var(--primary);
+  --color-primary-foreground:var(--primary-foreground);
+  --color-secondary:         var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
+  --color-muted:             var(--muted);
+  --color-muted-foreground:  var(--muted-foreground);
+  --color-accent:            var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
+  --color-destructive:       var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-border:            var(--border);
+  --color-input:             var(--input);
+  --color-ring:              var(--ring);
   --color-ring-offset-background: var(--background);
+
+  /* ── Finance-specific semantic colors ── */
+  --color-income:            var(--income);
+  --color-income-foreground: var(--income-foreground);
+  --color-income-muted:      var(--income-muted);
+  --color-expense:           var(--expense);
+  --color-expense-foreground:var(--expense-foreground);
+  --color-expense-muted:     var(--expense-muted);
+  --color-offering:          var(--offering);
+  --color-offering-foreground: var(--offering-foreground);
+  --color-offering-muted:    var(--offering-muted);
+
+  /* ── Approval workflow status colors ── */
+  --color-pending:           var(--pending);
+  --color-pending-foreground:var(--pending-foreground);
+  --color-pending-muted:     var(--pending-muted);
+  --color-approved:          var(--approved);
+  --color-approved-foreground:var(--approved-foreground);
+  --color-approved-muted:    var(--approved-muted);
+  --color-rejected:          var(--rejected);
+  --color-rejected-foreground:var(--rejected-foreground);
+  --color-rejected-muted:    var(--rejected-muted);
+
+  /* ── Status / utility ── */
+  --color-success:           var(--success);
+  --color-success-foreground:var(--success-foreground);
+  --color-warning:           var(--warning);
+  --color-warning-foreground:var(--warning-foreground);
+  --color-info:              var(--info);
+  --color-info-foreground:   var(--info-foreground);
+
+  /* ── Chart colors ── */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
+
+  /* ── Sidebar ── */
+  --color-sidebar:                  var(--sidebar);
+  --color-sidebar-foreground:       var(--sidebar-foreground);
+  --color-sidebar-primary:          var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --font-sans: "Prompt", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Kanit", "Prompt", ui-sans-serif, system-ui, sans-serif;
+  --color-sidebar-accent:           var(--sidebar-accent);
+  --color-sidebar-accent-foreground:var(--sidebar-accent-foreground);
+  --color-sidebar-border:           var(--sidebar-border);
+  --color-sidebar-ring:             var(--sidebar-ring);
+
+  /* ── Typography ── */
+  --font-sans:    "Sarabun", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sarabun", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
 
+/* ═══════════════════════════════════════════
+   LIGHT MODE (default)
+   Deep Slate + Violet-Indigo — trust, authority
+═══════════════════════════════════════════ */
 :root {
-  --radius: 0.25rem; /* Editorial: sharp corners, not pills */
-  /* Emil Kowalski custom easings */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --radius: 0.375rem;
+
+  /* ── Motion easings (Emil Kowalski) ── */
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Impeccable Design System Palette — Warm Ivory & Gold Amber */
-  --background: oklch(0.978 0.01 85); /* #FAF7F2 warm cream ivory */
-  --foreground: oklch(0.2 0.015 60); /* #24201C warm dark charcoal */
-  --card: oklch(1 0 0); /* #FFFFFF clean crisp white */
-  --card-foreground: oklch(0.2 0.015 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.015 60);
-  --primary: oklch(0.64 0.135 75); /* #C08233 warm gold/amber */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.93 0.015 80); /* #EDE7DD soft warm beige */
-  --secondary-foreground: oklch(0.25 0.02 60);
-  --muted: oklch(0.95 0.01 80); /* #F4EFE6 */
-  --muted-foreground: oklch(0.5 0.02 60); /* #78716C */
-  --accent: oklch(0.93 0.02 75); /* #EFE6D8 */
-  --accent-foreground: oklch(0.2 0.015 60);
-  --destructive: oklch(0.58 0.18 25); /* #D94638 */
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.62 0.14 150); /* #2D9D66 */
-  --success-foreground: oklch(1 0 0);
-  --warning: oklch(0.75 0.14 80); /* #D99B26 */
-  --warning-foreground: oklch(0.2 0.015 60);
-  --border: oklch(0.91 0.01 80); /* #E6E0D5 warm border */
-  --input: oklch(0.92 0.01 80);
-  --ring: oklch(0.64 0.135 75);
-  --chart-1: oklch(0.64 0.135 75); /* gold amber */
-  --chart-2: oklch(0.62 0.14 150); /* emerald green */
-  --chart-3: oklch(0.65 0.12 220); /* slate blue */
-  --chart-4: oklch(0.72 0.12 50); /* terra cotta */
-  --chart-5: oklch(0.58 0.18 25); /* crimson */
-  --sidebar: oklch(0.965 0.01 85); /* #F6F3EC soft sidebar background */
-  --sidebar-foreground: oklch(0.2 0.015 60);
-  --sidebar-primary: oklch(0.64 0.135 75);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.93 0.015 80);
-  --sidebar-accent-foreground: oklch(0.2 0.015 60);
-  --sidebar-border: oklch(0.91 0.01 80);
-  --sidebar-ring: oklch(0.64 0.135 75);
+  /* ── Base palette ── */
+  --background:          oklch(0.985 0.002 264);  /* #F8F9FC — near-white with cool hint */
+  --foreground:          oklch(0.18 0.02 264);     /* #1C1E2E — deep slate */
+  --card:                oklch(1 0 0);             /* #FFFFFF — pure white cards */
+  --card-foreground:     oklch(0.18 0.02 264);
+  --popover:             oklch(1 0 0);
+  --popover-foreground:  oklch(0.18 0.02 264);
+
+  /* Primary: Violet-Indigo — authority + trust */
+  --primary:             oklch(0.54 0.22 277);     /* #4F46E5 Indigo-600 equivalent */
+  --primary-foreground:  oklch(0.99 0 0);
+
+  --secondary:           oklch(0.95 0.008 264);    /* #EEF0F8 — cool light slate */
+  --secondary-foreground:oklch(0.25 0.02 264);
+
+  --muted:               oklch(0.96 0.005 264);    /* #F1F3FA */
+  --muted-foreground:    oklch(0.52 0.015 264);    /* #6B7280 equivalent */
+
+  --accent:              oklch(0.94 0.012 277);    /* #EDE9FF light violet tint */
+  --accent-foreground:   oklch(0.35 0.12 277);
+
+  --destructive:         oklch(0.58 0.22 27);      /* #DC2626 red-600 */
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --border:              oklch(0.91 0.008 264);    /* #E2E5F1 */
+  --input:               oklch(0.93 0.006 264);    /* #EAEDF5 */
+  --ring:                oklch(0.54 0.22 277);     /* same as primary */
+
+  /* ── Finance colors ── */
+  --income:              oklch(0.52 0.16 155);     /* #059669 emerald-600 */
+  --income-foreground:   oklch(0.99 0 0);
+  --income-muted:        oklch(0.95 0.04 155);     /* #D1FAE5 emerald-100 */
+
+  --expense:             oklch(0.57 0.2 27);       /* #DC2626 rose-600 */
+  --expense-foreground:  oklch(0.99 0 0);
+  --expense-muted:       oklch(0.95 0.04 27);      /* #FFE4E6 rose-100 */
+
+  --offering:            oklch(0.72 0.15 80);      /* #D97706 amber-600 */
+  --offering-foreground: oklch(0.15 0.01 80);
+  --offering-muted:      oklch(0.97 0.05 90);      /* #FEF3C7 amber-100 */
+
+  /* ── Workflow status colors ── */
+  --pending:             oklch(0.72 0.15 80);      /* Amber — รอการอนุมัติ */
+  --pending-foreground:  oklch(0.15 0.01 80);
+  --pending-muted:       oklch(0.97 0.05 90);
+
+  --approved:            oklch(0.52 0.16 155);     /* Emerald — อนุมัติแล้ว */
+  --approved-foreground: oklch(0.99 0 0);
+  --approved-muted:      oklch(0.95 0.04 155);
+
+  --rejected:            oklch(0.57 0.2 27);       /* Rose — ปฏิเสธ */
+  --rejected-foreground: oklch(0.99 0 0);
+  --rejected-muted:      oklch(0.95 0.04 27);
+
+  /* ── Utility status ── */
+  --success:             oklch(0.52 0.16 155);
+  --success-foreground:  oklch(0.99 0 0);
+  --warning:             oklch(0.72 0.15 80);
+  --warning-foreground:  oklch(0.15 0.01 80);
+  --info:                oklch(0.54 0.22 277);
+  --info-foreground:     oklch(0.99 0 0);
+
+  /* ── Charts ── */
+  --chart-1: oklch(0.54 0.22 277);  /* Indigo — primary */
+  --chart-2: oklch(0.52 0.16 155);  /* Emerald — income */
+  --chart-3: oklch(0.57 0.2 27);    /* Rose — expense */
+  --chart-4: oklch(0.72 0.15 80);   /* Amber — offering */
+  --chart-5: oklch(0.62 0.18 310);  /* Violet */
+
+  /* ── Sidebar ── */
+  --sidebar:                   oklch(0.978 0.004 264);  /* #F5F6FA */
+  --sidebar-foreground:        oklch(0.18 0.02 264);
+  --sidebar-primary:           oklch(0.54 0.22 277);
+  --sidebar-primary-foreground:oklch(0.99 0 0);
+  --sidebar-accent:            oklch(0.93 0.01 277);
+  --sidebar-accent-foreground: oklch(0.35 0.1 277);
+  --sidebar-border:            oklch(0.91 0.008 264);
+  --sidebar-ring:              oklch(0.54 0.22 277);
 }
 
+/* ═══════════════════════════════════════════
+   DARK MODE
+   Deep Slate background — Linear.app inspired
+═══════════════════════════════════════════ */
 .dark {
-  --background: oklch(0.18 0.01 60);
-  --foreground: oklch(0.95 0.008 80);
-  --card: oklch(0.22 0.012 60);
-  --card-foreground: oklch(0.95 0.008 80);
-  --popover: oklch(0.22 0.012 60);
-  --popover-foreground: oklch(0.95 0.008 80);
-  --primary: oklch(0.72 0.13 75);
-  --primary-foreground: oklch(0.15 0.01 60);
-  --secondary: oklch(0.28 0.015 60);
-  --secondary-foreground: oklch(0.95 0.008 80);
-  --muted: oklch(0.26 0.012 60);
-  --muted-foreground: oklch(0.7 0.015 75);
-  --accent: oklch(0.3 0.02 75);
-  --accent-foreground: oklch(0.95 0.008 80);
-  --destructive: oklch(0.6 0.18 25);
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.68 0.14 150);
-  --success-foreground: oklch(0.15 0.01 60);
-  --warning: oklch(0.78 0.14 80);
-  --warning-foreground: oklch(0.15 0.01 60);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.72 0.13 75);
-  --chart-1: oklch(0.72 0.13 75);
-  --chart-2: oklch(0.68 0.14 150);
-  --chart-3: oklch(0.7 0.12 220);
-  --chart-4: oklch(0.75 0.12 50);
-  --chart-5: oklch(0.6 0.18 25);
-  --sidebar: oklch(0.2 0.012 60);
-  --sidebar-foreground: oklch(0.95 0.008 80);
-  --sidebar-primary: oklch(0.72 0.13 75);
-  --sidebar-primary-foreground: oklch(0.15 0.01 60);
-  --sidebar-accent: oklch(0.28 0.015 60);
-  --sidebar-accent-foreground: oklch(0.95 0.008 80);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.13 75);
+  --background:          oklch(0.14 0.02 264);     /* #111827 — deep slate */
+  --foreground:          oklch(0.96 0.006 264);    /* #F0F3FF */
+  --card:                oklch(0.18 0.018 264);    /* #1E2235 */
+  --card-foreground:     oklch(0.96 0.006 264);
+  --popover:             oklch(0.2 0.018 264);
+  --popover-foreground:  oklch(0.96 0.006 264);
+
+  --primary:             oklch(0.66 0.2 277);      /* Lighter indigo for dark bg */
+  --primary-foreground:  oklch(0.1 0.02 264);
+
+  --secondary:           oklch(0.24 0.018 264);    /* #2A2F45 */
+  --secondary-foreground:oklch(0.92 0.006 264);
+
+  --muted:               oklch(0.22 0.016 264);    /* #262B40 */
+  --muted-foreground:    oklch(0.62 0.015 264);    /* #8B91A8 */
+
+  --accent:              oklch(0.28 0.04 277);     /* dark violet tint */
+  --accent-foreground:   oklch(0.82 0.1 277);
+
+  --destructive:         oklch(0.62 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --border:              oklch(1 0 0 / 8%);
+  --input:               oklch(1 0 0 / 10%);
+  --ring:                oklch(0.66 0.2 277);
+
+  /* ── Finance colors (dark) ── */
+  --income:              oklch(0.62 0.16 155);
+  --income-foreground:   oklch(0.1 0.02 155);
+  --income-muted:        oklch(0.22 0.06 155);
+
+  --expense:             oklch(0.65 0.2 27);
+  --expense-foreground:  oklch(0.1 0.02 27);
+  --expense-muted:       oklch(0.22 0.06 27);
+
+  --offering:            oklch(0.78 0.14 80);
+  --offering-foreground: oklch(0.12 0.02 80);
+  --offering-muted:      oklch(0.22 0.06 80);
+
+  /* ── Workflow status (dark) ── */
+  --pending:             oklch(0.78 0.14 80);
+  --pending-foreground:  oklch(0.12 0.02 80);
+  --pending-muted:       oklch(0.22 0.06 80);
+
+  --approved:            oklch(0.62 0.16 155);
+  --approved-foreground: oklch(0.1 0.02 155);
+  --approved-muted:      oklch(0.22 0.06 155);
+
+  --rejected:            oklch(0.65 0.2 27);
+  --rejected-foreground: oklch(0.1 0.02 27);
+  --rejected-muted:      oklch(0.22 0.06 27);
+
+  /* ── Utility status (dark) ── */
+  --success:             oklch(0.62 0.16 155);
+  --success-foreground:  oklch(0.1 0.02 155);
+  --warning:             oklch(0.78 0.14 80);
+  --warning-foreground:  oklch(0.12 0.02 80);
+  --info:                oklch(0.66 0.2 277);
+  --info-foreground:     oklch(0.1 0.02 264);
+
+  /* ── Charts (dark) ── */
+  --chart-1: oklch(0.66 0.2 277);
+  --chart-2: oklch(0.62 0.16 155);
+  --chart-3: oklch(0.65 0.2 27);
+  --chart-4: oklch(0.78 0.14 80);
+  --chart-5: oklch(0.68 0.18 310);
+
+  /* ── Sidebar (dark) ── */
+  --sidebar:                   oklch(0.16 0.02 264);
+  --sidebar-foreground:        oklch(0.96 0.006 264);
+  --sidebar-primary:           oklch(0.66 0.2 277);
+  --sidebar-primary-foreground:oklch(0.1 0.02 264);
+  --sidebar-accent:            oklch(0.24 0.04 277);
+  --sidebar-accent-foreground: oklch(0.82 0.1 277);
+  --sidebar-border:            oklch(1 0 0 / 8%);
+  --sidebar-ring:              oklch(0.66 0.2 277);
 }
 
+/* ═══════════════════════════════════════════
+   BASE LAYER
+═══════════════════════════════════════════ */
 @layer base {
   * {
     border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+
+  html {
+    /* Prevent layout shift from scrollbar */
+    scrollbar-gutter: stable;
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
+  /* Headings — Sarabun semi-bold, tight tracking */
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    font-weight: 600;
     letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  /* Focus visible — accessible but not ugly */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Scrollbar — minimal, on-brand */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+  }
+
+  /* Selection highlight */
+  ::selection {
+    background: oklch(0.54 0.22 277 / 20%);
+    color: var(--color-foreground);
   }
 }
 
-@utility glass-card {
+/* ═══════════════════════════════════════════
+   COMPONENT UTILITIES
+   Reusable patterns — use these, don't make
+   one-off inline styles
+═══════════════════════════════════════════ */
+
+/* Card variants */
+@utility card-ledger {
   background: var(--color-card);
   border: 1px solid var(--color-border);
-  box-shadow:
-    0 1px 2px 0 rgb(0 0 0 / 0.03),
-    0 4px 16px -4px rgb(0 0 0 / 0.02);
-  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
 }
 
+@utility card-glass {
+  background: color-mix(in oklch, var(--color-card) 80%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@utility card-subtle {
+  background: var(--color-muted);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+}
+
+/* Topbar glass */
 @utility glass-topbar {
-  background: color-mix(in sgb, var(--color-background) 85%, transparent);
+  background: color-mix(in oklch, var(--color-background) 88%, transparent);
   border-bottom: 1px solid var(--color-border);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-@utility shadow-craft {
-  box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.04),
-    0 1px 2px -1px rgb(0 0 0 / 0.02);
+/* Shadows — layered, perceptual depth */
+@utility shadow-xs {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
 }
 
-@utility shadow-elegant {
+@utility shadow-sm-card {
   box-shadow:
     0 1px 3px 0 rgb(0 0 0 / 0.05),
-    0 6px 20px -4px rgb(0 0 0 / 0.04);
+    0 1px 2px -1px rgb(0 0 0 / 0.04);
 }
 
-@utility shadow-gold-glow {
-  box-shadow: 0 0 20px -4px oklch(0.64 0.135 75 / 0.25);
+@utility shadow-card {
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.06),
+    0 4px 16px -4px rgb(0 0 0 / 0.06);
 }
 
-/* Micro-interaction helpers — functional, not decorative */
+@utility shadow-elevated {
+  box-shadow:
+    0 2px 8px -2px rgb(0 0 0 / 0.08),
+    0 8px 24px -4px rgb(0 0 0 / 0.08);
+}
+
+@utility shadow-primary-glow {
+  box-shadow: 0 0 24px -4px oklch(0.54 0.22 277 / 0.3);
+}
+
+/* Typography utilities */
+@utility kicker {
+  font-size: 0.6875rem;         /* 11px */
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+  font-feature-settings: "cpsp" 1;
+}
+
+/* Numeric display — critical for financial data */
+@utility num-display {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  letter-spacing: -0.01em;
+  font-family: "Inter", var(--font-sans);  /* Inter has excellent numerals */
+}
+
+/* Finance amount variants */
+@utility amount-income {
+  color: var(--color-income);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-family: "Inter", var(--font-sans);
+  font-weight: 600;
+}
+
+@utility amount-expense {
+  color: var(--color-expense);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-family: "Inter", var(--font-sans);
+  font-weight: 600;
+}
+
+@utility amount-neutral {
+  color: var(--color-foreground);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  font-family: "Inter", var(--font-sans);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════
+   MICRO-INTERACTIONS
+   Performance-first: transform & opacity only
+═══════════════════════════════════════════ */
+
+/* Press feedback */
 .active-press {
-  transition:
-    transform 120ms var(--ease-out),
-    background-color 120ms ease;
+  transition: transform 100ms var(--ease-out);
 }
 .active-press:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
+/* Hover lift — desktop only (pointer: fine) */
 @media (hover: hover) and (pointer: fine) {
   .hover-lift {
-    transition: background-color 120ms ease;
+    transition: background-color 150ms ease, box-shadow 150ms ease;
   }
   .hover-lift:hover {
     background-color: var(--color-muted);
   }
+
+  .hover-card-lift {
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+  .hover-card-lift:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 4px 12px -2px rgb(0 0 0 / 0.08),
+      0 8px 24px -4px rgb(0 0 0 / 0.06);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   Keyframes — subtle, purposeful, editorial
+═══════════════════════════════════════════ */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20%,
-  60% {
-    transform: translateX(-8px);
-  }
-  40%,
-  80% {
-    transform: translateX(8px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20%, 60%  { transform: translateX(-6px); }
+  40%, 80%  { transform: translateX(6px); }
 }
 
-@utility animate-shake {
-  animation: shake 0.4s ease-in-out;
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ——— Grace Ledger · editorial utilities ——— */
-
-@utility card-ledger {
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.54 0.22 277 / 0); }
+  50%       { box-shadow: 0 0 0 6px oklch(0.54 0.22 277 / 0.15); }
 }
 
-@utility kicker {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-muted-foreground);
-}
+@utility animate-fade-up       { animation: fade-up 0.3s var(--ease-out) both; }
+@utility animate-fade-in       { animation: fade-in 0.25s ease both; }
+@utility animate-fade-down     { animation: fade-down 0.3s var(--ease-out) both; }
+@utility animate-scale-in      { animation: scale-in 0.25s var(--ease-out) both; }
+@utility animate-shake         { animation: shake 0.35s ease-in-out; }
+@utility animate-slide-right   { animation: slide-in-right 0.3s var(--ease-out) both; }
+@utility animate-pulse-glow    { animation: pulse-glow 2s ease-in-out infinite; }
 
-@utility num-display {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-  letter-spacing: -0.01em;
-}
-
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@utility animate-fade-up {
-  animation: fade-up 0.35s var(--ease-out) both;
-}
-
+/* ── Staggered entrance for list children ── */
 @layer utilities {
-  /* Staggered entrance for list/grid children — subtle, editorial */
   .stagger > * {
-    animation: fade-up 0.4s var(--ease-out) both;
+    animation: fade-up 0.35s var(--ease-out) both;
   }
-  .stagger > *:nth-child(2) {
-    animation-delay: 50ms;
-  }
-  .stagger > *:nth-child(3) {
-    animation-delay: 100ms;
-  }
-  .stagger > *:nth-child(4) {
-    animation-delay: 150ms;
-  }
-  .stagger > *:nth-child(5) {
-    animation-delay: 200ms;
-  }
-  .stagger > *:nth-child(6) {
-    animation-delay: 250ms;
-  }
+  .stagger > *:nth-child(2) { animation-delay: 40ms; }
+  .stagger > *:nth-child(3) { animation-delay: 80ms; }
+  .stagger > *:nth-child(4) { animation-delay: 120ms; }
+  .stagger > *:nth-child(5) { animation-delay: 160ms; }
+  .stagger > *:nth-child(6) { animation-delay: 200ms; }
+  .stagger > *:nth-child(7) { animation-delay: 240ms; }
+  .stagger > *:nth-child(8) { animation-delay: 280ms; }
 
+  /* Respect user motion preference */
   @media (prefers-reduced-motion: reduce) {
     .stagger > *,
-    .animate-fade-up {
+    .animate-fade-up,
+    .animate-fade-in,
+    .animate-fade-down,
+    .animate-scale-in,
+    .animate-slide-right,
+    .animate-pulse-glow {
       animation: none !important;
+      transition: none !important;
     }
   }
+}
+
+/* ═══════════════════════════════════════════
+   STATUS BADGE UTILITIES
+   For use with StatusBadge component
+═══════════════════════════════════════════ */
+@layer utilities {
+  .badge-pending {
+    background-color: var(--color-pending-muted);
+    color: var(--color-pending);
+    border: 1px solid color-mix(in oklch, var(--color-pending) 30%, transparent);
+  }
+  .badge-approved {
+    background-color: var(--color-approved-muted);
+    color: var(--color-approved);
+    border: 1px solid color-mix(in oklch, var(--color-approved) 30%, transparent);
+  }
+  .badge-rejected {
+    background-color: var(--color-rejected-muted);
+    color: var(--color-rejected);
+    border: 1px solid color-mix(in oklch, var(--color-rejected) 30%, transparent);
+  }
+  .badge-income {
+    background-color: var(--color-income-muted);
+    color: var(--color-income);
+    border: 1px solid color-mix(in oklch, var(--color-income) 30%, transparent);
+  }
+  .badge-expense {
+    background-color: var(--color-expense-muted);
+    color: var(--color-expense);
+    border: 1px solid color-mix(in oklch, var(--color-expense) 30%, transparent);
+  }
+  .badge-offering {
+    background-color: var(--color-offering-muted);
+    color: var(--color-offering);
+    border: 1px solid color-mix(in oklch, var(--color-offering) 30%, transparent);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SURFACE DIVIDER
+   Subtle section separators
+═══════════════════════════════════════════ */
+@utility divider-x {
+  border-top: 1px solid var(--color-border);
+}
+@utility divider-y {
+  border-right: 1px solid var(--color-border);
 }

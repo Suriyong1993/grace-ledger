@@ -14,6 +14,7 @@ import {
   UserCircle2,
   FileSpreadsheet,
   MessageCircle,
+  CheckCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -54,6 +55,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "องค์กร",
     items: [
       { to: "/members", label: "สมาชิก", icon: Users },
+      { to: "/approvals", label: "อนุมัติ", icon: CheckCheck },
       { to: "/reports", label: "รายงาน", icon: FileBarChart2 },
       { to: "/reconciliation", label: "กระทบยอด", icon: FileSpreadsheet },
       { to: "/audit", label: "บันทึกตรวจสอบ", icon: ScrollText },

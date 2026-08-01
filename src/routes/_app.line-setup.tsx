@@ -29,12 +29,11 @@ export const Route = createFileRoute("/_app/line-setup")({
 });
 
 function LineSetupPage() {
-  // Credentials from LINE Developers Console Channel: 2009943836 (ชวดลวด)
-  const [channelId, setChannelId] = useState("2009943836");
-  const [channelSecret, setChannelSecret] = useState("2fa148fad814ec46c11ee545d8ba4809");
-  const [accessToken, setAccessToken] = useState(
-    "dtelrzp98fvoBx3shZ/SE3GuCK4Btt9Rb2k6zdvhgRrtqXmCzlH3jyti/w7uC6i4tea5RKEIuL8uFEXRYZiw+nEEZk4kHoUBPkscwSGfpjtwAyxJm8GQ43igMJI/VpQOxP5rJTW0ECU6kM5x96yklgdB04t89/1O/w1cDnyilFU=",
-  );
+  // LINE credentials are managed server-side via environment variables.
+  // These fields are for display/configuration only — never commit real secrets.
+  const [channelId, setChannelId] = useState("");
+  const [channelSecret, setChannelSecret] = useState("");
+  const [accessToken, setAccessToken] = useState("");
   const [webhookUrl] = useState("https://grace-ledger.app/api/line/webhook");
   const [isTesting, setIsTesting] = useState(false);
 

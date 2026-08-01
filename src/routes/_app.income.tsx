@@ -48,7 +48,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  approveIncome,
   createIncome,
   deleteIncome,
   getChurchId,
@@ -128,14 +127,6 @@ function IncomePage() {
     mutationFn: (id: string) => deleteIncome(id, user!),
     onSuccess: () => {
       toast.success("ลบแล้ว");
-      qc.invalidateQueries({ queryKey: ["income"] });
-    },
-  });
-
-  const approve = useMutation({
-    mutationFn: (id: string) => approveIncome(id, user!),
-    onSuccess: () => {
-      toast.success("อนุมัติแล้ว");
       qc.invalidateQueries({ queryKey: ["income"] });
     },
   });

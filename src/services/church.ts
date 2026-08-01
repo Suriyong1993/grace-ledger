@@ -24,6 +24,7 @@ import {
   apiCreateTransfer,
 } from "./api";
 import type {
+  AuditLog,
   Budget,
   Category,
   Expense,
@@ -611,18 +612,36 @@ export async function saveSettings(s: Settings, by: User) {
 
 // ── Audit ─────────────────────────────────────────────────────────
 
+/**
+ * Map snake_case Supabase audit_log row to camelCase AuditLog type.
+ * The audit_log table stores columns like created_at, user_id, user_name,
+ * but the frontend AuditLog interface uses camelCase (at, userId, userName).
+ */
+function transformAuditLog(row: Record<string, unknown>): AuditLog {
+  return {
+    id: row.id as string,
+    at: row.created_at as string,
+    userId: row.user_id as string,
+    userName: row.user_name as string,
+    action: row.action as string,
+    entity: row.entity as string,
+    entityId: (row.entity_id as string) ?? undefined,
+    details: (row.details as string) ?? undefined,
+  };
+}
+
 export async function listAudit() {
   const churchId = await getChurchId();
 
   const { data, error } = await supabase
     .from("audit_log")
-    .select("*")
+    .select("id, created_at, user_id, user_name, action, entity, entity_id, details")
     .eq("church_id", churchId)
     .order("created_at", { ascending: false })
     .limit(200);
 
   if (error) throw error;
-  return data || [];
+  return (data || []).map(transformAuditLog);
 }
 
 // ── Helpers ────────────────────────────────────────────────────────

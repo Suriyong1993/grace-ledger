@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -668,30 +668,16 @@ function ExpensePage() {
                 )}
               </div>
 
-              {/* Approver Action Bar */}
+              {/* Approver Action Bar — redirect to /approvals for proper workflow */}
               {can("expense.approve") && selectedExpense.status === "pending" && (
-                <div className="pt-4 border-t border-border grid grid-cols-2 gap-3">
-                  <Button
-                    variant="outline"
-                    className="h-10 border-destructive/40 text-destructive hover:bg-destructive/10 active-press cursor-pointer"
-                    onClick={() => {
-                      setStatus.mutate({ id: selectedExpense.id, s: "rejected" });
-                      setSelectedExpense(null);
-                    }}
+                <div className="pt-4 border-t border-border">
+                  <Link
+                    to="/approvals"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 active-press"
                   >
-                    <XCircle className="mr-1.5 h-4 w-4" />
-                    <span>ปฏิเสธคำขอ</span>
-                  </Button>
-                  <Button
-                    className="h-10 bg-success text-success-foreground hover:bg-success/90 active-press cursor-pointer"
-                    onClick={() => {
-                      setStatus.mutate({ id: selectedExpense.id, s: "approved" });
-                      setSelectedExpense(null);
-                    }}
-                  >
-                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                    <span>อนุมัติจ่าย (Cmd+Shift+A)</span>
-                  </Button>
+                    <ArrowUpRight className="h-4 w-4" />
+                    <span>ไปที่หน้ารออนุมัติ</span>
+                  </Link>
                 </div>
               )}
             </div>

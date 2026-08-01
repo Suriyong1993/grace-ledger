@@ -12,6 +12,7 @@ import {
   EyeOff,
   Eye,
   ArrowUpDown,
+  ShieldCheck,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { resetDb } from "@/lib/mock-db";
 import {
   listOfferingCategories,
   createOfferingCategory,
@@ -160,19 +160,12 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            รีเซ็ตข้อมูลตัวอย่างทั้งหมดกลับสู่ค่าเริ่มต้น
+            ข้อมูลทั้งหมดจัดเก็บใน Supabase Cloud Database พร้อมระบบ Audit Trail แบบ SHA-256 Hash Chain
           </p>
-          <Button
-            variant="outline"
-            className=""
-            onClick={() => {
-              resetDb();
-              qc.invalidateQueries();
-              toast.success("รีเซ็ตข้อมูลแล้ว");
-            }}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" /> รีเซ็ตข้อมูลตัวอย่าง
-          </Button>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 p-3 rounded-md">
+            <ShieldCheck className="h-4 w-4 text-success" />
+            หากต้องการรีเซ็ตข้อมูล กรุณาติดต่อผู้ดูแลระบบ
+          </div>
         </CardContent>
       </Card>
 
@@ -538,7 +531,7 @@ function SettingsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>ลบหมวดหมู่?</AlertDialogTitle>
             <AlertDialogDescription>
-              เงินถวายในหมวดนี้จะถูกย้ายไป "เงินถวายพิเศษ {">"} อื่น ๆ"
+              เงินถวายในหมวดนี้จะถูกย้ายไปหมวด "อื่น ๆ"
               การดำเนินการนี้ไม่สามารถย้อนกลับ
             </AlertDialogDescription>
           </AlertDialogHeader>

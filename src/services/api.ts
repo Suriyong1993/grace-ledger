@@ -196,3 +196,17 @@ export async function apiCreateFund(input: Record<string, unknown>): Promise<unk
 export async function apiCreateTransfer(input: Record<string, unknown>): Promise<unknown> {
   return apiRequest("POST", "/transfers", input);
 }
+
+// ============================================================================
+// Audit API
+// ============================================================================
+
+export interface AuditChainVerificationResult {
+  valid: boolean;
+  entriesChecked: number;
+  firstBreakAt?: string;
+}
+
+export async function apiVerifyAuditChain(): Promise<AuditChainVerificationResult> {
+  return apiRequest<AuditChainVerificationResult>("POST", "/audit/verify");
+}

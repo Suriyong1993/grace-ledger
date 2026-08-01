@@ -1,8 +1,18 @@
-import { LogOut, Search, Command as CommandIcon, Moon, Sun } from "lucide-react";
+import {
+  LogOut,
+  Search,
+  Command as CommandIcon,
+  Moon,
+  Sun,
+  Bell,
+  Clock,
+  ChevronRight,
+} from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +25,19 @@ import { useAuth } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
 import { CommandPalette, useCommandPalette } from "@/components/shared/CommandPalette";
 import { useTheme } from "@/components/shared/ThemeProvider";
+import { cn } from "@/lib/utils";
+
+/* Palette of avatar colors — indigo-aligned, no gold */
+const AVATAR_COLORS: Record<string, string> = {
+  super_admin: "oklch(0.54 0.22 277)",   // Indigo — Super Admin
+  admin: "oklch(0.52 0.16 155)",          // Emerald — Admin
+};
+
+/* Role badge variant mapping */
+const ROLE_BADGE_CLASS: Record<string, string> = {
+  super_admin: "bg-primary/10 text-primary border-primary/20",
+  admin: "bg-income-muted text-income border-income/20",
+};
 
 export function AppTopbar() {
   const { user, logout } = useAuth();
@@ -23,40 +46,41 @@ export function AppTopbar() {
   const { isDark, toggleTheme } = useTheme();
 
   const initial = user?.name?.trim()?.[0] ?? "?";
+  const avatarBg = user?.role ? (AVATAR_COLORS[user.role] ?? "oklch(0.54 0.22 277)") : "oklch(0.54 0.22 277)";
+  const roleBadge = user?.role ? (ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.auditor) : "";
 
   return (
-    <header className="glass-topbar sticky top-0 z-30 border-b border-border/80">
-      <div className="grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 md:px-6">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="hover:bg-muted/80 rounded-lg transition-colors" />
+    <header className="glass-topbar sticky top-0 z-30">
+      <div className="grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 md:px-6">
+
+        {/* Left: Sidebar trigger */}
+        <div className="flex items-center gap-1">
+          <SidebarTrigger className="rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
         </div>
+
+        {/* Center: Search bar (desktop) */}
         <button
           type="button"
+          id="topbar-search-trigger"
           onClick={() => palette.setOpen(true)}
-          className="group hidden w-full max-w-sm cursor-pointer items-center gap-2.5 rounded-lg border border-border/80 bg-muted/40 px-3.5 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/40 hover:bg-muted/80 hover:shadow-2xs md:flex"
+          className="group hidden w-full max-w-xs cursor-pointer items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/40 hover:bg-muted hover:shadow-xs md:flex"
         >
           <Search
-            className="h-3.5 w-3.5 text-muted-foreground/70 transition-colors group-hover:text-primary"
+            className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
             strokeWidth={2}
           />
-          <span className="flex-1 truncate text-left text-xs font-normal">
+          <span className="flex-1 truncate text-left text-xs">
             ค้นหารายการ, สมาชิก, กองทุน…
           </span>
-          <kbd className="hidden items-center gap-1 rounded-md border border-border/80 bg-card px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground shadow-2xs lg:inline-flex">
-            <CommandIcon className="h-3 w-3" /> K
+          <kbd className="hidden items-center gap-0.5 rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:inline-flex">
+            <CommandIcon className="h-2.5 w-2.5" /> K
           </kbd>
         </button>
-        <div className="flex items-center gap-2 justify-self-end">
-          {/* Theme toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-lg text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-            aria-label={isDark ? "เปลี่ยนเป็นโหมดสว่าง" : "เปลี่ยนเป็นโหมดมืด"}
-            onClick={toggleTheme}
-          >
-            {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
-          </Button>
+
+        {/* Right: Actions + User */}
+        <div className="flex items-center gap-1.5 justify-self-end">
+
+          {/* Mobile search */}
           <Button
             variant="ghost"
             size="icon"
@@ -66,51 +90,104 @@ export function AppTopbar() {
           >
             <Search className="h-4 w-4" />
           </Button>
+
+          {/* Pending approvals indicator — visible only for treasurer+ */}
+          {(user?.role === "admin" || user?.role === "super_admin") && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              aria-label="รายการรออนุมัติ"
+              onClick={() => navigate({ to: "/approvals" as never })}
+            >
+              <Clock className="h-4 w-4" />
+              {/* Dot indicator — will show count in future */}
+              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-pending animate-pulse-glow" />
+            </Button>
+          )}
+
+          {/* Theme toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            aria-label={isDark ? "เปลี่ยนเป็นโหมดสว่าง" : "เปลี่ยนเป็นโหมดมืด"}
+            onClick={toggleTheme}
+          >
+            {isDark
+              ? <Sun className="h-4 w-4 text-offering" />
+              : <Moon className="h-4 w-4" />
+            }
+          </Button>
+
+          {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border/80 bg-card px-2.5 py-1 shadow-2xs transition-all hover:border-border hover:bg-muted/60">
-                <Avatar className="h-6 w-6 rounded-md">
+              <button
+                id="topbar-user-menu"
+                className={cn(
+                  "flex cursor-pointer items-center gap-2 rounded-lg border border-border",
+                  "bg-card px-2 py-1.5 shadow-xs transition-all",
+                  "hover:border-primary/30 hover:bg-muted/60 active-press",
+                )}
+              >
+                <Avatar className="h-6 w-6 rounded-md shrink-0">
                   <AvatarFallback
-                    style={{ background: user?.avatarColor ?? "#C08233" }}
-                    className="rounded-md text-[10px] font-bold text-white shadow-xs"
+                    style={{ background: avatarBg }}
+                    className="rounded-md text-[10px] font-bold text-white"
                   >
                     {initial}
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden min-w-0 pr-1 text-left sm:block">
-                  <p className="max-w-28 truncate text-xs font-semibold leading-tight text-foreground">
+                <div className="hidden min-w-0 text-left sm:block">
+                  <p className="max-w-[100px] truncate text-xs font-semibold leading-tight text-foreground">
                     {user?.name}
                   </p>
-                  <p className="truncate text-[10px] font-medium text-muted-foreground">
+                  <p className={cn(
+                    "truncate text-[10px] font-medium px-1 rounded",
+                    roleBadge,
+                  )}>
                     {user ? ROLE_LABEL[user.role] : ""}
                   </p>
                 </div>
+                <ChevronRight className="hidden h-3 w-3 text-muted-foreground sm:block" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                บัญชีของฉัน
+
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel className="pb-1">
+                <p className="text-xs font-semibold text-foreground">{user?.name}</p>
+                <p className="text-[10px] text-muted-foreground">{user ? ROLE_LABEL[user.role] : ""}</p>
               </DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => navigate({ to: "/profile" })}
+                className="text-sm"
+              >
                 โปรไฟล์
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate({ to: "/settings" })}>
+              <DropdownMenuItem
+                onClick={() => navigate({ to: "/settings" })}
+                className="text-sm"
+              >
                 ตั้งค่า
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-destructive focus:bg-destructive/10"
+                className="text-destructive focus:bg-destructive/10 text-sm"
                 onClick={() => {
                   logout();
                   navigate({ to: "/auth" });
                 }}
               >
-                <LogOut className="mr-2 h-4 w-4" /> ออกจากระบบ
+                <LogOut className="mr-2 h-4 w-4" />
+                ออกจากระบบ
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
       <CommandPalette open={palette.open} onOpenChange={palette.setOpen} />
     </header>
   );

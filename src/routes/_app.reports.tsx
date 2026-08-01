@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   FileBarChart2,
   Download,
@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listIncome, listExpense, listOffering } from "@/services/church";
-import { thb } from "@/lib/format";
+import { thb, dayjs } from "@/lib/format";
 import { PageTransition } from "@/components/shared/PageTransition";
 
 export const Route = createFileRoute("/_app/reports")({
@@ -35,24 +35,51 @@ function ReportsPage() {
   const expenses = expenseQ.data ?? [];
   const offerings = offeringQ.data ?? [];
 
-  const totalIncome = incomes.reduce((acc, curr) => acc + (curr.amount || 0), 0);
-  const totalExpense = expenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  // Filter by selected period
+  const now = dayjs();
+  const filteredIncomes = useMemo(() => {
+    return incomes.filter((i) => {
+      const d = dayjs(i.date);
+      if (period === "month") return d.isSame(now, "month");
+      if (period === "quarter") return d.isAfter(now.subtract(3, "month"));
+      return d.isSame(now, "year");
+    });
+  }, [incomes, period]);
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter((e) => {
+      const d = dayjs(e.date);
+      if (period === "month") return d.isSame(now, "month");
+      if (period === "quarter") return d.isAfter(now.subtract(3, "month"));
+      return d.isSame(now, "year");
+    });
+  }, [expenses, period]);
+  const filteredOfferings = useMemo(() => {
+    return offerings.filter((o) => {
+      const d = dayjs(o.date);
+      if (period === "month") return d.isSame(now, "month");
+      if (period === "quarter") return d.isAfter(now.subtract(3, "month"));
+      return d.isSame(now, "year");
+    });
+  }, [offerings, period]);
+
+  const totalIncome = filteredIncomes.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const totalExpense = filteredExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
   const netBalance = totalIncome - totalExpense;
-  const totalOffering = offerings.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const totalOffering = filteredOfferings.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleExportCSV = () => {
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      "ประเภท,รายการ,จำนวนเงิน (บาท),วันที่\n" +
-      incomes.map((i) => `รายรับ,${i.description || "รายรับ"},${i.amount},${i.date}`).join("\n") +
-      "\n" +
-      expenses.map((e) => `รายจ่าย,${e.description || "รายจ่าย"},${e.amount},${e.date}`).join("\n");
-
-    const encodedUri = encodeURI(csvContent);
+    const csvRows = [
+      "ประเภท,รายการ,จำนวนเงิน (บาท),วันที่",
+      ...filteredIncomes.map((i) => `รายรับ,${i.description || "รายรับ"},${i.amount},${i.date}`),
+      ...filteredExpenses.map((e) => `รายจ่าย,${e.description || "รายจ่าย"},${e.amount},${e.date}`),
+    ];
+    const BOM = "\uFEFF";
+    const csvContent = BOM + csvRows.join("\n");
+    const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", `financial_report_${new Date().toISOString().split("T")[0]}.csv`);
@@ -81,26 +108,44 @@ function ReportsPage() {
         }
       />
 
+      {/* Period Selector */}
+      <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-lg w-fit">
+        {(["month", "quarter", "year"] as const).map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => setPeriod(p)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              period === p
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {p === "month" ? "เดือนนี้" : p === "quarter" ? "ไตรมาสนี้" : "ปีนี้"}
+          </button>
+        ))}
+      </div>
+
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
           label="รายรับรวม"
           value={thb(totalIncome)}
-          hint={`${incomes.length} รายการ`}
+          hint={`${filteredIncomes.length} รายการ`}
           icon={TrendingUp}
           tone="success"
         />
         <StatCard
           label="รายจ่ายรวม"
           value={thb(totalExpense)}
-          hint={`${expenses.length} รายการ`}
+          hint={`${filteredExpenses.length} รายการ`}
           icon={TrendingDown}
           tone="danger"
         />
         <StatCard
           label="เงินถวายรวม"
           value={thb(totalOffering)}
-          hint={`${offerings.length} สัปดาห์`}
+          hint={`${filteredOfferings.length} สัปดาห์`}
           icon={PieIcon}
           tone="primary"
         />
@@ -132,12 +177,12 @@ function ReportsPage() {
             </div>
             <div className="p-5 space-y-6">
               <div>
-                <h4 className="kicker mb-3 text-success">รายการรายรับ ({incomes.length} รายการ)</h4>
-                {incomes.length === 0 ? (
+                                <h4 className="kicker mb-3 text-success">รายการรายรับ ({filteredIncomes.length} รายการ)</h4>
+                {filteredIncomes.length === 0 ? (
                   <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
                 ) : (
                   <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
-                    {incomes.map((inc) => (
+                    {filteredIncomes.map((inc) => (
                       <div
                         key={inc.id}
                         className="flex justify-between p-3 hover:bg-muted/30 transition-colors"
@@ -159,13 +204,13 @@ function ReportsPage() {
 
               <div>
                 <h4 className="kicker mb-3 text-destructive">
-                  รายการรายจ่าย ({expenses.length} รายการ)
+                  รายการรายจ่าย ({filteredExpenses.length} รายการ)
                 </h4>
-                {expenses.length === 0 ? (
+                {filteredExpenses.length === 0 ? (
                   <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายจ่าย</p>
                 ) : (
                   <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
-                    {expenses.map((exp) => (
+                    {filteredExpenses.map((exp) => (
                       <div
                         key={exp.id}
                         className="flex justify-between p-3 hover:bg-muted/30 transition-colors"
@@ -196,13 +241,13 @@ function ReportsPage() {
               <CardTitle className="text-base font-medium">รายงานสรุปเงินถวายสัปดาห์</CardTitle>
             </CardHeader>
             <CardContent>
-              {offerings.length === 0 ? (
+                            {filteredOfferings.length === 0 ? (
                 <p className="text-xs text-muted-foreground py-4 text-center">
                   ยังไม่มีบันทึกสรุปเงินถวาย
                 </p>
               ) : (
                 <div className="border border-border divide-y divide-border rounded-md text-xs">
-                  {offerings.map((off) => (
+                  {filteredOfferings.map((off) => (
                     <div key={off.id} className="flex justify-between p-3">
                       <div>
                         <p className="font-medium text-foreground">
@@ -229,7 +274,7 @@ function ReportsPage() {
             <CardContent>
               <div className="space-y-3">
                 {Object.entries(
-                  expenses.reduce(
+                  filteredExpenses.reduce(
                     (acc, curr) => {
                       const cat = curr.categoryId || "อื่นๆ";
                       acc[cat] = (acc[cat] || 0) + (curr.amount || 0);
