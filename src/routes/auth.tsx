@@ -28,7 +28,11 @@ const FEATURES = [
 ];
 
 /* Deliberately square, bordered "vault gate" look — not the app's usual
-   rounded-button radius. Preserved via explicit rounded-none. */
+   rounded-button radius. Preserved via explicit rounded-none.
+   TODO(UI-VERIFY): confirm this renders pixel-consistent with the
+   pre-migration square design (shadow/focus-ring/active-press scale
+   from the Button base could interact with rounded-none unexpectedly);
+   not verifiable in this environment (no browser available). */
 const PAD_BUTTON =
   "h-14 rounded-none border border-border bg-card text-lg font-medium num-display hover:bg-muted";
 
