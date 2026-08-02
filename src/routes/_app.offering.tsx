@@ -202,7 +202,7 @@ function OfferingPage() {
           <>
             <Button
               variant="secondary"
-              className="h-8 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
+              className="h-9 bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20"
               onClick={() => setHandwrittenScanOpen(true)}
             >
               <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI
