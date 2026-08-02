@@ -23,12 +23,14 @@ ORDER BY u.name;
 
 -- 4. Update RLS policies to use simplified roles
 DROP POLICY IF EXISTS audit_read ON audit_log;
+DROP POLICY IF EXISTS audit_read ON audit_log;
 CREATE POLICY audit_read ON audit_log
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin', 'admin'))
   );
 
 -- 5. Update church_read policy for simplified roles
+DROP POLICY IF EXISTS church_read ON churches;
 DROP POLICY IF EXISTS church_read ON churches;
 CREATE POLICY church_read ON churches
   FOR SELECT USING (id = get_current_user_church_id() OR EXISTS (

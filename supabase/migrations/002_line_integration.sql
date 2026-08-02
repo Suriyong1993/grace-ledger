@@ -20,5 +20,6 @@ ALTER TABLE incomes ADD COLUMN IF NOT EXISTS line_message_id VARCHAR(255);
 
 -- RLS
 ALTER TABLE line_users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Church-scoped access" ON line_users;
 CREATE POLICY "Church-scoped access" ON line_users
   USING (church_id IN (SELECT church_id FROM users WHERE auth_user_id = auth.uid()));

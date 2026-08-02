@@ -33,6 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_categories_church_kind ON categories(church_id, k
 
 -- updated_at trigger (same function as other tables)
 DROP TRIGGER IF EXISTS trg_categories_updated_at ON categories;
+DROP TRIGGER IF EXISTS trg_categories_updated_at ON categories;
 CREATE TRIGGER trg_categories_updated_at BEFORE UPDATE ON categories
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -85,109 +86,136 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 
 -- Categories: read-only from the app
 DROP POLICY IF EXISTS categories_read ON categories;
+DROP POLICY IF EXISTS categories_read ON categories;
 CREATE POLICY categories_read ON categories
   FOR SELECT USING (church_id = get_current_user_church_id());
 
 -- Incomes: create / approve / delete
 DROP POLICY IF EXISTS income_insert ON incomes;
+DROP POLICY IF EXISTS income_insert ON incomes;
 CREATE POLICY income_insert ON incomes
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS income_update ON incomes;
 DROP POLICY IF EXISTS income_update ON incomes;
 CREATE POLICY income_update ON incomes
   FOR UPDATE USING (church_id = get_current_user_church_id())
   WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS income_delete ON incomes;
 DROP POLICY IF EXISTS income_delete ON incomes;
 CREATE POLICY income_delete ON incomes
   FOR DELETE USING (church_id = get_current_user_church_id());
 
 -- Expenses: create / set status / delete
 DROP POLICY IF EXISTS expense_insert ON expenses;
+DROP POLICY IF EXISTS expense_insert ON expenses;
 CREATE POLICY expense_insert ON expenses
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS expense_update ON expenses;
 DROP POLICY IF EXISTS expense_update ON expenses;
 CREATE POLICY expense_update ON expenses
   FOR UPDATE USING (church_id = get_current_user_church_id())
   WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS expense_delete ON expenses;
 DROP POLICY IF EXISTS expense_delete ON expenses;
 CREATE POLICY expense_delete ON expenses
   FOR DELETE USING (church_id = get_current_user_church_id());
 
 -- Offerings: create / delete
 DROP POLICY IF EXISTS offering_insert ON offerings;
+DROP POLICY IF EXISTS offering_insert ON offerings;
 CREATE POLICY offering_insert ON offerings
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS offering_delete ON offerings;
 DROP POLICY IF EXISTS offering_delete ON offerings;
 CREATE POLICY offering_delete ON offerings
   FOR DELETE USING (church_id = get_current_user_church_id());
 
 -- Funds: createFund()
 DROP POLICY IF EXISTS funds_insert ON funds;
+DROP POLICY IF EXISTS funds_insert ON funds;
 CREATE POLICY funds_insert ON funds
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
 
 -- Offering categories & subcategories: fully managed from Settings page
 DROP POLICY IF EXISTS oc_read ON offering_categories;
+DROP POLICY IF EXISTS oc_read ON offering_categories;
 CREATE POLICY oc_read ON offering_categories
   FOR SELECT USING (church_id = get_current_user_church_id());
 DROP POLICY IF EXISTS oc_insert ON offering_categories;
+DROP POLICY IF EXISTS oc_insert ON offering_categories;
 CREATE POLICY oc_insert ON offering_categories
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS oc_update ON offering_categories;
 DROP POLICY IF EXISTS oc_update ON offering_categories;
 CREATE POLICY oc_update ON offering_categories
   FOR UPDATE USING (church_id = get_current_user_church_id())
   WITH CHECK (church_id = get_current_user_church_id());
 DROP POLICY IF EXISTS oc_delete ON offering_categories;
+DROP POLICY IF EXISTS oc_delete ON offering_categories;
 CREATE POLICY oc_delete ON offering_categories
   FOR DELETE USING (church_id = get_current_user_church_id());
 
 DROP POLICY IF EXISTS osc_read ON offering_subcategories;
+DROP POLICY IF EXISTS osc_read ON offering_subcategories;
 CREATE POLICY osc_read ON offering_subcategories
   FOR SELECT USING (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS osc_insert ON offering_subcategories;
 DROP POLICY IF EXISTS osc_insert ON offering_subcategories;
 CREATE POLICY osc_insert ON offering_subcategories
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
 DROP POLICY IF EXISTS osc_update ON offering_subcategories;
+DROP POLICY IF EXISTS osc_update ON offering_subcategories;
 CREATE POLICY osc_update ON offering_subcategories
   FOR UPDATE USING (church_id = get_current_user_church_id())
   WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS osc_delete ON offering_subcategories;
 DROP POLICY IF EXISTS osc_delete ON offering_subcategories;
 CREATE POLICY osc_delete ON offering_subcategories
   FOR DELETE USING (church_id = get_current_user_church_id());
 
 -- Budgets: read-only from the app
 DROP POLICY IF EXISTS budgets_read ON budgets;
+DROP POLICY IF EXISTS budgets_read ON budgets;
 CREATE POLICY budgets_read ON budgets
   FOR SELECT USING (church_id = get_current_user_church_id());
 
 -- Members: list + create
 DROP POLICY IF EXISTS members_read ON members;
+DROP POLICY IF EXISTS members_read ON members;
 CREATE POLICY members_read ON members
   FOR SELECT USING (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS members_insert ON members;
 DROP POLICY IF EXISTS members_insert ON members;
 CREATE POLICY members_insert ON members
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
 
 -- Projects: list + create
 DROP POLICY IF EXISTS projects_read ON projects;
+DROP POLICY IF EXISTS projects_read ON projects;
 CREATE POLICY projects_read ON projects
   FOR SELECT USING (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS projects_insert ON projects;
 DROP POLICY IF EXISTS projects_insert ON projects;
 CREATE POLICY projects_insert ON projects
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
 
 -- Church settings: get + upsert (insert-or-update)
 DROP POLICY IF EXISTS settings_read ON church_settings;
+DROP POLICY IF EXISTS settings_read ON church_settings;
 CREATE POLICY settings_read ON church_settings
   FOR SELECT USING (church_id = get_current_user_church_id());
 DROP POLICY IF EXISTS settings_insert ON church_settings;
+DROP POLICY IF EXISTS settings_insert ON church_settings;
 CREATE POLICY settings_insert ON church_settings
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
+DROP POLICY IF EXISTS settings_update ON church_settings;
 DROP POLICY IF EXISTS settings_update ON church_settings;
 CREATE POLICY settings_update ON church_settings
   FOR UPDATE USING (church_id = get_current_user_church_id())
   WITH CHECK (church_id = get_current_user_church_id());
 
 -- Audit log: append-only from the app (reads already covered by audit_read)
+DROP POLICY IF EXISTS audit_insert ON audit_log;
 DROP POLICY IF EXISTS audit_insert ON audit_log;
 CREATE POLICY audit_insert ON audit_log
   FOR INSERT WITH CHECK (church_id = get_current_user_church_id());

@@ -558,58 +558,6 @@ ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE church_settings ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to get current user's church_id
-CREATE OR REPLACE FUNCTION get_current_user_church_id()
-RETURNS UUID AS $$
-  SELECT church_id FROM users WHERE auth_user_id = auth.uid();
-$$ LANGUAGE sql SECURITY DEFINER;
-
--- Church-level: all authenticated users can read their church data
-CREATE POLICY church_read ON churches
-  FOR SELECT USING (id = get_current_user_church_id() OR EXISTS (
-    SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin')
-  ));
-
--- Users: read own church users
-CREATE POLICY users_read ON users
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
--- Chart of accounts: church-scoped
-CREATE POLICY coa_read ON chart_of_accounts
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
--- Funds: church-scoped
-CREATE POLICY funds_read ON funds
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
--- Journal entries: read all church entries, write only
-CREATE POLICY je_read ON journal_entries
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
-CREATE POLICY je_insert ON journal_entries
-  FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
-
--- Offerings: church-scoped
-CREATE POLICY offering_read ON offerings
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
--- Incomes/Expenses: church-scoped
-CREATE POLICY income_read ON incomes
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
-CREATE POLICY expense_read ON expenses
-  FOR SELECT USING (church_id = get_current_user_church_id());
-
--- Audit log: super_admin + admin only
-CREATE POLICY audit_read ON audit_log
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin', 'admin'))
-  );
-
--- ============================================================================
--- Updated_at trigger
--- ============================================================================
-
-CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -619,14 +567,23 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply to all tables with updated_at column
+DROP TRIGGER IF EXISTS trg_churches_updated_at ON churches;
 CREATE TRIGGER trg_churches_updated_at BEFORE UPDATE ON churches FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
 CREATE TRIGGER trg_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_coa_updated_at ON chart_of_accounts;
 CREATE TRIGGER trg_coa_updated_at BEFORE UPDATE ON chart_of_accounts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_funds_updated_at ON funds;
 CREATE TRIGGER trg_funds_updated_at BEFORE UPDATE ON funds FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_fp_updated_at ON fiscal_periods;
 CREATE TRIGGER trg_fp_updated_at BEFORE UPDATE ON fiscal_periods FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_je_updated_at ON journal_entries;
 CREATE TRIGGER trg_je_updated_at BEFORE UPDATE ON journal_entries FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_ocs_updated_at ON offering_count_sheets;
 CREATE TRIGGER trg_ocs_updated_at BEFORE UPDATE ON offering_count_sheets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_oc_updated_at ON offering_categories;
 CREATE TRIGGER trg_oc_updated_at BEFORE UPDATE ON offering_categories FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS trg_settings_updated_at ON church_settings;
 CREATE TRIGGER trg_settings_updated_at BEFORE UPDATE ON church_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================================================
