@@ -1,11 +1,13 @@
 import { STATUS_LABEL, type TxStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle2, XCircle, FileEdit, Ban } from "lucide-react";
 
 /*
- * StatusBadge — color-coded pill badge for transaction status.
- * Uses semantic tokens from styles.css (badge-pending, badge-approved, etc.)
- * Never hard-code colors here — always use the token utilities.
+ * StatusBadge — typed wrapper over the canonical Badge for transaction
+ * status. Renders a Badge (variant="outline") with semantic coloring from
+ * styles.css (badge-pending, badge-approved, etc.) layered on top — same
+ * DOM/CSS system as every other Badge in the app, not a parallel component.
  */
 
 interface StatusConfig {
@@ -92,21 +94,16 @@ export function StatusBadge({
     );
   }
 
-  /* Pill variant — full colored badge */
+  /* Pill variant — canonical Badge, semantic status coloring layered on */
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2 py-0.5",
-        "text-xs font-semibold",
-        s.strike && "line-through opacity-70",
-        s.pill,
-        className,
-      )}
+    <Badge
+      variant="outline"
+      className={cn("whitespace-nowrap", s.strike && "line-through opacity-70", s.pill, className)}
     >
       {showIcon && (
         <Icon className={cn("h-3 w-3 shrink-0", s.iconClass)} strokeWidth={2.5} aria-hidden />
       )}
       {STATUS_LABEL[status]}
-    </span>
+    </Badge>
   );
 }
