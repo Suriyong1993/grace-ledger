@@ -10,7 +10,7 @@ import {
 } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { AuditService } from "@/server/services/audit.service";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 function route(
   method: "GET" | "POST" | "DELETE",
@@ -67,8 +67,10 @@ export const projectRoutes: RouteDefinition[] = [
         .select()
         .from(projects)
         .where(
-          eq(projects.id, projectId),
-          eq(projects.churchId, ctx.session.churchId),
+          and(
+            eq(projects.id, projectId),
+            eq(projects.churchId, ctx.session.churchId),
+          ),
         )
         .limit(1);
       if (!existing) {

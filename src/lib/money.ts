@@ -17,7 +17,9 @@ export class Money {
   static fromBaht(baht: string): Money {
     // Parse string to avoid floating-point (MF-9 fix)
     const cleaned = baht.replace(/[^\d.-]/g, "");
-    const parts = cleaned.split(".");
+    const negative = cleaned.trim().startsWith("-");
+    const unsigned = cleaned.replace("-", "");
+    const parts = unsigned.split(".");
     const whole = BigInt(parts[0] || "0") * 100n;
     let satang = 0n;
     if (parts.length > 1) {
@@ -25,11 +27,7 @@ export class Money {
       satang = BigInt(frac);
     }
     const total = whole + satang;
-    // Handle negative if input started with minus
-    if (baht.trim().startsWith("-")) {
-      return new Money(-total);
-    }
-    return new Money(total);
+    return new Money(negative ? -total : total);
   }
 
   /** Create Money from integer satang */

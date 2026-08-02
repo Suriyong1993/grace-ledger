@@ -9,7 +9,7 @@ import {
 } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { AuditService } from "@/server/services/audit.service";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 function route(
@@ -79,8 +79,10 @@ export const offeringSubcategoryRoutes: RouteDefinition[] = [
         .select()
         .from(offeringSubcategories)
         .where(
-          eq(offeringSubcategories.id, input.subcategoryId),
-          eq(offeringSubcategories.churchId, ctx.session.churchId),
+          and(
+            eq(offeringSubcategories.id, input.subcategoryId),
+            eq(offeringSubcategories.churchId, ctx.session.churchId),
+          ),
         )
         .limit(1);
       if (!existing) {
@@ -126,8 +128,10 @@ export const offeringSubcategoryRoutes: RouteDefinition[] = [
         .select()
         .from(offeringSubcategories)
         .where(
-          eq(offeringSubcategories.id, subcategoryId),
-          eq(offeringSubcategories.churchId, ctx.session.churchId),
+          and(
+            eq(offeringSubcategories.id, subcategoryId),
+            eq(offeringSubcategories.churchId, ctx.session.churchId),
+          ),
         )
         .limit(1);
       if (!existing) {

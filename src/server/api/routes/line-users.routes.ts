@@ -9,7 +9,7 @@ import {
 } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { AuditService } from "@/server/services/audit.service";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 function route(
@@ -61,8 +61,10 @@ export const lineUserRoutes: RouteDefinition[] = [
         .select()
         .from(lineUsers)
         .where(
-          eq(lineUsers.churchId, ctx.session.churchId),
-          eq(lineUsers.userId, ctx.session.userId),
+          and(
+            eq(lineUsers.churchId, ctx.session.churchId),
+            eq(lineUsers.userId, ctx.session.userId),
+          ),
         )
         .limit(1);
       if (!existing) {
@@ -81,8 +83,10 @@ export const lineUserRoutes: RouteDefinition[] = [
       await db
         .delete(lineUsers)
         .where(
-          eq(lineUsers.churchId, ctx.session.churchId),
-          eq(lineUsers.userId, ctx.session.userId),
+          and(
+            eq(lineUsers.churchId, ctx.session.churchId),
+            eq(lineUsers.userId, ctx.session.userId),
+          ),
         );
       return jsonResponse({ success: true });
     });
@@ -96,8 +100,10 @@ export const lineUserRoutes: RouteDefinition[] = [
         .select()
         .from(lineUsers)
         .where(
-          eq(lineUsers.churchId, ctx.session.churchId),
-          eq(lineUsers.userId, ctx.session.userId),
+          and(
+            eq(lineUsers.churchId, ctx.session.churchId),
+            eq(lineUsers.userId, ctx.session.userId),
+          ),
         )
         .limit(1);
       return jsonResponse({
