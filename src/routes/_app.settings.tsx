@@ -151,7 +151,7 @@ function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="ตั้งค่า" description="ตั้งค่าระบบและจัดการหมวดหมู่" />
+      <PageHeader kicker="ระบบ" title="ตั้งค่า" description="ตั้งค่าระบบและจัดการหมวดหมู่" />
 
       {/* ── ข้อมูลระบบ ── */}
       <Card className=" max-w-2xl">

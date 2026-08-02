@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import { useGSAPAnimation } from "@/hooks/useGSAPAnimation";
-import { gsap } from "@/lib/gsap";
+import { motion } from "framer-motion";
 
 interface Props {
   children: ReactNode;
@@ -8,13 +7,14 @@ interface Props {
 }
 
 export function PageTransition({ children, className = "" }: Props) {
-  const containerRef = useGSAPAnimation<HTMLDivElement>((el) => {
-    gsap.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" });
-  });
-
   return (
-    <div ref={containerRef} className={className}>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      className={className}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
