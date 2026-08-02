@@ -1,3 +1,12 @@
+# Grace Ledger — Design System (v2.0, ARCHIVED)
+
+> **HISTORICAL REFERENCE ONLY.** Superseded by
+> [`DESIGN_SYSTEM_V3.md`](../../DESIGN_SYSTEM_V3.md), which is the sole
+> source of truth as of the v3.0 UI refactor. Nothing below this line is
+> authoritative — kept for historical context only.
+
+---
+
 # Grace Ledger — Design System
 
 > **GROUND TRUTH** — ทุก AI session ที่ทำงาน frontend ต้อง read ไฟล์นี้ก่อน

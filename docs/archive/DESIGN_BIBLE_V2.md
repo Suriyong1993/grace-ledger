@@ -1,4 +1,16 @@
-﻿# DESIGN BIBLE — Grace Ledger
+﻿# DESIGN BIBLE — Grace Ledger (ARCHIVED)
+
+> **HISTORICAL REFERENCE ONLY.** This document's palette (Gold Amber
+> primary, Kanit/Prompt fonts, iPad-first) was never implemented in
+> `src/styles.css` and conflicted with the sibling `DESIGN_SYSTEM.md`
+> (now also archived). Superseded by
+> [`DESIGN_SYSTEM_V3.md`](../../DESIGN_SYSTEM_V3.md), the sole source of
+> truth as of the v3.0 UI refactor. Nothing below this line is
+> authoritative — kept for historical context only.
+
+---
+
+# DESIGN BIBLE — Grace Ledger
 
 > อ่านก่อน: promptmaster/MASTER_PROMPT.md
 > เอกสารนี้คือกฎการออกแบบ UI/UX ที่ AI ทุกตัวต้องปฏิบัติตาม
