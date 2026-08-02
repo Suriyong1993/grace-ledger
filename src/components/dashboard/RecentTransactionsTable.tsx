@@ -13,6 +13,7 @@ import { useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, ChevronRight } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
+import { Button } from "@/components/ui/button";
 import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { TxStatus } from "@/lib/types";
@@ -116,13 +117,15 @@ export function RecentTransactionsTable({
         {/* Filter Pills */}
         <div className="flex items-center gap-0.5 rounded-lg bg-muted/60 p-1">
           {(Object.keys(FILTER_LABELS) as FilterTab[]).map((tab) => (
-            <button
+            <Button
               key={tab}
+              variant="ghost"
+              size="sm"
               onClick={() => setFilter(tab)}
               className={cn(
-                "relative px-2.5 py-1 text-[11px] font-medium rounded-md transition-all duration-150",
+                "h-auto rounded-md px-2.5 py-1 text-[11px] font-medium",
                 filter === tab
-                  ? "bg-card text-foreground shadow-xs"
+                  ? "bg-card text-foreground shadow-xs hover:bg-card"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
@@ -132,7 +135,7 @@ export function RecentTransactionsTable({
                   {pendingCount}
                 </span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

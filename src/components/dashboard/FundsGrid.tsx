@@ -8,6 +8,7 @@
 
 import { Landmark, Home, Users, BookOpen, MoreVertical, TrendingUp } from "lucide-react";
 import { MoneyText } from "@/components/shared/MoneyText";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Fund } from "@/lib/types";
 
@@ -86,13 +87,14 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
           <h3 className="text-sm font-semibold text-foreground">กองทุน & บัญชีแยกประเภท</h3>
           <p className="text-xs text-muted-foreground">สรุปสถานะเงินทุนรายหมวด</p>
         </div>
-        <button
-          className="text-xs font-medium text-primary transition-colors hover:text-primary/80"
-          type="button"
+        <Button
+          variant="link"
+          size="sm"
+          className="h-auto p-0 text-xs font-medium"
           aria-label="ดูกองทุนทั้งหมด"
         >
           ดูทั้งหมด ({displayFunds.length})
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -129,13 +131,14 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
                 >
                   <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
                 </div>
-                <button
-                  className="rounded p-1 text-muted-foreground/50 transition-colors hover:text-foreground"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground/50 hover:text-foreground"
                   aria-label="เมนูกองทุน"
-                  type="button"
                 >
                   <MoreVertical className="h-3.5 w-3.5" />
-                </button>
+                </Button>
               </div>
 
               {/* Fund info */}

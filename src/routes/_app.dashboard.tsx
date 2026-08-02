@@ -261,7 +261,7 @@ export function Dashboard() {
           placeholder="ค้นหารายการการเงิน, หมวดหมู่, หรือผู้ขาย..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-card border-border/80 focus:border-primary h-11 text-sm shadow-sm rounded-xl"
+          className="pl-10 bg-card border-border/80 focus:border-primary text-sm shadow-sm"
         />
       </div>
 
