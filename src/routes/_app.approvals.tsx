@@ -292,13 +292,15 @@ function PendingRow({ item, onApprove, onReject, index }: PendingRowProps) {
         </div>
 
         {/* Expand toggle */}
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
+          className="ml-1 h-9 w-9 text-muted-foreground"
           onClick={() => setExpanded(!expanded)}
-          className="ml-1 rounded-lg p-1.5 text-muted-foreground hover:bg-muted transition-colors"
           aria-label={expanded ? "ซ่อนรายละเอียด" : "ดูรายละเอียด"}
         >
           {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </button>
+        </Button>
       </div>
 
       {/* Expanded: action buttons */}
