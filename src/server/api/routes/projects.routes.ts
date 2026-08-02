@@ -10,7 +10,7 @@ import {
 } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { AuditService } from "@/server/services/audit.service";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 function route(
   method: "GET" | "POST" | "DELETE",
@@ -47,10 +47,7 @@ export const projectRoutes: RouteDefinition[] = [
         project.id,
         ctx.session.userId,
         ctx.session.name,
-        { name: input.name, budgetAmount: input.budgetAmount } as Record<
-          string,
-          unknown
-        >,
+        { name: input.name, budgetAmount: input.budgetAmount } as Record<string, unknown>,
         ctx.ipAddress,
         ctx.userAgent,
       );
@@ -66,10 +63,7 @@ export const projectRoutes: RouteDefinition[] = [
       const [existing] = await db
         .select()
         .from(projects)
-        .where(
-          eq(projects.id, projectId),
-          eq(projects.churchId, ctx.session.churchId),
-        )
+        .where(and(eq(projects.id, projectId), eq(projects.churchId, ctx.session.churchId)))
         .limit(1);
       if (!existing) {
         return errorResponse(404, "NOT_FOUND", "Project not found");
@@ -80,10 +74,7 @@ export const projectRoutes: RouteDefinition[] = [
         projectId,
         ctx.session.userId,
         ctx.session.name,
-        { name: existing.name, budgetAmount: existing.budgetAmount } as Record<
-          string,
-          unknown
-        >,
+        { name: existing.name, budgetAmount: existing.budgetAmount } as Record<string, unknown>,
         ctx.ipAddress,
         ctx.userAgent,
       );

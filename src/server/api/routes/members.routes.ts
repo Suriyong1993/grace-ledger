@@ -38,7 +38,7 @@ export const memberRoutes: RouteDefinition[] = [
           email: input.email ?? null,
           address: input.address ?? null,
           departmentId: input.departmentId ?? null,
-          joinedAt: input.joinedAt ? new Date(input.joinedAt) : null,
+          joinedAt: input.joinedAt ?? null,
           status: "active",
           consentGiven: false,
         })

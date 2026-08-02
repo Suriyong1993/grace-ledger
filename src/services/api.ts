@@ -207,6 +207,10 @@ export interface AuditChainVerificationResult {
   firstBreakAt?: string;
 }
 
+export async function apiVerifyAuditChain(): Promise<AuditChainVerificationResult> {
+  return apiRequest("POST", "/audit/verify");
+}
+
 // ============================================================================
 // Project API
 // ============================================================================
@@ -251,11 +255,15 @@ export async function apiReorderOfferingCategories(orderedIds: string[]): Promis
 // Offering Subcategory API
 // ============================================================================
 
-export async function apiCreateOfferingSubcategory(input: Record<string, unknown>): Promise<unknown> {
+export async function apiCreateOfferingSubcategory(
+  input: Record<string, unknown>,
+): Promise<unknown> {
   return apiRequest("POST", "/offering-subcategories", input);
 }
 
-export async function apiUpdateOfferingSubcategory(input: Record<string, unknown>): Promise<unknown> {
+export async function apiUpdateOfferingSubcategory(
+  input: Record<string, unknown>,
+): Promise<unknown> {
   return apiRequest("PUT", "/offering-subcategories", input);
 }
 

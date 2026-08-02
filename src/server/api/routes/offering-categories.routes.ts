@@ -1,5 +1,5 @@
 import { db } from "@/server/infrastructure/db";
-import { offeringCategories } from "@/db/schema";
+import { offeringCategories, chartOfAccounts } from "@/db/schema";
 import {
   requireAuth,
   wrapError,
@@ -9,8 +9,25 @@ import {
 } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 import { AuditService } from "@/server/services/audit.service";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+
+/** Fallback: pick the first chart-of-accounts entry for the church (offering income account). */
+async function resolveDefaultAccountId(
+  db: typeof import("@/server/infrastructure/db").db,
+  churchId: string,
+): Promise<string> {
+  const [account] = await db
+    .select({ id: chartOfAccounts.id })
+    .from(chartOfAccounts)
+    .where(eq(chartOfAccounts.churchId, churchId))
+    .orderBy(chartOfAccounts.sortOrder)
+    .limit(1);
+  if (!account) {
+    throw new Error("No chart of accounts entry found for this church");
+  }
+  return account.id;
+}
 
 function route(
   method: "GET" | "POST" | "PUT" | "DELETE",
@@ -59,7 +76,7 @@ export const offeringCategoryRoutes: RouteDefinition[] = [
           icon: input.icon ?? null,
           sortOrder: 0,
           isActive: true,
-          accountId: input.accountId ?? null,
+          accountId: input.accountId ?? (await resolveDefaultAccountId(db, ctx.session.churchId)),
         })
         .returning();
       await AuditService.logCreate(
@@ -86,8 +103,10 @@ export const offeringCategoryRoutes: RouteDefinition[] = [
         .select()
         .from(offeringCategories)
         .where(
-          eq(offeringCategories.id, input.categoryId),
-          eq(offeringCategories.churchId, ctx.session.churchId),
+          and(
+            eq(offeringCategories.id, input.categoryId),
+            eq(offeringCategories.churchId, ctx.session.churchId),
+          ),
         )
         .limit(1);
       if (!existing) {
@@ -137,8 +156,10 @@ export const offeringCategoryRoutes: RouteDefinition[] = [
         .select()
         .from(offeringCategories)
         .where(
-          eq(offeringCategories.id, categoryId),
-          eq(offeringCategories.churchId, ctx.session.churchId),
+          and(
+            eq(offeringCategories.id, categoryId),
+            eq(offeringCategories.churchId, ctx.session.churchId),
+          ),
         )
         .limit(1);
       if (!existing) {
@@ -174,23 +195,23 @@ export const offeringCategoryRoutes: RouteDefinition[] = [
           .update(offeringCategories)
           .set({ sortOrder: update.sortOrder })
           .where(
-            eq(offeringCategories.id, update.id),
-            eq(offeringCategories.churchId, ctx.session.churchId),
+            and(
+              eq(offeringCategories.id, update.id),
+              eq(offeringCategories.churchId, ctx.session.churchId),
+            ),
           );
       }
-      await AuditService.log(
-        ctx.session.churchId,
-        "offering_category.reordered",
-        "offering_category",
-        undefined,
-        ctx.session.userId,
-        ctx.session.name,
-        "reorder",
-        undefined,
-        { orderedIds } as Record<string, unknown>,
-        ctx.ipAddress,
-        ctx.userAgent,
-      );
+      await AuditService.log({
+        churchId: ctx.session.churchId,
+        eventType: "offering_category.reordered",
+        entityType: "offering_category",
+        userId: ctx.session.userId,
+        userName: ctx.session.name,
+        action: "reorder",
+        afterState: { orderedIds } as Record<string, unknown>,
+        ipAddress: ctx.ipAddress,
+        userAgent: ctx.userAgent,
+      });
       return jsonResponse({ success: true });
     });
   }),

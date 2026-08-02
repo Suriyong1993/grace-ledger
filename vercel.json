@@ -2,5 +2,13 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
-  "framework": "vite"
+  "framework": "vite",
+  "env": {
+    "VITE_SUPABASE_URL": "@supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "OPENROUTER_API_KEY": "@openrouter_api_key",
+    "OPENROUTER_MODEL": "inclusionai/ling-3.0-flash:free",
+    "OPENROUTER_SITE_URL": "https://grace-ledger-pearl.vercel.app",
+    "OPENROUTER_APP_NAME": "Grace Ledger"
+  }
 }

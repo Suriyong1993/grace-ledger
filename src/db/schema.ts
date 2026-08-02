@@ -863,7 +863,9 @@ export const offeringSubcategories = pgTable(
   },
   (table) => [
     index("idx_os_category").on(table.categoryId),
-    index("idx_os_active").on(table.isActive).where(sql`${table.isActive} = true`),
+    index("idx_os_active")
+      .on(table.isActive)
+      .where(sql`${table.isActive} = true`),
   ],
 );
 

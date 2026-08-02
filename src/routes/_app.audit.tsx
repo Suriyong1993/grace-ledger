@@ -131,7 +131,6 @@ function AuditPage() {
     toast.success(`ส่งออก ${rows.length} รายการแล้ว`);
   }, [q.data]);
 
-  if (!can("audit.view")) return <Navigate to="/dashboard" replace />;
   const rows = q.data ?? [];
 
   // Filter rows by severity
@@ -149,6 +148,8 @@ function AuditPage() {
     () => rows.filter((r) => inferSeverity(r.action, r.details) === "warning").length,
     [rows],
   );
+
+  if (!can("audit.view")) return <Navigate to="/dashboard" replace />;
 
   // Group consecutive entries by calendar day
   const groups: { key: string; label: string; items: AuditLog[] }[] = [];

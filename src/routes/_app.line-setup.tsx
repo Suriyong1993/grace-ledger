@@ -34,7 +34,10 @@ function LineSetupPage() {
   const [channelId, setChannelId] = useState("");
   const [channelSecret, setChannelSecret] = useState("");
   const [accessToken, setAccessToken] = useState("");
-  const [webhookUrl] = useState("https://grace-ledger.app/api/line/webhook");
+  const [webhookUrl] = useState(
+    () =>
+      `${import.meta.env.VITE_SUPABASE_URL ?? "https://your-project.supabase.co"}/functions/v1/line-webhook`,
+  );
   const [isTesting, setIsTesting] = useState(false);
 
   // Queries for live database metrics
