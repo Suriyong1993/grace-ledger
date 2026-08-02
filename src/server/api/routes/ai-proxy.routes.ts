@@ -6,7 +6,7 @@
  * The client sends the file/image data, and the server handles the AI API call.
  */
 
-import { wrapError, jsonResponse, errorResponse } from "@/server/api/middleware";
+import { requireAuth, wrapError, jsonResponse, errorResponse } from "@/server/api/middleware";
 import type { RouteDefinition } from "@/server/api/routes";
 
 const FIREWORKS_API_KEY = process.env.FIREWORKS_API_KEY ?? process.env.VITE_FIREWORKS_API_KEY ?? "";
@@ -182,6 +182,7 @@ export const aiProxyRoutes: RouteDefinition[] = [
    */
   route("POST", "/ai/parse-document", async (request, _params, _query) => {
     return wrapError(async () => {
+      await requireAuth(request);
       const body = await request.json();
       const { image, mimeType } = body as { image: string; mimeType: string };
 
@@ -218,6 +219,7 @@ export const aiProxyRoutes: RouteDefinition[] = [
    */
   route("POST", "/ai/parse-church-form", async (request, _params, _query) => {
     return wrapError(async () => {
+      await requireAuth(request);
       const body = await request.json();
       const { image, mimeType } = body as { image: string; mimeType: string };
 
