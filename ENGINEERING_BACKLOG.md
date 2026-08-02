@@ -31,45 +31,33 @@ Several route modules referenced in `src/server/api/routes.ts` do not exist on d
 
 All 17 route modules exist. No missing route handlers.
 
-### P0-2: No CI/CD Pipeline
+### P0-2: No CI/CD Pipeline [COMPLETED]
 **Severity:** Critical | **Effort:** Low | **Area:** DevOps
 
-No `.github/workflows/` directory exists. No automated testing, linting, or deployment pipeline.
+GitHub Actions workflows configured:
+1. `.github/workflows/ci.yml` — runs lint, typecheck, and test suites with Postgres service container on PRs/main.
+2. `.github/workflows/deploy.yml` — deploys to Vercel on main branch merges.
 
-**Action:** Create GitHub Actions workflow with:
-1. `ci.yml` — runs `npm test`, `npm run lint`, `npm run typecheck` on PRs
-2. `deploy.yml` — deploys to Vercel on main branch merges
-
-### P0-3: Missing Production Environment Configuration
+### P0-3: Missing Production Environment Configuration [COMPLETED]
 **Severity:** Critical | **Effort:** Low | **Area:** DevOps/Config
 
-The `docker-compose.yml` and `Dockerfile` exist but there is no `.env.example` or `.env.production` template. The server requires `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `JWT_SECRET` but these are not documented or templated.
+`.env.example` template created with all required environment variables (`DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `OPENROUTER_API_KEY`, etc.) and clear configuration documentation.
 
-**Action:** Create `.env.example` with all required variables and documentation.
-
-### P0-4: No Test Coverage for Route Layer
+### P0-4: No Test Coverage for Route Layer [COMPLETED]
 **Severity:** Critical | **Effort:** Medium | **Area:** Testing
 
-The backend test file (`src/server/__tests__/backend.test.ts`) tests domain services (Journal, Money, Auth, Fund, Period, Transfer, Reconciliation, Audit) but does NOT test the API route handlers. The route handlers have no integration tests.
+Added `src/server/__tests__/routes.test.ts` — 45 integration tests calling `handleApiRequest()` directly across every registered route module, covering auth boundary (401), permission boundary (403), and happy-path dispatch (200/201).
 
-**Action:** Add route-level integration tests for all 17 route modules.
+Found and fixed a real bug in the process: `POST /ai/parse-document` and `POST /ai/parse-church-form` had no authentication check at all — fixed by adding `requireAuth()`.
 
-### P0-5: Frontend Uses Direct Supabase Reads for Mutations (Bypasses Business Rules)
+**Known gap, not fixed here:** `income.service.ts`, `expense.service.ts`, and the offering-financial service use the raw Supabase admin client instead of Drizzle, unlike the rest of the route layer — their handlers can't be integration-tested without real `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` credentials, which aren't configured in this environment or in `.github/workflows/ci.yml`. Only their auth-dispatch boundary is tested. Follow-up: either add Supabase test credentials to CI, or migrate these three services onto Drizzle.
+
+### P0-5: Frontend Uses Direct Supabase Reads for Mutations (Bypasses Business Rules) [COMPLETED]
 **Severity:** Critical | **Effort:** High | **Area:** Architecture
 
-The frontend `src/services/church.ts` reads data directly via Supabase client for LIST operations (income, expense, funds, members, etc.) — this is acceptable for reads. However, the `createOffering`, `deleteOffering`, `createProject`, `createMember`, `saveSettings`, and `reorderOfferingCategories` functions write directly to Supabase tables, bypassing the server-side API layer. This means:
-- No business rule enforcement on writes from the frontend
-- No audit logging for these mutations
-- No double-entry accounting for offerings
-- No permission checks on the server side
+Of the 6 functions originally flagged, `createOffering`/`deleteOffering`/`createOfferingCategory`/`updateOfferingCategory`/`deleteOfferingCategory`/`reorderOfferingCategories` were already migrated to the server API in a prior session. `createProject`, `createMember`, and `saveSettings` were fixed in this pass — all three now call the server API (`apiCreateProject`, `apiCreateMember`, `apiUpdateSettings`), which already existed with proper auth, permission checks, and audit logging; only the `church.ts` call sites needed rewiring.
 
-**Action:** Migrate all write operations to go through the server API (`src/services/api.ts`). Create server-side route handlers for:
-- `POST /offering-financial` (already exists but unused by frontend)
-- `DELETE /offering-financial/:id` (already exists but unused by frontend)
-- `POST /projects` (missing route handler)
-- `POST /members` (missing route handler)
-- `PUT /settings` (missing route handler)
-- `POST /offering-categories/reorder` (missing route handler)
+Note: `createProject`, `createMember`, and `saveSettings` have zero callers anywhere in the current frontend UI — this was closing a latent gap, not fixing live broken functionality.
 
 ---
 
