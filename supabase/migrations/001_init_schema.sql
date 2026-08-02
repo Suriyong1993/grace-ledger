@@ -558,6 +558,68 @@ ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE church_settings ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to get current user's church_id
+CREATE OR REPLACE FUNCTION get_current_user_church_id()
+RETURNS UUID AS $$
+  SELECT church_id FROM users WHERE auth_user_id = auth.uid();
+$$ LANGUAGE sql SECURITY DEFINER;
+
+-- Church-level: all authenticated users can read their church data
+DROP POLICY IF EXISTS church_read ON churches;
+CREATE POLICY church_read ON churches
+  FOR SELECT USING (id = get_current_user_church_id() OR EXISTS (
+    SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin')
+  ));
+
+-- Users: read own church users
+DROP POLICY IF EXISTS users_read ON users;
+CREATE POLICY users_read ON users
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+-- Chart of accounts: church-scoped
+DROP POLICY IF EXISTS coa_read ON chart_of_accounts;
+CREATE POLICY coa_read ON chart_of_accounts
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+-- Funds: church-scoped
+DROP POLICY IF EXISTS funds_read ON funds;
+CREATE POLICY funds_read ON funds
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+-- Journal entries: read all church entries, write only
+DROP POLICY IF EXISTS je_read ON journal_entries;
+CREATE POLICY je_read ON journal_entries
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+DROP POLICY IF EXISTS je_insert ON journal_entries;
+CREATE POLICY je_insert ON journal_entries
+  FOR INSERT WITH CHECK (church_id = get_current_user_church_id());
+
+-- Offerings: church-scoped
+DROP POLICY IF EXISTS offering_read ON offerings;
+CREATE POLICY offering_read ON offerings
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+-- Incomes/Expenses: church-scoped
+DROP POLICY IF EXISTS income_read ON incomes;
+CREATE POLICY income_read ON incomes
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+DROP POLICY IF EXISTS expense_read ON expenses;
+CREATE POLICY expense_read ON expenses
+  FOR SELECT USING (church_id = get_current_user_church_id());
+
+-- Audit log: super_admin + admin only
+DROP POLICY IF EXISTS audit_read ON audit_log;
+CREATE POLICY audit_read ON audit_log
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM users WHERE auth_user_id = auth.uid() AND role IN ('super_admin', 'admin'))
+  );
+
+-- ============================================================================
+-- Updated_at trigger
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -591,6 +653,7 @@ CREATE TRIGGER trg_settings_updated_at BEFORE UPDATE ON church_settings FOR EACH
 -- Joins users table with auth.users to expose email for Supabase Auth
 -- ============================================================================
 
+DROP VIEW IF EXISTS user_login_list CASCADE;
 CREATE OR REPLACE VIEW user_login_list AS
 SELECT
   u.id,

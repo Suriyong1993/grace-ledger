@@ -10,6 +10,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255);
 UPDATE users SET role = 'admin' WHERE role NOT IN ('super_admin', 'admin');
 
 -- 3. Create or replace user_login_list view
+DROP VIEW IF EXISTS user_login_list CASCADE;
 CREATE OR REPLACE VIEW user_login_list AS
 SELECT
   u.id,
