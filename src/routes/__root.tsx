@@ -15,6 +15,7 @@ import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { OfflineIndicator } from "@/components/shared/OfflineIndicator";
+import { Button } from "@/components/ui/button";
 
 function NotFoundComponent() {
   return (
@@ -29,12 +30,9 @@ function NotFoundComponent() {
           หน้าที่คุณต้องการไม่มีอยู่ หรือถูกย้ายไปแล้ว
         </p>
         <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            กลับหน้าหลัก
-          </Link>
+          <Button asChild>
+            <Link to="/">กลับหน้าหลัก</Link>
+          </Button>
         </div>
       </div>
     </div>
@@ -58,21 +56,19 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           เกิดข้อผิดพลาดจากระบบ ลองรีเฟรชอีกครั้ง หรือกลับไปหน้าหลัก
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
+          <Button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             ลองอีกครั้ง
-          </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            กลับหน้าหลัก
-          </a>
+          </Button>
+          {/* Plain <a> preserved deliberately (not <Link>) — a full page
+              reload is the safer recovery path from an error boundary. */}
+          <Button asChild variant="outline">
+            <a href="/">กลับหน้าหลัก</a>
+          </Button>
         </div>
       </div>
     </div>
@@ -94,7 +90,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "ระบบบริหารการเงินคริสตจักรที่ใช้งานง่ายและปลอดภัย" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#4F46E5" },
+      // TODO(UI-VERIFY): approximate hex for the new v3.0 primary blue
+      // (oklch(0.53 0.17 258)); sample the exact rendered --color-primary
+      // value with a browser color picker for a pixel-perfect match — not
+      // verifiable in this sandbox (no browser available).
+      { name: "theme-color", content: "#2E5FE0" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
