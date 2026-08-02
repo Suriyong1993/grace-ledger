@@ -237,7 +237,7 @@ function ExpensePage() {
           <>
             <Button
               variant="secondary"
-              className="h-8 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
+              className="h-9 bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20"
               onClick={() => setAiScannerOpen(true)}
             >
               <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI สแกนบิล/สลิป
@@ -570,7 +570,7 @@ function ExpensePage() {
           {selectedExpense && (
             <div className="p-6 space-y-6 flex-1 overflow-y-auto">
               {/* Approval Pipeline Stepper */}
-              <div className="card-ledger p-4 rounded-md bg-muted/20">
+              <div className="card-ledger p-4 bg-muted/20">
                 <span className="kicker block mb-3">ขั้นตอนการอนุมัติ (Approval Stepper)</span>
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex flex-col items-center gap-1">
@@ -611,7 +611,7 @@ function ExpensePage() {
               </div>
 
               {/* Amount Display Card */}
-              <div className="card-ledger p-5 rounded-md text-center">
+              <div className="card-ledger p-5 text-center">
                 <span className="kicker">จำนวนเงินเบิกจ่าย</span>
                 <p className="num-display font-display text-3xl font-bold text-destructive mt-1">
                   −฿{selectedExpense.amount.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
@@ -622,7 +622,7 @@ function ExpensePage() {
               {selectedExpense.attachmentDataUrl && (
                 <div className="space-y-2">
                   <span className="kicker">หลักฐานสลิป / ใบเสร็จแนบ</span>
-                  <div className="card-ledger p-2 rounded-md overflow-hidden bg-black/5 dark:bg-black/40">
+                  <div className="card-ledger p-2 overflow-hidden bg-black/5 dark:bg-black/40">
                     <img
                       src={selectedExpense.attachmentDataUrl}
                       alt="Receipt Slip"
@@ -671,13 +671,16 @@ function ExpensePage() {
               {/* Approver Action Bar — redirect to /approvals for proper workflow */}
               {can("expense.approve") && selectedExpense.status === "pending" && (
                 <div className="pt-4 border-t border-border">
-                  <Link
-                    to="/approvals"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 active-press"
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
                   >
-                    <ArrowUpRight className="h-4 w-4" />
-                    <span>ไปที่หน้ารออนุมัติ</span>
-                  </Link>
+                    <Link to="/approvals">
+                      <ArrowUpRight className="h-4 w-4" />
+                      <span>ไปที่หน้ารออนุมัติ</span>
+                    </Link>
+                  </Button>
                 </div>
               )}
             </div>
