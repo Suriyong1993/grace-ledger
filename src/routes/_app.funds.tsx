@@ -104,7 +104,7 @@ function FundsPage() {
               <article
                 key={f.id}
                 className={cn(
-                  "card-ledger rounded-sm flex flex-col overflow-hidden",
+                  "card-ledger flex flex-col overflow-hidden",
                   balance < 0 && "border-destructive/30",
                 )}
               >
