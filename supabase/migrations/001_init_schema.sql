@@ -6,7 +6,7 @@
 -- Enums
 -- ============================================================================
 
-DO $ BEGIN
+DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_type') THEN
     CREATE TYPE account_type AS ENUM ('asset', 'liability', 'equity', 'income', 'expense');
   END IF;
@@ -52,7 +52,7 @@ DO $ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'category_kind') THEN
     CREATE TYPE category_kind AS ENUM ('income', 'expense');
   END IF;
-END $;
+END $$;
 
 -- ============================================================================
 -- Churches (tenant isolation)
