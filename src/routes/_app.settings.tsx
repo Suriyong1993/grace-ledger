@@ -188,7 +188,7 @@ function SettingsPage() {
                 <div>
                   <Label>ชื่อหมวดหมู่</Label>
                   <Input
-                    className="rounded-xl mt-1.5"
+                    className="mt-1.5"
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
                     placeholder="เช่น ทีมสื่อ"
@@ -204,6 +204,8 @@ function SettingsPage() {
                         onClick={() => setNewCatColor(c)}
                         className={`w-8 h-8 rounded-full border-2 ${newCatColor === c ? "border-foreground" : "border-transparent"} transition`}
                         style={{ backgroundColor: c }}
+                        aria-label={`เลือกสี ${c}`}
+                        aria-pressed={newCatColor === c}
                       />
                     ))}
                   </div>
@@ -244,16 +246,19 @@ function SettingsPage() {
                       {/* Category row */}
                       <div className="flex items-center justify-between px-5 py-3 hover:bg-muted/30">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
                             onClick={() => setExpandedCat(expanded ? null : cat.id)}
-                            className="shrink-0 p-1"
+                            aria-label={expanded ? "ย่อหมวดหมู่ย่อย" : "ขยายหมวดหมู่ย่อย"}
                           >
                             {expanded ? (
                               <ChevronDown className="h-4 w-4 text-muted-foreground" />
                             ) : (
                               <ChevronRight className="h-4 w-4 text-muted-foreground" />
                             )}
-                          </button>
+                          </Button>
                           <span
                             className="inline-block w-3 h-3 rounded-full shrink-0"
                             style={{ backgroundColor: cat.color }}
@@ -382,7 +387,7 @@ function SettingsPage() {
                                 <div>
                                   <Label>ชื่อประเภทย่อย</Label>
                                   <Input
-                                    className="rounded-xl mt-1.5"
+                                    className="mt-1.5"
                                     value={newSubName}
                                     onChange={(e) => setNewSubName(e.target.value)}
                                     placeholder="เช่น ทีมกราฟิก"
@@ -437,7 +442,7 @@ function SettingsPage() {
               <div>
                 <Label>ชื่อหมวดหมู่</Label>
                 <Input
-                  className="rounded-xl mt-1.5"
+                  className="mt-1.5"
                   value={editingCat.name}
                   onChange={(e) => setEditingCat({ ...editingCat, name: e.target.value })}
                 />
@@ -452,6 +457,8 @@ function SettingsPage() {
                       onClick={() => setEditingCat({ ...editingCat, color: c })}
                       className={`w-8 h-8 rounded-full border-2 ${editingCat.color === c ? "border-foreground" : "border-transparent"}`}
                       style={{ backgroundColor: c }}
+                      aria-label={`เลือกสี ${c}`}
+                      aria-pressed={editingCat.color === c}
                     />
                   ))}
                 </div>
@@ -496,7 +503,7 @@ function SettingsPage() {
             <div>
               <Label>ชื่อประเภทย่อย</Label>
               <Input
-                className="rounded-xl mt-1.5"
+                className="mt-1.5"
                 value={editingSub.name}
                 onChange={(e) => setEditingSub({ ...editingSub, name: e.target.value })}
               />
