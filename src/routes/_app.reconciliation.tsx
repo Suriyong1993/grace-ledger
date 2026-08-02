@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { MoneyText } from "@/components/shared/MoneyText";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -189,19 +190,19 @@ function ReconciliationPage() {
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex flex-wrap gap-px border border-border bg-border">
               {(Object.keys(PERIOD_LABEL) as Period[]).map((p) => (
-                <button
+                <Button
                   key={p}
-                  type="button"
+                  variant="ghost"
                   onClick={() => setPeriod(p)}
                   className={cn(
-                    "h-8 cursor-pointer px-3 text-xs font-medium whitespace-nowrap transition-colors duration-100",
+                    "h-8 rounded-none px-3 text-xs font-medium whitespace-nowrap",
                     period === p
-                      ? "bg-foreground text-background"
+                      ? "bg-foreground text-background hover:bg-foreground hover:text-background"
                       : "bg-card text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {PERIOD_LABEL[p]}
-                </button>
+                </Button>
               ))}
             </div>
             {period === "custom" && (

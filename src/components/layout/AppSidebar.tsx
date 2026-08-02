@@ -64,7 +64,7 @@ function NavRow({
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "group/nav-row relative pl-3 transition-all duration-150 rounded-lg",
+          "group/nav-row relative pl-3 transition-all duration-150 rounded-button",
           compact ? "h-8 text-xs" : "h-9 text-[13px]",
           active
             ? ["bg-primary/8 font-semibold text-primary", "dark:bg-primary/12"]
@@ -112,7 +112,7 @@ export function AppSidebar() {
           className="group flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-muted/60"
         >
           {/* Logo with drop-shadow glow on hover */}
-          <div className="shrink-0 transition-all duration-200 group-hover:scale-105 group-hover:[filter:drop-shadow(0_0_8px_oklch(0.54_0.22_277_/_0.4))]">
+          <div className="shrink-0 transition-all duration-200 group-hover:scale-105 group-hover:[filter:drop-shadow(0_0_8px_color-mix(in_oklch,var(--color-primary)_40%,transparent))]">
             <GraceLedgerMark size={34} />
           </div>
 

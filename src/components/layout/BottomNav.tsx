@@ -45,7 +45,7 @@ export function BottomNav() {
                         key={item.to}
                         to={item.to}
                         className={cn(
-                          "flex flex-col items-center gap-2 border p-3 text-xs",
+                          "flex flex-col items-center gap-2 rounded-xl border p-3 text-xs transition-colors",
                           isActive(item.to)
                             ? "border-primary/40 bg-primary/5 font-medium text-foreground"
                             : "border-border bg-card text-muted-foreground",
@@ -69,7 +69,7 @@ export function BottomNav() {
                       key={item.to}
                       to={item.to}
                       className={cn(
-                        "flex flex-col items-center gap-2 border p-3 text-xs",
+                        "flex flex-col items-center gap-2 rounded-xl border p-3 text-xs transition-colors",
                         isActive(item.to)
                           ? "border-primary/40 bg-primary/5 font-medium text-foreground"
                           : "border-border bg-card text-muted-foreground",

@@ -1,9 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import { TrendingDown, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { cn } from "@/lib/utils";
-import { useGSAPAnimation } from "@/hooks/useGSAPAnimation";
-import { gsap } from "@/lib/gsap";
 
 interface Props {
   label: string;
@@ -50,18 +49,12 @@ export function StatCard({
   trend,
   decimals = 0,
 }: Props) {
-  const cardRef = useGSAPAnimation<HTMLDivElement>((el) => {
-    gsap.fromTo(
-      el,
-      { opacity: 0, y: 12, scale: 0.99 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out" },
-    );
-  });
-
   return (
-    <div
-      ref={cardRef}
-      className="group relative flex overflow-hidden rounded-sm border border-border/60 bg-card shadow-2xs transition-all duration-200 hover:border-border hover:shadow-xs"
+    <motion.div
+      initial={{ opacity: 0, y: 12, scale: 0.99 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+      className="group relative flex overflow-hidden rounded-card border border-border/60 bg-card shadow-2xs transition-all duration-200 hover:border-border hover:shadow-xs"
     >
       {/* Left accent strip — financial terminal style */}
       <div
@@ -77,7 +70,7 @@ export function StatCard({
           {Icon && (
             <div
               className={cn(
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-transform duration-200 group-hover:scale-110",
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-110",
                 ICON_BG[tone],
               )}
             >
@@ -104,7 +97,7 @@ export function StatCard({
             {typeof trend === "number" && (
               <span
                 className={cn(
-                  "num-display inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[11px] font-semibold",
+                  "num-display inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
                   trend >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
                 )}
               >
@@ -121,6 +114,6 @@ export function StatCard({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -84,7 +84,7 @@ export function MembersPage() {
           description="ลองค้นหาด้วยชื่อ ครอบครัว แผนก หรือเบอร์โทร"
         />
       ) : (
-        <section className="card-ledger animate-fade-up rounded-md shadow-craft">
+        <section className="card-ledger animate-fade-up shadow-craft">
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
             <p className="kicker">รายชื่อสมาชิก</p>
             <span className="num-display text-xs text-muted-foreground">{rows.length} คน</span>
@@ -164,7 +164,7 @@ export function MembersPage() {
           {selectedMember && (
             <div className="p-6 space-y-6 flex-1 overflow-y-auto">
               {/* Total Giving Stat Card */}
-              <div className="card-ledger p-4 rounded-md text-center bg-muted/20">
+              <div className="card-ledger p-4 text-center bg-muted/20">
                 <span className="kicker">ยอดถวายสะสมประจำปี (YTD)</span>
                 <p className="num-display font-display text-3xl font-bold text-success mt-1">
                   {thb(getMemberTotal(selectedMember.id))}

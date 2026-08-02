@@ -1,25 +1,15 @@
 /**
- * Grace Ledger v2 — Loading Skeleton Components
+ * Grace Ledger — Composite Loading Skeleton Templates
  *
- * Reusable skeleton placeholders for data-loading states.
- * Prevents layout shift and improves perceived performance.
+ * Named per-screen-shape skeletons (TableSkeleton, DashboardSkeleton, etc.)
+ * built on the single canonical Skeleton primitive from ui/skeleton.tsx —
+ * see Design System v3.0 Component Migration Tracking.
  */
 
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// ============================================================================
-// Base Skeleton
-// ============================================================================
-
-interface SkeletonProps {
-  className?: string;
-}
-
-export function Skeleton({ className }: SkeletonProps) {
-  return (
-    <div className={cn("animate-pulse rounded-sm bg-muted/70", className)} aria-hidden="true" />
-  );
-}
+export { Skeleton };
 
 // ============================================================================
 // Card Skeleton

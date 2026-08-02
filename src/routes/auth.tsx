@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth, fetchLoginUsers, type LoginUser } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -26,8 +27,14 @@ const FEATURES = [
   "รายงานพร้อมตรวจสอบ — โปร่งใสต่อคณะกรรมการ",
 ];
 
+/* Deliberately square, bordered "vault gate" look — not the app's usual
+   rounded-button radius. Preserved via explicit rounded-none.
+   TODO(UI-VERIFY): confirm this renders pixel-consistent with the
+   pre-migration square design (shadow/focus-ring/active-press scale
+   from the Button base could interact with rounded-none unexpectedly);
+   not verifiable in this environment (no browser available). */
 const PAD_BUTTON =
-  "flex h-14 cursor-pointer items-center justify-center border border-border bg-card text-lg font-medium num-display transition-all duration-100 hover:bg-muted active:scale-95 disabled:cursor-not-allowed disabled:opacity-40";
+  "h-14 rounded-none border border-border bg-card text-lg font-medium num-display hover:bg-muted";
 
 function AuthPage() {
   const { user: authUser, signIn } = useAuth();
@@ -205,11 +212,12 @@ function AuthPage() {
                   </div>
                 ))}
               {loginUsers.map((u) => (
-                <button
+                <Button
                   key={u.id}
                   type="button"
+                  variant="ghost"
                   onClick={() => handleSelectUser(u)}
-                  className="group flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors duration-100 hover:bg-muted"
+                  className="group h-auto w-full justify-start gap-3 rounded-none px-4 py-3 text-left font-normal"
                 >
                   <span className="grid h-9 w-9 shrink-0 place-items-center bg-primary/10 text-[13px] font-semibold text-primary">
                     {u.name[0]}
@@ -223,7 +231,7 @@ function AuthPage() {
                     </span>
                   </span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground/40 transition-transform duration-100 group-hover:translate-x-0.5 group-hover:text-foreground" />
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -233,14 +241,16 @@ function AuthPage() {
             <div className="animate-fade-up mt-6">
               {/* Selected user header */}
               <div className="mb-8 flex items-center gap-3 border border-border bg-card p-3">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={handleBack}
-                  className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="h-8 w-8 shrink-0 rounded-none text-muted-foreground"
                   aria-label="ย้อนกลับ"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                </button>
+                </Button>
                 <span className="grid h-9 w-9 shrink-0 place-items-center bg-primary/10 text-[13px] font-semibold text-primary">
                   {selectedUser.name[0]}
                 </span>
@@ -273,44 +283,47 @@ function AuthPage() {
               {/* Number pad */}
               <div className="mx-auto grid max-w-[264px] grid-cols-3 gap-2">
                 {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-                  <button
+                  <Button
                     key={d}
                     type="button"
+                    variant="outline"
                     onClick={() => handleDigit(d)}
                     disabled={loading || pin.length >= 6}
                     className={PAD_BUTTON}
                   >
                     {d}
-                  </button>
+                  </Button>
                 ))}
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={handleBackspace}
                   disabled={loading || pin.length === 0}
                   className={PAD_BUTTON}
                   aria-label="ลบ"
                 >
                   <Delete className="h-5 w-5" />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => handleDigit("0")}
                   disabled={loading || pin.length >= 6}
                   className={PAD_BUTTON}
                 >
                   0
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() =>
                     selectedUser && pin.length === 6 && handlePinComplete(pin, selectedUser)
                   }
                   disabled={loading || pin.length !== 6}
-                  className="flex h-14 cursor-pointer items-center justify-center border border-primary bg-primary text-lg font-semibold text-primary-foreground transition-all duration-100 hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="h-14 rounded-none text-lg font-semibold"
                   aria-label="ยืนยัน"
                 >
                   ✓
-                </button>
+                </Button>
               </div>
 
               {loading && (

@@ -27,10 +27,10 @@ import { CommandPalette, useCommandPalette } from "@/components/shared/CommandPa
 import { useTheme } from "@/components/shared/ThemeProvider";
 import { cn } from "@/lib/utils";
 
-/* Palette of avatar colors — indigo-aligned, no gold */
+/* Palette of avatar colors — semantic tokens, not hardcoded hex/oklch */
 const AVATAR_COLORS: Record<string, string> = {
-  super_admin: "oklch(0.54 0.22 277)", // Indigo — Super Admin
-  admin: "oklch(0.52 0.16 155)", // Emerald — Admin
+  super_admin: "var(--color-primary)", // Blue — Super Admin
+  admin: "var(--color-income)", // Emerald — Admin
 };
 
 /* Role badge variant mapping */
@@ -47,8 +47,8 @@ export function AppTopbar() {
 
   const initial = user?.name?.trim()?.[0] ?? "?";
   const avatarBg = user?.role
-    ? (AVATAR_COLORS[user.role] ?? "oklch(0.54 0.22 277)")
-    : "oklch(0.54 0.22 277)";
+    ? (AVATAR_COLORS[user.role] ?? "var(--color-primary)")
+    : "var(--color-primary)";
   const roleBadge = user?.role ? (ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.auditor) : "";
 
   return (
@@ -56,15 +56,16 @@ export function AppTopbar() {
       <div className="grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 md:px-6">
         {/* Left: Sidebar trigger */}
         <div className="flex items-center gap-1">
-          <SidebarTrigger className="rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
+          <SidebarTrigger className="text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
         </div>
 
         {/* Center: Search bar (desktop) */}
-        <button
+        <Button
           type="button"
+          variant="outline"
           id="topbar-search-trigger"
           onClick={() => palette.setOpen(true)}
-          className="group hidden w-full max-w-xs cursor-pointer items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/40 hover:bg-muted hover:shadow-xs md:flex"
+          className="group hidden h-9 w-full max-w-xs justify-start gap-2 bg-muted/50 px-3 font-normal text-muted-foreground hover:border-primary/40 hover:bg-muted md:flex"
         >
           <Search
             className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
@@ -74,7 +75,7 @@ export function AppTopbar() {
           <kbd className="hidden items-center gap-0.5 rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:inline-flex">
             <CommandIcon className="h-2.5 w-2.5" /> K
           </kbd>
-        </button>
+        </Button>
 
         {/* Right: Actions + User */}
         <div className="flex items-center gap-1.5 justify-self-end">
@@ -82,7 +83,7 @@ export function AppTopbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-lg md:hidden"
+            className="h-9 w-9 md:hidden"
             aria-label="ค้นหา"
             onClick={() => palette.setOpen(true)}
           >
@@ -94,7 +95,7 @@ export function AppTopbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="relative rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="relative h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               aria-label="รายการรออนุมัติ"
               onClick={() => navigate({ to: "/approvals" as never })}
             >
@@ -108,7 +109,7 @@ export function AppTopbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             aria-label={isDark ? "เปลี่ยนเป็นโหมดสว่าง" : "เปลี่ยนเป็นโหมดมืด"}
             onClick={toggleTheme}
           >
@@ -118,11 +119,11 @@ export function AppTopbar() {
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
+              <Button
+                variant="outline"
                 id="topbar-user-menu"
                 className={cn(
-                  "flex cursor-pointer items-center gap-2 rounded-lg border border-border",
-                  "bg-card px-2 py-1.5 shadow-xs transition-all",
+                  "h-9 gap-2 bg-card px-2 shadow-xs",
                   "hover:border-primary/30 hover:bg-muted/60 active-press",
                 )}
               >
@@ -143,7 +144,7 @@ export function AppTopbar() {
                   </p>
                 </div>
                 <ChevronRight className="hidden h-3 w-3 text-muted-foreground sm:block" />
-              </button>
+              </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-52">

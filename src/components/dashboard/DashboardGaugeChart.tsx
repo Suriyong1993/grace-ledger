@@ -35,8 +35,8 @@ const DEFAULT_CATEGORIES: CategorySpending[] = [
     spent: 89000,
     percentage: 35,
     icon: Zap,
-    colorClass: "text-amber-500",
-    bgClass: "bg-amber-500/10",
+    colorClass: "text-offering",
+    bgClass: "bg-offering-muted",
   },
   {
     name: "พันธกิจ & มิชชันนารี",
@@ -59,8 +59,8 @@ const DEFAULT_CATEGORIES: CategorySpending[] = [
     spent: 22000,
     percentage: 15,
     icon: GraduationCap,
-    colorClass: "text-purple-500",
-    bgClass: "bg-purple-500/10",
+    colorClass: "text-chart-5",
+    bgClass: "bg-chart-5/10",
   },
 ];
 
@@ -94,11 +94,11 @@ export function DashboardGaugeChart({
       <div className="relative flex flex-col items-center justify-center pt-2">
         <svg className="w-48 h-28 overflow-visible" viewBox="0 0 180 100">
           <defs>
-            {/* Indigo Gradient */}
+            {/* v3.0 primary -> income gradient, tracks tokens via CSS vars */}
             <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="oklch(0.54 0.22 277)" />
-              <stop offset="60%" stopColor="oklch(0.62 0.18 310)" />
-              <stop offset="100%" stopColor="oklch(0.68 0.17 155)" />
+              <stop offset="0%" style={{ stopColor: "var(--color-primary)" }} />
+              <stop offset="60%" style={{ stopColor: "var(--color-chart-5)" }} />
+              <stop offset="100%" style={{ stopColor: "var(--color-income)" }} />
             </linearGradient>
           </defs>
 

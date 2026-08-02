@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { listIncome, listExpense, listOffering } from "@/services/church";
 import { thb, dayjs } from "@/lib/format";
 import { PageTransition } from "@/components/shared/PageTransition";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/reports")({
   head: () => ({ meta: [{ title: "รายงานการเงิน — Grace Ledger" }] }),
@@ -111,18 +112,20 @@ function ReportsPage() {
       {/* Period Selector */}
       <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-lg w-fit">
         {(["month", "quarter", "year"] as const).map((p) => (
-          <button
+          <Button
             key={p}
-            type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setPeriod(p)}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            className={cn(
+              "h-auto rounded-md px-3 py-1.5 text-xs font-medium",
               period === p
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+                ? "bg-card text-foreground shadow-sm hover:bg-card"
+                : "text-muted-foreground hover:text-foreground",
+            )}
           >
             {p === "month" ? "เดือนนี้" : p === "quarter" ? "ไตรมาสนี้" : "ปีนี้"}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -167,7 +170,7 @@ function ReportsPage() {
         </TabsList>
 
         <TabsContent value="statement" className="mt-4">
-          <section className="card-ledger rounded-sm overflow-hidden">
+          <section className="card-ledger overflow-hidden">
             <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-5 py-3">
               <p className="kicker text-muted-foreground/80">งบสรุปรายรับ-รายจ่าย</p>
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
