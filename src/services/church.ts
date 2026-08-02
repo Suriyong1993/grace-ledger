@@ -440,29 +440,16 @@ export async function listProjects(): Promise<Project[]> {
   return (data || []) as Project[];
 }
 
-export async function createProject(input: Omit<Project, "id" | "used" | "progress">, by: User) {
-  const churchId = await getChurchId();
-
-  const { data, error } = await supabase
-    .from("projects")
-    .insert({
-      church_id: churchId,
-      name: input.name,
-      budget: input.budget,
-      used: 0,
-      progress: 0,
-      owner_id: input.ownerId ?? null,
-      start_date: input.startDate,
-      end_date: input.endDate ?? null,
-      status: input.status ?? "planning",
-      description: input.description ?? "",
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "create", "project", data.id, input.name);
-  return data as Project;
+export async function createProject(input: Omit<Project, "id" | "used" | "progress">, _by: User) {
+  const result = await apiCreateProject({
+    name: input.name,
+    budgetAmount: input.budget,
+    startDate: input.startDate,
+    endDate: input.endDate,
+    ownerId: input.ownerId,
+    description: input.description,
+  });
+  return result as Project;
 }
 
 // ── Members ───────────────────────────────────────────────────────
@@ -480,21 +467,24 @@ export async function listMembers(): Promise<Member[]> {
   return (data || []) as Member[];
 }
 
-export async function createMember(input: Omit<Member, "id">, by: User) {
-  const churchId = await getChurchId();
+export async function createMember(input: Omit<Member, "id">, _by: User) {
+  // The Member type collects a single `name` field in the UI, but the
+  // server schema (matching the members table) stores first/last name
+  // separately — split on the first space, falling back to the full
+  // string as firstName if there's no space.
+  const spaceIdx = input.name.indexOf(" ");
+  const firstName = spaceIdx === -1 ? input.name : input.name.slice(0, spaceIdx);
+  const lastName = spaceIdx === -1 ? "-" : input.name.slice(spaceIdx + 1);
 
-  const { data, error } = await supabase
-    .from("members")
-    .insert({
-      church_id: churchId,
-      ...input,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  await logAudit(by.id, by.name, "create", "member", data.id, input.name);
-  return data;
+  const result = await apiCreateMember({
+    firstName,
+    lastName,
+    familyName: input.family,
+    phone: input.phone,
+    email: input.email,
+    joinedAt: input.joinedAt,
+  });
+  return result as Member;
 }
 
 // ── Settings ──────────────────────────────────────────────────────
@@ -532,25 +522,16 @@ export async function getSettingsForChurch(churchId: string): Promise<Settings> 
   } as Settings;
 }
 
-export async function saveSettings(s: Settings, by: User) {
-  const churchId = await getChurchId();
-
-  const { data } = await supabase
-    .from("church_settings")
-    .upsert({
-      church_id: churchId,
-      church_name: s.churchName,
-      address: s.address,
-      tax_id: s.taxId,
-      fiscal_year_start: s.fiscalYearStart,
-      idle_timeout_min: s.idleTimeoutMin,
-      currency: s.currency,
-    })
-    .select()
-    .single();
-
-  await logAudit(by.id, by.name, "update", "settings");
-  return data;
+export async function saveSettings(s: Settings, _by: User) {
+  const result = await apiUpdateSettings({
+    churchName: s.churchName,
+    churchAddress: s.address,
+    taxId: s.taxId,
+    fiscalYearStart: s.fiscalYearStart,
+    idleTimeoutMin: s.idleTimeoutMin,
+    currency: s.currency,
+  });
+  return result;
 }
 
 // ── Audit ─────────────────────────────────────────────────────────
