@@ -65,7 +65,7 @@ function SeverityBadge({ severity }: { severity: "info" | "warning" | "critical"
   }
   if (severity === "warning") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
+      <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 border border-warning/30 px-2 py-0.5 text-[10px] font-semibold text-warning">
         <AlertTriangle className="h-3 w-3" />
         คำเตือน
       </span>
@@ -246,11 +246,11 @@ function AuditPage() {
         <div className="card-ledger p-4 flex items-center justify-between">
           <div>
             <p className="kicker">รายการแก้ไข/ปฏิเสธ</p>
-            <p className="num-display text-2xl font-bold text-amber-600 mt-1">
+            <p className="num-display text-2xl font-bold text-warning mt-1">
               {criticalCount + warningCount} รายการ
             </p>
           </div>
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-500/10 text-amber-600">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-warning/10 text-warning">
             <AlertTriangle className="h-5 w-5" />
           </div>
         </div>
@@ -282,18 +282,20 @@ function AuditPage() {
               critical: `สำคัญ/สุ่มเสี่ยง (${criticalCount})`,
             };
             return (
-              <button
+              <Button
                 key={sev}
+                variant="ghost"
+                size="sm"
                 onClick={() => setSeverityFilter(sev)}
                 className={cn(
-                  "px-3 py-1 text-xs font-medium rounded-lg transition-colors",
+                  "h-auto rounded-lg px-3 py-1 text-xs font-medium",
                   severityFilter === sev
-                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                    ? "bg-primary text-primary-foreground font-semibold shadow-xs hover:bg-primary hover:text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 {labels[sev]}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -340,7 +342,7 @@ function AuditPage() {
                             severity === "critical"
                               ? "bg-destructive border-destructive"
                               : severity === "warning"
-                                ? "bg-amber-500 border-amber-500"
+                                ? "bg-warning border-warning"
                                 : "bg-primary/40 border-primary",
                           )}
                         />
