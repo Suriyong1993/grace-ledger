@@ -58,10 +58,7 @@ export const offeringSubcategoryRoutes: RouteDefinition[] = [
         subcategory.id,
         ctx.session.userId,
         ctx.session.name,
-        { name: input.name, categoryId: input.categoryId } as Record<
-          string,
-          unknown
-        >,
+        { name: input.name, categoryId: input.categoryId } as Record<string, unknown>,
         ctx.ipAddress,
         ctx.userAgent,
       );

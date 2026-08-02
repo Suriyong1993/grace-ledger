@@ -160,7 +160,8 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            ข้อมูลทั้งหมดจัดเก็บใน Supabase Cloud Database พร้อมระบบ Audit Trail แบบ SHA-256 Hash Chain
+            ข้อมูลทั้งหมดจัดเก็บใน Supabase Cloud Database พร้อมระบบ Audit Trail แบบ SHA-256 Hash
+            Chain
           </p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 p-3 rounded-md">
             <ShieldCheck className="h-4 w-4 text-success" />
@@ -531,8 +532,7 @@ function SettingsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>ลบหมวดหมู่?</AlertDialogTitle>
             <AlertDialogDescription>
-              เงินถวายในหมวดนี้จะถูกย้ายไปหมวด "อื่น ๆ"
-              การดำเนินการนี้ไม่สามารถย้อนกลับ
+              เงินถวายในหมวดนี้จะถูกย้ายไปหมวด "อื่น ๆ" การดำเนินการนี้ไม่สามารถย้อนกลับ
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

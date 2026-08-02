@@ -76,9 +76,7 @@ export const offeringCategoryRoutes: RouteDefinition[] = [
           icon: input.icon ?? null,
           sortOrder: 0,
           isActive: true,
-          accountId:
-            input.accountId ??
-            (await resolveDefaultAccountId(db, ctx.session.churchId)),
+          accountId: input.accountId ?? (await resolveDefaultAccountId(db, ctx.session.churchId)),
         })
         .returning();
       await AuditService.logCreate(

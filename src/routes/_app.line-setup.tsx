@@ -35,7 +35,8 @@ function LineSetupPage() {
   const [channelSecret, setChannelSecret] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [webhookUrl] = useState(
-    () => `${import.meta.env.VITE_SUPABASE_URL ?? "https://your-project.supabase.co"}/functions/v1/line-webhook`,
+    () =>
+      `${import.meta.env.VITE_SUPABASE_URL ?? "https://your-project.supabase.co"}/functions/v1/line-webhook`,
   );
   const [isTesting, setIsTesting] = useState(false);
 

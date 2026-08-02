@@ -44,7 +44,7 @@ function ReportsPage() {
       if (period === "quarter") return d.isAfter(now.subtract(3, "month"));
       return d.isSame(now, "year");
     });
-  }, [incomes, period]);
+  }, [incomes, period, now]);
   const filteredExpenses = useMemo(() => {
     return expenses.filter((e) => {
       const d = dayjs(e.date);
@@ -52,7 +52,7 @@ function ReportsPage() {
       if (period === "quarter") return d.isAfter(now.subtract(3, "month"));
       return d.isSame(now, "year");
     });
-  }, [expenses, period]);
+  }, [expenses, period, now]);
   const filteredOfferings = useMemo(() => {
     return offerings.filter((o) => {
       const d = dayjs(o.date);
@@ -60,7 +60,7 @@ function ReportsPage() {
       if (period === "quarter") return d.isAfter(now.subtract(3, "month"));
       return d.isSame(now, "year");
     });
-  }, [offerings, period]);
+  }, [offerings, period, now]);
 
   const totalIncome = filteredIncomes.reduce((acc, curr) => acc + (curr.amount || 0), 0);
   const totalExpense = filteredExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
@@ -177,7 +177,9 @@ function ReportsPage() {
             </div>
             <div className="p-5 space-y-6">
               <div>
-                                <h4 className="kicker mb-3 text-success">รายการรายรับ ({filteredIncomes.length} รายการ)</h4>
+                <h4 className="kicker mb-3 text-success">
+                  รายการรายรับ ({filteredIncomes.length} รายการ)
+                </h4>
                 {filteredIncomes.length === 0 ? (
                   <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
                 ) : (
@@ -241,7 +243,7 @@ function ReportsPage() {
               <CardTitle className="text-base font-medium">รายงานสรุปเงินถวายสัปดาห์</CardTitle>
             </CardHeader>
             <CardContent>
-                            {filteredOfferings.length === 0 ? (
+              {filteredOfferings.length === 0 ? (
                 <p className="text-xs text-muted-foreground py-4 text-center">
                   ยังไม่มีบันทึกสรุปเงินถวาย
                 </p>

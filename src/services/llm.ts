@@ -29,9 +29,7 @@ export async function llmChat(options: ChatOptions): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
-    throw new Error(
-      "OPENROUTER_API_KEY is not set. Add it to Vercel environment variables."
-    );
+    throw new Error("OPENROUTER_API_KEY is not set. Add it to Vercel environment variables.");
   }
 
   const res = await fetch(`${OPENROUTER_API}/chat/completions`, {
@@ -39,9 +37,7 @@ export async function llmChat(options: ChatOptions): Promise<string> {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer":
-        process.env.OPENROUTER_SITE_URL ??
-        "https://grace-ledger-pearl.vercel.app",
+      "HTTP-Referer": process.env.OPENROUTER_SITE_URL ?? "https://grace-ledger-pearl.vercel.app",
       "X-Title": process.env.OPENROUTER_APP_NAME ?? "Grace Ledger",
     },
     body: JSON.stringify({
