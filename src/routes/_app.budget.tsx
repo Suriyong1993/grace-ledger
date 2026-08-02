@@ -97,10 +97,7 @@ function BudgetPage() {
               return (
                 <article
                   key={b.id}
-                  className={cn(
-                    "card-ledger rounded-sm overflow-hidden",
-                    alert && "border-destructive/30",
-                  )}
+                  className={cn("card-ledger overflow-hidden", alert && "border-destructive/30")}
                 >
                   {/* Top accent strip for over-budget items */}
                   {alert && (
