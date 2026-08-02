@@ -7,29 +7,35 @@
 /*
  * ╔══════════════════════════════════════════════════════════════╗
  * ║  GRACE LEDGER — DESIGN SYSTEM                               ║
- * ║  DNA: Apple × Stripe × Linear                               ║
- * ║  Version: 2.0                                               ║
+ * ║  DNA: Apple × Stripe × Linear × Mercury × Revolut × Notion   ║
+ * ║  Version: 3.0                                                ║
  * ║                                                              ║
- * ║  GROUND TRUTH — ทุก AI session ต้อง follow ไฟล์นี้         ║
- * ║  ห้ามเปลี่ยน token โดยไม่มีเหตุผล                          ║
+ * ║  Single source of truth — see DESIGN_SYSTEM_V3.md            ║
+ * ║  Governing principle: financial usability beats visual       ║
+ * ║  beauty whenever the two conflict.                           ║
  * ╚══════════════════════════════════════════════════════════════╝
  *
- * COLOR SYSTEM:
- *  --primary        : Violet-Indigo (trust, authority, FinTech)
- *  --color-income   : Emerald (รายรับ — positive money flow)
- *  --color-expense  : Rose (รายจ่าย — outflow)
- *  --color-offering : Amber (เงินถวาย — special/sacred)
- *  --color-pending  : Amber (รอการอนุมัติ)
- *  --color-approved : Emerald (อนุมัติแล้ว)
- *  --color-rejected : Rose (ปฏิเสธ)
+ * COLOR SYSTEM (muted, never oversaturated):
+ *  Neutral   : White / Warm Gray / Slate — background, surfaces, text
+ *  --primary : Blue (Stripe/Linear-grade authority, CTAs, active states)
+ *  --income / --success / --approved  : Emerald (positive money flow)
+ *  --offering / --warning / --pending : Amber (เงินถวาย, awaiting approval)
+ *  --expense / --destructive / --rejected : Red (outflow, danger)
+ *  --info    : Sky (neutral informational, distinct from primary)
  *
  * FONT SYSTEM:
- *  Body/UI  : "Sarabun" (Thai), "Inter" (Latin/numbers)
- *  Display  : "Sarabun" heavy weight (headings)
- *  Numeric  : tabular-nums via .num-display utility
+ *  Latin/UI/numbers : "Inter" (per v3.0 spec)
+ *  Thai              : "Sarabun" (Inter renders Thai poorly — kept
+ *                       deliberately; see DESIGN_SYSTEM_V3.md §Typography)
+ *  Numeric           : tabular-nums via .num-display utility
+ *
+ * RADIUS SCALE (v3.0 — significant increase from v2.0's 4–16px scale):
+ *  Cards 24px · Buttons 18px · Inputs 16px · Dialogs 28px · Sheets 32px
  *
  * SPACING:
- *  --radius : 0.375rem — slightly rounded, not pill-shaped
+ *  Tailwind v4's default 4px-multiplier scale already satisfies the
+ *  v3.0 8px-grid requirement (p-1..p-24 = 4,8,12,16,20,24,32,40,48,64,96px)
+ *  — inherited as-is, no custom spacing tokens needed.
  *
  * To add a new semantic color:
  * 1. Add variable to :root (light) and .dark (dark)
@@ -37,13 +43,22 @@
  */
 
 @theme inline {
-  /* ── Radius ── */
-  --radius-sm:  calc(var(--radius) - 2px);
-  --radius-md:  var(--radius);
-  --radius-lg:  calc(var(--radius) + 4px);
-  --radius-xl:  calc(var(--radius) + 8px);
-  --radius-2xl: calc(var(--radius) + 12px);
+  /* ── Radius ──
+     Base scale (sm/md/lg/xl/2xl) derived from --radius for generic
+     elements; named tokens below are the explicit v3.0 element radii. */
+  --radius-sm:  calc(var(--radius) - 4px);  /* 8px */
+  --radius-md:  var(--radius);              /* 12px */
+  --radius-lg:  calc(var(--radius) + 4px);  /* 16px */
+  --radius-xl:  calc(var(--radius) + 8px);  /* 20px */
+  --radius-2xl: calc(var(--radius) + 12px); /* 24px */
   --radius-full: 9999px;
+
+  /* Explicit v3.0 element radii (MasterPrompt spec) */
+  --radius-button: 1.125rem;   /* 18px */
+  --radius-input:  var(--radius-lg);   /* 16px */
+  --radius-card:   var(--radius-2xl);  /* 24px */
+  --radius-dialog: 1.75rem;    /* 28px */
+  --radius-sheet:  2rem;       /* 32px */
 
   /* ── Base semantic colors ── */
   --color-background:        var(--background);
@@ -115,17 +130,17 @@
   --color-sidebar-ring:             var(--sidebar-ring);
 
   /* ── Typography ── */
-  --font-sans:    "Sarabun", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Sarabun", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:    "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
   --font-mono:    "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
 
 /* ═══════════════════════════════════════════
    LIGHT MODE (default)
-   Deep Slate + Violet-Indigo — trust, authority
+   Slate + muted Blue — Stripe/Linear authority
 ═══════════════════════════════════════════ */
 :root {
-  --radius: 0.375rem;
+  --radius: 0.75rem; /* 12px base — softer, premium (v2.0 was 6px) */
 
   /* ── Motion easings (Emil Kowalski) ── */
   --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
@@ -133,84 +148,84 @@
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ── Base palette ── */
-  --background:          oklch(0.985 0.002 264);  /* #F8F9FC — near-white with cool hint */
-  --foreground:          oklch(0.18 0.02 264);     /* #1C1E2E — deep slate */
-  --card:                oklch(1 0 0);             /* #FFFFFF — pure white cards */
-  --card-foreground:     oklch(0.18 0.02 264);
+  /* ── Base palette — White / Warm Gray / Slate ── */
+  --background:          oklch(0.985 0.004 80);   /* warm near-white */
+  --foreground:          oklch(0.19 0.014 258);   /* slate — body text */
+  --card:                oklch(1 0 0);            /* pure white cards */
+  --card-foreground:     oklch(0.19 0.014 258);
   --popover:             oklch(1 0 0);
-  --popover-foreground:  oklch(0.18 0.02 264);
+  --popover-foreground:  oklch(0.19 0.014 258);
 
-  /* Primary: Violet-Indigo — authority + trust */
-  --primary:             oklch(0.54 0.22 277);     /* #4F46E5 Indigo-600 equivalent */
+  /* Primary: muted Blue — Stripe/Linear-grade authority */
+  --primary:             oklch(0.53 0.17 258);
   --primary-foreground:  oklch(0.99 0 0);
 
-  --secondary:           oklch(0.95 0.008 264);    /* #EEF0F8 — cool light slate */
-  --secondary-foreground:oklch(0.25 0.02 264);
+  --secondary:           oklch(0.96 0.005 80);    /* warm gray surface */
+  --secondary-foreground:oklch(0.28 0.012 258);
 
-  --muted:               oklch(0.96 0.005 264);    /* #F1F3FA */
-  --muted-foreground:    oklch(0.52 0.015 264);    /* #6B7280 equivalent */
+  --muted:               oklch(0.965 0.004 80);   /* warm gray */
+  --muted-foreground:    oklch(0.5 0.014 258);    /* slate mid-gray */
 
-  --accent:              oklch(0.94 0.012 277);    /* #EDE9FF light violet tint */
-  --accent-foreground:   oklch(0.35 0.12 277);
+  --accent:              oklch(0.94 0.02 258);    /* light blue tint */
+  --accent-foreground:   oklch(0.32 0.1 258);
 
-  --destructive:         oklch(0.58 0.22 27);      /* #DC2626 red-600 */
+  --destructive:         oklch(0.55 0.17 25);     /* muted Red */
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border:              oklch(0.91 0.008 264);    /* #E2E5F1 */
-  --input:               oklch(0.93 0.006 264);    /* #EAEDF5 */
-  --ring:                oklch(0.54 0.22 277);     /* same as primary */
+  --border:              oklch(0.9 0.006 80);     /* warm gray border */
+  --input:               oklch(0.92 0.005 80);
+  --ring:                oklch(0.53 0.17 258);    /* same as primary */
 
   /* ── Finance colors ── */
-  --income:              oklch(0.52 0.16 155);     /* #059669 emerald-600 */
+  --income:              oklch(0.5 0.13 155);     /* Emerald */
   --income-foreground:   oklch(0.99 0 0);
-  --income-muted:        oklch(0.95 0.04 155);     /* #D1FAE5 emerald-100 */
+  --income-muted:        oklch(0.95 0.035 155);
 
-  --expense:             oklch(0.57 0.2 27);       /* #DC2626 rose-600 */
+  --expense:             oklch(0.55 0.17 25);     /* Red */
   --expense-foreground:  oklch(0.99 0 0);
-  --expense-muted:       oklch(0.95 0.04 27);      /* #FFE4E6 rose-100 */
+  --expense-muted:       oklch(0.95 0.035 25);
 
-  --offering:            oklch(0.72 0.15 80);      /* #D97706 amber-600 */
-  --offering-foreground: oklch(0.15 0.01 80);
-  --offering-muted:      oklch(0.97 0.05 90);      /* #FEF3C7 amber-100 */
+  --offering:            oklch(0.7 0.13 80);      /* Amber */
+  --offering-foreground: oklch(0.16 0.01 80);
+  --offering-muted:      oklch(0.97 0.045 90);
 
   /* ── Workflow status colors ── */
-  --pending:             oklch(0.72 0.15 80);      /* Amber — รอการอนุมัติ */
-  --pending-foreground:  oklch(0.15 0.01 80);
-  --pending-muted:       oklch(0.97 0.05 90);
+  --pending:             oklch(0.7 0.13 80);      /* Amber — รอการอนุมัติ */
+  --pending-foreground:  oklch(0.16 0.01 80);
+  --pending-muted:       oklch(0.97 0.045 90);
 
-  --approved:            oklch(0.52 0.16 155);     /* Emerald — อนุมัติแล้ว */
+  --approved:            oklch(0.5 0.13 155);     /* Emerald — อนุมัติแล้ว */
   --approved-foreground: oklch(0.99 0 0);
-  --approved-muted:      oklch(0.95 0.04 155);
+  --approved-muted:      oklch(0.95 0.035 155);
 
-  --rejected:            oklch(0.57 0.2 27);       /* Rose — ปฏิเสธ */
+  --rejected:            oklch(0.55 0.17 25);     /* Red — ปฏิเสธ */
   --rejected-foreground: oklch(0.99 0 0);
-  --rejected-muted:      oklch(0.95 0.04 27);
+  --rejected-muted:      oklch(0.95 0.035 25);
 
   /* ── Utility status ── */
-  --success:             oklch(0.52 0.16 155);
+  --success:             oklch(0.5 0.13 155);
   --success-foreground:  oklch(0.99 0 0);
-  --warning:             oklch(0.72 0.15 80);
-  --warning-foreground:  oklch(0.15 0.01 80);
-  --info:                oklch(0.54 0.22 277);
+  --warning:             oklch(0.7 0.13 80);
+  --warning-foreground:  oklch(0.16 0.01 80);
+  --info:                oklch(0.58 0.12 222);    /* Sky — distinct from primary */
   --info-foreground:     oklch(0.99 0 0);
 
   /* ── Charts ── */
-  --chart-1: oklch(0.54 0.22 277);  /* Indigo — primary */
-  --chart-2: oklch(0.52 0.16 155);  /* Emerald — income */
-  --chart-3: oklch(0.57 0.2 27);    /* Rose — expense */
-  --chart-4: oklch(0.72 0.15 80);   /* Amber — offering */
-  --chart-5: oklch(0.62 0.18 310);  /* Violet */
+  --chart-1: oklch(0.53 0.17 258);  /* Blue — primary */
+  --chart-2: oklch(0.5 0.13 155);   /* Emerald — income */
+  --chart-3: oklch(0.55 0.17 25);   /* Red — expense */
+  --chart-4: oklch(0.7 0.13 80);    /* Amber — offering */
+  --chart-5: oklch(0.6 0.11 195);   /* Teal — 5th accent, distinct from primary blue */
 
   /* ── Sidebar ── */
-  --sidebar:                   oklch(0.978 0.004 264);  /* #F5F6FA */
-  --sidebar-foreground:        oklch(0.18 0.02 264);
-  --sidebar-primary:           oklch(0.54 0.22 277);
+  --sidebar:                   oklch(0.975 0.004 80);
+  --sidebar-foreground:        oklch(0.19 0.014 258);
+  --sidebar-primary:           oklch(0.53 0.17 258);
   --sidebar-primary-foreground:oklch(0.99 0 0);
-  --sidebar-accent:            oklch(0.93 0.01 277);
-  --sidebar-accent-foreground: oklch(0.35 0.1 277);
-  --sidebar-border:            oklch(0.91 0.008 264);
-  --sidebar-ring:              oklch(0.54 0.22 277);
+  --sidebar-accent:            oklch(0.93 0.015 258);
+  --sidebar-accent-foreground: oklch(0.32 0.09 258);
+  --sidebar-border:            oklch(0.9 0.006 80);
+  --sidebar-ring:              oklch(0.53 0.17 258);
 }
 
 /* ═══════════════════════════════════════════
@@ -218,82 +233,82 @@
    Deep Slate background — Linear.app inspired
 ═══════════════════════════════════════════ */
 .dark {
-  --background:          oklch(0.14 0.02 264);     /* #111827 — deep slate */
-  --foreground:          oklch(0.96 0.006 264);    /* #F0F3FF */
-  --card:                oklch(0.18 0.018 264);    /* #1E2235 */
-  --card-foreground:     oklch(0.96 0.006 264);
-  --popover:             oklch(0.2 0.018 264);
-  --popover-foreground:  oklch(0.96 0.006 264);
+  --background:          oklch(0.16 0.012 258);
+  --foreground:          oklch(0.96 0.004 258);
+  --card:                oklch(0.2 0.012 258);
+  --card-foreground:     oklch(0.96 0.004 258);
+  --popover:             oklch(0.22 0.012 258);
+  --popover-foreground:  oklch(0.96 0.004 258);
 
-  --primary:             oklch(0.66 0.2 277);      /* Lighter indigo for dark bg */
-  --primary-foreground:  oklch(0.1 0.02 264);
+  --primary:             oklch(0.68 0.15 258);    /* Lighter blue for dark bg */
+  --primary-foreground:  oklch(0.12 0.02 258);
 
-  --secondary:           oklch(0.24 0.018 264);    /* #2A2F45 */
-  --secondary-foreground:oklch(0.92 0.006 264);
+  --secondary:           oklch(0.26 0.012 258);
+  --secondary-foreground:oklch(0.92 0.006 258);
 
-  --muted:               oklch(0.22 0.016 264);    /* #262B40 */
-  --muted-foreground:    oklch(0.62 0.015 264);    /* #8B91A8 */
+  --muted:               oklch(0.23 0.012 258);
+  --muted-foreground:    oklch(0.64 0.012 258);
 
-  --accent:              oklch(0.28 0.04 277);     /* dark violet tint */
-  --accent-foreground:   oklch(0.82 0.1 277);
+  --accent:              oklch(0.28 0.04 258);
+  --accent-foreground:   oklch(0.82 0.09 258);
 
-  --destructive:         oklch(0.62 0.22 27);
+  --destructive:         oklch(0.64 0.16 25);
   --destructive-foreground: oklch(0.99 0 0);
 
   --border:              oklch(1 0 0 / 8%);
   --input:               oklch(1 0 0 / 10%);
-  --ring:                oklch(0.66 0.2 277);
+  --ring:                oklch(0.68 0.15 258);
 
   /* ── Finance colors (dark) ── */
-  --income:              oklch(0.62 0.16 155);
-  --income-foreground:   oklch(0.1 0.02 155);
-  --income-muted:        oklch(0.22 0.06 155);
+  --income:              oklch(0.6 0.13 155);
+  --income-foreground:   oklch(0.12 0.02 155);
+  --income-muted:        oklch(0.24 0.05 155);
 
-  --expense:             oklch(0.65 0.2 27);
-  --expense-foreground:  oklch(0.1 0.02 27);
-  --expense-muted:       oklch(0.22 0.06 27);
+  --expense:             oklch(0.64 0.16 25);
+  --expense-foreground:  oklch(0.12 0.02 25);
+  --expense-muted:       oklch(0.24 0.05 25);
 
-  --offering:            oklch(0.78 0.14 80);
-  --offering-foreground: oklch(0.12 0.02 80);
-  --offering-muted:      oklch(0.22 0.06 80);
+  --offering:            oklch(0.76 0.12 80);
+  --offering-foreground: oklch(0.14 0.02 80);
+  --offering-muted:      oklch(0.24 0.05 80);
 
   /* ── Workflow status (dark) ── */
-  --pending:             oklch(0.78 0.14 80);
-  --pending-foreground:  oklch(0.12 0.02 80);
-  --pending-muted:       oklch(0.22 0.06 80);
+  --pending:             oklch(0.76 0.12 80);
+  --pending-foreground:  oklch(0.14 0.02 80);
+  --pending-muted:       oklch(0.24 0.05 80);
 
-  --approved:            oklch(0.62 0.16 155);
-  --approved-foreground: oklch(0.1 0.02 155);
-  --approved-muted:      oklch(0.22 0.06 155);
+  --approved:            oklch(0.6 0.13 155);
+  --approved-foreground: oklch(0.12 0.02 155);
+  --approved-muted:      oklch(0.24 0.05 155);
 
-  --rejected:            oklch(0.65 0.2 27);
-  --rejected-foreground: oklch(0.1 0.02 27);
-  --rejected-muted:      oklch(0.22 0.06 27);
+  --rejected:            oklch(0.64 0.16 25);
+  --rejected-foreground: oklch(0.12 0.02 25);
+  --rejected-muted:      oklch(0.24 0.05 25);
 
   /* ── Utility status (dark) ── */
-  --success:             oklch(0.62 0.16 155);
-  --success-foreground:  oklch(0.1 0.02 155);
-  --warning:             oklch(0.78 0.14 80);
-  --warning-foreground:  oklch(0.12 0.02 80);
-  --info:                oklch(0.66 0.2 277);
-  --info-foreground:     oklch(0.1 0.02 264);
+  --success:             oklch(0.6 0.13 155);
+  --success-foreground:  oklch(0.12 0.02 155);
+  --warning:             oklch(0.76 0.12 80);
+  --warning-foreground:  oklch(0.14 0.02 80);
+  --info:                oklch(0.66 0.11 222);
+  --info-foreground:     oklch(0.12 0.02 222);
 
   /* ── Charts (dark) ── */
-  --chart-1: oklch(0.66 0.2 277);
-  --chart-2: oklch(0.62 0.16 155);
-  --chart-3: oklch(0.65 0.2 27);
-  --chart-4: oklch(0.78 0.14 80);
-  --chart-5: oklch(0.68 0.18 310);
+  --chart-1: oklch(0.68 0.15 258);
+  --chart-2: oklch(0.6 0.13 155);
+  --chart-3: oklch(0.64 0.16 25);
+  --chart-4: oklch(0.76 0.12 80);
+  --chart-5: oklch(0.66 0.1 195);
 
   /* ── Sidebar (dark) ── */
-  --sidebar:                   oklch(0.16 0.02 264);
-  --sidebar-foreground:        oklch(0.96 0.006 264);
-  --sidebar-primary:           oklch(0.66 0.2 277);
-  --sidebar-primary-foreground:oklch(0.1 0.02 264);
-  --sidebar-accent:            oklch(0.24 0.04 277);
-  --sidebar-accent-foreground: oklch(0.82 0.1 277);
+  --sidebar:                   oklch(0.18 0.012 258);
+  --sidebar-foreground:        oklch(0.96 0.004 258);
+  --sidebar-primary:           oklch(0.68 0.15 258);
+  --sidebar-primary-foreground:oklch(0.12 0.02 258);
+  --sidebar-accent:            oklch(0.26 0.05 258);
+  --sidebar-accent-foreground: oklch(0.82 0.09 258);
   --sidebar-border:            oklch(1 0 0 / 8%);
-  --sidebar-ring:              oklch(0.66 0.2 277);
+  --sidebar-ring:              oklch(0.68 0.15 258);
 }
 
 /* ═══════════════════════════════════════════
@@ -321,7 +336,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Headings — Sarabun semi-bold, tight tracking, balanced line breaks */
+  /* Headings — semi-bold, tight tracking, balanced line breaks */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 600;
@@ -355,7 +370,7 @@
 
   /* Selection highlight */
   ::selection {
-    background: oklch(0.54 0.22 277 / 20%);
+    background: oklch(0.53 0.17 258 / 20%);
     color: var(--color-foreground);
   }
 }
@@ -366,17 +381,17 @@
    one-off inline styles
 ═══════════════════════════════════════════ */
 
-/* Card variants */
+/* Card variants — v3.0 radius (24px) */
 @utility card-ledger {
   background: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
 }
 
 @utility card-glass {
   background: color-mix(in oklch, var(--color-card) 80%, transparent);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -384,7 +399,7 @@
 @utility card-subtle {
   background: var(--color-muted);
   border: 1px solid transparent;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
 }
 
 /* Topbar glass */
@@ -395,31 +410,31 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
-/* Shadows — layered, perceptual depth */
+/* Shadows — v3.0: no heavy shadows, very soft depth only */
 @utility shadow-xs {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
 }
 
 @utility shadow-sm-card {
   box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.05),
-    0 1px 2px -1px rgb(0 0 0 / 0.04);
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 1px 2px -1px rgb(0 0 0 / 0.03);
 }
 
 @utility shadow-card {
   box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.06),
-    0 4px 16px -4px rgb(0 0 0 / 0.06);
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 3px 10px -4px rgb(0 0 0 / 0.04);
 }
 
 @utility shadow-elevated {
   box-shadow:
-    0 2px 8px -2px rgb(0 0 0 / 0.08),
-    0 8px 24px -4px rgb(0 0 0 / 0.08);
+    0 1px 4px -1px rgb(0 0 0 / 0.05),
+    0 6px 16px -6px rgb(0 0 0 / 0.06);
 }
 
 @utility shadow-primary-glow {
-  box-shadow: 0 0 24px -4px oklch(0.54 0.22 277 / 0.3);
+  box-shadow: 0 0 24px -4px oklch(0.53 0.17 258 / 0.25);
 }
 
 /* Typography utilities */
@@ -467,7 +482,10 @@
 
 /* ═══════════════════════════════════════════
    MICRO-INTERACTIONS
-   Performance-first: transform & opacity only
+   Performance-first: transform & opacity only.
+   These are CSS-only (no JS) and stay independent
+   of the Framer Motion component/page-transition
+   layer — see MOTION_GUIDELINES.md.
 ═══════════════════════════════════════════ */
 
 /* Press feedback */
@@ -493,14 +511,17 @@
   .hover-card-lift:hover {
     transform: translateY(-1px);
     box-shadow:
-      0 4px 12px -2px rgb(0 0 0 / 0.08),
-      0 8px 24px -4px rgb(0 0 0 / 0.06);
+      0 4px 12px -2px rgb(0 0 0 / 0.06),
+      0 8px 24px -4px rgb(0 0 0 / 0.05);
   }
 }
 
 /* ═══════════════════════════════════════════
    ANIMATIONS
-   Keyframes — subtle, purposeful, editorial
+   Keyframes — subtle, purposeful, editorial.
+   CSS-only entrance/exit effects; interactive
+   component & route motion lives in Framer
+   Motion (GSAP removed — see MOTION_GUIDELINES.md).
 ═══════════════════════════════════════════ */
 
 @keyframes fade-up {
@@ -535,8 +556,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.54 0.22 277 / 0); }
-  50%       { box-shadow: 0 0 0 6px oklch(0.54 0.22 277 / 0.15); }
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.53 0.17 258 / 0); }
+  50%       { box-shadow: 0 0 0 6px oklch(0.53 0.17 258 / 0.15); }
 }
 
 @utility animate-fade-up       { animation: fade-up 0.3s var(--ease-out) both; }
