@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { listExpense, listFunds, listIncome, listOffering } from "@/services/church";
 import { thb } from "@/lib/format";
 import { FundTransferDialog } from "@/components/shared/FundTransferDialog";
+import { CreateFundDialog } from "@/components/shared/CreateFundDialog";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,14 @@ function FundsPage() {
         kicker="กองทุน & งบประมาณ"
         title="กองทุน"
         description="บริหารกองทุนและติดตามยอดคงเหลือแยกตามกองทุน"
-        actions={can("fund.write") ? <FundTransferDialog /> : null}
+        actions={
+          can("fund.write") ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <CreateFundDialog />
+              <FundTransferDialog />
+            </div>
+          ) : null
+        }
       />
 
       {fundsQ.isLoading ? (

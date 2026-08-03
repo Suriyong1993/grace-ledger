@@ -5,12 +5,13 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CreateBudgetDialog } from "@/components/shared/CreateBudgetDialog";
 import { listBudget } from "@/services/church";
 import { thb } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/budget")({
-  head: () => ({ meta: [{ title: "งบประมาณ" }] }),
+  head: () => ({ meta: [{ title: "งบประมาณ — ระบบจัดการการเงินคริสตจักร" }] }),
   component: BudgetPage,
 });
 
@@ -35,6 +36,7 @@ function BudgetPage() {
         kicker="กองทุน & งบประมาณ"
         title="งบประมาณ"
         description="ติดตามการใช้งบประมาณเทียบยอดที่ตั้งไว้"
+        actions={<CreateBudgetDialog />}
       />
 
       {q.isLoading ? (

@@ -25,6 +25,7 @@ import {
   apiCreateProject,
   apiDeleteProject,
   apiCreateMember,
+  apiCreateBudget,
   apiCreateOfferingCategory,
   apiUpdateOfferingCategory,
   apiDeleteOfferingCategory,
@@ -185,7 +186,7 @@ export async function transferFund(fromId: string, toId: string, amount: number,
  */
 export async function createFund(
   input: Omit<Fund, "id" | "createdAt" | "currentBalance">,
-  _by: User,
+  _by?: User,
 ) {
   const result = await apiCreateFund({
     fundCode: input.fundCode,
@@ -429,6 +430,21 @@ export async function listBudget(): Promise<Budget[]> {
   return (data || []) as Budget[];
 }
 
+export async function createBudget(input: {
+  name: string;
+  amount: number;
+  period: string;
+  year: number;
+}) {
+  const result = await apiCreateBudget({
+    name: input.name,
+    amount: input.amount,
+    period: input.period,
+    year: input.year,
+  });
+  return result as Budget;
+}
+
 // ── Projects ──────────────────────────────────────────────────────
 
 export async function listProjects(): Promise<Project[]> {
@@ -440,7 +456,7 @@ export async function listProjects(): Promise<Project[]> {
   return (data || []) as Project[];
 }
 
-export async function createProject(input: Omit<Project, "id" | "used" | "progress">, _by: User) {
+export async function createProject(input: Omit<Project, "id" | "used" | "progress">, _by?: User) {
   const result = await apiCreateProject({
     name: input.name,
     budgetAmount: input.budget,
@@ -467,7 +483,7 @@ export async function listMembers(): Promise<Member[]> {
   return (data || []) as Member[];
 }
 
-export async function createMember(input: Omit<Member, "id">, _by: User) {
+export async function createMember(input: Omit<Member, "id">, _by?: User) {
   // The Member type collects a single `name` field in the UI, but the
   // server schema (matching the members table) stores first/last name
   // separately — split on the first space, falling back to the full

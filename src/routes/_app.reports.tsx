@@ -19,6 +19,7 @@ import { listIncome, listExpense, listOffering } from "@/services/church";
 import { thb, dayjs } from "@/lib/format";
 import { PageTransition } from "@/components/shared/PageTransition";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/reports")({
   head: () => ({ meta: [{ title: "รายงานการเงิน — Grace Ledger" }] }),
@@ -87,6 +88,7 @@ function ReportsPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success("ส่งออกรายงานไฟล์ CSV เรียบร้อยแล้ว");
   };
 
   return (
@@ -97,13 +99,13 @@ function ReportsPage() {
         description="รายงานสรุปรายรับ-รายจ่าย สรุปงบประมาณ และรายงานเงินถวายประจำคริสตจักร"
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handlePrint}>
+            <Button variant="outline" size="sm" onClick={handlePrint} className="rounded-button">
               <Printer className="mr-2 h-4 w-4" />
               พิมพ์รายงาน
             </Button>
-            <Button size="sm" onClick={handleExportCSV}>
+            <Button size="sm" onClick={handleExportCSV} className="rounded-button font-semibold">
               <Download className="mr-2 h-4 w-4" />
-              ส่งออก CSV
+              ส่งออก CSV/Excel
             </Button>
           </div>
         }

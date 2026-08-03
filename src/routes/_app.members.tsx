@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { MemberFormDialog } from "@/components/shared/MemberFormDialog";
 import { listMembers, listOffering } from "@/services/church";
 import { thb, fmtDate } from "@/lib/format";
 import { type Member } from "@/lib/types";
@@ -28,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/members")({
-  head: () => ({ meta: [{ title: "สมาชิก — Grace Ledger" }] }),
+  head: () => ({ meta: [{ title: "สมาชิก — ระบบจัดการการเงินคริสตจักร" }] }),
   component: MembersPage,
 });
 
@@ -70,6 +71,7 @@ export function MembersPage() {
         kicker="องค์กร"
         title="สมาชิก"
         description={`รายชื่อสมาชิกทั้งหมด ${rows.length} คน · สามารถคลิกเพื่อดูประวัติการถวายและพิมพ์ใบอนุโมทนาบัตร`}
+        actions={<MemberFormDialog />}
       />
       <DataToolbar
         query={query}
