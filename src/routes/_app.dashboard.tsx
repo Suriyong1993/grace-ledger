@@ -1,15 +1,25 @@
 /**
  * /dashboard — Main Financial Dashboard
  *
- * Implements the 3-Column Layout inspired by the MyCloud reference UI:
- * - Center Main Column: Page Header, Search bar, Quick Access Cards, Funds Grid, Recent Transactions
- * - Right Side Column: Speedometer Gauge Chart (Annual Budget), Category Breakdown, Grace AI Insight
+ * - Center: Page header, search, KPI row, Funds grid, Recent transactions
+ * - Right column: Pending approvals preview, Budget gauge + category
+ *   breakdown + AI insight
  */
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Plus, RefreshCw, Search, Download, Filter, Calendar } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Plus,
+  RefreshCw,
+  Search,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  HandHeart,
+  Clock,
+  ArrowRight,
+} from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,12 +41,13 @@ import {
 } from "@/services/church";
 import { Money } from "@/lib/money";
 import { fmtDate, dayjs } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { StatCard } from "@/components/shared/StatCard";
 import { useRealtime } from "@/hooks/useRealtime";
 
-// New 3-Column Dashboard Components
-import { QuickAccessCards } from "@/components/dashboard/QuickAccessCards";
+// Dashboard Components
 import { FundsGrid } from "@/components/dashboard/FundsGrid";
 import {
   RecentTransactionsTable,
@@ -132,17 +143,34 @@ export function Dashboard() {
     return total.toNumber();
   }, [funds, incomes, expenses, offerings]);
 
-  // Pending items count
-  const pendingCount = useMemo(() => {
-    const pInc = incomes.filter((i) => i.status === "pending").length;
-    const pExp = expenses.filter((e) => e.status === "pending").length;
-    return pInc + pExp;
+  // Pending items — count and a small preview list for the right column
+  const pendingItems = useMemo(() => {
+    const pInc = incomes
+      .filter((i) => i.status === "pending")
+      .map((i) => ({ ...i, kind: "income" as const }));
+    const pExp = expenses
+      .filter((e) => e.status === "pending")
+      .map((e) => ({ ...e, kind: "expense" as const }));
+    return [...pInc, ...pExp].sort((a, b) => (a.date < b.date ? 1 : -1));
   }, [incomes, expenses]);
+  const pendingCount = pendingItems.length;
 
   // Latest Sunday offering total
   const offeringTotal = useMemo(() => {
     return offerings.reduce((sum, o) => sum + o.amount, 0);
   }, [offerings]);
+
+  // This month's income/expense totals — for the KPI row
+  const incomeMonth = useMemo(
+    () =>
+      incomes.filter((i) => dayjs(i.date).isSame(now, "month")).reduce((s, i) => s + i.amount, 0),
+    [incomes, now],
+  );
+  const expenseMonth = useMemo(
+    () =>
+      expenses.filter((e) => dayjs(e.date).isSame(now, "month")).reduce((s, e) => s + e.amount, 0),
+    [expenses, now],
+  );
 
   // Annual budget from API (replaces hardcoded 2,500,000)
   const budgets = useMemo(() => budgetQ.data ?? [], [budgetQ.data]);
@@ -265,17 +293,57 @@ export function Dashboard() {
         />
       </div>
 
+      {/* KPI row — cash balance hero + this month's income/expense + latest offering */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <motion.div
+          initial={{ opacity: 0, y: 12, scale: 0.99 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+          className="relative overflow-hidden rounded-card bg-foreground p-5 text-background"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/30 blur-3xl"
+          />
+          <p className="kicker relative text-background/60">เงินสดคงเหลือรวม</p>
+          <p className="num-display font-display relative mt-3 text-[28px] font-bold leading-none tracking-tight md:text-[32px]">
+            <MoneyText value={totalBalanceNumber} />
+          </p>
+          <p className="relative mt-3.5 border-t border-background/15 pt-3 text-xs text-background/60">
+            {funds.length} กองทุน
+          </p>
+        </motion.div>
+        <StatCard
+          label="รายรับเดือนนี้"
+          value={incomeMonth}
+          icon={ArrowDownCircle}
+          tone="success"
+          hint="เทียบเดือนก่อน"
+        />
+        <StatCard
+          label="รายจ่ายเดือนนี้"
+          value={expenseMonth}
+          icon={ArrowUpCircle}
+          tone="danger"
+          hint={
+            annualBudget.total > 0
+              ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
+              : undefined
+          }
+        />
+        <StatCard
+          label="เงินถวายล่าสุด"
+          value={offeringTotal}
+          icon={HandHeart}
+          tone="warning"
+          hint="ยอดรวมทุกช่องทาง"
+        />
+      </div>
+
       {/* Main 3-Column Layout Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
         {/* Left 2-Columns: Operations & Transactions */}
         <div className="xl:col-span-2 space-y-6">
-          {/* Quick Access Cards */}
-          <QuickAccessCards
-            pendingCount={pendingCount}
-            bankBalance={totalBalanceNumber}
-            offeringTotal={offeringTotal}
-          />
-
           {/* Church Funds Grid */}
           <FundsGrid funds={funds} />
 
@@ -286,8 +354,53 @@ export function Dashboard() {
           />
         </div>
 
-        {/* Right 1-Column: Gauge Chart & Financial Analytics */}
+        {/* Right 1-Column: Approvals, Gauge Chart & Financial Analytics */}
         <div className="xl:col-span-1 space-y-6">
+          {/* Pending Approvals preview */}
+          <div className="card-ledger p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-sm font-semibold text-foreground">รอการอนุมัติ</p>
+              {pendingCount > 0 && (
+                <span className="num-display rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-semibold text-warning">
+                  {pendingCount} รายการ
+                </span>
+              )}
+            </div>
+            {pendingItems.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-6 text-center">
+                <Clock className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />
+                <p className="text-xs text-muted-foreground">ไม่มีรายการค้างอนุมัติ</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                {pendingItems.slice(0, 3).map((t) => (
+                  <div key={t.id} className="rounded-lg border border-border/60 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-xs font-semibold leading-snug text-foreground">
+                        {t.description || "รายการ"}
+                      </p>
+                      <p
+                        className={cn(
+                          "num-display shrink-0 text-xs font-bold",
+                          t.kind === "income" ? "amount-income" : "amount-expense",
+                        )}
+                      >
+                        <MoneyText value={t.amount} />
+                      </p>
+                    </div>
+                    <p className="mt-1 text-[11px] text-muted-foreground">{fmtDate(t.date)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Button asChild variant="outline" className="mt-3 w-full">
+              <Link to="/approvals">
+                ไปที่คิวอนุมัติ
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          </div>
+
           <DashboardGaugeChart
             totalBudget={annualBudget.total > 0 ? annualBudget.total : 2500000}
             usedBudget={annualBudget.total > 0 ? annualBudget.used : 0}

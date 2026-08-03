@@ -9,7 +9,7 @@ interface Props {
   value: string | number;
   hint?: string;
   icon?: LucideIcon;
-  tone?: "primary" | "secondary" | "accent" | "success" | "danger";
+  tone?: "primary" | "secondary" | "accent" | "success" | "danger" | "warning";
   trend?: number;
   /** decimal places when `value` is a number (animated ticker) */
   decimals?: number;
@@ -21,6 +21,7 @@ const VALUE_TONE: Record<NonNullable<Props["tone"]>, string> = {
   accent: "text-foreground",
   success: "text-success",
   danger: "text-destructive",
+  warning: "text-warning",
 };
 
 const ICON_BG: Record<NonNullable<Props["tone"]>, string> = {
@@ -29,6 +30,7 @@ const ICON_BG: Record<NonNullable<Props["tone"]>, string> = {
   accent: "bg-accent text-accent-foreground",
   success: "bg-success/8 text-success",
   danger: "bg-destructive/8 text-destructive",
+  warning: "bg-warning/10 text-warning",
 };
 
 /** Left accent strip per tone — financial terminal style */
@@ -38,6 +40,7 @@ const ACCENT_BAR: Record<NonNullable<Props["tone"]>, string> = {
   accent: "bg-muted-foreground/30",
   success: "bg-success",
   danger: "bg-destructive",
+  warning: "bg-warning",
 };
 
 export function StatCard({
