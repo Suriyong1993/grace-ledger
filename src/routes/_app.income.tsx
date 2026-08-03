@@ -391,7 +391,7 @@ function IncomePage() {
 
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายรับหรือเงินถวาย..." />
 
-      <section className="rounded-sm border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+      <section className="rounded-card border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
         <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
           <p className="kicker font-medium text-muted-foreground/80">รายการทั้งหมด</p>
           <p className="num-display text-xs font-semibold text-muted-foreground">
