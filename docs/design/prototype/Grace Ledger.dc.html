@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8F9FC;font-family:Sarabun,Inter,sans-serif;color:#1C1E2E;-webkit-font-smoothing:antialiased}
+a{color:#4F46E5;text-decoration:none}a:hover{color:#4338CA}
+*{box-sizing:border-box}
+input,select,textarea,button{font-family:Sarabun,Inter,sans-serif}
+input:focus,select:focus,textarea:focus{outline:2px solid #4F46E5;outline-offset:-1px}
+@keyframes glFadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glFadeIn{from{opacity:0}to{opacity:1}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#D8DCEA;border-radius:5px;border:2px solid #F8F9FC}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;overflow:hidden;background:#F8F9FC">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside style="width:240px;flex:none;background:#FFFFFF;border-right:1px solid #E2E5F1;display:flex;flex-direction:column;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;height:56px;border-bottom:1px solid #F1F3FA">
+      <div style="width:30px;height:30px;flex:none;border-radius:8px;background:#4F46E5;display:grid;place-items:center;color:#fff;font-family:Inter,sans-serif;font-weight:700;font-size:15px;box-shadow:0 1px 2px rgba(79,70,229,.3)">G</div>
+      <div style="min-width:0">
+        <div style="font-size:14px;font-weight:700;letter-spacing:-.01em;line-height:1.1">Grace Ledger</div>
+        <div style="font-size:11px;color:#6B7280;line-height:1.3">ระบบการเงินคริสตจักร</div>
+      </div>
+    </div>
+    <nav style="padding:12px 10px;display:flex;flex-direction:column;gap:2px;flex:1">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;padding:6px 10px 4px">ภาพรวม</div>
+      <div onClick="{{ goDashboard }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_dashboard }};color:{{ nc_dashboard }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>แดชบอร์ด</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;padding:12px 10px 4px">การเงิน</div>
+      <div onClick="{{ goIncome }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_income }};color:{{ nc_income }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg>รายรับ</div>
+      <div onClick="{{ goExpense }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_expense }};color:{{ nc_expense }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>รายจ่าย</div>
+      <div onClick="{{ goOffering }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_offering }};color:{{ nc_offering }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path></svg>เงินถวาย</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;padding:12px 10px 4px">การควบคุม</div>
+      <div onClick="{{ goApprovals }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_approvals }};color:{{ nc_approvals }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m9 12 2 2 4-4"></path></svg><span style="flex:1">รออนุมัติ</span>
+        <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ true }}"><span style="font-family:Inter,sans-serif;font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;background:#FEF3C7;color:#B45309;border-radius:999px;padding:1px 7px">{{ pendingCount }}</span></sc-if></div>
+      <div onClick="{{ goClose }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_close }};color:{{ nc_close }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg>ปิดรอบ &amp; ตรวจสอบ</div>
+      <div onClick="{{ goAudit }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_audit }};color:{{ nc_audit }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path><path d="m9 12 2 2 4-4"></path></svg>ตรวจสอบบัญชี</div>
+      <div onClick="{{ goReports }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_reports }};color:{{ nc_reports }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><path d="M14 2v6h6"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>รายงาน</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;padding:12px 10px 4px">จัดการ</div>
+      <div onClick="{{ goFunds }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_funds }};color:{{ nc_funds }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h18"></path><path d="M6 18v-7"></path><path d="M10 18v-7"></path><path d="M14 18v-7"></path><path d="M18 18v-7"></path><path d="m12 2 9 5H3l9-5Z"></path></svg>กองทุน</div>
+      <div onClick="{{ goBudget }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_budget }};color:{{ nc_budget }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10Z"></path></svg>งบประมาณ</div>
+      <div onClick="{{ goMembers }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_members }};color:{{ nc_members }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>สมาชิก</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;padding:12px 10px 4px">ระบบ</div>
+      <div onClick="{{ goAi }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_ai }};color:{{ nc_ai }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8 5.8 1.9-5.8 1.9L12 18.4l-1.9-5.8-5.8-1.9 5.8-1.9L12 3Z"></path></svg>Grace AI</div>
+      <div onClick="{{ goLine }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_line }};color:{{ nc_line }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"></path></svg>LINE Bot</div>
+      <div onClick="{{ goSettings }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:{{ nb_settings }};color:{{ nc_settings }}" style-hover="background:#F1F3FA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"></path><path d="M4 10V3"></path><path d="M12 21v-9"></path><path d="M12 8V3"></path><path d="M20 21v-5"></path><path d="M20 12V3"></path><path d="M1 14h6"></path><path d="M9 8h6"></path><path d="M17 16h6"></path></svg>ตั้งค่า</div>
+    </nav>
+    <div style="padding:12px 16px;border-top:1px solid #F1F3FA;display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;flex:none;border-radius:999px;background:#EEF2FF;color:#4F46E5;display:grid;place-items:center;font-size:13px;font-weight:600">{{ roleInitial }}</div>
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:600;line-height:1.2">{{ userName }}</div>
+        <div style="font-size:11px;color:#6B7280;line-height:1.3">คริสตจักรพระคุณกรุงเทพ</div>
+      </div>
+    </div>
+  </aside>
+  <!-- ═══ MAIN ═══ -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <!-- Topbar -->
+    <header style="height:56px;flex:none;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-bottom:1px solid #E2E5F1;display:flex;align-items:center;gap:16px;padding:0 24px;position:relative;z-index:30">
+      <div style="font-size:14px;font-weight:600;letter-spacing:-.01em">{{ pageTitle }}</div>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:8px;background:#F1F3FA;border:1px solid #E2E5F1;border-radius:8px;padding:6px 12px;color:#6B7280;font-size:13px;min-width:220px;cursor:text">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        <span style="flex:1">ค้นหารายการ, สมาชิก, รายงาน…</span>
+        <span style="font-family:Inter,sans-serif;font-size:11px;background:#fff;border:1px solid #E2E5F1;border-radius:4px;padding:1px 5px;color:#9AA0B4">⌘K</span>
+      </div>
+      <div style="position:relative;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:#6B7280;cursor:pointer" style-hover="background:#F1F3FA">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span style="position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:999px;background:#E11D48;border:1.5px solid #fff"></span>
+      </div>
+      <div style="position:relative">
+        <div onClick="{{ toggleRoleMenu }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E2E5F1;background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:600" style-hover="border-color:#C7CBE0">
+          <span style="width:8px;height:8px;border-radius:999px;background:#4F46E5"></span>{{ roleLabel }}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+        </div>
+        <sc-if value="{{ roleMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:0;top:42px;width:260px;background:#fff;border:1px solid #E2E5F1;border-radius:12px;box-shadow:0 12px 32px rgba(28,30,46,.12);padding:6px;animation:glFadeUp .15s ease-out">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;padding:8px 10px 6px">สลับบทบาท (ตัวอย่าง)</div>
+            <sc-for list="{{ roleOptions }}" as="r" hint-placeholder-count="5">
+              <div onClick="{{ r.pick }}" style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;background:{{ r.bg }}" style-hover="background:#F1F3FA">
+                <div style="width:26px;height:26px;flex:none;border-radius:999px;background:#EEF2FF;color:#4F46E5;display:grid;place-items:center;font-size:12px;font-weight:600">{{ r.initial }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;line-height:1.3">{{ r.label }}</div>
+                  <div style="font-size:12px;color:#6B7280;line-height:1.4">{{ r.desc }}</div>
+                </div>
+                <sc-if value="{{ r.active }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </header>
+    <sc-if value="{{ readOnly }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:none;background:#FFFBEB;border-bottom:1px solid #FDE68A;color:#92400E;font-size:13px;padding:7px 24px;display:flex;align-items:center;gap:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+        บทบาท{{ roleLabel }}ดูข้อมูลได้อย่างเดียว — ไม่สามารถบันทึกหรืออนุมัติรายการ</div>
+    </sc-if>
+    <!-- Content -->
+    <main style="flex:1;overflow-y:auto;padding:28px 32px 48px">
+      <div style="max-width:1200px;margin:0 auto">
+
+        <!-- ═══ DASHBOARD ═══ -->
+        <sc-if value="{{ pgDashboard }}" hint-placeholder-val="{{ true }}">
+          <div data-screen-label="แดชบอร์ด" style="display:flex;flex-direction:column;gap:24px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">ภาพรวมการเงิน · {{ monthLabel }}</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">แดชบอร์ดคริสตจักร</h1>
+                <div style="font-size:13px;color:#6B7280">สถานะการเงินทุกกองทุน อัปเดตล่าสุด วันนี้ 11:42 น.</div>
+              </div>
+              <sc-if value="{{ canRecord }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ openIncomeForm }}" style="display:flex;align-items:center;gap:6px;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA" style-active="transform:scale(.98)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>บันทึกรายรับ</button>
+                  <button onClick="{{ openExpenseForm }}" style="display:flex;align-items:center;gap:6px;background:#fff;color:#1C1E2E;border:1px solid #E2E5F1;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#C7CBE0;background:#FAFBFE" style-active="transform:scale(.98)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>บันทึกรายจ่าย</button>
+                </div>
+              </sc-if>
+            </div>
+            <!-- KPI row -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px">
+              <div style="background:#1C1E2E;border-radius:12px;padding:20px;color:#fff;position:relative;overflow:hidden">
+                <div style="position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:999px;background:rgba(79,70,229,.35);filter:blur(40px)"></div>
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#A8ADC4;position:relative">เงินสดคงเหลือรวม</div>
+                <div style="margin-top:10px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:-.02em;position:relative;white-space:nowrap">฿{{ totalBalance }}</div>
+                <div style="margin-top:6px;font-size:12px;color:#A8ADC4;position:relative">4 กองทุน · กระทบยอดล่าสุด 31 ก.ค.</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">รายรับเดือนนี้</div>
+                <div style="margin-top:10px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:-.02em;color:#047857">฿{{ incomeMonth }}</div>
+                <div style="margin-top:6px;font-size:12px;color:#047857;display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg>+8.2% จากเดือนก่อน</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">รายจ่ายเดือนนี้</div>
+                <div style="margin-top:10px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:-.02em;color:#BE123C">฿{{ expenseMonth }}</div>
+                <div style="margin-top:6px;font-size:12px;color:#6B7280">งบประมาณใช้ไป {{ budgetPct }}% ของปี</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">เงินถวายอาทิตย์ล่าสุด</div>
+                <div style="margin-top:10px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:-.02em;color:#B45309">฿{{ lastOffering }}</div>
+                <div style="margin-top:6px;font-size:12px;color:#6B7280">อา. 2 ส.ค. · ปิดรอบแล้ว ✓</div>
+              </div>
+            </div>
+            <!-- 2-col -->
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:16px;min-width:0;flex:2 1 420px">
+                <!-- Funds -->
+                <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                    <div style="font-size:15px;font-weight:600">กองทุนคริสตจักร</div>
+                    <div onClick="{{ goFunds }}" style="font-size:12px;color:#4F46E5;font-weight:600;cursor:pointer">ดูทั้งหมด →</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+                    <sc-for list="{{ fundCards }}" as="f" hint-placeholder-count="4">
+                      <div style="border:1px solid #EDEFF7;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px" style-hover="border-color:#C7CBE0">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <span style="width:9px;height:9px;flex:none;border-radius:3px;background:{{ f.color }}"></span>
+                          <span style="font-size:13px;font-weight:600;flex:1">{{ f.name }}</span>
+                        </div>
+                        <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:19px;font-weight:700;letter-spacing:-.01em">฿{{ f.balanceFmt }}</div>
+                        <div style="height:5px;border-radius:3px;background:#F1F3FA;overflow:hidden"><div style="height:100%;border-radius:3px;background:{{ f.color }};width:{{ f.pct }}%"></div></div>
+                        <div style="font-size:11px;color:#6B7280">{{ f.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <!-- Recent transactions -->
+                <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
+                    <div style="font-size:15px;font-weight:600;flex:1">รายการล่าสุด</div>
+                    <div style="display:flex;background:#F1F3FA;border-radius:8px;padding:3px;gap:2px">
+                      <sc-for list="{{ periodTabs }}" as="p" hint-placeholder-count="4">
+                        <div onClick="{{ p.pick }}" style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:{{ p.bg }};color:{{ p.color }};box-shadow:{{ p.shadow }}">{{ p.label }}</div>
+                      </sc-for>
+                    </div>
+                    <input value="{{ search }}" onChange="{{ setSearch }}" placeholder="ค้นหารายการ…" style="border:1px solid #E2E5F1;border-radius:8px;padding:6px 10px;font-size:13px;width:160px;background:#FAFBFE">
+                  </div>
+                  <sc-for list="{{ recentRows }}" as="t" hint-placeholder-count="6">
+                    <div onClick="{{ t.open }}" style="display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid #F1F3FA;cursor:pointer" style-hover="background:#FAFBFE">
+                      <div style="width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;background:{{ t.iconBg }};color:{{ t.iconColor }}">
+                        <sc-if value="{{ t.isIncome }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg></sc-if>
+                        <sc-if value="{{ t.isExpense }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></sc-if>
+                      </div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.desc }}</div>
+                        <div style="font-size:12px;color:#6B7280">{{ t.meta }}</div>
+                      </div>
+                      <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:{{ t.stBg }};color:{{ t.stColor }}"><span style="width:5px;height:5px;border-radius:999px;background:{{ t.stColor }}"></span>{{ t.stLabel }}</span>
+                      <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:{{ t.amtColor }};min-width:90px;text-align:right">{{ t.amt }}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ noRecent }}" hint-placeholder-val="{{ false }}"><div style="padding:28px;text-align:center;color:#6B7280;font-size:13px">ไม่พบรายการในช่วงเวลาที่เลือก</div></sc-if>
+                </div>
+              </div>
+              <!-- Right column -->
+              <div style="display:flex;flex-direction:column;gap:16px;min-width:0;flex:1 1 280px">
+                <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                    <div style="font-size:15px;font-weight:600">รอการอนุมัติ</div>
+                    <span style="font-family:Inter,sans-serif;font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;background:#FEF3C7;color:#B45309;border-radius:999px;padding:2px 8px">{{ pendingCount }} รายการ</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ pendingPreview }}" as="a" hint-placeholder-count="3">
+                      <div style="border:1px solid #EDEFF7;border-radius:10px;padding:12px">
+                        <div style="display:flex;justify-content:space-between;gap:8px">
+                          <div style="font-size:13px;font-weight:600;line-height:1.35">{{ a.desc }}</div>
+                          <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;color:{{ a.amtColor }};white-space:nowrap">{{ a.amt }}</div>
+                        </div>
+                        <div style="margin-top:4px;font-size:11px;color:#6B7280">{{ a.meta }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <button onClick="{{ goApprovals }}" style="margin-top:12px;width:100%;background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:8px;font-size:13px;font-weight:600;color:#4F46E5;cursor:pointer" style-hover="background:#EEF2FF;border-color:#C7D2FE">ไปที่คิวอนุมัติ →</button>
+                </div>
+                <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                  <div style="font-size:15px;font-weight:600;margin-bottom:4px">งบประมาณปี 2026</div>
+                  <div style="font-size:12px;color:#6B7280;margin-bottom:14px">อนุมัติโดยคณะกรรมการ · ธ.ค. 2025</div>
+                  <div style="display:flex;align-items:baseline;gap:6px">
+                    <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:22px;font-weight:700">฿{{ budgetUsed }}</span>
+                    <span style="font-size:12px;color:#6B7280">/ ฿{{ budgetTotal }}</span>
+                  </div>
+                  <div style="margin-top:10px;height:8px;border-radius:4px;background:#F1F3FA;overflow:hidden"><div style="height:100%;border-radius:4px;background:linear-gradient(90deg,#4F46E5,#6366F1);width:{{ budgetPct }}%"></div></div>
+                  <div style="margin-top:8px;display:flex;justify-content:space-between;font-size:12px;color:#6B7280"><span>ใช้ไป {{ budgetPct }}%</span><span>เหลือ ฿{{ budgetLeft }}</span></div>
+                </div>
+                <sc-if value="{{ showAi }}" hint-placeholder-val="{{ true }}">
+                  <div style="background:linear-gradient(160deg,#EEF2FF,#FAFBFF 60%);border:1px solid #C7D2FE;border-radius:12px;padding:20px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                      <div style="width:24px;height:24px;border-radius:7px;background:#4F46E5;display:grid;place-items:center;color:#fff"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8 5.8 1.9-5.8 1.9L12 18.4l-1.9-5.8-5.8-1.9 5.8-1.9L12 3Z"></path></svg></div>
+                      <div style="font-size:14px;font-weight:700;color:#3730A3">Grace AI · ข้อสังเกต</div>
+                    </div>
+                    <div style="font-size:13px;line-height:1.6;color:#312E81">ค่าสาธารณูปโภคเดือน ก.ค. สูงกว่าค่าเฉลี่ย 6 เดือน <strong>+18%</strong> ส่วนใหญ่มาจากค่าไฟฟ้า อาจเกี่ยวข้องกับการใช้เครื่องปรับอากาศช่วงค่ายเยาวชน</div>
+                    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+                      <span style="font-size:11px;font-weight:600;background:#fff;border:1px solid #C7D2FE;color:#4F46E5;border-radius:999px;padding:3px 9px">หลักฐาน: 6 รายการ</span>
+                      <span style="font-size:11px;font-weight:600;background:#fff;border:1px solid #C7D2FE;color:#4F46E5;border-radius:999px;padding:3px 9px">ความมั่นใจ 86%</span>
+                    </div>
+                    <div style="margin-top:10px;font-size:11px;color:#6B7280">AI ให้ข้อสังเกตเท่านั้น — ไม่แก้ไขหรืออนุมัติข้อมูลการเงิน</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ INCOME / EXPENSE ═══ -->
+        <sc-if value="{{ pgLedger }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="{{ ledgerTitle }}" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">การเงิน · {{ monthLabel }}</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">{{ ledgerTitle }}</h1>
+                <div style="font-size:13px;color:#6B7280">{{ ledgerSub }}</div>
+              </div>
+              <sc-if value="{{ canRecord }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ openLedgerForm }}" style="display:flex;align-items:center;gap:6px;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA" style-active="transform:scale(.98)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>{{ ledgerCta }}</button>
+              </sc-if>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:18px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">รวมเดือนนี้</div>
+                <div style="margin-top:8px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:23px;font-weight:700;color:{{ ledgerAccent }}">฿{{ ledgerMonthTotal }}</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:18px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">รอการอนุมัติ</div>
+                <div style="margin-top:8px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:23px;font-weight:700;color:#B45309">{{ ledgerPending }} รายการ</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:18px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">จำนวนรายการทั้งหมด</div>
+                <div style="margin-top:8px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:23px;font-weight:700">{{ ledgerCount }} รายการ</div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #F1F3FA;flex-wrap:wrap">
+                <div style="display:flex;background:#F1F3FA;border-radius:8px;padding:3px;gap:2px">
+                  <sc-for list="{{ ledgerTabs }}" as="tb" hint-placeholder-count="3">
+                    <div onClick="{{ tb.pick }}" style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:{{ tb.bg }};color:{{ tb.color }};box-shadow:{{ tb.shadow }}">{{ tb.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="flex:1"></div>
+                <button style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;color:#6B7280;cursor:pointer" style-hover="border-color:#C7CBE0">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>ส่งออก</button>
+              </div>
+              <div style="overflow-x:auto">
+                <div style="min-width:820px">
+                  <div style="display:grid;grid-template-columns:90px minmax(220px,1fr) 130px 140px 110px 110px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+                    <div>วันที่</div><div>รายการ</div><div>หมวดหมู่</div><div>กองทุน</div><div>สถานะ</div><div style="text-align:right">จำนวนเงิน</div>
+                  </div>
+                  <sc-for list="{{ ledgerRows }}" as="t" hint-placeholder-count="7">
+                    <div onClick="{{ t.open }}" style="display:grid;grid-template-columns:90px minmax(220px,1fr) 130px 140px 110px 110px;gap:8px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center;cursor:pointer" style-hover="background:#FAFBFE">
+                      <div style="color:#6B7280;font-size:13px">{{ t.date }}</div>
+                      <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.desc }}</div><div style="font-size:12px;color:#9AA0B4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.by }}</div></div>
+                      <div style="font-size:13px;color:#6B7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.cat }}</div>
+                      <div style="font-size:13px;color:#6B7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.fund }}</div>
+                      <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:{{ t.stBg }};color:{{ t.stColor }};white-space:nowrap"><span style="width:5px;height:5px;border-radius:999px;background:{{ t.stColor }}"></span>{{ t.stLabel }}</span></div>
+                      <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;text-align:right;color:{{ t.amtColor }};white-space:nowrap">{{ t.amt }}</div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ noLedger }}" hint-placeholder-val="{{ false }}"><div style="padding:32px;text-align:center;color:#6B7280;font-size:13px">ไม่มีรายการในตัวกรองนี้</div></sc-if>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ OFFERING ═══ -->
+        <sc-if value="{{ pgOffering }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="เงินถวาย" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">การเงิน · เงินถวาย</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">เงินถวายวันอาทิตย์</h1>
+                <div style="font-size:13px;color:#6B7280">นับโดยผู้นับ 2 คนทุกรอบ ตามหลักการแบ่งแยกหน้าที่ (Segregation of Duties)</div>
+              </div>
+              <sc-if value="{{ canRecord }}" hint-placeholder-val="{{ true }}">
+                <button style="display:flex;align-items:center;gap:6px;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>เริ่มนับเงินถวาย</button>
+              </sc-if>
+            </div>
+            <!-- Latest sunday hero -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:24px">
+              <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">
+                <div style="min-width:200px">
+                  <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">อาทิตย์ล่าสุด · 2 ส.ค. 2026</div>
+                  <div style="margin-top:8px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:34px;font-weight:700;letter-spacing:-.02em;color:#B45309">฿50,650</div>
+                  <div style="margin-top:8px;display:flex;align-items:center;gap:6px;font-size:12px;color:#047857;font-weight:600">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>ปิดรอบแล้ว · ตรวจนับตรงกัน 2 คน</div>
+                  <div style="margin-top:4px;font-size:12px;color:#6B7280">ผู้นับ: สมศรี วงศ์ประเสริฐ + วิชัย ศรีสุวรรณ · 12:45 น.</div>
+                </div>
+                <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:12px">
+                  <sc-for list="{{ offeringBreakdown }}" as="b" hint-placeholder-count="3">
+                    <div>
+                      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600">{{ b.label }}</span><span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:600">฿{{ b.amt }}</span></div>
+                      <div style="height:8px;border-radius:4px;background:#F1F3FA;overflow:hidden"><div style="height:100%;border-radius:4px;background:{{ b.color }};width:{{ b.pct }}%"></div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">ประวัติรอบนับ</div>
+              <div style="overflow-x:auto"><div style="min-width:820px">
+              <div style="display:grid;grid-template-columns:minmax(200px,1fr) 120px 120px 120px 110px 120px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+                <div>วันอาทิตย์</div><div style="text-align:right">สิบลด</div><div style="text-align:right">ถวายทั่วไป</div><div style="text-align:right">ถวายพิเศษ</div><div>สถานะ</div><div style="text-align:right">รวม</div>
+              </div>
+              <sc-for list="{{ sundayRows }}" as="s" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:minmax(200px,1fr) 120px 120px 120px 110px 120px;gap:8px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center" style-hover="background:#FAFBFE">
+                  <div><div style="font-weight:500">{{ s.date }}</div><div style="font-size:12px;color:#9AA0B4">ผู้นับ: {{ s.counters }}</div></div>
+                  <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#6B7280">{{ s.tithe }}</div>
+                  <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#6B7280">{{ s.general }}</div>
+                  <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#6B7280">{{ s.special }}</div>
+                  <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>ปิดรอบ</span></div>
+                  <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;text-align:right">฿{{ s.total }}</div>
+                </div>
+              </sc-for>
+              </div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ APPROVALS ═══ -->
+        <sc-if value="{{ pgApprovals }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="รออนุมัติ" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out;max-width:860px">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">การควบคุม · การอนุมัติ</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">คิวรอการอนุมัติ</h1>
+              <div style="font-size:13px;color:#6B7280">รายการเกิน ฿50,000 ต้องอนุมัติ 2 คน · ผู้บันทึกอนุมัติรายการตัวเองไม่ได้</div>
+            </div>
+            <sc-if value="{{ noApprovals }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:48px;text-align:center">
+                <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:#D1FAE5;display:grid;place-items:center;color:#047857"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+                <div style="font-size:15px;font-weight:600">ไม่มีรายการค้างอนุมัติ</div>
+                <div style="margin-top:4px;font-size:13px;color:#6B7280">ทุกรายการได้รับการตรวจสอบแล้ว</div>
+              </div>
+            </sc-if>
+            <sc-for list="{{ approvalCards }}" as="a" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+                  <div style="width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;background:{{ a.iconBg }};color:{{ a.iconColor }}">
+                    <sc-if value="{{ a.isIncome }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg></sc-if>
+                    <sc-if value="{{ a.isExpense }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:220px">
+                    <div style="font-size:15px;font-weight:600">{{ a.desc }}</div>
+                    <div style="margin-top:3px;font-size:12px;color:#6B7280">{{ a.meta }}</div>
+                    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+                      <span style="font-size:11px;font-weight:600;background:#F1F3FA;color:#6B7280;border-radius:999px;padding:3px 9px">{{ a.fund }}</span>
+                      <span style="font-size:11px;font-weight:600;background:#F1F3FA;color:#6B7280;border-radius:999px;padding:3px 9px">แนบหลักฐาน {{ a.attach }} ไฟล์</span>
+                      <sc-if value="{{ a.dual }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;background:#FEF3C7;color:#B45309;border-radius:999px;padding:3px 9px">ต้องอนุมัติ 2 คน · อนุมัติแล้ว 1/2</span></sc-if>
+                    </div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;color:{{ a.amtColor }}">{{ a.amt }}</div>
+                    <div style="font-size:11px;color:#9AA0B4;margin-top:2px">{{ a.date }}</div>
+                  </div>
+                </div>
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #F1F3FA;display:flex;gap:8px;align-items:center">
+                  <sc-if value="{{ canApprove }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ a.approve }}" style="display:flex;align-items:center;gap:6px;background:#047857;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#065F46" style-active="transform:scale(.98)">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>อนุมัติ</button>
+                    <button onClick="{{ a.reject }}" style="display:flex;align-items:center;gap:6px;background:#fff;color:#BE123C;border:1px solid #FECDD3;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FFF1F2">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>ปฏิเสธ</button>
+                  </sc-if>
+                  <sc-if value="{{ cannotApprove }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:12px;color:#9AA0B4;display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>บทบาทของคุณไม่มีสิทธิ์อนุมัติ</div>
+                  </sc-if>
+                  <div style="flex:1"></div>
+                  <div style="font-size:12px;color:#9AA0B4">บันทึกโดย {{ a.by }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- ═══ CLOSE PERIOD & REVIEW ═══ -->
+        <sc-if value="{{ pgClose }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="ปิดรอบ &amp; ตรวจสอบ" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">การควบคุม · ปิดรอบประจำเดือน</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">งวดกรกฎาคม 2026</h1>
+                <div style="font-size:13px;color:#6B7280">งวดที่ล็อกแล้วแก้ไขย้อนหลังไม่ได้ — ทำได้เฉพาะรายการปรับปรุง (reversal)</div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:4px 11px;background:{{ closeStBg }};color:{{ closeStColor }}"><span style="width:5px;height:5px;border-radius:999px;background:{{ closeStColor }}"></span>{{ closeStLabel }}</span>
+            </div>
+            <!-- Checklist -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:16px">ขั้นตอนการปิดรอบ</div>
+              <div style="display:flex;flex-direction:column;gap:0">
+                <sc-for list="{{ closeSteps }}" as="st" hint-placeholder-count="4">
+                  <div style="display:flex;gap:14px;align-items:flex-start;padding:0 0 4px">
+                    <div style="display:flex;flex-direction:column;align-items:center;flex:none">
+                      <div style="width:28px;height:28px;border-radius:999px;display:grid;place-items:center;background:{{ st.cBg }};color:{{ st.cColor }};font-family:Inter,sans-serif;font-size:12px;font-weight:700;border:{{ st.cBorder }}">{{ st.mark }}</div>
+                      <sc-if value="{{ st.hasLine }}" hint-placeholder-val="{{ true }}"><div style="width:2px;height:34px;background:{{ st.lineColor }}"></div></sc-if>
+                    </div>
+                    <div style="flex:1;min-width:0;padding-top:4px">
+                      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <span style="font-size:14px;font-weight:600;color:{{ st.titleColor }}">{{ st.title }}</span>
+                        <span style="font-size:12px;color:#9AA0B4">{{ st.meta }}</span>
+                        <span style="flex:1"></span>
+                        <sc-if value="{{ st.showCertify }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ certify }}" style="display:flex;align-items:center;gap:6px;background:#047857;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#065F46" style-active="transform:scale(.98)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>เซ็นรับรองงวดนี้</button>
+                        </sc-if>
+                        <sc-if value="{{ st.showWait }}" hint-placeholder-val="{{ false }}">
+                          <span style="font-size:12px;color:#9AA0B4;display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>รอผู้ตรวจสอบ — สลับเป็นบทบาทผู้ตรวจสอบเพื่อเซ็น</span>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+              <!-- Reconciliation -->
+              <div style="flex:1 1 340px;background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                  <div style="font-size:15px;font-weight:600;flex:1">กระทบยอดธนาคาร · ก.ค. 2026</div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>ตรงกัน ฿0.00</span>
+                </div>
+                <div style="display:flex;flex-direction:column">
+                  <sc-for list="{{ reconRows }}" as="rc" hint-placeholder-count="4">
+                    <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid #F1F3FA;font-size:13px">
+                      <span style="color:#6B7280">{{ rc.k }}</span>
+                      <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:{{ rc.w }};color:{{ rc.color }}">{{ rc.v }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="margin-top:12px;font-size:12px;color:#6B7280">กระทบยอดโดย สมศรี วงศ์ประเสริฐ · 31 ก.ค. 21:14 น. · แนบ statement 1 ไฟล์</div>
+              </div>
+              <!-- Auditor anomalies -->
+              <div style="flex:1 1 340px;background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                  <div style="width:24px;height:24px;border-radius:7px;background:#4F46E5;display:grid;place-items:center;color:#fff"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8 5.8 1.9-5.8 1.9L12 18.4l-1.9-5.8-5.8-1.9 5.8-1.9L12 3Z"></path></svg></div>
+                  <div style="font-size:15px;font-weight:600;flex:1">Grace Auditor — สิ่งที่ตรวจพบ</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ anomalyRows }}" as="an" hint-placeholder-count="3">
+                    <div style="border:1px solid #EDEFF7;border-radius:10px;padding:12px">
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <span style="width:8px;height:8px;flex:none;border-radius:999px;background:{{ an.dot }}"></span>
+                        <span style="font-size:13px;font-weight:600;flex:1">{{ an.title }}</span>
+                        <span style="font-size:11px;font-weight:600;background:{{ an.tagBg }};color:{{ an.tagColor }};border-radius:999px;padding:2px 8px">{{ an.tag }}</span>
+                      </div>
+                      <div style="margin-top:5px;font-size:12px;color:#6B7280;line-height:1.6">{{ an.desc }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="margin-top:12px;font-size:11px;color:#9AA0B4">AI ตรวจพบและรายงานเท่านั้น — การวินิจฉัยเป็นของผู้ตรวจสอบ</div>
+              </div>
+            </div>
+            <!-- Past periods -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">งวดที่ผ่านมา</div>
+              <div style="overflow-x:auto"><div style="min-width:720px">
+                <div style="display:grid;grid-template-columns:minmax(140px,1fr) 130px 130px 160px 130px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+                  <div>งวด</div><div style="text-align:right">รายรับ</div><div style="text-align:right">รายจ่าย</div><div>ผู้รับรอง</div><div>สถานะ</div>
+                </div>
+                <sc-for list="{{ periodRows }}" as="pd" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:minmax(140px,1fr) 130px 130px 160px 130px;gap:8px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center" style-hover="background:#FAFBFE">
+                    <div style="font-weight:500">{{ pd.name }}</div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#047857">{{ pd.inc }}</div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#BE123C">{{ pd.exp }}</div>
+                    <div style="font-size:12px;color:#6B7280">{{ pd.cert }}</div>
+                    <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:{{ pd.stBg }};color:{{ pd.stColor }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>{{ pd.st }}</span></div>
+                  </div>
+                </sc-for>
+              </div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ AUDIT ═══ -->
+        <sc-if value="{{ pgAudit }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="ตรวจสอบบัญชี" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out;max-width:860px">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">การควบคุม · Audit Trail</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">บันทึกการตรวจสอบ</h1>
+              <div style="font-size:13px;color:#6B7280;display:flex;align-items:center;gap:8px">
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:#D1FAE5;color:#047857;border-radius:999px;padding:3px 9px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path></svg>Hash chain สมบูรณ์</span>
+                บันทึกถาวร แก้ไข/ลบไม่ได้ · ตรวจสอบด้วย SHA-256 hash chain</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <sc-for list="{{ auditRows }}" as="e" hint-placeholder-count="8">
+                <div style="display:flex;gap:14px;padding:14px 20px;border-bottom:1px solid #F1F3FA;align-items:flex-start" style-hover="background:#FAFBFE">
+                  <div style="width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;background:{{ e.iconBg }};color:{{ e.iconColor }};font-size:12px;font-weight:700">{{ e.icon }}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;line-height:1.5"><strong>{{ e.actor }}</strong> {{ e.action }}</div>
+                    <div style="margin-top:2px;font-size:12px;color:#9AA0B4">{{ e.time }} · IP {{ e.ip }}</div>
+                  </div>
+                  <span style="font-family:Inter,sans-serif;font-size:11px;background:#F1F3FA;border:1px solid #E2E5F1;color:#6B7280;border-radius:6px;padding:3px 8px;white-space:nowrap">#{{ e.hash }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ REPORTS ═══ -->
+        <sc-if value="{{ pgReports }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="รายงาน" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">รายงาน · {{ monthLabel }}</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">รายงานการเงิน</h1>
+              <div style="font-size:13px;color:#6B7280">ทุกรายงานอ้างอิงข้อมูลที่อนุมัติแล้วเท่านั้น · ส่งออก PDF / Excel / CSV</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+              <sc-for list="{{ reportCards }}" as="r" hint-placeholder-count="6">
+                <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px;display:flex;flex-dire-column;flex-direction:column;gap:10px;cursor:pointer" style-hover="border-color:#C7D2FE;box-shadow:0 4px 16px rgba(28,30,46,.06)">
+                  <div style="width:36px;height:36px;border-radius:10px;background:{{ r.iconBg }};color:{{ r.iconColor }};display:grid;place-items:center;font-size:15px;font-weight:700">{{ r.icon }}</div>
+                  <div style="font-size:15px;font-weight:600">{{ r.name }}</div>
+                  <div style="font-size:12px;color:#6B7280;line-height:1.5;flex:1">{{ r.desc }}</div>
+                  <div style="display:flex;gap:6px">
+                    <span style="font-size:11px;font-weight:600;background:#F1F3FA;color:#6B7280;border-radius:6px;padding:3px 8px">PDF</span>
+                    <span style="font-size:11px;font-weight:600;background:#F1F3FA;color:#6B7280;border-radius:6px;padding:3px 8px">Excel</span>
+                    <span style="font-size:11px;font-weight:600;background:#F1F3FA;color:#6B7280;border-radius:6px;padding:3px 8px">CSV</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ FUNDS ═══ -->
+        <sc-if value="{{ pgFunds }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="กองทุน" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">จัดการ · กองทุน</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">กองทุนคริสตจักร</h1>
+                <div style="font-size:13px;color:#6B7280">ทุกกองทุนแยกบัญชีชัดเจน — โอนข้ามกองทุนต้องผ่านการอนุมัติเสมอ</div>
+              </div>
+              <sc-if value="{{ canRecord }}" hint-placeholder-val="{{ true }}">
+                <button style="display:flex;align-items:center;gap:6px;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>โอนระหว่างกองทุน</button>
+              </sc-if>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+              <sc-for list="{{ fundDetailCards }}" as="f" hint-placeholder-count="4">
+                <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="width:10px;height:10px;flex:none;border-radius:3px;background:{{ f.color }}"></span>
+                    <span style="font-size:15px;font-weight:600;flex:1">{{ f.name }}</span>
+                    <span style="font-size:11px;color:#9AA0B4">{{ f.tag }}</span>
+                  </div>
+                  <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:-.02em">฿{{ f.balanceFmt }}</div>
+                  <sc-if value="{{ f.hasGoal }}" hint-placeholder-val="{{ false }}">
+                    <div>
+                      <div style="height:6px;border-radius:3px;background:#F1F3FA;overflow:hidden"><div style="height:100%;border-radius:3px;background:{{ f.color }};width:{{ f.pct }}%"></div></div>
+                      <div style="margin-top:5px;font-size:11px;color:#6B7280">เป้าหมาย ฿{{ f.goal }} · ถึงแล้ว {{ f.pct }}%</div>
+                    </div>
+                  </sc-if>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;border-top:1px solid #F1F3FA;padding-top:12px">
+                    <div><div style="font-size:11px;color:#9AA0B4">ยกมา</div><div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600">{{ f.opening }}</div></div>
+                    <div><div style="font-size:11px;color:#9AA0B4">เข้าเดือนนี้</div><div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:#047857">+{{ f.inMonth }}</div></div>
+                    <div><div style="font-size:11px;color:#9AA0B4">ออกเดือนนี้</div><div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:#BE123C">−{{ f.outMonth }}</div></div>
+                  </div>
+                  <div style="font-size:12px;color:#6B7280">{{ f.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">การโอนระหว่างกองทุนล่าสุด</div>
+              <sc-for list="{{ transferRows }}" as="tr" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;flex-wrap:wrap" style-hover="background:#FAFBFE">
+                  <div style="width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;background:#EEF2FF;color:#4F46E5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg></div>
+                  <div style="flex:1;min-width:200px"><div style="font-weight:500">{{ tr.route }}</div><div style="font-size:12px;color:#9AA0B4">{{ tr.meta }}</div></div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>อนุมัติแล้ว</span>
+                  <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;min-width:80px;text-align:right">฿{{ tr.amt }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ BUDGET ═══ -->
+        <sc-if value="{{ pgBudget }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="งบประมาณ" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">จัดการ · งบประมาณ ปี 2026</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">งบประมาณเทียบจริง</h1>
+                <div style="font-size:13px;color:#6B7280">อนุมัติโดยคณะกรรมการ ธ.ค. 2025 · การแก้งบต้องผ่านมติที่ประชุม</div>
+              </div>
+              <div style="display:flex;background:#F1F3FA;border-radius:8px;padding:3px;gap:2px">
+                <div style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;background:#fff;box-shadow:0 1px 3px rgba(28,30,46,.1)">2026</div>
+                <div style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;color:#6B7280;cursor:pointer">2025</div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+              <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+                <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700">฿{{ budgetUsed }}</span>
+                <span style="font-size:13px;color:#6B7280">ใช้ไปจากงบทั้งปี ฿{{ budgetTotal }} ({{ budgetPct }}%)</span>
+                <span style="flex:1"></span>
+                <span style="font-size:12px;color:#6B7280">เหลือ ฿{{ budgetLeft }} · เหลือเวลา 5 เดือน</span>
+              </div>
+              <div style="margin-top:12px;height:10px;border-radius:5px;background:#F1F3FA;overflow:hidden"><div style="height:100%;border-radius:5px;background:linear-gradient(90deg,#4F46E5,#6366F1);width:{{ budgetPct }}%"></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="overflow-x:auto"><div style="min-width:760px">
+                <div style="display:grid;grid-template-columns:minmax(180px,1fr) 120px 120px 200px 90px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+                  <div>หมวดงบประมาณ</div><div style="text-align:right">งบทั้งปี</div><div style="text-align:right">ใช้ไปแล้ว</div><div>ความคืบหน้า</div><div style="text-align:right">ใช้ไป</div>
+                </div>
+                <sc-for list="{{ budgetRows }}" as="b" hint-placeholder-count="7">
+                  <div style="display:grid;grid-template-columns:minmax(180px,1fr) 120px 120px 200px 90px;gap:8px;padding:13px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center" style-hover="background:#FAFBFE">
+                    <div style="font-weight:500">{{ b.name }}</div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;color:#6B7280">{{ b.total }}</div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;font-weight:600">{{ b.used }}</div>
+                    <div><div style="height:6px;border-radius:3px;background:#F1F3FA;overflow:hidden"><div style="height:100%;border-radius:3px;background:{{ b.barColor }};width:{{ b.barPct }}%"></div></div></div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;text-align:right;font-weight:600;color:{{ b.pctColor }}">{{ b.pct }}%</div>
+                  </div>
+                </sc-for>
+              </div></div>
+              <div style="padding:12px 18px;font-size:12px;color:#6B7280;display:flex;gap:14px;flex-wrap:wrap">
+                <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#4F46E5"></span>ปกติ</span>
+                <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#B45309"></span>เกิน 90% — Grace AI จะแจ้งเตือนทาง LINE</span>
+                <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#BE123C"></span>เกินงบ — ต้องขอมติเพิ่มงบ</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ MEMBERS ═══ -->
+        <sc-if value="{{ pgMembers }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="สมาชิก" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:260px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">จัดการ · สมาชิก</div>
+                <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">สมาชิกและผู้ใช้ระบบ</h1>
+                <div style="font-size:13px;color:#6B7280">สมาชิกคริสตจักร 128 คน · มีสิทธิ์เข้าระบบการเงิน 8 คน</div>
+              </div>
+              <sc-if value="{{ canRecord }}" hint-placeholder-val="{{ true }}">
+                <button style="display:flex;align-items:center;gap:6px;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>เพิ่มผู้ใช้ระบบ</button>
+              </sc-if>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="overflow-x:auto"><div style="min-width:760px">
+                <div style="display:grid;grid-template-columns:minmax(200px,1fr) 140px 170px 110px 110px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+                  <div>ชื่อ</div><div>บทบาทระบบ</div><div>ติดต่อ</div><div>เข้าร่วมเมื่อ</div><div>สถานะ</div>
+                </div>
+                <sc-for list="{{ memberRows }}" as="m" hint-placeholder-count="7">
+                  <div style="display:grid;grid-template-columns:minmax(200px,1fr) 140px 170px 110px 110px;gap:8px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center" style-hover="background:#FAFBFE">
+                    <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                      <div style="width:30px;height:30px;flex:none;border-radius:999px;background:{{ m.avBg }};color:{{ m.avColor }};display:grid;place-items:center;font-size:12px;font-weight:600">{{ m.initial }}</div>
+                      <div style="min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div><div style="font-size:11px;color:#9AA0B4">{{ m.duty }}</div></div>
+                    </div>
+                    <div><span style="font-size:11px;font-weight:600;background:{{ m.roleBg }};color:{{ m.roleColor }};border-radius:999px;padding:3px 9px">{{ m.role }}</span></div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-size:12px;color:#6B7280">{{ m.contact }}</div>
+                    <div style="font-size:12px;color:#6B7280">{{ m.joined }}</div>
+                    <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>ใช้งาน</span></div>
+                  </div>
+                </sc-for>
+              </div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ GRACE AI ═══ -->
+        <sc-if value="{{ pgAi }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="Grace AI" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">ระบบ · Grace AI</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">Grace AI — ผู้ช่วยวิเคราะห์การเงิน</h1>
+              <div style="font-size:13px;color:#6B7280">ตอบจากข้อมูลที่อนุมัติแล้วเท่านั้น พร้อมหลักฐานทุกคำตอบ · ไม่มีสิทธิ์แก้ไขหรืออนุมัติข้อมูล</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+              <div style="flex:2 1 420px;min-width:0;background:#fff;border:1px solid #E2E5F1;border-radius:12px;display:flex;flex-direction:column;min-height:480px">
+                <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;overflow-y:auto">
+                  <div style="background:linear-gradient(160deg,#EEF2FF,#FAFBFF 60%);border:1px solid #C7D2FE;border-radius:12px;padding:16px;max-width:480px">
+                    <div style="font-size:14px;font-weight:700;color:#3730A3;margin-bottom:4px">สวัสดีครับ 🙏 ผมคือ Grace AI</div>
+                    <div style="font-size:13px;line-height:1.6;color:#312E81">ถามเรื่องการเงินคริสตจักรได้เลย เช่น งบประมาณ เงินถวาย หรือรายการรออนุมัติ — ผมจะตอบพร้อมหลักฐานเสมอ และไม่แตะต้องข้อมูลจริงของคุณ</div>
+                  </div>
+                  <sc-for list="{{ aiMessages }}" as="msg" hint-placeholder-count="1">
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                      <div style="align-self:flex-end;background:#4F46E5;color:#fff;border-radius:12px 12px 4px 12px;padding:10px 14px;font-size:13px;max-width:420px">{{ msg.q }}</div>
+                      <div style="align-self:flex-start;background:#FAFBFE;border:1px solid #EDEFF7;border-radius:12px 12px 12px 4px;padding:14px 16px;font-size:13px;line-height:1.65;max-width:480px">
+                        <div>{{ msg.a }}</div>
+                        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+                          <span style="font-size:11px;font-weight:600;background:#fff;border:1px solid #C7D2FE;color:#4F46E5;border-radius:999px;padding:3px 9px">หลักฐาน: {{ msg.ev }}</span>
+                          <span style="font-size:11px;font-weight:600;background:#fff;border:1px solid #C7D2FE;color:#4F46E5;border-radius:999px;padding:3px 9px">ความมั่นใจ {{ msg.conf }}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <sc-for list="{{ aiChips }}" as="c" hint-placeholder-count="3">
+                      <div onClick="{{ c.pick }}" style="border:1px solid #C7D2FE;background:#fff;color:#4F46E5;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#EEF2FF">{{ c.q }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="border-top:1px solid #F1F3FA;padding:14px 16px;display:flex;gap:8px">
+                  <input value="{{ aiInput }}" onChange="{{ setAiInput }}" placeholder="ถาม Grace AI เรื่องการเงินคริสตจักร…" style="flex:1;border:1px solid #E2E5F1;border-radius:8px;padding:10px 14px;font-size:13px;background:#FAFBFE">
+                  <button onClick="{{ aiSend }}" style="background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA">ส่ง</button>
+                </div>
+                <div style="padding:0 16px 12px;font-size:11px;color:#9AA0B4">AI ให้ข้อสังเกตเท่านั้น — ไม่แก้ไขหรืออนุมัติข้อมูลการเงิน · ทุกคำถามถูกบันทึกลง Audit Trail</div>
+              </div>
+              <div style="flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ aiAgents }}" as="ag" hint-placeholder-count="4">
+                  <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:32px;height:32px;flex:none;border-radius:10px;background:#EEF2FF;color:#4F46E5;display:grid;place-items:center;font-size:14px;font-weight:700">{{ ag.icon }}</div>
+                    <div style="min-width:0">
+                      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600">{{ ag.name }}</span><span style="width:6px;height:6px;border-radius:999px;background:#047857"></span></div>
+                      <div style="margin-top:3px;font-size:12px;color:#6B7280;line-height:1.5">{{ ag.desc }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:14px 16px;font-size:12px;color:#92400E;line-height:1.6"><strong>Guardrails:</strong> ไม่อนุมัติอัตโนมัติ · ไม่แก้ไขข้อมูลการเงิน · ตอบเฉพาะจากข้อมูลจริง · อธิบายเหตุผลทุกครั้ง</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ LINE BOT ═══ -->
+        <sc-if value="{{ pgLine }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="LINE Bot" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out;max-width:860px">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">ระบบ · LINE Bot</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">การแจ้งเตือนผ่าน LINE</h1>
+              <div style="font-size:13px;color:#6B7280">ส่งสรุปและแจ้งเตือนเข้ากลุ่มผู้เกี่ยวข้อง — การอนุมัติยังต้องทำในระบบเสมอ</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+              <div style="width:40px;height:40px;flex:none;border-radius:10px;background:#D1FAE5;color:#047857;display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"></path></svg></div>
+              <div style="flex:1;min-width:200px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-size:15px;font-weight:600">เชื่อมต่อแล้ว</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>ออนไลน์</span></div>
+                <div style="margin-top:3px;font-size:12px;color:#6B7280">กลุ่ม "การเงินคริสตจักรพระคุณ" · สมาชิก 6 คน · เชื่อมต่อเมื่อ 12 มิ.ย. 2026</div>
+              </div>
+              <button style="background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;color:#6B7280;cursor:pointer" style-hover="border-color:#C7CBE0">ตั้งค่าการเชื่อมต่อ</button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+              <div style="flex:1 1 340px;background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+                <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">การแจ้งเตือน</div>
+                <sc-for list="{{ lineToggleRows }}" as="tg" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid #F1F3FA">
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:13px;font-weight:500;color:{{ tg.titleColor }}">{{ tg.title }}</div>
+                      <div style="font-size:12px;color:#9AA0B4;margin-top:1px">{{ tg.desc }}</div>
+                    </div>
+                    <sc-if value="{{ tg.locked }}" hint-placeholder-val="{{ false }}">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9AA0B4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </sc-if>
+                    <div onClick="{{ tg.flip }}" style="width:36px;height:20px;flex:none;border-radius:999px;background:{{ tg.trackBg }};position:relative;cursor:{{ tg.cursor }};transition:background .15s ease">
+                      <div style="position:absolute;top:2px;left:{{ tg.knobLeft }};width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(28,30,46,.25);transition:left .15s ease"></div>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="padding:12px 18px;font-size:11px;color:#9AA0B4">การอนุมัติผ่าน LINE ถูกปิดถาวรตามนโยบายความปลอดภัย — ต้องอนุมัติในระบบเท่านั้น</div>
+              </div>
+              <div style="flex:1 1 280px;background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:18px">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;margin-bottom:12px">ตัวอย่างข้อความที่ส่ง</div>
+                <div style="background:#F1F3FA;border-radius:12px;padding:14px;font-size:13px;line-height:1.7">
+                  <div style="font-weight:700">🔔 Grace Ledger — สรุปวันอาทิตย์</div>
+                  <div style="margin-top:6px">เงินถวาย อา. 2 ส.ค.: <strong style="font-family:Inter,Sarabun,sans-serif">฿50,650</strong><br>สิบลด 18,200 · ทั่วไป 26,450 · พิเศษ 6,000<br>ปิดรอบโดยผู้นับ 2 คน ✓</div>
+                  <div style="margin-top:6px;color:#6B7280;font-size:12px">รายการรออนุมัติ 4 รายการ → เปิดระบบเพื่ออนุมัติ</div>
+                </div>
+                <div style="margin-top:10px;font-size:11px;color:#9AA0B4">ส่งอัตโนมัติหลังปิดรอบนับ · ไม่มีปุ่มอนุมัติในข้อความ</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ CLOSE ═══ -->
+        <sc-if value="{{ pgClose }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="ปิดรอบ" style="display:flex;flex-direction:column;gap:20px;animation:glFadeUp .3s ease-out">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">การควบคุม · ปิดรอบและการตรวจสอบ</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">ปิดรอบ & ตรวจสอบงวดกรกฎาคม 2026</h1>
+              <div style="font-size:13px;color:#6B7280">กระบวนการตรวจสอบตามมาตรฐาน — ต้องเสร็จสมบูรณ์ก่อนเปิดรอบใหม่</div>
+            </div>
+            <!-- Workflow -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:32px;max-width:640px">
+              <sc-for list="{{ closeSteps }}" as="st" hint-placeholder-count="4">
+                <div style="display:flex;gap:16px;margin-bottom:{{ st.hasLine ? '32px' : '0' }}">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;flex:none">
+                    <div style="width:36px;height:36px;border-radius:999px;background:{{ st.cBg }};border:{{ st.cBorder }};color:{{ st.cColor }};display:grid;place-items:center;font-size:14px;font-weight:700">{{ st.mark }}</div>
+                    <sc-if value="{{ st.hasLine }}" hint-placeholder-val="{{ true }}">
+                      <div style="width:2px;height:28px;background:{{ st.lineColor }}"></div>
+                    </sc-if>
+                  </div>
+                  <div style="flex:1;padding-top:2px">
+                    <div style="font-size:14px;font-weight:600;color:{{ st.titleColor }};margin-bottom:2px">{{ st.title }}</div>
+                    <div style="font-size:12px;color:#9AA0B4;line-height:1.5;margin-bottom:10px">{{ st.meta }}</div>
+                    <sc-if value="{{ st.showCertify }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ certify }}" style="background:#047857;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#065F46">✓ รับรองและล็อกงวด</button>
+                    </sc-if>
+                    <sc-if value="{{ st.showWait }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12px;color:#6B7280;padding:6px 12px;background:#F1F3FA;border-radius:6px;display:inline-block">รอผู้ตรวจสอบ</div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <!-- Reconciliation -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:14px">กระทบยอดธนาคาร</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ reconRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F1F3FA">
+                    <div style="font-size:13px;color:#6B7280">{{ r.k }}</div>
+                    <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;font-weight:700;color:{{ r.color }}">{{ r.v }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="margin-top:12px;font-size:12px;color:#047857;background:#D1FAE5;border-radius:8px;padding:10px;text-align:center;font-weight:600">✓ ตรงกันทุกบาท — พร้อมปิดรอบ</div>
+            </div>
+            <!-- Anomalies -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">ผลการตรวจสอบจาก Grace Auditor</div>
+              <sc-for list="{{ anomalyRows }}" as="an" hint-placeholder-count="3">
+                <div style="display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid #F1F3FA">
+                  <div style="width:10px;height:10px;flex:none;margin-top:3px;border-radius:2px;background:{{ an.dot }}"></div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:500;margin-bottom:2px">{{ an.title }}</div>
+                    <div style="font-size:12px;color:#6B7280;line-height:1.5;margin-bottom:8px">{{ an.desc }}</div>
+                    <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:{{ an.tagBg }};color:{{ an.tagColor }}">{{ an.tag }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <!-- Past periods -->
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">งวดที่ปิดมาแล้ว</div>
+              <sc-for list="{{ periodRows }}" as="pd" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid #F1F3FA;flex-wrap:wrap">
+                  <div style="flex:1;min-width:140px">
+                    <div style="font-size:13px;font-weight:500">{{ pd.name }}</div>
+                    <div style="font-size:12px;color:#9AA0B4;margin-top:2px">รับรองโดย {{ pd.cert }}</div>
+                  </div>
+                  <div style="display:flex;gap:16px;min-width:140px">
+                    <div style="text-align:right"><div style="font-size:11px;color:#9AA0B4">รายรับ</div><div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:#047857">+{{ pd.inc }}</div></div>
+                    <div style="text-align:right"><div style="font-size:11px;color:#9AA0B4">รายจ่าย</div><div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:#BE123C">−{{ pd.exp }}</div></div>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:{{ pd.stBg }};color:{{ pd.stColor }}">{{ pd.st }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ═══ SETTINGS ═══ -->
+        <sc-if value="{{ pgSettings }}" hint-placeholder-val="{{ false }}">
+          <div data-screen-label="ตั้งค่า" style="display:flex;flex-direction:column;gap:16px;animation:glFadeUp .3s ease-out;max-width:860px">
+            <div>
+              <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">ระบบ · ตั้งค่า</div>
+              <h1 style="margin:6px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.02em">ตั้งค่าระบบ</h1>
+              <div style="font-size:13px;color:#6B7280">การเปลี่ยนกฎการเงินต้องได้รับมติคณะกรรมการ และถูกบันทึกลง Audit Trail</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:14px">ข้อมูลคริสตจักร</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+                <div><div style="font-size:12px;color:#9AA0B4;margin-bottom:4px">ชื่อคริสตจักร</div><div style="border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE">คริสตจักรพระคุณกรุงเทพ</div></div>
+                <div><div style="font-size:12px;color:#9AA0B4;margin-bottom:4px">ปีบัญชี</div><div style="border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE">มกราคม – ธันวาคม</div></div>
+                <div><div style="font-size:12px;color:#9AA0B4;margin-bottom:4px">สกุลเงิน</div><div style="border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE">บาท (THB)</div></div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                <div style="font-size:15px;font-weight:600;flex:1">กฎการควบคุมการเงิน</div>
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#F1F3FA;color:#6B7280"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>แก้ได้เฉพาะมติกรรมการ</span>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ ruleRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center">
+                    <div><div style="font-weight:500">{{ r.name }}</div><div style="font-size:12px;color:#9AA0B4">{{ r.desc }}</div></div>
+                    <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap">{{ r.val }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+              <div style="padding:14px 18px;border-bottom:1px solid #F1F3FA;font-size:15px;font-weight:600">บทบาทและสิทธิ์ (RBAC)</div>
+              <div style="overflow-x:auto"><div style="min-width:620px">
+                <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 90px 90px 90px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+                  <div>บทบาท</div><div style="text-align:center">บันทึก</div><div style="text-align:center">อนุมัติ</div><div style="text-align:center">รายงาน</div><div style="text-align:center">ตั้งค่า</div>
+                </div>
+                <sc-for list="{{ roleMatrix }}" as="rm" hint-placeholder-count="5">
+                  <div style="display:grid;grid-template-columns:minmax(160px,1fr) 90px 90px 90px 90px;gap:8px;padding:11px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center">
+                    <div style="font-weight:500">{{ rm.role }}</div>
+                    <div style="text-align:center;color:{{ rm.recColor }};font-weight:700">{{ rm.rec }}</div>
+                    <div style="text-align:center;color:{{ rm.appColor }};font-weight:700">{{ rm.app }}</div>
+                    <div style="text-align:center;color:{{ rm.repColor }};font-weight:700">{{ rm.rep }}</div>
+                    <div style="text-align:center;color:{{ rm.setColor }};font-weight:700">{{ rm.set }}</div>
+                  </div>
+                </sc-for>
+              </div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+              <div style="width:40px;height:40px;flex:none;border-radius:10px;background:#D1FAE5;color:#047857;display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+              <div style="flex:1;min-width:220px">
+                <div style="font-size:15px;font-weight:600">ความสมบูรณ์ของ Audit Trail</div>
+                <div style="margin-top:2px;font-size:12px;color:#6B7280">SHA-256 hash chain สมบูรณ์ 1,284 รายการ · ตรวจสอบล่าสุด 31 ก.ค. 00:00 น.</div>
+              </div>
+              <button onClick="{{ verifyChain }}" style="background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;color:#4F46E5;cursor:pointer" style-hover="background:#EEF2FF;border-color:#C7D2FE">ตรวจสอบตอนนี้</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ TX DETAIL DRAWER ═══ -->
+  <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(28,30,46,.32);z-index:50;animation:glFadeIn .15s ease-out"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:400px;background:#fff;z-index:51;box-shadow:-12px 0 40px rgba(28,30,46,.18);display:flex;flex-direction:column;animation:glFadeUp .2s ease-out">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #F1F3FA">
+        <div style="font-size:15px;font-weight:700">รายละเอียดรายการ</div>
+        <div onClick="{{ closeDrawer }}" style="width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#6B7280;cursor:pointer" style-hover="background:#F1F3FA"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:16px">
+        <div style="border:1px solid #E2E5F1;background:#FAFBFE;border-radius:12px;padding:18px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">จำนวนเงิน</div>
+          <div style="margin-top:6px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:28px;font-weight:700;color:{{ dAmtColor }}">{{ dAmt }}</div>
+          <div style="margin-top:8px"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:{{ dStBg }};color:{{ dStColor }}"><span style="width:5px;height:5px;border-radius:999px;background:{{ dStColor }}"></span>{{ dStLabel }}</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ dFields }}" as="f" hint-placeholder-count="5">
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid #F1F3FA;font-size:13px">
+              <span style="color:#6B7280">{{ f.k }}</span><span style="font-weight:600;text-align:right">{{ f.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border:1px solid #EDEFF7;border-radius:10px;padding:14px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;margin-bottom:10px">ประวัติรายการนี้ (Audit)</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ dTrail }}" as="h" hint-placeholder-count="2">
+              <div style="display:flex;gap:10px;font-size:12px">
+                <span style="width:7px;height:7px;flex:none;margin-top:5px;border-radius:999px;background:#4F46E5"></span>
+                <div><div style="font-weight:500">{{ h.t }}</div><div style="color:#9AA0B4;font-size:11px">{{ h.m }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ═══ RECORD FORM SHEET ═══ -->
+  <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeForm }}" style="position:fixed;inset:0;background:rgba(28,30,46,.32);z-index:50;animation:glFadeIn .15s ease-out"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:420px;background:#fff;z-index:51;box-shadow:-12px 0 40px rgba(28,30,46,.18);display:flex;flex-direction:column;animation:glFadeUp .2s ease-out">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #F1F3FA">
+        <div><div style="font-size:15px;font-weight:700">{{ formTitle }}</div><div style="font-size:12px;color:#6B7280;margin-top:2px">รายการจะเข้าสู่สถานะ "รออนุมัติ" โดยอัตโนมัติ</div></div>
+        <div onClick="{{ closeForm }}" style="width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#6B7280;cursor:pointer" style-hover="background:#F1F3FA"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:13px;font-weight:600">จำนวนเงิน (บาท) <span style="color:#BE123C">*</span></label>
+          <input value="{{ fAmount }}" onChange="{{ setFAmount }}" placeholder="0.00" inputMode="decimal" style="border:1px solid #E2E5F1;border-radius:8px;padding:12px 14px;font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;background:#FAFBFE">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:13px;font-weight:600">วันที่</label>
+            <input type="date" value="{{ fDate }}" onChange="{{ setFDate }}" style="border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:13px;font-weight:600">กองทุน</label>
+            <select value="{{ fFund }}" onChange="{{ setFFund }}" style="border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE">
+              <option value="กองทุนทั่วไป">กองทุนทั่วไป</option><option value="กองทุนก่อสร้างพระวิหาร">กองทุนก่อสร้างพระวิหาร</option><option value="กองทุนมิชชั่น">กองทุนมิชชั่น</option><option value="กองทุนเมตตา">กองทุนเมตตา</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:13px;font-weight:600">หมวดหมู่</label>
+          <select value="{{ fCat }}" onChange="{{ setFCat }}" style="border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE">
+            <sc-for list="{{ fCatOptions }}" as="c" hint-placeholder-count="4"><option value="{{ c.v }}">{{ c.v }}</option></sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:13px;font-weight:600">คำอธิบาย <span style="color:#BE123C">*</span></label>
+          <textarea value="{{ fDesc }}" onChange="{{ setFDesc }}" rows="3" placeholder="เช่น ถวายพิเศษจากครอบครัวสมชาย" style="border:1px solid #E2E5F1;border-radius:8px;padding:10px 12px;font-size:13px;background:#FAFBFE;resize:vertical"></textarea>
+        </div>
+        <div style="border:1.5px dashed #C7CBE0;border-radius:10px;padding:18px;text-align:center;color:#6B7280;font-size:13px;cursor:pointer" style-hover="border-color:#4F46E5;color:#4F46E5">
+          <div style="font-weight:600">แนบหลักฐาน (สลิป / ใบเสร็จ)</div>
+          <div style="margin-top:3px;font-size:12px">รองรับ AI อ่านใบเสร็จอัตโนมัติ</div>
+        </div>
+        <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFF1F2;border:1px solid #FECDD3;color:#BE123C;font-size:13px;border-radius:8px;padding:10px 12px">{{ formErrorMsg }}</div>
+        </sc-if>
+      </div>
+      <div style="padding:16px 22px;border-top:1px solid #F1F3FA;display:flex;gap:8px">
+        <button onClick="{{ submitForm }}" style="flex:1;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)" style-hover="background:#4338CA" style-active="transform:scale(.99)">บันทึกและส่งขออนุมัติ</button>
+        <button onClick="{{ closeForm }}" style="background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#F1F3FA">ยกเลิก</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ═══ CONFIRM DIALOG ═══ -->
+  <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(28,30,46,.4);z-index:60;display:grid;place-items:center;animation:glFadeIn .15s ease-out">
+      <div style="width:400px;background:#fff;border-radius:16px;padding:24px;box-shadow:0 24px 64px rgba(28,30,46,.24);animation:glFadeUp .2s ease-out">
+        <div style="width:40px;height:40px;border-radius:10px;background:{{ confirmIconBg }};color:{{ confirmIconColor }};display:grid;place-items:center;margin-bottom:14px">
+          <sc-if value="{{ confirmIsApprove }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+          <sc-if value="{{ confirmIsReject }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></sc-if>
+        </div>
+        <div style="font-size:16px;font-weight:700">{{ confirmTitle }}</div>
+        <div style="margin-top:6px;font-size:13px;color:#6B7280;line-height:1.6">{{ confirmDesc }}</div>
+        <div style="margin-top:14px;background:#FAFBFE;border:1px solid #EDEFF7;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;font-weight:600">{{ confirmItemDesc }}</span>
+          <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;font-weight:700">{{ confirmItemAmt }}</span>
+        </div>
+        <sc-if value="{{ confirmIsReject }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:13px;font-weight:600">เหตุผลการปฏิเสธ <span style="color:#BE123C">*</span></label>
+            <textarea value="{{ rejectReason }}" onChange="{{ setRejectReason }}" rows="2" placeholder="ระบุเหตุผลเพื่อบันทึกลง Audit Trail" style="border:1px solid #E2E5F1;border-radius:8px;padding:10px 12px;font-size:13px;background:#FAFBFE;resize:vertical"></textarea>
+          </div>
+        </sc-if>
+        <div style="margin-top:10px;font-size:12px;color:#9AA0B4;display:flex;align-items:center;gap:6px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path></svg>
+          การตัดสินใจนี้จะถูกบันทึกลง Audit Trail อย่างถาวร</div>
+        <div style="margin-top:18px;display:flex;gap:8px;justify-content:flex-end">
+          <button onClick="{{ confirmNo }}" style="background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#F1F3FA">ยกเลิก</button>
+          <button onClick="{{ confirmYes }}" style="background:{{ confirmBtnBg }};color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer" style-active="transform:scale(.98)">{{ confirmBtnLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ═══ TOAST ═══ -->
+  <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:70;background:#1C1E2E;color:#fff;border-radius:10px;padding:11px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:0 12px 32px rgba(28,30,46,.3);animation:glFadeUp .2s ease-out">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>{{ toastMsg }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultRole&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;superadmin&quot;,&quot;options&quot;:[&quot;treasurer&quot;,&quot;pastor&quot;,&quot;committee&quot;,&quot;auditor&quot;,&quot;superadmin&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;พฤติกรรม&quot;},&quot;showAiInsights&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;พฤติกรรม&quot;}}">
+class Component extends DCLogic {
+  state = {
+    page: "dashboard", role: null, roleMenuOpen: false,
+    period: "month", search: "",
+    ledgerTab: "all", selectedTx: null,
+    aiInput: "", aiMessages: [], certified: false,
+    lineToggles: { pending: true, offering: true, weekly: true, budget: false },
+    form: null, // {kind,'income'|'expense', amount,date,fund,cat,desc,error}
+    confirm: null, rejectReason: "",
+    toast: "", 
+    incomes: [
+      { id: "i1", kind: "income", date: "2 ส.ค.", iso: "2026-08-02", desc: "ถวายวันอาทิตย์ (รอบนมัสการเช้า)", cat: "ถวายวันอาทิตย์", fund: "กองทุนทั่วไป", amount: 32450, status: "approved", by: "สมศรี วงศ์ประเสริฐ" },
+      { id: "i2", kind: "income", date: "2 ส.ค.", iso: "2026-08-02", desc: "สิบลดสมาชิก (โอนธนาคาร)", cat: "สิบลด", fund: "กองทุนทั่วไป", amount: 18200, status: "approved", by: "สมศรี วงศ์ประเสริฐ" },
+      { id: "i3", kind: "income", date: "1 ส.ค.", iso: "2026-08-01", desc: "ถวายก่อสร้างพระวิหาร — ครอบครัวประเสริฐ", cat: "ถวายพิเศษ", fund: "กองทุนก่อสร้างพระวิหาร", amount: 50000, status: "pending", by: "สมศรี วงศ์ประเสริฐ", attach: 1 },
+      { id: "i4", kind: "income", date: "27 ก.ค.", iso: "2026-07-27", desc: "ดอกเบี้ยเงินฝากออมทรัพย์ ก.ค.", cat: "ดอกเบี้ยธนาคาร", fund: "กองทุนทั่วไป", amount: 1245, status: "approved", by: "ระบบ (นำเข้าอัตโนมัติ)" },
+      { id: "i5", kind: "income", date: "26 ก.ค.", iso: "2026-07-26", desc: "ถวายวันอาทิตย์", cat: "ถวายวันอาทิตย์", fund: "กองทุนทั่วไป", amount: 30320, status: "approved", by: "วิชัย ศรีสุวรรณ" },
+      { id: "i6", kind: "income", date: "26 ก.ค.", iso: "2026-07-26", desc: "ถวายมิชชั่นประจำเดือน", cat: "ถวายพิเศษ", fund: "กองทุนมิชชั่น", amount: 8500, status: "approved", by: "วิชัย ศรีสุวรรณ" },
+      { id: "i7", kind: "income", date: "19 ก.ค.", iso: "2026-07-19", desc: "ถวายวันอาทิตย์", cat: "ถวายวันอาทิตย์", fund: "กองทุนทั่วไป", amount: 33640, status: "approved", by: "สมศรี วงศ์ประเสริฐ" },
+    ],
+    expenses: [
+      { id: "e1", kind: "expense", date: "1 ส.ค.", iso: "2026-08-01", desc: "ค่าไฟฟ้าประจำเดือน ก.ค.", cat: "ค่าสาธารณูปโภค", fund: "กองทุนทั่วไป", amount: 8420, status: "pending", by: "สมศรี วงศ์ประเสริฐ", vendor: "การไฟฟ้านครหลวง", attach: 1 },
+      { id: "e2", kind: "expense", date: "31 ก.ค.", iso: "2026-07-31", desc: "งวดที่ 3 ก่อสร้างพระวิหาร", cat: "ก่อสร้าง", fund: "กองทุนก่อสร้างพระวิหาร", amount: 185000, status: "pending", by: "อ.ดาวิด บุญมาก", vendor: "หจก.ศิลาแกร่งก่อสร้าง", attach: 3, dual: true },
+      { id: "e3", kind: "expense", date: "31 ก.ค.", iso: "2026-07-31", desc: "ซ่อมเครื่องปรับอากาศห้องนมัสการ", cat: "ซ่อมบำรุง", fund: "กองทุนทั่วไป", amount: 12500, status: "pending", by: "วิชัย ศรีสุวรรณ", vendor: "ร้านแอร์เย็นใจ", attach: 2 },
+      { id: "e4", kind: "expense", date: "30 ก.ค.", iso: "2026-07-30", desc: "ถุงยังชีพเยี่ยมสมาชิกผู้สูงอายุ 15 ครอบครัว", cat: "เมตตาสงเคราะห์", fund: "กองทุนเมตตา", amount: 4500, status: "approved", by: "สมศรี วงศ์ประเสริฐ", vendor: "แม็คโคร สาขาบางนา" },
+      { id: "e5", kind: "expense", date: "28 ก.ค.", iso: "2026-07-28", desc: "ค่าอินเทอร์เน็ตสำนักงาน", cat: "ค่าสาธารณูปโภค", fund: "กองทุนทั่วไป", amount: 799, status: "approved", by: "สมศรี วงศ์ประเสริฐ", vendor: "True Online" },
+      { id: "e6", kind: "expense", date: "25 ก.ค.", iso: "2026-07-25", desc: "ค่าน้ำประปาประจำเดือน", cat: "ค่าสาธารณูปโภค", fund: "กองทุนทั่วไป", amount: 1240, status: "approved", by: "สมศรี วงศ์ประเสริฐ", vendor: "การประปานครหลวง" },
+      { id: "e7", kind: "expense", date: "20 ก.ค.", iso: "2026-07-20", desc: "อุปกรณ์และตกแต่งสถานที่ค่ายเยาวชน", cat: "พันธกิจเยาวชน", fund: "กองทุนทั่วไป", amount: 6800, status: "approved", by: "วิชัย ศรีสุวรรณ", vendor: "ร้านศึกษาภัณฑ์" },
+    ],
+    audit: [
+      { actor: "สมศรี วงศ์ประเสริฐ", action: "เข้าสู่ระบบ", time: "วันนี้ 09:12 น.", ip: "58.8.xx.xx", icon: "→", tone: "info" },
+      { actor: "อ.ดาวิด บุญมาก", action: "อนุมัติรายรับ ฿32,450 — ถวายวันอาทิตย์", time: "วันนี้ 08:40 น.", ip: "49.49.xx.xx", icon: "✓", tone: "ok" },
+      { actor: "สมศรี วงศ์ประเสริฐ", action: "ปิดรอบนับเงินถวาย อา. 2 ส.ค. — ฿50,650", time: "อา. 2 ส.ค. 12:45 น.", ip: "58.8.xx.xx", icon: "✓", tone: "ok" },
+      { actor: "วิชัย ศรีสุวรรณ", action: "ยืนยันการนับเงินถวาย (ผู้นับคนที่ 2)", time: "อา. 2 ส.ค. 12:44 น.", ip: "27.55.xx.xx", icon: "✓", tone: "ok" },
+      { actor: "สมศรี วงศ์ประเสริฐ", action: "บันทึกรายจ่าย ฿8,420 — ค่าไฟฟ้า ก.ค. (รออนุมัติ)", time: "1 ส.ค. 15:02 น.", ip: "58.8.xx.xx", icon: "+", tone: "info" },
+      { actor: "อ.ดาวิด บุญมาก", action: "ส่งออกรายงานสรุปการเงิน ก.ค. (PDF)", time: "1 ส.ค. 10:20 น.", ip: "49.49.xx.xx", icon: "↓", tone: "info" },
+      { actor: "คุณมานะ ตรีทรัพย์", action: "อนุมัติ (1/2) งวดที่ 3 ก่อสร้างพระวิหาร ฿185,000", time: "31 ก.ค. 19:31 น.", ip: "184.22.xx.xx", icon: "✓", tone: "ok" },
+      { actor: "ระบบ", action: "ตรวจสอบ hash chain ประจำวัน — สมบูรณ์ 1,284 รายการ", time: "31 ก.ค. 00:00 น.", ip: "internal", icon: "#", tone: "info" },
+    ],
+  };
+  fmt(n) { return Math.round(n).toLocaleString("en-US"); }
+  go(p) { this.setState({ page: p, roleMenuOpen: false }); }
+  toast(msg) {
+    clearTimeout(this._tt);
+    this.setState({ toast: msg });
+    this._tt = setTimeout(() => this.setState({ toast: "" }), 2600);
+  }
+  addAudit(action) {
+    const actor = this.roleDef().name;
+    this.setState((s) => ({ audit: [{ actor, action, time: "เมื่อสักครู่", ip: "58.8.xx.xx", icon: "✓", tone: "ok" }, ...s.audit] }));
+  }
+  roleDef() {
+    const roles = {
+      treasurer: { label: "เหรัญญิก", name: "สมศรี วงศ์ประเสริฐ", desc: "บันทึก อนุมัติ ส่งออกรายงาน", record: true, approve: true },
+      pastor: { label: "ศิษยาภิบาล", name: "อ.ดาวิด บุญมาก", desc: "ดูภาพรวมทั้งหมด อ่านอย่างเดียว", record: false, approve: false },
+      committee: { label: "คณะกรรมการ", name: "คุณมานะ ตรีทรัพย์", desc: "ดูรายงาน อนุมัติรายการและงบประมาณ", record: false, approve: true },
+      auditor: { label: "ผู้ตรวจสอบ", name: "คุณพรทิพย์ ธรรมรักษ์", desc: "อ่านอย่างเดียว เน้น Audit Trail", record: false, approve: false },
+      superadmin: { label: "Super Admin", name: "ผู้ดูแลระบบ", desc: "สิทธิ์ทั้งหมดของระบบ", record: true, approve: true },
+    };
+    const key = this.state.role ?? this.props.defaultRole ?? "treasurer";
+    return { key, ...roles[key], all: roles };
+  }
+  statusMeta(st) {
+    return {
+      pending: { stLabel: "รออนุมัติ", stBg: "#FEF3C7", stColor: "#B45309" },
+      approved: { stLabel: "อนุมัติแล้ว", stBg: "#D1FAE5", stColor: "#047857" },
+      rejected: { stLabel: "ปฏิเสธ", stBg: "#FFE4E6", stColor: "#BE123C" },
+    }[st] || { stLabel: st, stBg: "#F1F3FA", stColor: "#6B7280" };
+  }
+  txRow(t) {
+    const isIncome = t.kind === "income";
+    return {
+      ...t, ...this.statusMeta(t.status), isIncome, isExpense: !isIncome,
+      iconBg: isIncome ? "#D1FAE5" : "#FFE4E6", iconColor: isIncome ? "#047857" : "#BE123C",
+      amtColor: isIncome ? "#047857" : "#BE123C",
+      amt: (isIncome ? "+฿" : "−฿") + this.fmt(t.amount),
+      meta: t.date + " · " + t.cat + (t.vendor ? " · " + t.vendor : ""),
+      open: () => this.setState({ selectedTx: t }),
+    };
+  }
+  setStatus(id, status, reason) {
+    const upd = (list) => list.map((t) => (t.id === id ? { ...t, status, reason } : t));
+    this.setState((s) => ({ incomes: upd(s.incomes), expenses: upd(s.expenses) }));
+  }
+  renderVals() {
+    const s = this.state;
+    const role = this.roleDef();
+    const pages = ["dashboard","income","expense","offering","approvals","close","audit","reports","funds","budget","members","ai","line","settings"];
+    const titles = { dashboard:"แดชบอร์ด", income:"รายรับ", expense:"รายจ่าย", offering:"เงินถวาย", approvals:"รออนุมัติ", close:"ปิดรอบ & ตรวจสอบ", audit:"ตรวจสอบบัญชี", reports:"รายงาน", funds:"กองทุน", budget:"งบประมาณ", members:"สมาชิก", ai:"Grace AI", line:"LINE Bot", settings:"ตั้งค่า" };
+    const v = {};
+    for (const p of pages) {
+      const cap = p.charAt(0).toUpperCase() + p.slice(1);
+      v["go" + cap] = () => this.go(p);
+      v["nb_" + p] = s.page === p ? "#EEF2FF" : "transparent";
+      v["nc_" + p] = s.page === p ? "#4F46E5" : "#4B5162";
+    }
+    const all = [...s.incomes, ...s.expenses];
+    const pending = all.filter((t) => t.status === "pending");
+    // dashboard numbers
+    const sumBy = (list, pred) => list.filter(pred).reduce((a, t) => a + t.amount, 0);
+    const isAug = (t) => t.iso >= "2026-08-01";
+    const incomeMonth = sumBy(s.incomes, isAug);
+    const expenseMonth = sumBy(s.expenses, (t) => isAug(t) && t.status !== "rejected");
+    const budgetTotal = 1800000, budgetUsed = 986400;
+    // recent rows: period + search filter
+    const cut = { today: "2026-08-02", week: "2026-07-27", month: "2026-08-01", quarter: "2026-05-01" }[s.period];
+    let recent = all.filter((t) => t.iso >= cut).sort((a, b) => (a.iso < b.iso ? 1 : -1));
+    if (s.search.trim()) {
+      const q = s.search.toLowerCase();
+      recent = recent.filter((t) => (t.desc + t.cat + (t.vendor || "")).toLowerCase().includes(q));
+    }
+    // ledger page
+    const isIncomePg = s.page === "income";
+    const ledgerList = isIncomePg ? s.incomes : s.expenses;
+    const tabFiltered = ledgerList.filter((t) => (s.ledgerTab === "all" ? true : t.status === s.ledgerTab));
+    const mkTab = (id, label) => ({
+      label, pick: () => this.setState({ ledgerTab: id }),
+      bg: s.ledgerTab === id ? "#fff" : "transparent", color: s.ledgerTab === id ? "#1C1E2E" : "#6B7280",
+      shadow: s.ledgerTab === id ? "0 1px 3px rgba(28,30,46,.1)" : "none",
+    });
+    const mkPeriod = (id, label) => ({
+      label, pick: () => this.setState({ period: id }),
+      bg: s.period === id ? "#fff" : "transparent", color: s.period === id ? "#1C1E2E" : "#6B7280",
+      shadow: s.period === id ? "0 1px 3px rgba(28,30,46,.1)" : "none",
+    });
+    // drawer
+    const d = s.selectedTx;
+    const dRow = d ? this.txRow(d) : null;
+    // form
+    const f = s.form;
+    // confirm
+    const c = s.confirm;
+    const startConfirm = (item, action) => this.setState({ confirm: { item, action }, rejectReason: "" });
+    return {
+      ...v,
+      userName: role.name, roleLabel: role.label, roleInitial: role.label.charAt(0),
+      roleMenuOpen: s.roleMenuOpen,
+      toggleRoleMenu: () => this.setState({ roleMenuOpen: !s.roleMenuOpen }),
+      roleOptions: Object.entries(role.all).map(([k, r]) => ({
+        label: r.label, desc: r.desc, initial: r.label.charAt(0),
+        active: k === role.key, bg: k === role.key ? "#F5F6FC" : "transparent",
+        pick: () => { this.setState({ role: k, roleMenuOpen: false }); this.toast("สลับเป็นบทบาท" + r.label + " — " + r.name); },
+      })),
+      canRecord: role.record, canApprove: role.approve, cannotApprove: !role.approve,
+      readOnly: !role.record && !role.approve,
+      pageTitle: titles[s.page], monthLabel: "สิงหาคม 2026",
+      pgDashboard: s.page === "dashboard",
+      pgLedger: s.page === "income" || s.page === "expense",
+      pgOffering: s.page === "offering", pgApprovals: s.page === "approvals",
+      pgAudit: s.page === "audit", pgReports: s.page === "reports",
+      pgFunds: s.page === "funds", pgBudget: s.page === "budget", pgMembers: s.page === "members",
+      pgAi: s.page === "ai", pgLine: s.page === "line", pgSettings: s.page === "settings",
+      pgClose: s.page === "close",
+      ...this.closeVals(role),
+      // dashboard
+      totalBalance: this.fmt(1882400), incomeMonth: this.fmt(incomeMonth), expenseMonth: this.fmt(expenseMonth),
+      lastOffering: this.fmt(50650),
+      budgetTotal: this.fmt(budgetTotal), budgetUsed: this.fmt(budgetUsed),
+      budgetLeft: this.fmt(budgetTotal - budgetUsed), budgetPct: Math.round((budgetUsed / budgetTotal) * 100),
+      hasPending: pending.length > 0, pendingCount: pending.length,
+      fundCards: [
+        { name: "กองทุนทั่วไป", balanceFmt: this.fmt(458200), color: "#4F46E5", pct: 62, note: "รายรับ-จ่ายประจำของคริสตจักร" },
+        { name: "กองทุนก่อสร้างพระวิหาร", balanceFmt: this.fmt(1284500), color: "#B45309", pct: 64, note: "เป้าหมาย ฿2,000,000 · ถึงแล้ว 64%" },
+        { name: "กองทุนมิชชั่น", balanceFmt: this.fmt(96500), color: "#047857", pct: 38, note: "สนับสนุนมิชชันนารี 2 ครอบครัว" },
+        { name: "กองทุนเมตตา", balanceFmt: this.fmt(43200), color: "#BE123C", pct: 24, note: "ช่วยเหลือสมาชิกและชุมชน" },
+      ],
+      periodTabs: [mkPeriod("today","วันนี้"), mkPeriod("week","สัปดาห์"), mkPeriod("month","เดือนนี้"), mkPeriod("quarter","ไตรมาส")],
+      search: s.search, setSearch: (e) => this.setState({ search: e.target.value }),
+      recentRows: recent.slice(0, 7).map((t) => this.txRow(t)),
+      noRecent: recent.length === 0,
+      pendingPreview: pending.slice(0, 3).map((t) => {
+        const r = this.txRow(t);
+        return { desc: t.desc, amt: r.amt, amtColor: r.amtColor, meta: t.date + " · " + t.by };
+      }),
+      showAi: this.props.showAiInsights ?? true,
+      // ledger
+      ledgerTitle: isIncomePg ? "รายรับ" : "รายจ่าย",
+      ledgerSub: isIncomePg ? "เงินถวาย สิบลด และรายรับอื่นทั้งหมดของคริสตจักร" : "รายจ่ายทุกกองทุน พร้อมหลักฐานแนบและสถานะอนุมัติ",
+      ledgerCta: isIncomePg ? "บันทึกรายรับ" : "บันทึกรายจ่าย",
+      ledgerAccent: isIncomePg ? "#047857" : "#BE123C",
+      ledgerMonthTotal: this.fmt(sumBy(ledgerList, isAug)),
+      ledgerPending: ledgerList.filter((t) => t.status === "pending").length,
+      ledgerCount: ledgerList.length,
+      ledgerTabs: [mkTab("all","ทั้งหมด"), mkTab("pending","รออนุมัติ"), mkTab("approved","อนุมัติแล้ว")],
+      ledgerRows: tabFiltered.map((t) => this.txRow(t)),
+      noLedger: tabFiltered.length === 0,
+      openLedgerForm: () => this.openForm(isIncomePg ? "income" : "expense"),
+      openIncomeForm: () => this.openForm("income"),
+      openExpenseForm: () => this.openForm("expense"),
+      // offering
+      offeringBreakdown: [
+        { label: "สิบลด", amt: this.fmt(18200), pct: 36, color: "#4F46E5" },
+        { label: "ถวายทั่วไป", amt: this.fmt(26450), pct: 52, color: "#B45309" },
+        { label: "ถวายพิเศษ", amt: this.fmt(6000), pct: 12, color: "#047857" },
+      ],
+      sundayRows: [
+        { date: "อา. 2 ส.ค. 2026", counters: "สมศรี + วิชัย", tithe: "18,200", general: "26,450", special: "6,000", total: "50,650" },
+        { date: "อา. 26 ก.ค. 2026", counters: "วิชัย + มานะ", tithe: "16,840", general: "24,980", special: "5,500", total: "47,320" },
+        { date: "อา. 19 ก.ค. 2026", counters: "สมศรี + วิชัย", tithe: "19,320", general: "27,120", special: "5,400", total: "51,840" },
+        { date: "อา. 12 ก.ค. 2026", counters: "สมศรี + มานะ", tithe: "15,760", general: "23,820", special: "5,400", total: "44,980" },
+        { date: "อา. 5 ก.ค. 2026", counters: "สมศรี + วิชัย", tithe: "17,910", general: "25,300", special: "6,400", total: "49,610" },
+      ],
+      // approvals
+      noApprovals: pending.length === 0,
+      approvalCards: pending.map((t) => {
+        const r = this.txRow(t);
+        return { ...r, attach: t.attach || 0, dual: !!t.dual || t.amount >= 50000,
+          meta: t.cat + (t.vendor ? " · " + t.vendor : "") + " · บันทึกเมื่อ " + t.date,
+          approve: () => startConfirm(t, "approve"), reject: () => startConfirm(t, "reject") };
+      }),
+      // audit
+      auditRows: s.audit.map((e, i) => ({ ...e, hash: ["a3f8","7c21","e94b","2d6f","b8a0","f317","19ce","d442"][i % 8] + "…" + (9120 + i * 7),
+        iconBg: e.tone === "ok" ? "#D1FAE5" : "#EEF2FF", iconColor: e.tone === "ok" ? "#047857" : "#4F46E5" })),
+      // reports
+      reportCards: [
+        { name: "สรุปการเงินประจำเดือน", desc: "รายรับ-รายจ่ายทุกกองทุน พร้อมยอดยกมาและคงเหลือ สำหรับประชุมคณะกรรมการ", icon: "฿", iconBg: "#EEF2FF", iconColor: "#4F46E5" },
+        { name: "รายงานเงินถวาย", desc: "สรุปเงินถวายรายอาทิตย์ แยกสิบลด / ถวายทั่วไป / ถวายพิเศษ", icon: "♥", iconBg: "#FEF3C7", iconColor: "#B45309" },
+        { name: "งบประมาณเทียบจริง", desc: "เปรียบเทียบการใช้จ่ายจริงกับงบประมาณปี 2026 รายหมวด", icon: "◑", iconBg: "#D1FAE5", iconColor: "#047857" },
+        { name: "กระแสเงินสด", desc: "เงินเข้า-ออกรายเดือน แยกเงินสด / ธนาคาร / เช็ค", icon: "⇄", iconBg: "#EEF2FF", iconColor: "#4F46E5" },
+        { name: "รายงานตรวจสอบ (Audit)", desc: "บันทึกการกระทำทั้งหมดพร้อม hash chain สำหรับผู้ตรวจสอบ", icon: "✓", iconBg: "#D1FAE5", iconColor: "#047857" },
+        { name: "ทะเบียนกองทุนและโครงการ", desc: "สถานะทุกกองทุน ยอดคงเหลือ และความคืบหน้าเป้าหมาย", icon: "▤", iconBg: "#FFE4E6", iconColor: "#BE123C" },
+      ],
+      // drawer
+      drawerOpen: !!d, closeDrawer: () => this.setState({ selectedTx: null }),
+      dAmt: dRow ? dRow.amt : "", dAmtColor: dRow ? dRow.amtColor : "#1C1E2E",
+      dStLabel: dRow ? dRow.stLabel : "", dStBg: dRow ? dRow.stBg : "#F1F3FA", dStColor: dRow ? dRow.stColor : "#6B7280",
+      dFields: d ? [
+        { k: "ประเภท", v: d.kind === "income" ? "รายรับ" : "รายจ่าย" },
+        { k: "วันที่", v: d.date + " 2026" },
+        { k: "หมวดหมู่", v: d.cat }, { k: "กองทุน", v: d.fund },
+        ...(d.vendor ? [{ k: "ผู้รับเงิน / ร้านค้า", v: d.vendor }] : []),
+        { k: "บันทึกโดย", v: d.by },
+        { k: "หลักฐานแนบ", v: (d.attach || 0) + " ไฟล์" },
+      ] : [],
+      dTrail: d ? [
+        { t: "บันทึกรายการ", m: d.by + " · " + d.date + " 2026" },
+        ...(d.status === "approved" ? [{ t: "อนุมัติรายการ", m: "อ.ดาวิด บุญมาก · " + d.date + " 2026" }] : [{ t: "รอการอนุมัติ", m: "อยู่ในคิวอนุมัติ" }]),
+      ] : [],
+      // form
+      formOpen: !!f,
+      formTitle: f && f.kind === "income" ? "บันทึกรายรับ" : "บันทึกรายจ่าย",
+      fAmount: f ? f.amount : "", fDate: f ? f.date : "", fFund: f ? f.fund : "", fCat: f ? f.cat : "", fDesc: f ? f.desc : "",
+      fCatOptions: (f && f.kind === "income"
+        ? ["ถวายวันอาทิตย์","สิบลด","ถวายพิเศษ","ดอกเบี้ยธนาคาร","รายรับอื่น"]
+        : ["ค่าสาธารณูปโภค","ซ่อมบำรุง","พันธกิจเยาวชน","เมตตาสงเคราะห์","ก่อสร้าง","รายจ่ายอื่น"]).map((x) => ({ v: x })),
+      setFAmount: (e) => this.patchForm({ amount: e.target.value }),
+      setFDate: (e) => this.patchForm({ date: e.target.value }),
+      setFFund: (e) => this.patchForm({ fund: e.target.value }),
+      setFCat: (e) => this.patchForm({ cat: e.target.value }),
+      setFDesc: (e) => this.patchForm({ desc: e.target.value }),
+      formError: !!(f && f.error), formErrorMsg: f ? f.error : "",
+      closeForm: () => this.setState({ form: null }),
+      submitForm: () => this.submitForm(),
+      // confirm
+      confirmOpen: !!c,
+      confirmIsApprove: c ? c.action === "approve" : true,
+      confirmIsReject: c ? c.action === "reject" : false,
+      confirmIconBg: c && c.action === "reject" ? "#FFE4E6" : "#D1FAE5",
+      confirmIconColor: c && c.action === "reject" ? "#BE123C" : "#047857",
+      confirmTitle: c ? (c.action === "approve" ? "ยืนยันการอนุมัติ" : "ยืนยันการปฏิเสธ") : "",
+      confirmDesc: c ? (c.action === "approve"
+        ? (c.item.amount >= 50000 ? "รายการนี้เกิน ฿50,000 — ต้องมีผู้อนุมัติ 2 คน การอนุมัติของคุณจะนับเป็นลำดับถัดไป" : "เมื่ออนุมัติแล้ว รายการจะถูกบันทึกเข้าบัญชีและแก้ไขไม่ได้")
+        : "รายการจะถูกส่งกลับให้ผู้บันทึกแก้ไข พร้อมเหตุผลของคุณ") : "",
+      confirmItemDesc: c ? c.item.desc : "", confirmItemAmt: c ? "฿" + this.fmt(c.item.amount) : "",
+      confirmBtnBg: c && c.action === "reject" ? "#BE123C" : "#047857",
+      confirmBtnLabel: c ? (c.action === "approve" ? "อนุมัติรายการ" : "ปฏิเสธรายการ") : "",
+      rejectReason: s.rejectReason, setRejectReason: (e) => this.setState({ rejectReason: e.target.value }),
+      confirmNo: () => this.setState({ confirm: null }),
+      confirmYes: () => this.confirmYes(),
+      // funds page
+      fundDetailCards: [
+        { name: "กองทุนทั่วไป", tag: "หลัก", color: "#4F46E5", balanceFmt: this.fmt(458200), hasGoal: false, opening: this.fmt(412300), inMonth: this.fmt(51895), outMonth: this.fmt(8420), note: "รายรับ-รายจ่ายประจำของคริสตจักร" },
+        { name: "กองทุนก่อสร้างพระวิหาร", tag: "โครงการ", color: "#B45309", balanceFmt: this.fmt(1284500), hasGoal: true, goal: "2,000,000", pct: 64, opening: this.fmt(1234500), inMonth: this.fmt(50000), outMonth: this.fmt(0), note: "งวดก่อสร้างที่ 3 (฿185,000) อยู่ระหว่างรออนุมัติ" },
+        { name: "กองทุนมิชชั่น", tag: "พันธกิจ", color: "#047857", balanceFmt: this.fmt(96500), hasGoal: false, opening: this.fmt(88000), inMonth: this.fmt(8500), outMonth: this.fmt(0), note: "สนับสนุนมิชชันนารี 2 ครอบครัว รายเดือน" },
+        { name: "กองทุนเมตตา", tag: "สงเคราะห์", color: "#BE123C", balanceFmt: this.fmt(43200), hasGoal: false, opening: this.fmt(47700), inMonth: this.fmt(0), outMonth: this.fmt(4500), note: "ช่วยเหลือสมาชิกและชุมชนตามการพิจารณา" },
+      ],
+      transferRows: [
+        { route: "กองทุนทั่วไป → กองทุนเมตตา", meta: "15 ก.ค. 2026 · อนุมัติโดย อ.ดาวิด บุญมาก · มติที่ประชุม 7/2026", amt: this.fmt(5000) },
+        { route: "กองทุนทั่วไป → กองทุนมิชชั่น", meta: "1 ก.ค. 2026 · อนุมัติโดย อ.ดาวิด บุญมาก · งวดสนับสนุนประจำเดือน", amt: this.fmt(12000) },
+        { route: "กองทุนทั่วไป → กองทุนก่อสร้างพระวิหาร", meta: "20 มิ.ย. 2026 · อนุมัติ 2 คน (มานะ + อ.ดาวิด)", amt: this.fmt(100000) },
+      ],
+      // budget page
+      budgetRows: [
+        ["นมัสการและดนตรี", 120000, 74200], ["อาคารสถานที่", 350000, 298400], ["พันธกิจเยาวชน", 150000, 96800],
+        ["มิชชั่นและประกาศ", 200000, 104000], ["เมตตาสงเคราะห์", 100000, 61200], ["สำนักงานและสาธารณูปโภค", 180000, 171800],
+        ["ก่อสร้างพระวิหาร", 700000, 180000],
+      ].map(([name, total, used]) => {
+        const pct = Math.round((used / total) * 100);
+        const barColor = pct > 100 ? "#BE123C" : pct >= 90 ? "#B45309" : "#4F46E5";
+        return { name, total: this.fmt(total), used: this.fmt(used), pct, barPct: Math.min(pct, 100), barColor, pctColor: pct >= 90 ? barColor : "#1C1E2E" };
+      }),
+      // members page
+      memberRows: [
+        { name: "อ.ดาวิด บุญมาก", duty: "ศิษยาภิบาลอาวุโส", role: "ศิษยาภิบาล", contact: "081-234-xxxx", joined: "ม.ค. 2015" },
+        { name: "สมศรี วงศ์ประเสริฐ", duty: "เหรัญญิก", role: "เหรัญญิก", contact: "089-556-xxxx", joined: "มี.ค. 2018" },
+        { name: "วิชัย ศรีสุวรรณ", duty: "ผู้ช่วยเหรัญญิก / ผู้นับเงิน", role: "เหรัญญิก", contact: "086-771-xxxx", joined: "ก.ย. 2019" },
+        { name: "มานะ ตรีทรัพย์", duty: "ประธานคณะกรรมการ", role: "คณะกรรมการ", contact: "081-905-xxxx", joined: "มิ.ย. 2016" },
+        { name: "พรทิพย์ ธรรมรักษ์", duty: "ผู้ตรวจสอบภายนอก", role: "ผู้ตรวจสอบ", contact: "02-215-xxxx", joined: "ม.ค. 2024" },
+        { name: "สุภาพร แก้วใส", duty: "ผู้นำนมัสการ", role: "ไม่มีสิทธิ์ระบบ", contact: "084-330-xxxx", joined: "พ.ค. 2020" },
+        { name: "ประเสริฐ ชัยมงคล", duty: "มัคนายก", role: "คณะกรรมการ", contact: "081-442-xxxx", joined: "ก.พ. 2017" },
+      ].map((m) => {
+        const map = { "เหรัญญิก": ["#EEF2FF","#4F46E5"], "ศิษยาภิบาล": ["#FEF3C7","#B45309"], "คณะกรรมการ": ["#D1FAE5","#047857"], "ผู้ตรวจสอบ": ["#FFE4E6","#BE123C"], "ไม่มีสิทธิ์ระบบ": ["#F1F3FA","#6B7280"] };
+        const [roleBg, roleColor] = map[m.role];
+        return { ...m, roleBg, roleColor, avBg: "#EEF2FF", avColor: "#4F46E5", initial: m.name.replace("อ.", "").charAt(0) };
+      }),
+      // grace ai page
+      aiMessages: s.aiMessages, aiInput: s.aiInput,
+      setAiInput: (e) => this.setState({ aiInput: e.target.value }),
+      aiSend: () => this.aiAsk(s.aiInput),
+      aiChips: [
+        { q: "เดือนนี้ใช้งบหมวดไหนใกล้เกินแผน?", pick: () => this.aiAsk("เดือนนี้ใช้งบหมวดไหนใกล้เกินแผน?") },
+        { q: "สรุปเงินถวาย 5 อาทิตย์ล่าสุด", pick: () => this.aiAsk("สรุปเงินถวาย 5 อาทิตย์ล่าสุด") },
+        { q: "มีรายการรออนุมัตินานเกิน 3 วันไหม?", pick: () => this.aiAsk("มีรายการรออนุมัตินานเกิน 3 วันไหม?") },
+      ],
+      aiAgents: [
+        { icon: "A", name: "Grace Assistant", desc: "ตอบคำถามการเงินทั่วไป และช่วยหารายการ" },
+        { icon: "α", name: "Grace Analyst", desc: "วิเคราะห์แนวโน้มรายรับ-จ่าย และงบประมาณ" },
+        { icon: "✓", name: "Grace Auditor", desc: "เฝ้าดูความผิดปกติ และความสมบูรณ์ hash chain" },
+        { icon: "S", name: "Grace Secretary", desc: "ร่างสรุปประชุมการเงิน และรายงานประจำเดือน" },
+      ],
+      // line page
+      lineToggleRows: [
+        { id: "pending", title: "รายการรออนุมัติใหม่", desc: "แจ้งทันทีเมื่อมีรายการเข้าคิว" },
+        { id: "offering", title: "สรุปเงินถวายหลังปิดรอบ", desc: "ส่งอัตโนมัติเมื่อผู้นับ 2 คนยืนยันตรงกัน" },
+        { id: "weekly", title: "สรุปการเงินรายสัปดาห์", desc: "ทุกวันจันทร์ 08:00 น." },
+        { id: "budget", title: "งบประมาณใกล้เกิน (>90%)", desc: "แจ้งเมื่อหมวดใดใช้เกิน 90% ของงบ" },
+        { id: "approve", title: "อนุมัติผ่าน LINE", desc: "ปิดถาวร — ต้องอนุมัติในระบบเท่านั้น", locked: true },
+      ].map((t) => {
+        const on = t.locked ? false : s.lineToggles[t.id];
+        return { ...t, on, trackBg: t.locked ? "#EDEFF7" : on ? "#4F46E5" : "#D8DCEA",
+          knobLeft: on ? "18px" : "2px", cursor: t.locked ? "not-allowed" : "pointer",
+          titleColor: t.locked ? "#9AA0B4" : "#1C1E2E",
+          flip: t.locked ? () => {} : () => { this.setState((st) => ({ lineToggles: { ...st.lineToggles, [t.id]: !st.lineToggles[t.id] } })); this.toast((s.lineToggles[t.id] ? "ปิด" : "เปิด") + "การแจ้งเตือน: " + t.title); } };
+      }),
+      // settings page
+      ruleRows: [
+        { name: "เพดานอนุมัติคนเดียว", desc: "รายการเกินเพดานต้องอนุมัติ 2 คน", val: "฿50,000" },
+        { name: "ห้ามอนุมัติรายการตัวเอง", desc: "Segregation of Duties", val: "บังคับใช้" },
+        { name: "ผู้นับเงินถวายต่อรอบ", desc: "ยอดต้องตรงกันจึงปิดรอบได้", val: "2 คน" },
+        { name: "แก้ไขรายการที่อนุมัติแล้ว", desc: "ทำได้เฉพาะรายการปรับปรุง (reversal) เท่านั้น", val: "ไม่อนุญาต" },
+      ],
+      roleMatrix: [
+        ["เหรัญญิก", "✓", "✓", "✓", "—"], ["ศิษยาภิบาล", "—", "—", "✓", "—"], ["คณะกรรมการ", "—", "✓", "✓", "—"],
+        ["ผู้ตรวจสอบ", "—", "—", "✓", "—"], ["Super Admin", "✓", "✓", "✓", "✓"],
+      ].map(([role, rec, app, rep, set]) => ({ role, rec, app, rep, set,
+        recColor: rec === "✓" ? "#047857" : "#C7CBE0", appColor: app === "✓" ? "#047857" : "#C7CBE0",
+        repColor: rep === "✓" ? "#047857" : "#C7CBE0", setColor: set === "✓" ? "#047857" : "#C7CBE0" })),
+      verifyChain: () => { this.addAudit("สั่งตรวจสอบความสมบูรณ์ hash chain ด้วยตนเอง — ผลสมบูรณ์"); this.toast("ตรวจสอบแล้ว — hash chain สมบูรณ์ 1,284 รายการ"); },
+      // toast
+      toastOpen: !!s.toast, toastMsg: s.toast,
+    };
+  }
+  closeVals(role) {
+    const certified = this.state.certified;
+    const canCertify = role.key === "auditor" || role.key === "superadmin";
+    const steps = [
+      { title: "ปิดรับรายการของงวด", meta: "ทุกรายการ ก.ค. อนุมัติ/ปฏิเสธครบ · 31 ก.ค. 20:02 น.", done: true },
+      { title: "กระทบยอดธนาคาร", meta: "ระบบตรงกับ statement ผลต่าง ฿0.00 · 31 ก.ค. 21:14 น.", done: true },
+      { title: "ผู้ตรวจสอบเซ็นรับรอง", meta: certified ? "รับรองโดย คุณพรทิพย์ ธรรมรักษ์ · เมื่อสักครู่" : "ตรวจแล้วไม่พบข้อผิดปกติที่ต้องแก้ไข", done: certified, current: !certified },
+      { title: "ล็อกงวดถาวร", meta: certified ? "งวดถูกล็อกและบันทึกลง Audit Trail แล้ว" : "จะล็อกอัตโนมัติหลังการรับรอง", done: certified },
+    ];
+    return {
+      closeStLabel: certified ? "รับรองและล็อกแล้ว" : "รอผู้ตรวจสอบรับรอง",
+      closeStBg: certified ? "#D1FAE5" : "#FEF3C7", closeStColor: certified ? "#047857" : "#B45309",
+      certify: () => {
+        this.setState({ certified: true });
+        this.addAudit("เซ็นรับรองงวดกรกฎาคม 2026 และล็อกงวดถาวร");
+        this.toast("รับรองงวด ก.ค. 2026 แล้ว — งวดถูกล็อกถาวร");
+      },
+      closeSteps: steps.map((st, i) => ({
+        ...st, hasLine: i < steps.length - 1,
+        mark: st.done ? "✓" : String(i + 1),
+        cBg: st.done ? "#D1FAE5" : st.current ? "#EEF2FF" : "#F1F3FA",
+        cColor: st.done ? "#047857" : st.current ? "#4F46E5" : "#9AA0B4",
+        cBorder: st.current ? "2px solid #4F46E5" : "2px solid transparent",
+        lineColor: st.done ? "#A7F3D0" : "#E2E5F1",
+        titleColor: st.done || st.current ? "#1C1E2E" : "#9AA0B4",
+        showCertify: !!st.current && canCertify,
+        showWait: !!st.current && !canCertify,
+      })),
+      reconRows: [
+        { k: "ยอดคงเหลือตามระบบ (ทุกกองทุน)", v: "฿1,882,400.00", w: 600, color: "#1C1E2E" },
+        { k: "ยอดตาม statement ธนาคาร", v: "฿1,846,150.00", w: 400, color: "#6B7280" },
+        { k: "เงินสดย่อยในตู้นิรภัย", v: "฿36,250.00", w: 400, color: "#6B7280" },
+        { k: "ผลต่างหลังกระทบยอด", v: "฿0.00", w: 700, color: "#047857" },
+      ],
+      anomalyRows: [
+        { title: "ค่าไฟฟ้า ก.ค. สูงกว่าค่าเฉลี่ย +18%", desc: "฿8,420 เทียบค่าเฉลี่ย 6 เดือน ฿7,140 — สอดคล้องช่วงค่ายเยาวชน ไม่พบความผิดปกติของผู้บันทึก", dot: "#B45309", tag: "ควรทราบ", tagBg: "#FEF3C7", tagColor: "#B45309" },
+        { title: "ไม่พบรายการซ้ำหรือยอดกลม ๆ ผิดปกติ", desc: "ตรวจ 214 รายการของงวด — ไม่พบเลขซ้ำ ผู้รับเงินซ้ำผิดปกติ หรือการแตกยอดเลี่ยงเพดานอนุมัติ", dot: "#047857", tag: "ผ่าน", tagBg: "#D1FAE5", tagColor: "#047857" },
+        { title: "การอนุมัติทั้งหมดเป็นไปตามกฎ", desc: "ไม่มีการอนุมัติรายการตัวเอง · รายการเกิน ฿50,000 มีผู้อนุมัติครบ 2 คนทุกรายการ", dot: "#047857", tag: "ผ่าน", tagBg: "#D1FAE5", tagColor: "#047857" },
+      ],
+      periodRows: [
+        { name: "มิถุนายน 2026", inc: "192,340", exp: "148,220", cert: "พรทิพย์ ธรรมรักษ์ · 5 ก.ค.", st: "ล็อกแล้ว", stBg: "#F1F3FA", stColor: "#6B7280" },
+        { name: "พฤษภาคม 2026", inc: "201,180", exp: "163,400", cert: "พรทิพย์ ธรรมรักษ์ · 6 มิ.ย.", st: "ล็อกแล้ว", stBg: "#F1F3FA", stColor: "#6B7280" },
+        { name: "เมษายน 2026", inc: "188,960", exp: "171,850", cert: "พรทิพย์ ธรรมรักษ์ · 7 พ.ค.", st: "ล็อกแล้ว", stBg: "#F1F3FA", stColor: "#6B7280" },
+        { name: "มีนาคม 2026", inc: "196,420", exp: "155,300", cert: "พรทิพย์ ธรรมรักษ์ · 4 เม.ย.", st: "ล็อกแล้ว", stBg: "#F1F3FA", stColor: "#6B7280" },
+      ],
+    };
+  }
+  aiAsk(q) {
+    q = (q || "").trim();
+    if (!q) return;
+    const canned = {
+      "เดือนนี้ใช้งบหมวดไหนใกล้เกินแผน?": { a: "หมวด \"สำนักงานและสาธารณูปโภค\" ใช้ไปแล้ว ฿171,800 จากงบ ฿180,000 (95%) — สูงสุดในทุกหมวด สาเหตุหลักคือค่าไฟฟ้า ก.ค. ที่สูงกว่าค่าเฉลี่ย 6 เดือน +18% แนะนำให้ตั้งเรื่องขอมติเพิ่มงบหรือลดการใช้ในไตรมาส 4", ev: "7 รายการ · หน้างบประมาณ", conf: 92 },
+      "สรุปเงินถวาย 5 อาทิตย์ล่าสุด": { a: "รวม 5 อาทิตย์ล่าสุด ฿244,400 เฉลี่ย ฿48,880/อาทิตย์ — สูงสุด อา. 19 ก.ค. (฿51,840) ต่ำสุด อา. 12 ก.ค. (฿44,980) แนวโน้มคงที่เทียบช่วงเดียวกันปีก่อน (+3.1%) สัดส่วนสิบลดประมาณ 36% ของยอดรวม", ev: "5 รอบนับ · หน้าเงินถวาย", conf: 97 },
+      "มีรายการรออนุมัตินานเกิน 3 วันไหม?": { a: "ไม่มีรายการค้างเกิน 3 วัน — รายการเก่าสุดในคิวคือ \"งวดที่ 3 ก่อสร้างพระวิหาร\" (฿185,000) บันทึกเมื่อ 31 ก.ค. รอผู้อนุมัติคนที่ 2 ตามกฎเพดาน ฿50,000 แนะนำแจ้งเตือนคณะกรรมการผ่าน LINE", ev: "4 รายการ · คิวอนุมัติ", conf: 95 },
+    };
+    const ans = canned[q] || { a: "จากข้อมูลที่อนุมัติแล้วในระบบ ผมยังตอบคำถามนี้ได้ไม่ครบถ้วน — ลองถามให้เจาะจงขึ้น เช่น ระบุเดือน กองทุน หรือหมวดงบประมาณ ผมจะแสดงหลักฐานประกอบทุกคำตอบ", ev: "—", conf: 60 };
+    this.setState((st) => ({ aiMessages: [...st.aiMessages, { q, ...ans }], aiInput: "" }));
+  }
+  patchForm(p) { this.setState((s) => ({ form: { ...s.form, ...p, error: "" } })); }
+  openForm(kind) {
+    this.setState({ form: { kind, amount: "", date: "2026-08-02", fund: "กองทุนทั่วไป", cat: kind === "income" ? "ถวายวันอาทิตย์" : "ค่าสาธารณูปโภค", desc: "", error: "" } });
+  }
+  submitForm() {
+    const f = this.state.form;
+    const amt = parseFloat(String(f.amount).replace(/,/g, ""));
+    if (!amt || amt <= 0) return this.patchForm({ error: "กรุณาระบุจำนวนเงินให้ถูกต้อง" });
+    if (!f.desc.trim()) return this.patchForm({ error: "กรุณาระบุคำอธิบายรายการ" });
+    const item = { id: "n" + Date.now(), kind: f.kind, date: "2 ส.ค.", iso: f.date, desc: f.desc.trim(), cat: f.cat, fund: f.fund, amount: amt, status: "pending", by: this.roleDef().name, attach: 0 };
+    this.setState((s) => (f.kind === "income" ? { incomes: [item, ...s.incomes], form: null } : { expenses: [item, ...s.expenses], form: null }));
+    this.addAudit("บันทึก" + (f.kind === "income" ? "รายรับ" : "รายจ่าย") + " ฿" + this.fmt(amt) + " — " + f.desc.trim() + " (รออนุมัติ)");
+    this.toast("บันทึกแล้ว — รายการอยู่ในคิวรออนุมัติ");
+  }
+  confirmYes() {
+    const c = this.state.confirm;
+    if (!c) return;
+    if (c.action === "reject" && !this.state.rejectReason.trim()) return;
+    this.setStatus(c.item.id, c.action === "approve" ? "approved" : "rejected", this.state.rejectReason);
+    this.addAudit((c.action === "approve" ? "อนุมัติ" : "ปฏิเสธ") + (c.item.kind === "income" ? "รายรับ" : "รายจ่าย") + " ฿" + this.fmt(c.item.amount) + " — " + c.item.desc);
+    this.setState({ confirm: null });
+    this.toast(c.action === "approve" ? "อนุมัติแล้ว — บันทึกลง Audit Trail" : "ปฏิเสธแล้ว — ส่งกลับให้ผู้บันทึกแก้ไข");
+  }
+}
+</script>
+</body>
+</html>

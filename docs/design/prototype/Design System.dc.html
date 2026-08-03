@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8F9FC;font-family:Sarabun,Inter,sans-serif;color:#1C1E2E;-webkit-font-smoothing:antialiased}
+a{color:#4F46E5;text-decoration:none}a:hover{color:#4338CA}
+*{box-sizing:border-box}
+@keyframes glShimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+</style>
+</helmet>
+<div style="max-width:1080px;margin:0 auto;padding:48px 32px 96px;display:flex;flex-direction:column;gap:40px">
+  <div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:38px;height:38px;border-radius:10px;background:#4F46E5;display:grid;place-items:center;color:#fff;font-family:Inter,sans-serif;font-weight:700;font-size:19px">G</div>
+      <div>
+        <h1 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em">Grace Ledger — Design System v2</h1>
+        <div style="font-size:13px;color:#6B7280">Single source of truth · Apple × Stripe × Linear · คู่กับ DESIGN-SYSTEM-V2.md</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1 Colors -->
+  <section>
+    <h2 style="margin:0 0 4px;font-size:17px;font-weight:700">1 · Color System</h2>
+    <div style="font-size:13px;color:#6B7280;margin-bottom:16px">สีการเงินผูกความหมายตายตัว — รายรับ=เขียว รายจ่าย=แดง เงินถวาย/รอดำเนินการ=เหลืองอำพัน ห้ามสลับ</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden"><div style="height:56px;background:#4F46E5"></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">Primary</div><div style="font-family:Inter,sans-serif;font-size:11px;color:#6B7280">#4F46E5 · muted #EEF2FF</div></div></div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden"><div style="height:56px;background:#047857"></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">Income / Approved</div><div style="font-family:Inter,sans-serif;font-size:11px;color:#6B7280">#047857 · muted #D1FAE5</div></div></div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden"><div style="height:56px;background:#BE123C"></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">Expense / Rejected</div><div style="font-family:Inter,sans-serif;font-size:11px;color:#6B7280">#BE123C · muted #FFE4E6</div></div></div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden"><div style="height:56px;background:#B45309"></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">Offering / Pending</div><div style="font-family:Inter,sans-serif;font-size:11px;color:#6B7280">#B45309 · muted #FEF3C7</div></div></div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden"><div style="height:56px;background:#1C1E2E"></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">Foreground</div><div style="font-family:Inter,sans-serif;font-size:11px;color:#6B7280">#1C1E2E · bg #F8F9FC</div></div></div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden"><div style="height:56px;display:grid;grid-template-columns:1fr 1fr 1fr"><div style="background:#F1F3FA"></div><div style="background:#E2E5F1"></div><div style="background:#9AA0B4"></div></div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">Neutrals</div><div style="font-family:Inter,sans-serif;font-size:11px;color:#6B7280">#F1F3FA · #E2E5F1 · #9AA0B4</div></div></div>
+    </div>
+  </section>
+
+  <!-- 2 Typography -->
+  <section>
+    <h2 style="margin:0 0 4px;font-size:17px;font-weight:700">2 · Typography Scale</h2>
+    <div style="font-size:13px;color:#6B7280;margin-bottom:16px">Sarabun (ไทย/UI) + Inter (ตัวเลขทุกตัว, tabular-nums) · เล็กสุด 11px</div>
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">hero · 34/700 Inter</span><span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:34px;font-weight:700;letter-spacing:-.02em">฿1,882,400</span></div>
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">page title · 24/700</span><span style="font-size:24px;font-weight:700;letter-spacing:-.02em">แดชบอร์ดคริสตจักร</span></div>
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">card title · 15/600</span><span style="font-size:15px;font-weight:600">กองทุนคริสตจักร</span></div>
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">emphasis · 14/500</span><span style="font-size:14px;font-weight:500">ถวายวันอาทิตย์ (รอบนมัสการเช้า)</span></div>
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">body · 13/400</span><span style="font-size:13px">นับโดยผู้นับ 2 คนทุกรอบ ตามหลักการแบ่งแยกหน้าที่</span></div>
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">meta · 12/400</span><span style="font-size:12px;color:#6B7280">2 ส.ค. · ถวายวันอาทิตย์ · สมศรี วงศ์ประเสริฐ</span></div>
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="width:150px;font-family:Inter,sans-serif;font-size:11px;color:#9AA0B4">kicker · 11/600</span><span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6B7280">ภาพรวมการเงิน · สิงหาคม 2026</span></div>
+    </div>
+  </section>
+
+  <!-- 3 Tokens -->
+  <section>
+    <h2 style="margin:0 0 4px;font-size:17px;font-weight:700">3 · Design Tokens — Radius · Spacing · Shadow · Motion</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px">
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">Radius</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div style="text-align:center"><div style="width:40px;height:40px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:6px"></div><div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:4px">6 chip</div></div>
+          <div style="text-align:center"><div style="width:40px;height:40px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px"></div><div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:4px">8 ปุ่ม/input</div></div>
+          <div style="text-align:center"><div style="width:40px;height:40px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px"></div><div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:4px">10 icon tile</div></div>
+          <div style="text-align:center"><div style="width:40px;height:40px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:12px"></div><div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:4px">12 การ์ด</div></div>
+          <div style="text-align:center"><div style="width:40px;height:40px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:16px"></div><div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:4px">16 dialog</div></div>
+          <div style="text-align:center"><div style="width:40px;height:40px;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:999px"></div><div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:4px">full badge</div></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">Spacing scale (px)</div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div style="width:4px;height:4px;background:#4F46E5"></div><div style="width:8px;height:8px;background:#4F46E5"></div><div style="width:12px;height:12px;background:#4F46E5"></div><div style="width:16px;height:16px;background:#4F46E5"></div><div style="width:20px;height:20px;background:#4F46E5"></div><div style="width:24px;height:24px;background:#4F46E5"></div><div style="width:32px;height:32px;background:#4F46E5"></div><div style="width:48px;height:48px;background:#4F46E5"></div>
+        </div>
+        <div style="font-family:Inter,sans-serif;font-size:10.5px;color:#6B7280;margin-top:8px">4 · 8 · 12 · 16 · 20 · 24 · 32 · 48 — การ์ด padding 20, gap 16</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">Shadow &amp; Motion</div>
+        <div style="font-size:12px;color:#6B7280;line-height:1.8">การ์ด = ขอบ ไม่มีเงา · ปุ่ม primary เงาจาง<br>เมนูลอย 12/32 · dialog 24/64 · drawer -12/40<br>เข้าเพจ fade-up 0.3s ease-out · press scale(.98)<br>ห้าม bounce · ห้ามเกิน 400ms · reduced-motion เสมอ</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Components -->
+  <section>
+    <h2 style="margin:0 0 4px;font-size:17px;font-weight:700">4 · Component Library</h2>
+    <div style="font-size:13px;color:#6B7280;margin-bottom:16px">ทุกหน้าประกอบจากชิ้นส่วนชุดนี้เท่านั้น</div>
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;margin-bottom:10px">Buttons</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button style="display:flex;align-items:center;gap:6px;background:#4F46E5;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(79,70,229,.35)">บันทึกรายรับ</button>
+          <button style="background:#fff;color:#1C1E2E;border:1px solid #E2E5F1;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer">ส่งออก</button>
+          <button style="background:#047857;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer">อนุมัติ</button>
+          <button style="background:#fff;color:#BE123C;border:1px solid #FECDD3;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer">ปฏิเสธ</button>
+          <button style="background:#F1F3FA;color:#9AA0B4;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:not-allowed">disabled</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;margin-bottom:10px">Status badges — สี + จุด + ข้อความเสมอ</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#FEF3C7;color:#B45309"><span style="width:5px;height:5px;border-radius:999px;background:#B45309"></span>รออนุมัติ</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>อนุมัติแล้ว</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#FFE4E6;color:#BE123C"><span style="width:5px;height:5px;border-radius:999px;background:#BE123C"></span>ปฏิเสธ</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#FEF3C7;color:#B45309">ต้องอนุมัติ 2 คน · 1/2</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;margin-bottom:10px">Input / Select</div>
+          <input placeholder="0.00" style="width:100%;border:1px solid #E2E5F1;border-radius:8px;padding:10px 12px;font-family:Inter,Sarabun,sans-serif;font-size:15px;font-weight:600;background:#FAFBFE;margin-bottom:8px">
+          <select style="width:100%;border:1px solid #E2E5F1;border-radius:8px;padding:9px 12px;font-size:13px;background:#FAFBFE"><option>กองทุนทั่วไป</option></select>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;margin-bottom:10px">Segmented tabs</div>
+          <div style="display:inline-flex;background:#F1F3FA;border-radius:8px;padding:3px;gap:2px">
+            <div style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;background:#fff;box-shadow:0 1px 3px rgba(28,30,46,.1)">เดือนนี้</div>
+            <div style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;color:#6B7280">ไตรมาส</div>
+            <div style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;color:#6B7280">ปีนี้</div>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9AA0B4;margin:14px 0 10px">Icon tile + จำนวนเงิน</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#D1FAE5;color:#047857"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg></div>
+            <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:#047857">+฿32,450</span>
+            <div style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#FFE4E6;color:#BE123C"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></div>
+            <span style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:#BE123C">−฿8,420</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 Nav + Responsive -->
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+      <h2 style="margin:0 0 10px;font-size:15px;font-weight:700">5 · Navigation Principles</h2>
+      <div style="font-size:13px;color:#4B5162;line-height:1.9">Sidebar 240px + Topbar 56px · เนื้อหา ≤1200px<br>เมนู 5 กลุ่ม: ภาพรวม / การเงิน / การควบคุม / จัดการ / ระบบ<br>ทุกหน้า ≤ 2 คลิก · ปุ่ม primary เดียวต่อหน้า มุมขวาบน<br>ของค้างแสดง badge บนเมนู · role เห็นตลอดที่ topbar<br>role อ่านอย่างเดียว → แถบเหลืองแจ้งใต้ topbar</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+      <h2 style="margin:0 0 10px;font-size:15px;font-weight:700">6 · Responsive Rules</h2>
+      <div style="font-size:13px;color:#4B5162;line-height:1.9">KPI: <span style="font-family:Inter,sans-serif;font-size:12px;background:#F1F3FA;border-radius:6px;padding:1px 6px">auto-fit minmax(210px,1fr)</span><br>2 คอลัมน์: flex-wrap (2 1 420px / 1 1 280px)<br>ตาราง: overflow-x auto + min-width 820px — ห้ามคอลัมน์ทับกัน<br>ข้อความยาว: nowrap + ellipsis · touch target ≥ 44px</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+      <h2 style="margin:0 0 10px;font-size:15px;font-weight:700">7 · Accessibility</h2>
+      <div style="font-size:13px;color:#4B5162;line-height:1.9">Contrast ≥ 4.5:1 · ห้ามจางกว่า #9AA0B4 บนพื้นขาว<br>Focus ring 2px primary ทุก input/ปุ่ม<br>สถานะ = สี + จุด + ข้อความ ไม่พึ่งสีอย่างเดียว<br>ตัวอักษร ≥ 11px · prefers-reduced-motion เสมอ</div>
+    </div>
+  </section>
+
+  <!-- 8-10 States -->
+  <section>
+    <h2 style="margin:0 0 12px;font-size:17px;font-weight:700">8–10 · Empty · Error · Loading States</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:28px;text-align:center">
+        <div style="width:48px;height:48px;margin:0 auto 12px;border-radius:12px;background:#D1FAE5;display:grid;place-items:center;color:#047857"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+        <div style="font-size:15px;font-weight:600">ไม่มีรายการค้างอนุมัติ</div>
+        <div style="margin-top:4px;font-size:13px;color:#6B7280">ทุกรายการได้รับการตรวจสอบแล้ว</div>
+        <div style="margin-top:10px;font-family:Inter,sans-serif;font-size:10.5px;color:#9AA0B4">EMPTY — icon tile 48 + หัวข้อ + คำอธิบาย + การกระทำถัดไป</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:28px">
+        <div style="background:#FFF1F2;border:1px solid #FECDD3;color:#BE123C;font-size:13px;border-radius:8px;padding:10px 12px">กรุณาระบุจำนวนเงินให้ถูกต้อง — ต้องมากกว่า 0 บาท</div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <button style="background:#fff;border:1px solid #E2E5F1;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">ลองใหม่</button>
+          <span style="font-size:12px;color:#6B7280">เครือข่ายขัดข้อง → การ์ด + ปุ่มลองใหม่</span>
+        </div>
+        <div style="margin-top:14px;font-family:Inter,sans-serif;font-size:10.5px;color:#9AA0B4">ERROR — บอกวิธีแก้ ไม่ใช่แค่ "ผิดพลาด" · คงค่าที่กรอกไว้</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:28px">
+        <div style="height:12px;width:40%;border-radius:6px;background:linear-gradient(90deg,#F1F3FA 25%,#E8EBF5 37%,#F1F3FA 63%);background-size:400px 100%;animation:glShimmer 1.4s infinite linear"></div>
+        <div style="margin-top:10px;height:24px;width:65%;border-radius:6px;background:linear-gradient(90deg,#F1F3FA 25%,#E8EBF5 37%,#F1F3FA 63%);background-size:400px 100%;animation:glShimmer 1.4s infinite linear"></div>
+        <div style="margin-top:10px;height:12px;width:80%;border-radius:6px;background:linear-gradient(90deg,#F1F3FA 25%,#E8EBF5 37%,#F1F3FA 63%);background-size:400px 100%;animation:glShimmer 1.4s infinite linear"></div>
+        <div style="margin-top:14px;font-family:Inter,sans-serif;font-size:10.5px;color:#9AA0B4">LOADING — skeleton ตรงรูปทรงเนื้อหา ห้าม spinner กลางจอ</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 Table -->
+  <section>
+    <h2 style="margin:0 0 12px;font-size:17px;font-weight:700">11 · Table Standard</h2>
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;overflow:hidden">
+      <div style="overflow-x:auto"><div style="min-width:680px">
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px 110px;gap:8px;padding:9px 18px;background:#FAFBFE;border-bottom:1px solid #F1F3FA;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#9AA0B4">
+          <div>วันที่</div><div>รายการ</div><div>หมวดหมู่</div><div>สถานะ</div><div style="text-align:right">จำนวนเงิน</div>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px 110px;gap:8px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center;background:#FAFBFE">
+          <div style="color:#6B7280">2 ส.ค.</div>
+          <div><div style="font-weight:500">ถวายวันอาทิตย์ (แถวนี้ = hover)</div><div style="font-size:12px;color:#9AA0B4">สมศรี วงศ์ประเสริฐ</div></div>
+          <div style="color:#6B7280">ถวายวันอาทิตย์</div>
+          <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#D1FAE5;color:#047857"><span style="width:5px;height:5px;border-radius:999px;background:#047857"></span>อนุมัติแล้ว</span></div>
+          <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;text-align:right;color:#047857">+฿32,450</div>
+        </div>
+        <div style="display:grid;grid-template-columns:90px 1fr 130px 110px 110px;gap:8px;padding:12px 18px;border-bottom:1px solid #F1F3FA;font-size:13px;align-items:center">
+          <div style="color:#6B7280">1 ส.ค.</div>
+          <div><div style="font-weight:500">ค่าไฟฟ้าประจำเดือน ก.ค.</div><div style="font-size:12px;color:#9AA0B4">การไฟฟ้านครหลวง</div></div>
+          <div style="color:#6B7280">ค่าสาธารณูปโภค</div>
+          <div><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px;background:#FEF3C7;color:#B45309"><span style="width:5px;height:5px;border-radius:999px;background:#B45309"></span>รออนุมัติ</span></div>
+          <div style="font-family:Inter,Sarabun,sans-serif;font-variant-numeric:tabular-nums;font-weight:600;text-align:right;color:#BE123C">−฿8,420</div>
+        </div>
+      </div></div>
+      <div style="padding:12px 18px;font-size:12px;color:#6B7280">Header 11/600 uppercase บน #FAFBFE · เงินชิดขวา Inter tabular · แถวคลิกเปิด drawer · ตารางห่อ overflow-x</div>
+    </div>
+  </section>
+
+  <!-- 12-14 -->
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+      <h2 style="margin:0 0 10px;font-size:15px;font-weight:700">12 · Form Standard</h2>
+      <div style="font-size:13px;color:#4B5162;line-height:1.9">ฟอร์มอยู่ใน drawer 420px — ไม่เปลี่ยนหน้า<br>จำนวนเงิน = ฟิลด์แรก ใหญ่สุด (Inter 20/600)<br>แนบหลักฐานมีเสมอ (AI อ่านใบเสร็จ)<br>Submit = "บันทึกและส่งขออนุมัติ" → pending เสมอ<br>Error ใต้ฟอร์ม + คงค่าที่กรอก</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E2E5F1;border-radius:12px;padding:20px">
+      <h2 style="margin:0 0 10px;font-size:15px;font-weight:700">13 · Dashboard Standard</h2>
+      <div style="font-size:13px;color:#4B5162;line-height:1.9">ลำดับ: เงินสดรวม (การ์ดเข้ม) → รายรับ/จ่ายเดือนนี้ → ถวายล่าสุด → กองทุน → รายการล่าสุด → คอลัมน์ขวา (อนุมัติ/งบ/AI)<br>KPI = kicker + ตัวเลข Inter + บริบท 1 บรรทัด<br>Quick actions เฉพาะ role ที่มีสิทธิ์</div>
+    </div>
+    <div style="background:linear-gradient(160deg,#EEF2FF,#FAFBFF 60%);border:1px solid #C7D2FE;border-radius:12px;padding:20px">
+      <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#3730A3">14 · AI Workspace Standard</h2>
+      <div style="font-size:13px;color:#312E81;line-height:1.9">การ์ด AI = gradient indigo + ขอบ #C7D2FE แยกจากข้อมูลจริง<br>ทุก insight: เหตุผล + chip หลักฐาน + chip ความมั่นใจ<br>guardrail: "AI ให้ข้อสังเกตเท่านั้น — ไม่แก้ไข/อนุมัติ"<br>AI ไม่มีปุ่มแก้ข้อมูลการเงิน — ลิงก์ไปดูหลักฐานเท่านั้น</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-size:10.5px;font-weight:600;background:#fff;border:1px solid #C7D2FE;color:#4F46E5;border-radius:999px;padding:3px 9px">หลักฐาน: 6 รายการ</span>
+        <span style="font-size:10.5px;font-weight:600;background:#fff;border:1px solid #C7D2FE;color:#4F46E5;border-radius:999px;padding:3px 9px">ความมั่นใจ 86%</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="font-size:12px;color:#9AA0B4;border-top:1px solid #E2E5F1;padding-top:16px">v2.0 · สิงหาคม 2026 · แอปจริง: <a href="Grace Ledger.dc.html">Grace Ledger.dc.html</a> · สเปกข้อความเต็ม: DESIGN-SYSTEM-V2.md (คัดลอกเข้า repo แทน DESIGN_SYSTEM.md เดิมได้เลย)</div>
+</div>
+</x-dc>
+</body>
+</html>
