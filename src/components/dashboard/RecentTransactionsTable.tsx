@@ -160,31 +160,21 @@ export function RecentTransactionsTable({
                 key={tx.id}
                 onClick={() => onSelectTx?.(tx)}
                 className={cn(
-                  "group relative flex cursor-pointer items-center gap-3 px-5 py-3.5",
+                  "group flex cursor-pointer items-center gap-3 px-5 py-3.5",
                   "transition-colors duration-150 hover:bg-muted/40",
-                  // Left border accent
-                  "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-r before:transition-all before:duration-150",
-                  isPending
-                    ? "before:bg-pending"
-                    : isIncome
-                      ? "before:bg-income before:opacity-0 hover:before:opacity-100"
-                      : "before:bg-expense before:opacity-0 hover:before:opacity-100",
-                  isPending && "bg-pending/[0.025]",
-                  "animate-fade-up",
                 )}
-                style={{ animationDelay: `${index * 35}ms` }}
               >
                 {/* Kind icon */}
                 <div
                   className={cn(
-                    "grid h-9 w-9 shrink-0 place-items-center rounded-xl",
-                    isIncome ? "bg-income-muted text-income" : "bg-expense-muted text-expense",
+                    "grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border/60",
+                    isIncome ? "text-income" : "text-expense",
                   )}
                 >
                   {isIncome ? (
-                    <ArrowDownLeft className="h-4 w-4" strokeWidth={2} />
+                    <ArrowDownLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
                   ) : (
-                    <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+                    <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.75} />
                   )}
                 </div>
 

@@ -53,43 +53,28 @@ function NavRow({
   compact?: boolean;
 }) {
   return (
-    <SidebarMenuItem className="relative">
-      {/* Active left border indicator */}
-      {active && (
-        <span className="absolute inset-y-1 left-0 w-0.5 rounded-r-full bg-primary" aria-hidden />
-      )}
-
+    <SidebarMenuItem>
       <SidebarMenuButton
         asChild
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "group/nav-row relative pl-3 transition-all duration-150 rounded-button",
+          "group/nav-row relative transition-colors duration-150 rounded-md",
           compact ? "h-8 text-xs" : "h-9 text-[13px]",
           active
-            ? ["bg-primary/8 font-semibold text-primary", "dark:bg-primary/12"]
-            : [
-                "text-muted-foreground font-medium",
-                "hover:translate-x-px hover:bg-muted hover:text-foreground",
-              ],
+            ? "bg-muted font-semibold text-foreground"
+            : "text-muted-foreground font-medium hover:bg-muted/60 hover:text-foreground",
         )}
       >
         <Link to={item.to} className="flex items-center gap-2.5">
-          {/* Icon with subtle background when active */}
-          <span
+          <item.icon
             className={cn(
-              "grid shrink-0 place-items-center rounded-md transition-all duration-150",
-              compact ? "h-5 w-5" : "h-6 w-6",
-              active
-                ? "bg-primary/12 text-primary"
-                : "text-muted-foreground/60 group-hover/nav-row:text-foreground",
+              "shrink-0",
+              compact ? "h-3.5 w-3.5" : "h-4 w-4",
+              active ? "text-primary" : "text-muted-foreground/70 group-hover/nav-row:text-foreground",
             )}
-          >
-            <item.icon
-              className={compact ? "h-3 w-3" : "h-3.5 w-3.5"}
-              strokeWidth={active ? 2.25 : 1.75}
-            />
-          </span>
+            strokeWidth={active ? 2 : 1.75}
+          />
           <span className="truncate">{item.label}</span>
         </Link>
       </SidebarMenuButton>
@@ -111,8 +96,7 @@ export function AppSidebar() {
           to="/dashboard"
           className="group flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-muted/60"
         >
-          {/* Logo with drop-shadow glow on hover */}
-          <div className="shrink-0 transition-all duration-200 group-hover:scale-105 group-hover:[filter:drop-shadow(0_0_8px_color-mix(in_oklch,var(--color-primary)_40%,transparent))]">
+          <div className="shrink-0">
             <GraceLedgerMark size={34} />
           </div>
 

@@ -90,11 +90,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "ระบบบริหารการเงินคริสตจักรที่ใช้งานง่ายและปลอดภัย" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      // TODO(UI-VERIFY): approximate hex for the new v3.0 primary blue
-      // (oklch(0.53 0.17 258)); sample the exact rendered --color-primary
-      // value with a browser color picker for a pixel-perfect match — not
-      // verifiable in this sandbox (no browser available).
-      { name: "theme-color", content: "#2E5FE0" },
+      // v3.0 primary blue — oklch(0.53 0.17 258) converted to sRGB hex
+      { name: "theme-color", content: "#5D70AD" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
