@@ -188,7 +188,7 @@ function ReportsPage() {
                 {filteredIncomes.length === 0 ? (
                   <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายรับ</p>
                 ) : (
-                  <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
+                  <div className="divide-y divide-border/60 border border-border/60 rounded-lg text-xs">
                     {filteredIncomes.map((inc) => (
                       <div
                         key={inc.id}
@@ -216,7 +216,7 @@ function ReportsPage() {
                 {filteredExpenses.length === 0 ? (
                   <p className="text-xs text-muted-foreground py-2">ยังไม่มีรายการรายจ่าย</p>
                 ) : (
-                  <div className="divide-y divide-border/60 border border-border/60 rounded-sm text-xs">
+                  <div className="divide-y divide-border/60 border border-border/60 rounded-lg text-xs">
                     {filteredExpenses.map((exp) => (
                       <div
                         key={exp.id}
@@ -243,7 +243,7 @@ function ReportsPage() {
         </TabsContent>
 
         <TabsContent value="offering" className="mt-4">
-          <Card>
+          <Card className="card-ledger">
             <CardHeader>
               <CardTitle className="text-base font-medium">รายงานสรุปเงินถวายสัปดาห์</CardTitle>
             </CardHeader>
@@ -253,7 +253,7 @@ function ReportsPage() {
                   ยังไม่มีบันทึกสรุปเงินถวาย
                 </p>
               ) : (
-                <div className="border border-border divide-y divide-border rounded-md text-xs">
+                <div className="border border-border divide-y divide-border rounded-lg text-xs">
                   {filteredOfferings.map((off) => (
                     <div key={off.id} className="flex justify-between p-3">
                       <div>
@@ -274,7 +274,7 @@ function ReportsPage() {
         </TabsContent>
 
         <TabsContent value="category" className="mt-4">
-          <Card>
+          <Card className="card-ledger">
             <CardHeader>
               <CardTitle className="text-base font-medium">สรุปค่าใช้จ่ายแยกตามหมวดหมู่</CardTitle>
             </CardHeader>

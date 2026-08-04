@@ -20,7 +20,6 @@ interface CategorySpending {
   percentage: number;
   icon: React.ElementType;
   colorClass: string;
-  bgClass: string;
 }
 
 interface DashboardGaugeChartProps {
@@ -36,7 +35,6 @@ const DEFAULT_CATEGORIES: CategorySpending[] = [
     percentage: 35,
     icon: Zap,
     colorClass: "text-offering",
-    bgClass: "bg-offering-muted",
   },
   {
     name: "พันธกิจ & มิชชันนารี",
@@ -44,7 +42,6 @@ const DEFAULT_CATEGORIES: CategorySpending[] = [
     percentage: 30,
     icon: HeartHandshake,
     colorClass: "text-primary",
-    bgClass: "bg-primary/10",
   },
   {
     name: "ค่าซ่อมบำรุงอาคาร",
@@ -52,15 +49,13 @@ const DEFAULT_CATEGORIES: CategorySpending[] = [
     percentage: 20,
     icon: Wrench,
     colorClass: "text-income",
-    bgClass: "bg-income-muted",
   },
   {
     name: "กิจกรรม & การศึกษา",
     spent: 22000,
     percentage: 15,
     icon: GraduationCap,
-    colorClass: "text-chart-5",
-    bgClass: "bg-chart-5/10",
+    colorClass: "text-muted-foreground",
   },
 ];
 
@@ -73,19 +68,17 @@ export function DashboardGaugeChart({
   const { percentage, radius, strokeWidth, halfCircumference, strokeDashoffset } = gauge;
 
   return (
-    <div className="card-ledger p-5 flex flex-col justify-between space-y-5 animate-fade-up">
+    <div className="card-ledger p-5 flex flex-col justify-between space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
-            <PieChart className="h-4 w-4" strokeWidth={2} />
-          </div>
+          <PieChart className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
           <div>
             <h3 className="font-semibold text-sm text-foreground">งบประมาณประจำปี</h3>
             <p className="text-[11px] text-muted-foreground">ปีงบประมาณปัจจุบัน</p>
           </div>
         </div>
-        <span className="badge-approved text-[11px] px-2.5 py-0.5 font-medium rounded-full">
+        <span className="bg-muted text-muted-foreground text-[11px] px-2.5 py-0.5 font-medium rounded-full">
           {getGaugeStatusLabel(percentage)} ({percentage}%)
         </span>
       </div>
@@ -93,15 +86,6 @@ export function DashboardGaugeChart({
       {/* Speedometer Gauge Visual */}
       <div className="relative flex flex-col items-center justify-center pt-2">
         <svg className="w-48 h-28 overflow-visible" viewBox="0 0 180 100">
-          <defs>
-            {/* v3.0 primary -> income gradient, tracks tokens via CSS vars */}
-            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style={{ stopColor: "var(--color-primary)" }} />
-              <stop offset="60%" style={{ stopColor: "var(--color-chart-5)" }} />
-              <stop offset="100%" style={{ stopColor: "var(--color-income)" }} />
-            </linearGradient>
-          </defs>
-
           {/* Background Arc Track */}
           <path
             d="M 20 90 A 70 70 0 0 1 160 90"
@@ -112,11 +96,11 @@ export function DashboardGaugeChart({
             className="text-muted/60"
           />
 
-          {/* Filled Progress Arc */}
+          {/* Filled Progress Arc — single primary color */}
           <path
             d="M 20 90 A 70 70 0 0 1 160 90"
             fill="none"
-            stroke="url(#gaugeGradient)"
+            stroke="var(--color-primary)"
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={halfCircumference}
@@ -152,14 +136,7 @@ export function DashboardGaugeChart({
                 className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={cn(
-                      "grid h-7 w-7 shrink-0 place-items-center rounded-md",
-                      cat.bgClass,
-                    )}
-                  >
-                    <Icon className={cn("h-3.5 w-3.5", cat.colorClass)} />
-                  </div>
+                  <Icon className={cn("h-3.5 w-3.5 shrink-0", cat.colorClass)} strokeWidth={1.75} />
                   <span className="text-xs font-medium text-foreground truncate">{cat.name}</span>
                 </div>
                 <div className="shrink-0 text-right">

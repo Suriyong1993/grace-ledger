@@ -20,29 +20,29 @@ interface StatusConfig {
 
 const MAP: Record<TxStatus, StatusConfig> = {
   draft: {
-    pill: "bg-muted text-muted-foreground border-border",
+    pill: "bg-muted text-muted-foreground border-transparent",
     icon: FileEdit,
     iconClass: "text-muted-foreground",
     muted: true,
   },
   pending: {
-    pill: "badge-pending",
+    pill: "bg-muted text-pending border-transparent",
     icon: Clock,
     iconClass: "text-pending",
   },
   approved: {
-    pill: "badge-approved",
+    pill: "bg-muted text-approved border-transparent",
     icon: CheckCircle2,
     iconClass: "text-approved",
   },
   rejected: {
-    pill: "badge-rejected",
+    pill: "bg-muted text-rejected border-transparent",
     icon: XCircle,
     iconClass: "text-rejected",
     muted: true,
   },
   voided: {
-    pill: "bg-muted text-muted-foreground border-border",
+    pill: "bg-muted text-muted-foreground border-transparent",
     icon: Ban,
     iconClass: "text-muted-foreground",
     muted: true,

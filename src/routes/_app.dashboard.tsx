@@ -98,7 +98,7 @@ export function Dashboard() {
   useEffect(() => {
     getChurchId()
       .then(setChurchId)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   // When incomes table changes (INSERT/UPDATE/DELETE), refetch income query

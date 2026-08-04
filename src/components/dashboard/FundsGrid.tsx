@@ -16,35 +16,9 @@ interface FundsGridProps {
   funds?: Fund[];
 }
 
-/* Icon + color per fund index — gives each card a unique identity */
-const FUND_PALETTES = [
-  {
-    icon: Landmark,
-    iconBg: "bg-primary/10 group-hover:bg-primary",
-    iconColor: "text-primary group-hover:text-white",
-    hoverBorder: "hover:border-primary/30",
-  },
-  {
-    icon: Home,
-    iconBg: "bg-income-muted group-hover:bg-income",
-    iconColor: "text-income group-hover:text-white",
-    hoverBorder: "hover:border-income/30",
-  },
-  {
-    icon: Users,
-    iconBg: "bg-offering-muted group-hover:bg-offering",
-    iconColor: "text-offering group-hover:text-white",
-    hoverBorder: "hover:border-offering/30",
-  },
-  {
-    icon: BookOpen,
-    iconBg: "bg-accent group-hover:bg-primary",
-    iconColor: "text-accent-foreground group-hover:text-white",
-    hoverBorder: "hover:border-primary/20",
-  },
-];
-
-const PROGRESS_COLORS = ["bg-primary", "bg-income", "bg-offering", "bg-primary/70"] as const;
+/* Icon per fund index — distinct identity, restrained color */
+const FUND_ICONS = [Landmark, Home, Users, BookOpen] as const;
+const ICON_COLORS = ["text-primary", "text-income", "text-offering", "text-muted-foreground"] as const;
 
 const DEFAULT_FUNDS: Fund[] = [
   {
@@ -105,31 +79,26 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
           const progressPercent = Math.round(Math.min(growthRatio * 50, 100));
           const growthDisplay = opening > 0 ? Math.round((growthRatio - 1) * 100) : 0;
 
-          const palette = FUND_PALETTES[i % FUND_PALETTES.length];
-          const Icon = palette.icon;
-          const barColor = PROGRESS_COLORS[i % PROGRESS_COLORS.length];
+          const Icon = FUND_ICONS[i % FUND_ICONS.length];
+          const iconColor = ICON_COLORS[i % ICON_COLORS.length];
 
           return (
             <div
               key={fund.id}
               className={cn(
-                "card-ledger group flex cursor-pointer flex-col gap-3 p-4",
-                "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card",
-                palette.hoverBorder,
-                "animate-fade-up",
+                "card-ledger flex cursor-pointer flex-col gap-3 p-4",
+                "transition-colors duration-150 hover:border-border/80",
               )}
-              style={{ animationDelay: `${i * 60}ms` }}
             >
               {/* Top row: icon + menu */}
               <div className="flex items-start justify-between">
                 <div
                   className={cn(
-                    "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors duration-200",
-                    palette.iconBg,
-                    palette.iconColor,
+                    "grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border/60",
+                    iconColor,
                   )}
                 >
-                  <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
                 </div>
                 <Button
                   variant="ghost"
@@ -168,7 +137,7 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
                 {/* Subtle progress bar */}
                 <div className="h-1 w-full overflow-hidden rounded-full bg-border/60">
                   <div
-                    className={cn("h-full rounded-full transition-all duration-700", barColor)}
+                    className="h-full rounded-full bg-primary/70 transition-all duration-500"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
