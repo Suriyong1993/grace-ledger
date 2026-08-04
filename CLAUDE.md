@@ -2,6 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+---
+
+## 🚀 Current Phase: Sprint 2 (HTML Prototype)
+
+**Status**: Phase A (Infrastructure) complete. Ready for prototype development.
+
+**What to do**: Build FS-001 (Finance Staff Home) and Record Income Wizard (FS-002 through FS-005).
+
+**Reference**: Read `.claude/sprint-2-instructions.md` first.
+
+**Key docs**:
+- `docs/TECH_LEAD_NOTE.md` — Why we're doing this
+- `docs/PHASE-0-HYPOTHESES.md` — User assumptions
+- `docs/ux/UXDR.md` — Design decisions
+- `docs/MENTAL_MODELS.md` — How staff think
+
+**Do NOT**: Build backend, add accounting features, or second-guess design decisions. UI validation only.
+
+---
+
 # Grace Ledger v2 — Church Accounting Platform
 
 Enterprise-grade church accounting platform: double-entry bookkeeping, segregated approval workflows, and immutable per-church audit trails. See `README.md` for feature highlights and deployment options.
@@ -52,7 +72,13 @@ Permissions are also defined twice with different shapes: `src/server/auth/permi
 
 ### Reads vs. writes go through different paths (frontend)
 
-`src/services/api.ts` is explicit about this split: **reads go straight to Supabase** (`src/services/church.ts`, for speed), **writes go through the server API client** in `api.ts`, which attaches the Supabase access token as a Bearer header so the server can enforce business rules, double-entry accounting, and audit logging. `ENGINEERING_BACKLOG.md` (P0-5) tracks several `church.ts` functions (`createOffering`, `createProject`, `createMember`, `saveSettings`, etc.) that still write directly to Supabase, bypassing server-side validation/audit — don't add new direct-write functions there; route new mutations through `src/services/api.ts` and a corresponding `src/server/api/routes/*.routes.ts` handler instead.
+`src/services/api.ts` is explicit about this split: **reads go straight to Supabase** (`src/services/church.ts`, for speed), **writes go through the server API client** in `api.ts`, which attaches the Supabase access token as a Bearer header so the server can enforce business rules, double-entry accounting, and audit logging. All `church.ts` mutation functions (`createOffering`, `createProject`, `createMember`, `saveSettings`, etc.) were migrated onto this path as of P0-5 (`ENGINEERING_BACKLOG.md`) — don't add new direct-write functions there; route new mutations through `src/services/api.ts` and a corresponding `src/server/api/routes/*.routes.ts` handler instead.
+
+One layer inconsistency to know about: `income.service.ts`, `expense.service.ts`, and the offering-financial service talk to Supabase's admin client directly instead of going through Drizzle like the rest of the route layer (`ENGINEERING_BACKLOG.md` P0-4). Their route handlers can't be integration-tested without real `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` credentials — only their auth-dispatch boundary is covered in `src/server/__tests__/routes.test.ts`.
+
+### A second, unwired LLM integration exists
+
+`src/services/llm.ts` wraps OpenRouter (`OPENROUTER_API_KEY`/`OPENROUTER_MODEL`, default `inclusionai/ling-3.0-flash:free`) behind an `llmChat()` function, and `.env.example` documents it as the current AI backend — but nothing calls it yet (`llmChat` has no callers outside its own definition). The `_app.ai.tsx` "Grace AI workspace" route that shipped alongside it is a read-only dashboard over existing income/expense/offering/budget data (via `church.ts`); despite the name, it makes no LLM calls. Don't assume "AI workspace" means chat — the only live AI calls in the app are the Fireworks/Gemini OCR proxy described above.
 
 ### Journal engine is the only path for financial state changes
 

@@ -98,7 +98,7 @@ export function Dashboard() {
   useEffect(() => {
     getChurchId()
       .then(setChurchId)
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // When incomes table changes (INSERT/UPDATE/DELETE), refetch income query
@@ -296,22 +296,16 @@ export function Dashboard() {
       {/* KPI row — cash balance hero + this month's income/expense + latest offering */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <motion.div
-          initial={{ opacity: 0, y: 12, scale: 0.99 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-          className="relative overflow-hidden rounded-card bg-foreground p-5 text-background"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+          className="rounded-card border border-border bg-card p-5"
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/30 blur-3xl"
-          />
-          <p className="kicker relative text-background/60">เงินสดคงเหลือรวม</p>
-          <p className="num-display font-display relative mt-3 text-[28px] font-bold leading-none tracking-tight md:text-[32px]">
+          <p className="text-[13px] font-medium text-muted-foreground">เงินสดคงเหลือรวม</p>
+          <p className="num-display font-display mt-2 text-[28px] font-semibold leading-none tracking-tight md:text-[32px]">
             <MoneyText value={totalBalanceNumber} />
           </p>
-          <p className="relative mt-3.5 border-t border-background/15 pt-3 text-xs text-background/60">
-            {funds.length} กองทุน
-          </p>
+          <p className="mt-3 text-xs text-muted-foreground">{funds.length} กองทุน</p>
         </motion.div>
         <StatCard
           label="รายรับเดือนนี้"
