@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
-    exclude: ["node_modules", ".claude", "dist", ".output"],
+    exclude: ["node_modules", ".claude", ".agents", "dist", ".output"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
