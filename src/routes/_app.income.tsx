@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -87,6 +88,7 @@ function IncomePage() {
   const [churchId, setChurchId] = useState<string>();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState<"income" | "offering">("income");
   const [attachment, setAttachment] = useState<AttachmentValue | undefined>();
 
   // Load churchId for attachment uploads
@@ -144,12 +146,16 @@ function IncomePage() {
   const catName = (id: string) => cats.find((c) => c.id === id)?.name ?? "-";
   const fundName = (id: string) => funds.find((f) => f.id === id)?.name ?? "-";
 
-  // Merge income + offering into one combined list
+  // Income and Offering are two different record shapes — real income has an
+  // approval workflow (status), real offering has a channel and no approval
+  // workflow. Keep them as two real tables, not one merged shape with
+  // hardcoded/empty cells for whichever type doesn't fit (ledger-grid thesis,
+  // see docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md §3a).
   const incomes = incomeQ.data ?? [];
   const offerings = offeringQ.data ?? [];
 
-  const combined = [
-    ...incomes.map((r) => ({
+  const incomeRows = incomes
+    .map((r) => ({
       id: r.id,
       date: r.date,
       category: catName(r.categoryId),
@@ -157,59 +163,84 @@ function IncomePage() {
       amount: r.amount,
       status: r.status,
       description: r.description ?? "",
-      isOffering: false as const,
-      channel: undefined as string | undefined,
       hasAttachment: !!r.attachmentDataUrl,
-    })),
-    ...offerings.map((r) => ({
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .filter((r) => {
+      if (!q) return true;
+      const s = q.toLowerCase();
+      return [r.category, r.fund, r.description, String(r.amount)].some((v) =>
+        v.toLowerCase().includes(s),
+      );
+    });
+
+  const offeringRows = offerings
+    .map((r) => ({
       id: r.id,
       date: r.date,
       category: offCatName(r.categoryId),
+      channel: CHANNEL_LABEL[r.channel],
       fund: fundName(r.fundId),
       amount: r.amount,
-      status: "approved" as const,
       description: r.note ?? "",
-      isOffering: true as const,
-      channel: CHANNEL_LABEL[r.channel],
-      hasAttachment: false,
-    })),
-  ].sort((a, b) => b.date.localeCompare(a.date));
-
-  const rows = combined.filter((r) => {
-    if (!q) return true;
-    const s = q.toLowerCase();
-    return [r.category, r.fund, r.description, String(r.amount)].some((v) =>
-      v.toLowerCase().includes(s),
-    );
-  });
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .filter((r) => {
+      if (!q) return true;
+      const s = q.toLowerCase();
+      return [r.category, r.channel, r.fund, r.description, String(r.amount)].some((v) =>
+        v.toLowerCase().includes(s),
+      );
+    });
 
   const totalIncome = incomes.reduce((s, r) => s + r.amount, 0);
   const totalOffering = offerings.reduce((s, r) => s + r.amount, 0);
   const totalAll = totalIncome + totalOffering;
   const isLoading = incomeQ.isLoading || offeringQ.isLoading;
+  const isError = incomeQ.isError || offeringQ.isError;
 
   const exportCsv = () => {
-    const csv = toCsv(
-      rows.map((r) => ({
-        date: r.date,
-        type: r.isOffering ? "เงินถวาย" : "รายรับ",
-        category: r.category,
-        channel: r.channel ?? "-",
-        fund: r.fund,
-        amount: r.amount,
-        description: r.description,
-      })),
-      {
-        date: "วันที่",
-        type: "ประเภท",
-        category: "หมวดหมู่",
-        channel: "ช่องทาง",
-        fund: "กองทุน",
-        amount: "จำนวน",
-        description: "รายละเอียด",
-      },
-    );
-    downloadCsv(`income-all-${today()}.csv`, csv);
+    if (tab === "income") {
+      const csv = toCsv(
+        incomeRows.map((r) => ({
+          date: r.date,
+          category: r.category,
+          fund: r.fund,
+          amount: r.amount,
+          status: r.status,
+          description: r.description,
+        })),
+        {
+          date: "วันที่",
+          category: "หมวดหมู่",
+          fund: "กองทุน",
+          amount: "จำนวน",
+          status: "สถานะ",
+          description: "รายละเอียด",
+        },
+      );
+      downloadCsv(`income-${today()}.csv`, csv);
+    } else {
+      const csv = toCsv(
+        offeringRows.map((r) => ({
+          date: r.date,
+          category: r.category,
+          channel: r.channel,
+          fund: r.fund,
+          amount: r.amount,
+          description: r.description,
+        })),
+        {
+          date: "วันที่",
+          category: "หมวดหมู่",
+          channel: "ช่องทาง",
+          fund: "กองทุน",
+          amount: "จำนวน",
+          description: "รายละเอียด",
+        },
+      );
+      downloadCsv(`offering-${today()}.csv`, csv);
+    }
   };
 
   return (
@@ -217,7 +248,7 @@ function IncomePage() {
       <PageHeader
         kicker="รายการเงิน"
         title="รายรับ"
-        description={`บันทึกรายรับและเงินถวายของคริสตจักร · แสดง ${rows.length} รายการ`}
+        description={`บันทึกรายรับและเงินถวายของคริสตจักร · แสดง ${tab === "income" ? incomeRows.length : offeringRows.length} รายการ`}
         actions={
           <>
             <Button variant="outline" className="h-8" onClick={exportCsv}>
@@ -357,6 +388,24 @@ function IncomePage() {
         }
       />
 
+      {isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <p className="text-sm text-destructive">
+            โหลดข้อมูลไม่สำเร็จ — รายการที่แสดงอาจไม่ครบถ้วน
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              incomeQ.refetch();
+              offeringQ.refetch();
+            }}
+          >
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
+
       {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -384,96 +433,160 @@ function IncomePage() {
             value={thb(totalAll)}
             tone="secondary"
             icon={Wallet}
-            hint={`รวม ${combined.length} รายการ`}
+            hint={`รวม ${incomes.length + offerings.length} รายการ`}
           />
         </div>
       )}
 
-      <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายรับหรือเงินถวาย..." />
+      <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
+        <TabsList>
+          <TabsTrigger value="income" className="gap-1.5">
+            <ArrowDownLeft className="h-3.5 w-3.5" strokeWidth={1.75} />
+            รายรับ
+          </TabsTrigger>
+          <TabsTrigger value="offering" className="gap-1.5">
+            <HandHeart className="h-3.5 w-3.5" strokeWidth={1.75} />
+            เงินถวาย
+          </TabsTrigger>
+        </TabsList>
 
-      <section className="rounded-card border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
-        <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
-          <p className="kicker font-medium text-muted-foreground/80">รายการทั้งหมด</p>
-          <p className="num-display text-xs font-semibold text-muted-foreground">
-            {rows.length} รายการ
-          </p>
-        </div>
-        {isLoading ? (
-          <div className="divide-y divide-border">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex items-center justify-between gap-4 px-5 py-4">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="hidden h-4 w-32 sm:block" />
-                <Skeleton className="hidden h-4 w-20 md:block" />
-                <Skeleton className="h-4 w-16" />
+        <div className="mt-4 space-y-4">
+          <DataToolbar
+            query={q}
+            onQueryChange={setQ}
+            placeholder={tab === "income" ? "ค้นหารายรับ..." : "ค้นหาเงินถวาย..."}
+          />
+
+          <TabsContent value="income" className="mt-0">
+            <section className="rounded-card border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+              <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
+                <p className="kicker font-medium text-muted-foreground/80">รายรับทั้งหมด</p>
+                <p className="num-display text-xs font-semibold text-muted-foreground">
+                  {incomeRows.length} รายการ
+                </p>
               </div>
-            ))}
-          </div>
-        ) : rows.length === 0 ? (
-          <div className="p-4 md:p-5">
-            <EmptyState
-              icon={ArrowDownCircle}
-              title="ยังไม่มีรายการ"
-              description="เริ่มบันทึกรายรับหรือเงินถวายเพื่อดูข้อมูลที่นี่"
-            />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="px-5">วันที่</TableHead>
-                <TableHead className="px-5">ประเภท</TableHead>
-                <TableHead className="px-5">หมวดหมู่</TableHead>
-                <TableHead className="px-5">ช่องทาง</TableHead>
-                <TableHead className="px-5">กองทุน</TableHead>
-                <TableHead className="px-5">รายละเอียด</TableHead>
-                <TableHead className="px-5">สถานะ</TableHead>
-                <TableHead className="px-5 text-right">จำนวน</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
-                    {fmtDate(r.date)}
-                  </TableCell>
-                  <TableCell className="px-5 py-3">
-                    {r.isOffering ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
-                        <HandHeart className="h-3.5 w-3.5 text-primary" strokeWidth={1.75} />
-                        เงินถวาย
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
-                        <ArrowDownLeft className="h-3.5 w-3.5 text-success" strokeWidth={1.75} />
-                        รายรับ
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="px-5 py-3 font-medium">{r.category}</TableCell>
-                  <TableCell className="px-5 py-3 text-muted-foreground">
-                    {r.channel ?? <span className="text-xs text-muted-foreground">—</span>}
-                  </TableCell>
-                  <TableCell className="px-5 py-3">{r.fund}</TableCell>
-                  <TableCell className="max-w-xs truncate px-5 py-3 text-muted-foreground">
-                    {r.description || <span className="text-xs text-muted-foreground">—</span>}
-                  </TableCell>
-                  <TableCell className="px-5 py-3">
-                    {r.isOffering ? (
-                      <StatusBadge status="approved" />
-                    ) : (
-                      <StatusBadge status={r.status} />
-                    )}
-                  </TableCell>
-                  <TableCell className="px-5 py-3 text-right">
-                    <MoneyText value={r.amount} tone="income" />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </section>
+              {isLoading ? (
+                <TableSkeletonRows />
+              ) : incomeRows.length === 0 ? (
+                <div className="p-4 md:p-5">
+                  <EmptyState
+                    icon={ArrowDownCircle}
+                    title="ยังไม่มีรายรับ"
+                    description="เริ่มบันทึกรายรับเพื่อดูข้อมูลที่นี่"
+                  />
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="px-5">วันที่</TableHead>
+                      <TableHead className="px-5">หมวดหมู่</TableHead>
+                      <TableHead className="px-5">กองทุน</TableHead>
+                      <TableHead className="px-5">รายละเอียด</TableHead>
+                      <TableHead className="px-5">สถานะ</TableHead>
+                      <TableHead className="px-5 text-right">จำนวน</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {incomeRows.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
+                          {fmtDate(r.date)}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 font-medium">{r.category}</TableCell>
+                        <TableCell className="px-5 py-3">{r.fund}</TableCell>
+                        <TableCell className="max-w-xs truncate px-5 py-3 text-muted-foreground">
+                          {r.description || (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-5 py-3">
+                          <StatusBadge status={r.status} />
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-right">
+                          <MoneyText value={r.amount} tone="income" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </section>
+          </TabsContent>
+
+          <TabsContent value="offering" className="mt-0">
+            <section className="rounded-card border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+              <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
+                <p className="kicker font-medium text-muted-foreground/80">เงินถวายทั้งหมด</p>
+                <p className="num-display text-xs font-semibold text-muted-foreground">
+                  {offeringRows.length} รายการ
+                </p>
+              </div>
+              {isLoading ? (
+                <TableSkeletonRows />
+              ) : offeringRows.length === 0 ? (
+                <div className="p-4 md:p-5">
+                  <EmptyState
+                    icon={HandHeart}
+                    title="ยังไม่มีเงินถวาย"
+                    description="บันทึกเงินถวายจากหน้าเงินถวายเพื่อดูข้อมูลที่นี่"
+                  />
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="px-5">วันที่</TableHead>
+                      <TableHead className="px-5">หมวดหมู่</TableHead>
+                      <TableHead className="px-5">ช่องทาง</TableHead>
+                      <TableHead className="px-5">กองทุน</TableHead>
+                      <TableHead className="px-5">รายละเอียด</TableHead>
+                      <TableHead className="px-5 text-right">จำนวน</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {offeringRows.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
+                          {fmtDate(r.date)}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 font-medium">{r.category}</TableCell>
+                        <TableCell className="px-5 py-3 text-muted-foreground">
+                          {r.channel}
+                        </TableCell>
+                        <TableCell className="px-5 py-3">{r.fund}</TableCell>
+                        <TableCell className="max-w-xs truncate px-5 py-3 text-muted-foreground">
+                          {r.description || (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="px-5 py-3 text-right">
+                          <MoneyText value={r.amount} tone="income" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </section>
+          </TabsContent>
+        </div>
+      </Tabs>
+    </div>
+  );
+}
+
+function TableSkeletonRows() {
+  return (
+    <div className="divide-y divide-border">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center justify-between gap-4 px-5 py-4">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="hidden h-4 w-32 sm:block" />
+          <Skeleton className="hidden h-4 w-20 md:block" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      ))}
     </div>
   );
 }

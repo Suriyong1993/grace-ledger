@@ -198,6 +198,26 @@ export async function apiCreateTransfer(input: Record<string, unknown>): Promise
 }
 
 // ============================================================================
+// Fiscal Period API
+// ============================================================================
+
+export async function apiListPeriods(): Promise<unknown[]> {
+  return apiRequest("GET", "/periods");
+}
+
+// ============================================================================
+// Reconciliation API
+// ============================================================================
+
+export async function apiListReconciliations(periodId: string): Promise<unknown[]> {
+  return apiRequest("GET", `/reconciliations?periodId=${encodeURIComponent(periodId)}`);
+}
+
+export async function apiCreateReconciliation(input: Record<string, unknown>): Promise<unknown> {
+  return apiRequest("POST", "/reconciliations", input);
+}
+
+// ============================================================================
 // Audit API
 // ============================================================================
 

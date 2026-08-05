@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, HandHeart, Sparkles } from "lucide-react";
+import { Plus, Download, Trash2, HandHeart, Sparkles, Wallet, AlertTriangle } from "lucide-react";
+import { StatCard } from "@/components/shared/StatCard";
 import { ChurchHandwrittenFormScannerModal } from "@/components/church/ChurchHandwrittenFormScannerModal";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
@@ -200,11 +201,7 @@ function OfferingPage() {
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button
-              variant="secondary"
-              className="h-9 bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20"
-              onClick={() => setHandwrittenScanOpen(true)}
-            >
+            <Button variant="outline" className="h-8" onClick={() => setHandwrittenScanOpen(true)}>
               <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI
               สแกนใบตรวจนับเงินเขียนมือ
             </Button>
@@ -434,7 +431,51 @@ function OfferingPage() {
         }
       />
 
-      <Tabs defaultValue="sunday-sheet">
+      {offQ.isError ? (
+        <div className="mt-6 flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">โหลดข้อมูลเงินถวายไม่สำเร็จ</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => offQ.refetch()} className="shrink-0">
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
+
+      {offQ.isLoading ? (
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-[104px]" />
+          ))}
+        </div>
+      ) : (
+        <div className="stagger mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+          <StatCard
+            label="รวมทั้งหมด"
+            value={thb(total)}
+            tone="primary"
+            icon={HandHeart}
+            hint={`${rows.length} รายการ`}
+          />
+          <StatCard
+            label="จำนวนรายการ"
+            value={rows.length}
+            tone="secondary"
+            icon={Wallet}
+            hint="ทุกช่องทางรวมกัน"
+          />
+          <StatCard
+            label="เฉลี่ยต่อรายการ"
+            value={thb(rows.length > 0 ? total / rows.length : 0)}
+            tone="secondary"
+            icon={HandHeart}
+            hint="ยอดถวายเฉลี่ย"
+          />
+        </div>
+      )}
+
+      <Tabs defaultValue="sunday-sheet" className="mt-6">
         <TabsList className="flex h-auto w-full flex-wrap justify-start rounded-none">
           <TabsTrigger value="sunday-sheet" className={TAB_TRIGGER}>
             ใบนับเงิน &amp; ถวายรายบุคคล (วันอาทิตย์)

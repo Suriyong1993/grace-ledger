@@ -4,8 +4,15 @@ import { AlertTriangle, PiggyBank, TrendingUp, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateBudgetDialog } from "@/components/shared/CreateBudgetDialog";
+
+/** Guard against amount=0 producing NaN/Infinity percentages */
+function usagePct(used: number, amount: number): number {
+  if (amount <= 0) return 0;
+  return Math.min(100, Math.round((used / amount) * 100));
+}
 import { listBudget } from "@/services/church";
 import { thb } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -28,7 +35,7 @@ function BudgetPage() {
 
   const totalAmount = budgets.reduce((s, b) => s + b.amount, 0);
   const totalUsed = budgets.reduce((s, b) => s + b.used, 0);
-  const nearFull = budgets.filter((b) => Math.round((b.used / b.amount) * 100) >= 90).length;
+  const nearFull = budgets.filter((b) => usagePct(b.used, b.amount) >= 90).length;
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -38,6 +45,18 @@ function BudgetPage() {
         description="ติดตามการใช้งบประมาณเทียบยอดที่ตั้งไว้"
         actions={<CreateBudgetDialog />}
       />
+
+      {q.isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">โหลดข้อมูลงบประมาณไม่สำเร็จ</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => q.refetch()}>
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
 
       {q.isLoading ? (
         <>
@@ -93,7 +112,7 @@ function BudgetPage() {
           {/* Budget vs actual cards */}
           <div className="stagger grid gap-4 md:grid-cols-2">
             {budgets.map((b) => {
-              const pct = Math.min(100, Math.round((b.used / b.amount) * 100));
+              const pct = usagePct(b.used, b.amount);
               const alert = pct >= 90;
               const remaining = b.amount - b.used;
               return (

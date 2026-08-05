@@ -1,12 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -17,9 +25,31 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listFunds, listIncome, listExpense, listOffering } from "@/services/church";
+import { apiListPeriods, apiListReconciliations, apiCreateReconciliation } from "@/services/api";
 import { thb, dayjs, fmtDate } from "@/lib/format";
 import { CHANNEL_LABEL } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+
+interface PeriodView {
+  id: string;
+  fiscalYear: number;
+  periodNumber: number;
+  startDate: string;
+  endDate: string;
+  status: "open" | "closed" | "reconciled";
+}
+
+interface ReconciliationView {
+  id: string;
+  periodId: string;
+  fundId: string;
+  systemBalance: string;
+  actualBalance: string;
+  variance: string;
+  isReconciled: boolean;
+  reconciledAt: string;
+}
 
 export const Route = createFileRoute("/_app/reconciliation")({
   head: () => ({ meta: [{ title: "สรุปยอด — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -68,11 +98,13 @@ const PERIOD_LABEL: Record<Period, string> = {
 };
 
 function ReconciliationPage() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const canReconcile = user?.role === "admin" || user?.role === "super_admin";
+
   const [period, setPeriod] = useState<Period>("this_month");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
-  const [actualCash, setActualCash] = useState("");
-  const [actualBank, setActualBank] = useState("");
 
   const range = usePeriodRange(period, { start: customStart, end: customEnd });
 
@@ -83,6 +115,44 @@ function ReconciliationPage() {
 
   const isLoading =
     fundsQ.isLoading || incomeQ.isLoading || expenseQ.isLoading || offeringQ.isLoading;
+  const isError = fundsQ.isError || incomeQ.isError || expenseQ.isError || offeringQ.isError;
+
+  // ---- Sign-off: real fiscal-period reconciliation, persisted server-side ----
+  const periodsQ = useQuery({
+    queryKey: ["fiscal-periods"],
+    queryFn: () => apiListPeriods() as Promise<PeriodView[]>,
+  });
+  const [signOffPeriodId, setSignOffPeriodId] = useState<string>("");
+
+  useEffect(() => {
+    if (signOffPeriodId || !periodsQ.data?.length) return;
+    const today = dayjs().format("YYYY-MM-DD");
+    const current = periodsQ.data.find((p) => p.startDate <= today && today <= p.endDate);
+    setSignOffPeriodId((current ?? periodsQ.data[periodsQ.data.length - 1]).id);
+  }, [periodsQ.data, signOffPeriodId]);
+
+  const reconciliationsQ = useQuery({
+    queryKey: ["reconciliations", signOffPeriodId],
+    queryFn: () => apiListReconciliations(signOffPeriodId) as Promise<ReconciliationView[]>,
+    enabled: !!signOffPeriodId,
+  });
+
+  const [actualDrafts, setActualDrafts] = useState<Record<string, string>>({});
+
+  const saveReconciliation = useMutation({
+    mutationFn: (input: { periodId: string; fundId: string; actualBalance: number }) =>
+      apiCreateReconciliation(input),
+    onSuccess: (_data, vars) => {
+      toast.success("บันทึกยอดกระทบแล้ว — ผูกกับ Audit Trail");
+      qc.invalidateQueries({ queryKey: ["reconciliations", vars.periodId] });
+      setActualDrafts((prev) => {
+        const next = { ...prev };
+        delete next[vars.fundId];
+        return next;
+      });
+    },
+    onError: () => toast.error("บันทึกไม่สำเร็จ — ลองใหม่อีกครั้ง"),
+  });
 
   const funds = fundsQ.data ?? [];
   const incomes = incomeQ.data ?? [];
@@ -170,15 +240,9 @@ function ReconciliationPage() {
     expenseQ.data,
   ]);
 
-  // Reconciliation check
-  const actualCashNum = parseFloat(actualCash) || 0;
-  const actualBankNum = parseFloat(actualBank) || 0;
-  const actualTotal = actualCashNum + actualBankNum;
-  const hasActual = actualCash !== "" || actualBank !== "";
-  const diff = hasActual ? currentBalance - actualTotal : 0;
-  const isBalanced = hasActual && Math.abs(diff) < 0.01;
-
   const periodLabel = `${fmtDate(start)} — ${fmtDate(end)}`;
+  const reconciliations = reconciliationsQ.data ?? [];
+  const recByFund = (fundId: string) => reconciliations.find((r) => r.fundId === fundId);
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -228,6 +292,30 @@ function ReconciliationPage() {
           </div>
         }
       />
+
+      {isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">
+              โหลดข้อมูลไม่สำเร็จ — ตัวเลขที่แสดงอาจไม่ครบถ้วน
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              fundsQ.refetch();
+              incomeQ.refetch();
+              expenseQ.refetch();
+              offeringQ.refetch();
+            }}
+            className="shrink-0"
+          >
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
 
       {isLoading ? (
         <div className="space-y-4">
@@ -385,127 +473,120 @@ function ReconciliationPage() {
             </section>
           </div>
 
-          {/* ============ RECONCILIATION CHECK ============ */}
+          {/* ============ SIGN-OFF: RECONCILIATION CHECK ============ */}
           <section className="card-ledger animate-fade-up">
-            <div className="border-b border-border px-5 py-3.5">
-              <p className="kicker">ตรวจสอบยอด (Reconciliation)</p>
-            </div>
-            <div className="grid divide-y divide-border lg:grid-cols-2 lg:divide-x lg:divide-y-0">
-              {/* System ledger column */}
-              <div className="px-5 py-4">
-                <p className="kicker">ยอดในระบบ</p>
-                <div className="mt-3 space-y-2.5 text-sm">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-muted-foreground">ยอดยกมาตั้งต้น</span>
-                    <span className="num-display text-foreground">
-                      {thb(funds.reduce((s, f) => s + f.openingBalance, 0))}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-muted-foreground">รายรับทั้งหมด (รวมเงินถวาย)</span>
-                    <span className="num-display text-success">
-                      {thb(
-                        incomes.reduce((s, x) => s + x.amount, 0) +
-                          offerings.reduce((s, x) => s + x.amount, 0),
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="text-muted-foreground">รายจ่ายทั้งหมด</span>
-                    <span className="num-display text-destructive">
-                      {thb(expenses.reduce((s, x) => s + x.amount, 0))}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
-                  <span className="text-sm font-semibold text-foreground">ยอดคงเหลือในระบบ</span>
-                  <span className="num-display text-lg font-semibold text-foreground">
-                    {thb(currentBalance)}
-                  </span>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3.5">
+              <div>
+                <p className="kicker">ลงนามกระทบยอด (per fund, ผูก Audit Trail จริง)</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  บันทึกยอดเงินจริงต่อกองทุน ต่องวดบัญชี — เก็บถาวร ไม่หายเมื่อรีเฟรช
+                </p>
               </div>
+              {periodsQ.data && periodsQ.data.length > 0 && (
+                <Select value={signOffPeriodId} onValueChange={setSignOffPeriodId}>
+                  <SelectTrigger className="h-8 w-56 bg-card text-xs">
+                    <SelectValue placeholder="เลือกงวดบัญชี" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {periodsQ.data.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        งวด {p.periodNumber}/{p.fiscalYear} · {fmtDate(p.startDate)}–
+                        {fmtDate(p.endDate)}
+                        {p.status !== "open" ? ` (${p.status})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
 
-              {/* Actual ledger column */}
-              <div className="px-5 py-4">
-                <p className="kicker">ยอดเงินจริง</p>
-                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label
-                      htmlFor="actual-cash"
-                      className="text-xs font-normal text-muted-foreground"
-                    >
-                      เงินสดในมือ (Cash on Hand)
-                    </Label>
-                    <Input
-                      id="actual-cash"
-                      type="number"
-                      step="0.01"
-                      className="num-display mt-1.5 h-9 bg-card"
-                      placeholder="0.00"
-                      value={actualCash}
-                      onChange={(e) => setActualCash(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="actual-bank"
-                      className="text-xs font-normal text-muted-foreground"
-                    >
-                      เงินในบัญชี (Bank Balance)
-                    </Label>
-                    <Input
-                      id="actual-bank"
-                      type="number"
-                      step="0.01"
-                      className="num-display mt-1.5 h-9 bg-card"
-                      placeholder="0.00"
-                      value={actualBank}
-                      onChange={(e) => setActualBank(e.target.value)}
-                    />
-                  </div>
-                </div>
+            {periodsQ.isLoading || reconciliationsQ.isLoading ? (
+              <div className="space-y-3 px-5 py-5">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-14" />
+                ))}
+              </div>
+            ) : !periodsQ.data?.length ? (
+              <p className="px-5 py-6 text-sm text-muted-foreground">
+                ยังไม่มีงวดบัญชี (fiscal period) ในระบบ —
+                ไม่สามารถลงนามกระทบยอดได้จนกว่าจะสร้างงวดบัญชี
+              </p>
+            ) : (
+              <div className="divide-y divide-border">
+                {funds.map((f) => {
+                  const rec = recByFund(f.id);
+                  const draft = actualDrafts[f.id];
+                  const inputValue = draft ?? (rec ? rec.actualBalance : "");
+                  const variance = rec ? parseFloat(rec.variance) : null;
+                  const isBalanced = variance !== null && Math.abs(variance) < 0.01;
 
-                {hasActual ? (
-                  <div className="mt-4 border-t border-border pt-3">
-                    <div className="flex items-baseline justify-between gap-3 text-sm">
-                      <span className="text-muted-foreground">ยอดเงินจริงรวม</span>
-                      <span className="num-display font-medium text-foreground">
-                        {thb(actualTotal)}
-                      </span>
-                    </div>
-                    <div className="mt-2 flex items-baseline justify-between gap-3 text-sm">
-                      <span className="text-muted-foreground">ผลต่างจากระบบ</span>
-                      <span
-                        className={cn(
-                          "num-display font-semibold",
-                          isBalanced ? "text-success" : "text-destructive",
+                  return (
+                    <div
+                      key={f.id}
+                      className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">{f.name}</p>
+                        {rec ? (
+                          <p
+                            className={cn(
+                              "mt-0.5 flex items-center gap-1.5 text-xs font-medium",
+                              isBalanced ? "text-success" : "text-destructive",
+                            )}
+                          >
+                            {isBalanced ? (
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            ) : (
+                              <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                            )}
+                            {isBalanced
+                              ? `ยอดตรงกัน · กระทบยอดแล้ว ${fmtDate(rec.reconciledAt)}`
+                              : `ต่างจากระบบ ${thb(Math.abs(variance!))} · กระทบยอดแล้ว ${fmtDate(rec.reconciledAt)}`}
+                          </p>
+                        ) : (
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            ยอดในระบบ (ประมาณการ):{" "}
+                            {thb(fundRows.find((r) => r.name === f.name)?.balance ?? 0)}
+                          </p>
                         )}
-                      >
-                        {diff >= 0 ? "+" : ""}
-                        {thb(diff)}
-                      </span>
+                      </div>
+                      {canReconcile && (
+                        <div className="flex shrink-0 items-center gap-2">
+                          <Label htmlFor={`actual-${f.id}`} className="sr-only">
+                            ยอดเงินจริง {f.name}
+                          </Label>
+                          <Input
+                            id={`actual-${f.id}`}
+                            type="number"
+                            step="0.01"
+                            placeholder="ยอดเงินจริง"
+                            className="num-display h-9 w-36 bg-card"
+                            value={inputValue}
+                            onChange={(e) =>
+                              setActualDrafts((prev) => ({ ...prev, [f.id]: e.target.value }))
+                            }
+                          />
+                          <Button
+                            size="sm"
+                            className="h-9"
+                            disabled={!inputValue || saveReconciliation.isPending}
+                            onClick={() =>
+                              saveReconciliation.mutate({
+                                periodId: signOffPeriodId,
+                                fundId: f.id,
+                                actualBalance: parseFloat(inputValue) || 0,
+                              })
+                            }
+                          >
+                            {rec ? "บันทึกใหม่" : "บันทึก"}
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    <p
-                      className={cn(
-                        "mt-3 flex items-center gap-1.5 text-xs font-medium",
-                        isBalanced ? "text-success" : "text-destructive",
-                      )}
-                    >
-                      {isBalanced ? (
-                        <CheckCircle2 className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                      ) : (
-                        <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                      )}
-                      {isBalanced ? "ยอดตรงกัน" : `ยอดไม่ตรงกัน (ต่าง ${thb(Math.abs(diff))})`}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-                    กรอกยอดเงินจริงเพื่อเปรียบเทียบกับยอดในระบบ
-                  </p>
-                )}
+                  );
+                })}
               </div>
-            </div>
+            )}
           </section>
         </>
       )}

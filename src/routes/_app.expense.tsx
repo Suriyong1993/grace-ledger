@@ -10,11 +10,11 @@ import {
   Download,
   Trash2,
   CheckCircle2,
-  XCircle,
   ArrowUpCircle,
   ArrowUpRight,
   Clock,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
@@ -64,7 +64,6 @@ import {
   listCategories,
   listExpense,
   listFunds,
-  setExpenseStatus,
 } from "@/services/church";
 import { useAuth } from "@/lib/auth";
 import { fmtDate, thb, today } from "@/lib/format";
@@ -156,13 +155,11 @@ function ExpensePage() {
       qc.invalidateQueries({ queryKey: ["expense"] });
     },
   });
-  const setStatus = useMutation({
-    mutationFn: ({ id, s }: { id: string; s: "approved" | "rejected" }) =>
-      setExpenseStatus(id, s, user!),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["expense"] });
-    },
-  });
+  // Approve/reject happens in exactly one place: /approvals (with its
+  // mandatory reason-on-reject + confirm-dialog friction, appropriate for an
+  // irreversible financial action). This page only links there — no inline
+  // one-click approve, no second competing path. See
+  // docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md §8 principle 7.
 
   const form = useForm<Values>({
     resolver: zodResolver(schema),
@@ -235,11 +232,7 @@ function ExpensePage() {
         description={`รวมทั้งหมด ${thb(total)} จาก ${rows.length} รายการ`}
         actions={
           <>
-            <Button
-              variant="secondary"
-              className="h-9 bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20"
-              onClick={() => setAiScannerOpen(true)}
-            >
+            <Button variant="outline" className="h-8" onClick={() => setAiScannerOpen(true)}>
               <Sparkles className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> AI สแกนบิล/สลิป
             </Button>
             <Button variant="outline" className="h-8" onClick={exportCsv}>
@@ -396,6 +389,18 @@ function ExpensePage() {
         }
       />
 
+      {expQ.isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">โหลดข้อมูลรายจ่ายไม่สำเร็จ</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => expQ.refetch()} className="shrink-0">
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
+
       {expQ.isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -509,28 +514,6 @@ function ExpensePage() {
                   </TableCell>
                   <TableCell className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
-                      {can("expense.approve") && r.status === "pending" && (
-                        <>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 active-press"
-                            onClick={() => setStatus.mutate({ id: r.id, s: "approved" })}
-                            aria-label="อนุมัติ"
-                          >
-                            <CheckCircle2 className="h-4 w-4 text-success" strokeWidth={1.75} />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 active-press"
-                            onClick={() => setStatus.mutate({ id: r.id, s: "rejected" })}
-                            aria-label="ปฏิเสธ"
-                          >
-                            <XCircle className="h-4 w-4 text-destructive" strokeWidth={1.75} />
-                          </Button>
-                        </>
-                      )}
                       {can("expense.write") && (
                         <Button
                           size="icon"

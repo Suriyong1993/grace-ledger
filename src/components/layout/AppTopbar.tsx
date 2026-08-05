@@ -158,9 +158,6 @@ export function AppTopbar() {
               <DropdownMenuItem onClick={() => navigate({ to: "/profile" })} className="text-sm">
                 โปรไฟล์
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate({ to: "/settings" })} className="text-sm">
-                ตั้งค่า
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:bg-destructive/10 text-sm"

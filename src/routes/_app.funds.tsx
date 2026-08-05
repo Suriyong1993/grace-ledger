@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { listExpense, listFunds, listIncome, listOffering } from "@/services/church";
 import { thb } from "@/lib/format";
@@ -28,19 +30,24 @@ function FundsPage() {
   const inc = inQ.data ?? [];
   const exp = exQ.data ?? [];
   const off = offQ.data ?? [];
+  const isError = fundsQ.isError || inQ.isError || exQ.isError || offQ.isError;
 
-  const rows = funds.map((f) => {
-    const income = inc.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
-    const offering = off.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
-    const expense = exp.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
-    return {
-      fund: f,
-      income,
-      offering,
-      expense,
-      balance: f.openingBalance + income + offering - expense,
-    };
-  });
+  const rows = useMemo(
+    () =>
+      funds.map((f) => {
+        const income = inc.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
+        const offering = off.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
+        const expense = exp.filter((x) => x.fundId === f.id).reduce((s, x) => s + x.amount, 0);
+        return {
+          fund: f,
+          income,
+          offering,
+          expense,
+          balance: f.openingBalance + income + offering - expense,
+        };
+      }),
+    [funds, inc, exp, off],
+  );
 
   const totalBalance = rows.reduce((s, r) => s + r.balance, 0);
   const totalIn = rows.reduce((s, r) => s + r.income + r.offering, 0);
@@ -61,6 +68,27 @@ function FundsPage() {
           ) : null
         }
       />
+
+      {isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">โหลดข้อมูลกองทุนไม่สำเร็จ</p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              fundsQ.refetch();
+              inQ.refetch();
+              exQ.refetch();
+              offQ.refetch();
+            }}
+          >
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
 
       {fundsQ.isLoading ? (
         <>

@@ -53,12 +53,14 @@
   --radius-2xl: calc(var(--radius) + 12px); /* 24px */
   --radius-full: 9999px;
 
-  /* Explicit v3.0 element radii (MasterPrompt spec) */
-  --radius-button: 1.125rem;   /* 18px */
-  --radius-input:  var(--radius-lg);   /* 16px */
-  --radius-card:   var(--radius-2xl);  /* 24px */
-  --radius-dialog: 1.75rem;    /* 28px */
-  --radius-sheet:  2rem;       /* 32px */
+  /* Explicit vNext element radii — tightened from v3.0's 18/16/24
+     (read as "soft toy" next to Linear/Stripe/Mercury references).
+     See docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md §4. */
+  --radius-button: 0.75rem;    /* 12px */
+  --radius-input:  0.625rem;   /* 10px */
+  --radius-card:   1rem;       /* 16px */
+  --radius-dialog: 1.25rem;    /* 20px */
+  --radius-sheet:  1.5rem;     /* 24px */
 
   /* ── Base semantic colors ── */
   --color-background:        var(--background);

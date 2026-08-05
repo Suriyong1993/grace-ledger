@@ -67,7 +67,7 @@ export const NAV_GROUPS: NavGroup[] = [
 export const NAV_SYSTEM: NavItem[] = [
   { to: "/ai", label: "Grace AI", icon: Sparkles },
   { to: "/line-setup", label: "LINE", icon: MessageCircle },
-  { to: "/settings", label: "ตั้งค่า", icon: Settings },
+  { to: "/settings", label: "หมวดหมู่เงินถวาย", icon: Settings },
   { to: "/profile", label: "โปรไฟล์", icon: UserCircle2 },
 ];
 

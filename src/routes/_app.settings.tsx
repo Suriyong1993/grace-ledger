@@ -13,10 +13,12 @@ import {
   Eye,
   ArrowUpDown,
   ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +54,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_app/settings")({
-  head: () => ({ meta: [{ title: "ตั้งค่า" }] }),
+  head: () => ({ meta: [{ title: "หมวดหมู่เงินถวาย — Grace Ledger" }] }),
   component: SettingsPage,
 });
 
@@ -149,9 +151,35 @@ function SettingsPage() {
   const subsForCat = (catId: string) =>
     allSubs.filter((s) => s.categoryId === catId).sort((a, b) => a.sortOrder - b.sortOrder);
 
+  const isLoading = catsQ.isLoading || subsQ.isLoading;
+  const isError = catsQ.isError || subsQ.isError;
+
   return (
     <div>
-      <PageHeader kicker="ระบบ" title="ตั้งค่า" description="ตั้งค่าระบบและจัดการหมวดหมู่" />
+      <PageHeader
+        kicker="จัดการ"
+        title="หมวดหมู่เงินถวาย"
+        description="หน้านี้จัดการเฉพาะหมวดหมู่เงินถวายและข้อมูลระบบ — ยังไม่มีการตั้งค่าผู้ใช้/สิทธิ์/แจ้งเตือนที่นี่"
+      />
+
+      {isError ? (
+        <div className="mb-6 flex max-w-2xl items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">โหลดหมวดหมู่ไม่สำเร็จ</p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              catsQ.refetch();
+              subsQ.refetch();
+            }}
+          >
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
 
       {/* ── ข้อมูลระบบ ── */}
       <Card className=" max-w-2xl">
@@ -232,7 +260,13 @@ function SettingsPage() {
           </Dialog>
         </CardHeader>
         <CardContent className="p-0">
-          {categories.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-2 p-5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          ) : categories.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground text-center">ยังไม่มีหมวดหมู่</p>
           ) : (
             <div className="divide-y">

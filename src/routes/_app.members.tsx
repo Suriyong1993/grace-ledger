@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Users, FileText, Download, HandHeart, Phone, Mail, ChevronRight } from "lucide-react";
+import { Users, Download, Phone, Mail, ChevronRight, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Sheet,
   SheetContent,
@@ -23,9 +24,9 @@ import {
 import { EmptyState } from "@/components/shared/EmptyState";
 import { MemberFormDialog } from "@/components/shared/MemberFormDialog";
 import { listMembers, listOffering } from "@/services/church";
-import { thb, fmtDate } from "@/lib/format";
+import { thb, fmtDate, today } from "@/lib/format";
+import { downloadCsv, toCsv } from "@/lib/csv";
 import { type Member } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/members")({
@@ -60,9 +61,22 @@ export function MembersPage() {
     return getMemberOfferings(memberId).reduce((sum, o) => sum + o.amount, 0);
   };
 
-  const generateTaxReceipt = (member: Member) => {
-    const total = getMemberTotal(member.id);
-    toast.success(`กำลังพิมพ์ใบอนุโมทนาบัตรสำหรับ ${member.name} (ยอดเงินรวม ${thb(total)})`);
+  // Real CSV export of a member's giving history — a genuine "ใบอนุโมทนาบัตร"
+  // PDF generator does not exist yet, so this does not pretend to be one; it
+  // gives the treasurer real, complete source data instead of a fake success
+  // toast that recorded nothing (see docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md §8.4).
+  const exportGivingHistory = (member: Member) => {
+    const rows = getMemberOfferings(member.id);
+    if (rows.length === 0) {
+      toast.error("ไม่มีประวัติการถวายให้ส่งออก");
+      return;
+    }
+    const csv = toCsv(
+      rows.map((o) => ({ date: o.date, amount: o.amount, note: o.note ?? "" })),
+      { date: "วันที่", amount: "จำนวนเงิน", note: "หมายเหตุ" },
+    );
+    downloadCsv(`giving-history-${member.name}-${today()}.csv`, csv);
+    toast.success(`ส่งออกประวัติการถวายของ ${member.name} เรียบร้อย`);
   };
 
   return (
@@ -70,7 +84,7 @@ export function MembersPage() {
       <PageHeader
         kicker="องค์กร"
         title="สมาชิก"
-        description={`รายชื่อสมาชิกทั้งหมด ${rows.length} คน · สามารถคลิกเพื่อดูประวัติการถวายและพิมพ์ใบอนุโมทนาบัตร`}
+        description={`รายชื่อสมาชิกทั้งหมด ${rows.length} คน · คลิกเพื่อดูประวัติการถวายและส่งออกไฟล์`}
         actions={<MemberFormDialog />}
       />
       <DataToolbar
@@ -79,7 +93,25 @@ export function MembersPage() {
         placeholder="ค้นหาสมาชิกด้วยชื่อ, ครอบครัว, หรือเบอร์โทร..."
       />
 
-      {rows.length === 0 ? (
+      {membersQ.isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">โหลดรายชื่อสมาชิกไม่สำเร็จ</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => membersQ.refetch()}>
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
+
+      {membersQ.isLoading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
+      ) : rows.length === 0 ? (
         <EmptyState
           icon={Users}
           title="ไม่พบสมาชิก"
@@ -214,15 +246,19 @@ export function MembersPage() {
                 </div>
               </div>
 
-              {/* Tax Receipt Button */}
+              {/* Export giving history — real CSV, for producing a tax receipt manually */}
               <div className="pt-4 border-t border-border">
                 <Button
                   className="w-full h-10 gap-2 active-press cursor-pointer"
-                  onClick={() => generateTaxReceipt(selectedMember)}
+                  variant="outline"
+                  onClick={() => exportGivingHistory(selectedMember)}
                 >
-                  <FileText className="h-4 w-4" />
-                  <span>พิมพ์ใบอนุโมทนาบัตร (Tax Receipt PDF)</span>
+                  <Download className="h-4 w-4" />
+                  <span>ส่งออกประวัติการถวาย (CSV)</span>
                 </Button>
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  ใบอนุโมทนาบัตร PDF ยังไม่พร้อมใช้งาน — ใช้ไฟล์นี้จัดทำเอกสารได้
+                </p>
               </div>
             </div>
           )}

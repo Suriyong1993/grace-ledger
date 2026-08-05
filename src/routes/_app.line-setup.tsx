@@ -6,12 +6,12 @@ import {
   MessageCircle,
   QrCode,
   Key,
-  CheckCircle2,
   Copy,
   Send,
   ShieldCheck,
   Smartphone,
   RefreshCw,
+  AlertCircle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { PageTransition } from "@/components/shared/PageTransition";
@@ -24,7 +24,7 @@ import { Switch } from "@/components/ui/switch";
 import { listLineUsers, listMembers } from "@/services/church";
 
 export const Route = createFileRoute("/_app/line-setup")({
-  head: () => ({ meta: [{ title: "ตั้งค่า LINE OA (ชวดลวด) — Grace Ledger" }] }),
+  head: () => ({ meta: [{ title: "ตั้งค่า LINE OA — Grace Ledger" }] }),
   component: LineSetupPage,
 });
 
@@ -57,16 +57,22 @@ function LineSetupPage() {
     toast.success("คัดลอก Webhook URL เรียบร้อยแล้ว");
   };
 
+  // Real LINE channel credentials are configured server-side via environment
+  // variables, not through this form (see comment above) — there is no API
+  // endpoint that persists these fields, and no real webhook to test from the
+  // browser. Both handlers below say so honestly instead of faking success.
   const handleTestConnection = () => {
     setIsTesting(true);
     setTimeout(() => {
       setIsTesting(false);
-      toast.success("เชื่อมต่อกับ LINE Official Account (ชวดลวด) สำเร็จ! (Webhook 200 OK)");
-    }, 1000);
+      toast.error("ฟีเจอร์ทดสอบการเชื่อมต่อยังไม่พร้อมใช้งาน — ยังไม่เชื่อมต่อ LINE จริง");
+    }, 600);
   };
 
   const handleSaveSettings = () => {
-    toast.success("บันทึกการตั้งค่า LINE Official Account เรียบร้อยแล้ว");
+    toast.error(
+      "หน้านี้ยังไม่บันทึกข้อมูลจริง — Channel credentials ตั้งค่าผ่าน environment variable ฝั่งเซิร์ฟเวอร์เท่านั้น",
+    );
   };
 
   return (
@@ -74,37 +80,48 @@ function LineSetupPage() {
       <PageHeader
         kicker="ระบบการแจ้งเตือน"
         title="ตั้งค่า LINE Official Account"
-        description="เชื่อมต่อระบบการเงินคริสตจักรกับ LINE Messaging API (แชนแนล: ชวดลวด)"
+        description="เชื่อมต่อระบบการเงินคริสตจักรกับ LINE Messaging API"
         actions={
-          <Button size="sm" onClick={handleSaveSettings}>
-            บันทึกการตั้งค่า
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge className="border-warning/30 bg-warning/10 px-3 py-1 text-xs font-semibold text-warning">
+              <AlertCircle className="mr-1.5 h-3.5 w-3.5" /> ทดลอง — ยังไม่เชื่อมต่อจริง
+            </Badge>
+            <Button size="sm" variant="outline" onClick={handleSaveSettings}>
+              บันทึกการตั้งค่า
+            </Button>
+          </div>
         }
       />
+      <div className="-mt-4 mb-2 flex items-start gap-2 rounded-card border border-warning/30 bg-warning/5 px-4 py-2.5 text-xs text-warning">
+        <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <p>
+          หน้านี้เป็นตัวอย่างสาธิต (demo) — ช่อง Channel ID/Secret/Access Token
+          ด้านล่างไม่ได้ถูกบันทึก จริง (credentials จริงตั้งค่าผ่าน environment variable
+          ฝั่งเซิร์ฟเวอร์เท่านั้น) และปุ่มทดสอบ การเชื่อมต่อ/บันทึกยังไม่มีผลจริง
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Status Card */}
         <Card className="card-ledger border border-border lg:col-span-1">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-success" />
+              <MessageCircle className="h-5 w-5 text-muted-foreground" />
               <CardTitle className="text-base font-medium">สถานะการเชื่อมต่อ</CardTitle>
             </div>
             <CardDescription className="text-xs">
-              LINE OA: ชวดลวด (Channel ID: 2009943836)
+              เชื่อมต่อ LINE Official Account ของคริสตจักร
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <span className="text-xs font-medium text-muted-foreground">สถานะบอท</span>
-              <Badge className="bg-success/15 text-success hover:bg-success/20 border-0">
-                <CheckCircle2 className="mr-1 h-3 w-3" /> ออนไลน์ (Active)
-              </Badge>
+              <Badge className="bg-muted text-muted-foreground border-0">ยังไม่เชื่อมต่อ</Badge>
             </div>
 
             <div className="flex items-center justify-between border-b border-border pb-3">
               <span className="text-xs font-medium text-muted-foreground">Webhook Status</span>
-              <span className="text-xs font-semibold text-foreground">Verified 200 OK</span>
+              <span className="text-xs font-semibold text-muted-foreground">ยังไม่ทดสอบ</span>
             </div>
 
             <div className="flex items-center justify-between border-b border-border pb-3">
@@ -141,7 +158,7 @@ function LineSetupPage() {
               </CardTitle>
             </div>
             <CardDescription className="text-xs">
-              ข้อมูล Channel Credentials สำหรับแชนแนล 2009943836 (ชวดลวด)
+              ตัวอย่างฟอร์ม — credentials จริงตั้งค่าผ่าน environment variable ฝั่งเซิร์ฟเวอร์
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -195,8 +212,8 @@ function LineSetupPage() {
 
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-success" /> ข้อมูลทั้งหมดถูกเข้ารหัสด้วย
-                AES-256
+                <ShieldCheck className="h-4 w-4 text-muted-foreground" />{" "}
+                ฟอร์มนี้ไม่ส่งหรือบันทึกค่าที่กรอกไปที่ใด
               </div>
               <Button
                 variant="outline"
@@ -229,7 +246,8 @@ function LineSetupPage() {
             </CardTitle>
           </div>
           <CardDescription className="text-xs">
-            เลือกเปิด-ปิดฟีเจอร์โต้ตอบอัตโนมัติของบอทคริสตจักร
+            เลือกเปิด-ปิดฟีเจอร์โต้ตอบอัตโนมัติของบอทคริสตจักร (ตัวอย่าง —
+            การเปลี่ยนค่าด้านล่างยังไม่ถูกบันทึก)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

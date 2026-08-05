@@ -13,16 +13,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  CheckCircle2,
-  XCircle,
-  ArrowDownLeft,
-  ArrowUpLeft,
-  FileText,
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { CheckCircle2, XCircle, ArrowDownLeft, ArrowUpLeft, AlertTriangle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -228,111 +220,183 @@ function ApproveDialog({ open, item, onClose, onConfirm }: ApproveDialogProps) {
   );
 }
 
+/* ── Bulk Approve Confirm Dialog ── */
+interface BulkApproveDialogProps {
+  items: PendingItem[];
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+}
+
+function BulkApproveDialog({ items, onClose, onConfirm }: BulkApproveDialogProps) {
+  const [loading, setLoading] = useState(false);
+  const total = items.reduce((s, i) => s + (i.kind === "income" ? i.amount : -i.amount), 0);
+
+  async function handleConfirm() {
+    setLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog open={items.length > 0} onOpenChange={() => !loading && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-approved">
+            <CheckCircle2 className="h-5 w-5" strokeWidth={2} />
+            อนุมัติ {items.length} รายการ
+          </DialogTitle>
+          <DialogDescription>
+            ยืนยันการอนุมัติทุกรายการที่เลือก — ไม่สามารถย้อนกลับได้หากไม่มีผู้ดูแลระบบ
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="max-h-64 space-y-1.5 overflow-y-auto rounded-lg border border-approved/20 bg-approved-muted/50 p-3 text-sm">
+          {items.map((it) => (
+            <div key={`${it.kind}-${it.id}`} className="flex items-center justify-between gap-3">
+              <span className="min-w-0 truncate text-foreground">
+                {it.kind === "income" ? "รายรับ" : "รายจ่าย"} · {it.description || fmtDate(it.date)}
+              </span>
+              <span
+                className={cn(
+                  "num-display shrink-0 font-semibold",
+                  it.kind === "income" ? "amount-income" : "amount-expense",
+                )}
+              >
+                <MoneyText value={it.amount} />
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          สุทธิ:{" "}
+          <span className="num-display font-semibold text-foreground">
+            <MoneyText value={total} />
+          </span>
+        </p>
+
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="outline" onClick={onClose} disabled={loading}>
+            ยกเลิก
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={loading}
+            className="bg-approved text-approved-foreground hover:bg-approved/90 active-press"
+          >
+            <CheckCircle2 className="mr-2 h-4 w-4" strokeWidth={2} />
+            {loading ? "กำลังบันทึก…" : `ยืนยันอนุมัติ ${items.length} รายการ`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /* ── Pending Item Row ── */
 interface PendingRowProps {
   item: PendingItem;
   onApprove: (item: PendingItem) => void;
   onReject: (item: PendingItem) => void;
   index: number;
+  selectable: boolean;
+  selected: boolean;
+  onToggleSelect: (item: PendingItem) => void;
 }
 
-function PendingRow({ item, onApprove, onReject, index }: PendingRowProps) {
-  const [expanded, setExpanded] = useState(false);
+function PendingRow({
+  item,
+  onApprove,
+  onReject,
+  index,
+  selectable,
+  selected,
+  onToggleSelect,
+}: PendingRowProps) {
   const isIncome = item.kind === "income";
 
   return (
     <div
-      className={cn("card-ledger overflow-hidden transition-all duration-200", "animate-fade-up")}
+      className={cn(
+        "card-ledger flex items-center gap-3 p-4 transition-all duration-200 animate-fade-up",
+        selected && "border-primary/40 bg-primary/[0.03]",
+      )}
       style={{ animationDelay: `${index * 40}ms` }}
     >
-      {/* Main row */}
-      <div className="flex items-center gap-3 p-4">
-        {/* Kind icon */}
-        <div
-          className={cn(
-            "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
-            isIncome ? "bg-income-muted" : "bg-expense-muted",
-          )}
-        >
-          {isIncome ? (
-            <ArrowDownLeft className="h-5 w-5 text-income" strokeWidth={1.75} />
-          ) : (
-            <ArrowUpLeft className="h-5 w-5 text-expense" strokeWidth={1.75} />
-          )}
-        </div>
+      {selectable && (
+        <Checkbox
+          checked={selected}
+          onCheckedChange={() => onToggleSelect(item)}
+          aria-label="เลือกรายการนี้"
+        />
+      )}
 
-        {/* Info */}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-foreground">
-              {isIncome ? "รายรับ" : "รายจ่าย"}
-            </span>
-            {item.vendor && <span className="text-xs text-muted-foreground">{item.vendor}</span>}
-          </div>
-          {item.description && (
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.description}</p>
-          )}
-          <p className="mt-0.5 text-[11px] text-muted-foreground/70">
-            {fmtDate(item.date)} · บันทึกโดย {item.createdBy}
-          </p>
-        </div>
-
-        {/* Amount */}
-        <div className="shrink-0 text-right">
-          <p
-            className={cn(
-              "num-display text-base font-bold",
-              isIncome ? "amount-income" : "amount-expense",
-            )}
-          >
-            {isIncome ? "+" : "-"}
-            <MoneyText value={item.amount} />
-          </p>
-          <StatusBadge status="pending" variant="dot" className="mt-0.5" />
-        </div>
-
-        {/* Expand toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="ml-1 h-9 w-9 text-muted-foreground"
-          onClick={() => setExpanded(!expanded)}
-          aria-label={expanded ? "ซ่อนรายละเอียด" : "ดูรายละเอียด"}
-        >
-          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </Button>
+      {/* Kind icon */}
+      <div
+        className={cn(
+          "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
+          isIncome ? "bg-income-muted" : "bg-expense-muted",
+        )}
+      >
+        {isIncome ? (
+          <ArrowDownLeft className="h-5 w-5 text-income" strokeWidth={1.75} />
+        ) : (
+          <ArrowUpLeft className="h-5 w-5 text-expense" strokeWidth={1.75} />
+        )}
       </div>
 
-      {/* Expanded: action buttons */}
-      {expanded && (
-        <div className="border-t border-border bg-muted/40 px-4 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-muted-foreground">
-              <FileText className="mr-1 inline h-3 w-3" />
-              ตรวจสอบข้อมูลครบถ้วนก่อนอนุมัติ
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-destructive/30 text-destructive hover:bg-destructive/10 active-press"
-                onClick={() => onReject(item)}
-              >
-                <XCircle className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                ปฏิเสธ
-              </Button>
-              <Button
-                size="sm"
-                className="bg-approved text-approved-foreground hover:bg-approved/90 active-press"
-                onClick={() => onApprove(item)}
-              >
-                <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                อนุมัติ
-              </Button>
-            </div>
-          </div>
+      {/* Info */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-semibold text-foreground">
+            {isIncome ? "รายรับ" : "รายจ่าย"}
+          </span>
+          {item.vendor && <span className="text-xs text-muted-foreground">{item.vendor}</span>}
         </div>
-      )}
+        {item.description && (
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.description}</p>
+        )}
+        <p className="mt-0.5 text-[11px] text-muted-foreground/70">
+          {fmtDate(item.date)} · บันทึกโดย {item.createdBy}
+        </p>
+      </div>
+
+      {/* Amount */}
+      <div className="shrink-0 text-right">
+        <p
+          className={cn(
+            "num-display text-base font-bold",
+            isIncome ? "amount-income" : "amount-expense",
+          )}
+        >
+          {isIncome ? "+" : "-"}
+          <MoneyText value={item.amount} />
+        </p>
+        <StatusBadge status="pending" variant="dot" className="mt-0.5" />
+      </div>
+
+      {/* Actions — always visible; the confirm dialog is where full detail + friction lives */}
+      <div className="flex shrink-0 items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-destructive/30 text-destructive hover:bg-destructive/10 active-press"
+          onClick={() => onReject(item)}
+        >
+          <XCircle className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+          ปฏิเสธ
+        </Button>
+        <Button
+          size="sm"
+          className="bg-approved text-approved-foreground hover:bg-approved/90 active-press"
+          onClick={() => onApprove(item)}
+        >
+          <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+          อนุมัติ
+        </Button>
+      </div>
     </div>
   );
 }
@@ -344,13 +408,25 @@ function ApprovalsPage() {
 
   const [approveTarget, setApproveTarget] = useState<PendingItem | null>(null);
   const [rejectTarget, setRejectTarget] = useState<PendingItem | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [bulkApproving, setBulkApproving] = useState(false);
 
-  const { data: incomeList = [], isLoading: incomeLoading } = useQuery({
+  const {
+    data: incomeList = [],
+    isLoading: incomeLoading,
+    isError: incomeError,
+    refetch: refetchIncome,
+  } = useQuery({
     queryKey: ["income"],
     queryFn: listIncome,
   });
 
-  const { data: expenseList = [], isLoading: expenseLoading } = useQuery({
+  const {
+    data: expenseList = [],
+    isLoading: expenseLoading,
+    isError: expenseError,
+    refetch: refetchExpense,
+  } = useQuery({
     queryKey: ["expense"],
     queryFn: listExpense,
   });
@@ -361,6 +437,19 @@ function ApprovalsPage() {
   ].sort((a, b) => (a.date < b.date ? 1 : -1));
 
   const isLoading = incomeLoading || expenseLoading;
+  const isError = incomeError || expenseError;
+  const keyOf = (it: PendingItem) => `${it.kind}-${it.id}`;
+  const selectedItems = pendingItems.filter((it) => selectedKeys.has(keyOf(it)));
+
+  function toggleSelect(item: PendingItem) {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev);
+      const k = keyOf(item);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+  }
 
   /* Approve mutation */
   const approveMutation = useMutation({
@@ -416,6 +505,28 @@ function ApprovalsPage() {
             : "ไม่มีรายการรออนุมัติในขณะนี้"
         }
       />
+
+      {isError && (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">
+              โหลดคิวอนุมัติไม่สำเร็จ — รายการที่แสดงอาจไม่ครบถ้วน
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              refetchIncome();
+              refetchExpense();
+            }}
+            className="shrink-0"
+          >
+            ลองใหม่
+          </Button>
+        </div>
+      )}
 
       {/* Role warning */}
       {!canApprove && (
@@ -484,6 +595,28 @@ function ApprovalsPage() {
         </div>
       )}
 
+      {/* Bulk action bar — appears once anything is selected */}
+      {canApprove && selectedItems.length > 0 && (
+        <div className="sticky top-2 z-10 flex items-center justify-between gap-3 rounded-card border border-primary/30 bg-primary/5 px-4 py-2.5">
+          <p className="text-xs font-medium text-foreground">
+            เลือกแล้ว {selectedItems.length} รายการ
+          </p>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setSelectedKeys(new Set())}>
+              ยกเลิกเลือก
+            </Button>
+            <Button
+              size="sm"
+              className="bg-approved text-approved-foreground hover:bg-approved/90 active-press"
+              onClick={() => setBulkApproving(true)}
+            >
+              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+              อนุมัติที่เลือก
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Pending list */}
       {!isLoading && pendingItems.length > 0 && (
         <div className="space-y-3">
@@ -492,6 +625,9 @@ function ApprovalsPage() {
               key={`${item.kind}-${item.id}`}
               item={item}
               index={i}
+              selectable={canApprove}
+              selected={selectedKeys.has(keyOf(item))}
+              onToggleSelect={toggleSelect}
               onApprove={(it) => canApprove && setApproveTarget(it)}
               onReject={(it) => canApprove && setRejectTarget(it)}
             />
@@ -522,6 +658,27 @@ function ApprovalsPage() {
           }
         }}
       />
+
+      {/* Bulk approve dialog */}
+      {bulkApproving && (
+        <BulkApproveDialog
+          items={selectedItems}
+          onClose={() => setBulkApproving(false)}
+          onConfirm={async () => {
+            const results = await Promise.allSettled(
+              selectedItems.map((it) => approveMutation.mutateAsync(it)),
+            );
+            const failed = results.filter((r) => r.status === "rejected").length;
+            if (failed > 0) {
+              toast.error(`อนุมัติไม่สำเร็จ ${failed} จาก ${selectedItems.length} รายการ`);
+            } else {
+              toast.success(`อนุมัติ ${selectedItems.length} รายการเรียบร้อยแล้ว`);
+            }
+            setSelectedKeys(new Set());
+            setBulkApproving(false);
+          }}
+        />
+      )}
     </div>
   );
 }

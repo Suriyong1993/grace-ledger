@@ -255,15 +255,57 @@ function AuditPage() {
           </div>
         </div>
 
-        <div className="card-ledger p-4 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={handleVerifyChain}
+          disabled={verifying}
+          className="card-ledger flex items-center justify-between p-4 text-left transition-colors hover:border-primary/30 disabled:cursor-wait"
+        >
           <div>
-            <p className="kicker">สถานะความถูกต้อง</p>
-            <p className="num-display text-2xl font-bold text-income mt-1">100% สมบูรณ์</p>
+            <p className="kicker">สถานะความถูกต้อง (SHA-256 Chain)</p>
+            <p
+              className={cn(
+                "num-display mt-1 text-2xl font-bold",
+                verifyResult === null
+                  ? "text-muted-foreground"
+                  : verifyResult.valid
+                    ? "text-income"
+                    : "text-destructive",
+              )}
+            >
+              {verifying
+                ? "กำลังตรวจสอบ…"
+                : verifyResult === null
+                  ? "ยังไม่ตรวจสอบ"
+                  : verifyResult.valid
+                    ? "สมบูรณ์"
+                    : "พบปัญหา"}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {verifyResult === null
+                ? "คลิกเพื่อตรวจสอบ"
+                : `ตรวจแล้ว ${verifyResult.entriesChecked} รายการ`}
+            </p>
           </div>
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-income-muted text-income">
-            <CheckCircle2 className="h-5 w-5" />
+          <div
+            className={cn(
+              "grid h-10 w-10 shrink-0 place-items-center rounded-xl",
+              verifyResult === null
+                ? "bg-muted text-muted-foreground"
+                : verifyResult.valid
+                  ? "bg-income-muted text-income"
+                  : "bg-destructive/10 text-destructive",
+            )}
+          >
+            {verifying ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : verifyResult && !verifyResult.valid ? (
+              <AlertTriangle className="h-5 w-5" />
+            ) : (
+              <CheckCircle2 className="h-5 w-5" />
+            )}
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Filter Toolbar */}
@@ -301,13 +343,27 @@ function AuditPage() {
         </div>
       </div>
 
+      {q.isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">
+              โหลด Audit Trail ไม่สำเร็จ — ไม่ใช่ "ไม่พบบันทึก", การเชื่อมต่อล้มเหลว
+            </p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => q.refetch()} className="shrink-0">
+            ลองใหม่
+          </Button>
+        </div>
+      ) : null}
+
       {/* Timeline Content */}
       {q.isLoading ? (
         <div className="space-y-6">
           <Skeleton className="h-44 w-full rounded-xl" />
           <Skeleton className="h-44 w-full rounded-xl" />
         </div>
-      ) : filteredRows.length === 0 ? (
+      ) : q.isError ? null : filteredRows.length === 0 ? (
         <EmptyState
           icon={ScrollText}
           title="ไม่พบบันทึกตามเงื่อนไข"

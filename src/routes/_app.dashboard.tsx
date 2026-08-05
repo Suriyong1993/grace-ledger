@@ -19,10 +19,14 @@ import {
   HandHeart,
   Clock,
   ArrowRight,
+  Info,
+  AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -91,6 +95,11 @@ export function Dashboard() {
   const offQ = useQuery({ queryKey: ["offering"], queryFn: listOffering });
   const budgetQ = useQuery({ queryKey: ["budget"], queryFn: listBudget });
 
+  const queries = [incomeQ, expenseQ, catsQ, fundsQ, offQ, budgetQ];
+  const isInitialLoading = queries.some((q) => q.isLoading);
+  const isError = queries.some((q) => q.isError);
+  const refetchAll = () => queries.forEach((q) => q.refetch());
+
   // Real-time: fetch churchId then subscribe to table changes
   const qc = useQueryClient();
   const [churchId, setChurchId] = useState("");
@@ -98,7 +107,7 @@ export function Dashboard() {
   useEffect(() => {
     getChurchId()
       .then(setChurchId)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   // When incomes table changes (INSERT/UPDATE/DELETE), refetch income query
@@ -249,17 +258,13 @@ export function Dashboard() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                incomeQ.refetch();
-                expenseQ.refetch();
-                offQ.refetch();
-              }}
-              className="gap-1 text-xs"
+              variant="ghost"
+              size="icon"
+              onClick={refetchAll}
+              aria-label="รีเฟรชข้อมูล"
+              className="h-8 w-8 text-muted-foreground"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              รีเฟรช
             </Button>
             <Button
               size="sm"
@@ -282,125 +287,197 @@ export function Dashboard() {
         }
       />
 
-      {/* Search Bar inspired by MyCloud UI */}
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="ค้นหารายการการเงิน, หมวดหมู่, หรือผู้ขาย..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-card border-border/80 focus:border-primary text-sm shadow-sm"
-        />
-      </div>
-
-      {/* KPI row — cash balance hero + this month's income/expense + latest offering */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-          className="rounded-card border border-border bg-card p-5"
-        >
-          <p className="text-[13px] font-medium text-muted-foreground">เงินสดคงเหลือรวม</p>
-          <p className="num-display font-display mt-2 text-[28px] font-semibold leading-none tracking-tight md:text-[32px]">
-            <MoneyText value={totalBalanceNumber} />
-          </p>
-          <p className="mt-3 text-xs text-muted-foreground">{funds.length} กองทุน</p>
-        </motion.div>
-        <StatCard
-          label="รายรับเดือนนี้"
-          value={incomeMonth}
-          icon={ArrowDownCircle}
-          tone="success"
-          hint="เทียบเดือนก่อน"
-        />
-        <StatCard
-          label="รายจ่ายเดือนนี้"
-          value={expenseMonth}
-          icon={ArrowUpCircle}
-          tone="danger"
-          hint={
-            annualBudget.total > 0
-              ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
-              : undefined
-          }
-        />
-        <StatCard
-          label="เงินถวายล่าสุด"
-          value={offeringTotal}
-          icon={HandHeart}
-          tone="warning"
-          hint="ยอดรวมทุกช่องทาง"
-        />
-      </div>
-
-      {/* Main 3-Column Layout Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
-        {/* Left 2-Columns: Operations & Transactions */}
-        <div className="xl:col-span-2 space-y-6">
-          {/* Church Funds Grid */}
-          <FundsGrid funds={funds} />
-
-          {/* Recent Transactions Table */}
-          <RecentTransactionsTable
-            transactions={filteredTxs}
-            onSelectTx={(tx) => setSelectedTx(tx)}
-          />
+      {isError ? (
+        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">
+              โหลดข้อมูลแดชบอร์ดไม่สำเร็จ — ตัวเลขที่แสดงอาจไม่ครบถ้วน
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={refetchAll}
+            className="shrink-0 gap-1 text-xs"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            ลองใหม่
+          </Button>
         </div>
+      ) : null}
 
-        {/* Right 1-Column: Approvals, Gauge Chart & Financial Analytics */}
-        <div className="xl:col-span-1 space-y-6">
-          {/* Pending Approvals preview */}
-          <div className="card-ledger p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">รอการอนุมัติ</p>
-              {pendingCount > 0 && (
-                <span className="num-display rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-semibold text-warning">
-                  {pendingCount} รายการ
-                </span>
-              )}
+      {isInitialLoading ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[128px] rounded-card" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="xl:col-span-2 space-y-6">
+              <Skeleton className="h-[180px] rounded-card" />
+              <Skeleton className="h-[360px] rounded-card" />
             </div>
-            {pendingItems.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 py-6 text-center">
-                <Clock className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />
-                <p className="text-xs text-muted-foreground">ไม่มีรายการค้างอนุมัติ</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2.5">
-                {pendingItems.slice(0, 3).map((t) => (
-                  <div key={t.id} className="rounded-lg border border-border/60 p-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-xs font-semibold leading-snug text-foreground">
-                        {t.description || "รายการ"}
-                      </p>
-                      <p
-                        className={cn(
-                          "num-display shrink-0 text-xs font-bold",
-                          t.kind === "income" ? "amount-income" : "amount-expense",
-                        )}
-                      >
-                        <MoneyText value={t.amount} />
-                      </p>
-                    </div>
-                    <p className="mt-1 text-[11px] text-muted-foreground">{fmtDate(t.date)}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <Button asChild variant="outline" className="mt-3 w-full">
-              <Link to="/approvals">
-                ไปที่คิวอนุมัติ
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
+            <div className="space-y-6">
+              <Skeleton className="h-[220px] rounded-card" />
+              <Skeleton className="h-[180px] rounded-card" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* KPI row — cash balance hero + this month's income/expense + latest offering */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+              className="rounded-card border border-border bg-card p-5"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground">
+                    เงินสดคงเหลือรวม
+                    <Info className="h-3 w-3 text-muted-foreground/60" />
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[240px]">
+                  ยอดยกมาต้นงวด + รายรับ + เงินถวาย − รายจ่าย รวมทุกกองทุน
+                </TooltipContent>
+              </Tooltip>
+              <p className="num-display font-display mt-2 text-[28px] font-semibold leading-none tracking-tight md:text-[32px]">
+                <MoneyText value={totalBalanceNumber} />
+              </p>
+              <p className="mt-3 text-xs text-muted-foreground">{funds.length} กองทุน</p>
+            </motion.div>
+            <StatCard
+              label="รายรับเดือนนี้"
+              value={incomeMonth}
+              icon={ArrowDownCircle}
+              tone="success"
+              hint="เทียบเดือนก่อน"
+            />
+            <StatCard
+              label="รายจ่ายเดือนนี้"
+              value={expenseMonth}
+              icon={ArrowUpCircle}
+              tone="danger"
+              hint={
+                annualBudget.total > 0
+                  ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
+                  : undefined
+              }
+            />
+            <StatCard
+              label="เงินถวายล่าสุด"
+              value={offeringTotal}
+              icon={HandHeart}
+              tone="warning"
+              hint="ยอดรวมทุกช่องทาง"
+            />
           </div>
 
-          <DashboardGaugeChart
-            totalBudget={annualBudget.total > 0 ? annualBudget.total : 2500000}
-            usedBudget={annualBudget.total > 0 ? annualBudget.used : 0}
-          />
-        </div>
-      </div>
+          {/* Main 3-Column Layout Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+            {/* Left 2-Columns: Operations & Transactions */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Church Funds Grid */}
+              <FundsGrid funds={funds} />
+
+              {/* Scoped search + period filter for the transactions list below */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="ค้นหาในรายการล่าสุด..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-8 pl-8 text-xs"
+                  />
+                </div>
+                <div className="flex items-center gap-0.5 rounded-lg bg-muted/60 p-1">
+                  {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+                    <Button
+                      key={p}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setPeriod(p)}
+                      className={cn(
+                        "h-auto rounded-md px-2.5 py-1 text-[11px] font-medium",
+                        period === p
+                          ? "bg-card text-foreground shadow-xs hover:bg-card"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {PERIOD_LABELS[p]}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent Transactions Table */}
+              <RecentTransactionsTable
+                transactions={filteredTxs}
+                onSelectTx={(tx) => setSelectedTx(tx)}
+              />
+            </div>
+
+            {/* Right 1-Column: Approvals, Gauge Chart & Financial Analytics */}
+            <div className="xl:col-span-1 space-y-6">
+              {/* Pending Approvals preview */}
+              <div className="card-ledger p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">รอการอนุมัติ</p>
+                  {pendingCount > 0 && (
+                    <span className="num-display rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-semibold text-warning">
+                      {pendingCount} รายการ
+                    </span>
+                  )}
+                </div>
+                {pendingItems.length === 0 ? (
+                  <div className="flex flex-col items-center gap-2 py-6 text-center">
+                    <Clock className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />
+                    <p className="text-xs text-muted-foreground">ไม่มีรายการค้างอนุมัติ</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2.5">
+                    {pendingItems.slice(0, 3).map((t) => (
+                      <div key={t.id} className="rounded-lg border border-border/60 p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-xs font-semibold leading-snug text-foreground">
+                            {t.description || "รายการ"}
+                          </p>
+                          <p
+                            className={cn(
+                              "num-display shrink-0 text-xs font-bold",
+                              t.kind === "income" ? "amount-income" : "amount-expense",
+                            )}
+                          >
+                            <MoneyText value={t.amount} />
+                          </p>
+                        </div>
+                        <p className="mt-1 text-[11px] text-muted-foreground">{fmtDate(t.date)}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Button asChild variant="outline" className="mt-3 w-full">
+                  <Link to="/approvals">
+                    ไปที่คิวอนุมัติ
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
+
+              <DashboardGaugeChart
+                totalBudget={annualBudget.total > 0 ? annualBudget.total : 2500000}
+                usedBudget={annualBudget.total > 0 ? annualBudget.used : 0}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Transaction Detail Drawer */}
       <Sheet open={!!selectedTx} onOpenChange={() => setSelectedTx(null)}>

@@ -93,7 +93,11 @@ export function RecentTransactionsTable({
   transactions = DEFAULT_TXS,
   onSelectTx,
 }: RecentTransactionsTableProps) {
-  const displayTxs = transactions.length > 0 ? transactions : DEFAULT_TXS;
+  // NOTE: `transactions` must never be silently replaced with demo data —
+  // an empty array means "no real transactions" and must render the real
+  // empty state below, not fabricated rows. DEFAULT_TXS only applies when
+  // the prop itself is omitted (e.g. isolated component preview).
+  const displayTxs = transactions;
   const [filter, setFilter] = useState<FilterTab>("all");
 
   const filtered = displayTxs.filter((tx) => {

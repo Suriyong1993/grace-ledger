@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -8,10 +8,8 @@ import {
   UploadCloud,
   FileText,
   ShieldCheck,
-  CheckCircle2,
   AlertCircle,
   HelpCircle,
-  TrendingUp,
   Brain,
   Receipt,
   RotateCw,
@@ -56,7 +54,8 @@ export function GraceAiPage() {
   const offerings = offeringQ.data ?? [];
   const budgets = budgetQ.data ?? [];
 
-  const totalIn = incomes.reduce((s, x) => s + x.amount, 0) + offerings.reduce((s, x) => s + x.amount, 0);
+  const totalIn =
+    incomes.reduce((s, x) => s + x.amount, 0) + offerings.reduce((s, x) => s + x.amount, 0);
   const totalExp = expenses.reduce((s, x) => s + x.amount, 0);
 
   // Chat message history
@@ -106,7 +105,7 @@ export function GraceAiPage() {
       if (q.includes("สรุป") || q.includes("ภาพรวม") || q.includes("การเงิน")) {
         aiReply = `สรุปสถานะการเงินคริสตจักรล่าสุด: รายรับสะสมรวม ${thb(totalIn)} บาท (รวมเงินถวายและรายรับทั่วไป) รายจ่ายสะสมรวม ${thb(totalExp)} บาท สภาพคล่องการเงินสุทธิบวก ${thb(totalIn - totalExp)} บาท ระบบบันทึกรายการถูกต้องสมบูรณ์ครับ`;
       } else if (q.includes("งบ") || q.includes("งบประมาณ")) {
-        const over = budgets.filter((b) => (b.used / b.amount) >= 0.9);
+        const over = budgets.filter((b) => b.used / b.amount >= 0.9);
         aiReply = `วิเคราะห์งบประมาณปี ${new Date().getFullYear()}: มีงบประมาณทั้งหมด ${budgets.length} หมวด โดยมี ${over.length} หมวดที่ใช้ไปแล้วเกิน 90% ของวงเงิน เช่น ค่าสาธารณูปโภค ควรติดตามยอดเบิกจ่ายในไตรมาสถัดไปครับ`;
       } else if (q.includes("ถวาย") || q.includes("สัปดาห์")) {
         aiReply = `แนวโน้มเงินถวาย: มียอดเงินถวายสะสมทั้งสิ้น ${thb(offerings.reduce((s, x) => s + x.amount, 0))} บาท จากการบันทึก ${offerings.length} รายการ ยอดถวายเฉลี่ยวันอาทิตย์อยู่ในเกณฑ์สม่ำเสมอ`;
@@ -137,15 +136,16 @@ export function GraceAiPage() {
     setTimeout(() => {
       setOcrLoading(false);
       setOcrResult({
-        docType: "สลิปโอนเงินธนาคาร (Bank Slip)",
+        docType: "สลิปโอนเงินธนาคาร (Bank Slip) — ตัวอย่างจำลอง",
         merchantName: "โอนเงินเข้าบัญชีคริสตจักรพระคุณ",
         date: new Date().toISOString().split("T")[0],
         amount: 2500,
         category: "เงินถวายสิบลด",
         confidence: 0.97,
-        description: "สลิปโอนเงินถวายสิบลดประจำสัปดาห์ อ่านข้อมูลอัตโนมัติผ่าน Fireworks AI / Gemini OCR",
+        description:
+          "ข้อมูลตัวอย่าง (จำลอง) — ยังไม่ได้เชื่อมต่อ OCR จริง ไม่ได้อ่านจากไฟล์ที่อัปโหลด",
       });
-      toast.success("อ่านข้อมูลสลิปด้วย AI สำเร็จ! (Confidence 97%)");
+      toast.success("แสดงผลตัวอย่างจำลองแล้ว (ไม่ใช่ผลอ่านไฟล์จริง)");
     }, 1500);
   };
 
@@ -156,11 +156,19 @@ export function GraceAiPage() {
         title="Grace AI Workspace"
         description="ผู้ช่วยวิเคราะห์ข้อมูลการเงิน สแกนสลิปใบเสร็จ และให้ข้อสังเกตด้านธรรมาภิบาล"
         actions={
-          <Badge className="bg-primary/10 text-primary border-primary/20 px-3 py-1 text-xs font-semibold">
-            <Sparkles className="mr-1.5 h-3.5 w-3.5" /> AI Model: Gemini 2.0 Flash / Fireworks
+          <Badge className="border-warning/30 bg-warning/10 px-3 py-1 text-xs font-semibold text-warning">
+            <AlertCircle className="mr-1.5 h-3.5 w-3.5" /> ทดลอง — ยังไม่เชื่อมต่อโมเดล AI จริง
           </Badge>
         }
       />
+      <div className="-mt-4 mb-2 flex items-start gap-2 rounded-card border border-warning/30 bg-warning/5 px-4 py-2.5 text-xs text-warning">
+        <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <p>
+          หน้านี้เป็นตัวอย่างสาธิต (demo) — คำตอบแชทและผลสแกนสลิปด้านล่างเป็นข้อมูลจำลอง
+          ไม่ได้เชื่อมต่อกับ AI จริง และปุ่ม "นำเข้าเป็นบันทึก" ยังไม่บันทึกข้อมูลจริง
+          กรุณาบันทึกรายการผ่านหน้ารายรับ/รายจ่าย/เงินถวายตามปกติ
+        </p>
+      </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "assistant" | "ocr")}>
         <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
@@ -182,7 +190,9 @@ export function GraceAiPage() {
                   <div className="h-2.5 w-2.5 rounded-full bg-success animate-pulse" />
                   <CardTitle className="text-sm font-bold">สนทนากับ Grace AI Advisor</CardTitle>
                 </div>
-                <span className="text-[11px] text-muted-foreground">ข้อสังเกตเท่านั้น — ไม่แก้ไขข้อมูลการเงินโดยตรง</span>
+                <span className="text-[11px] text-muted-foreground">
+                  ข้อสังเกตเท่านั้น — ไม่แก้ไขข้อมูลการเงินโดยตรง
+                </span>
               </CardHeader>
 
               <CardContent className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -201,7 +211,9 @@ export function GraceAiPage() {
                       {m.sender === "ai" && (
                         <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-[#C7D2FE]/60">
                           <Sparkles className="h-3.5 w-3.5 text-primary" />
-                          <span className="font-bold text-primary text-[11px]">Grace AI Insight</span>
+                          <span className="font-bold text-primary text-[11px]">
+                            Grace AI Insight
+                          </span>
                         </div>
                       )}
                       <p>{m.text}</p>
@@ -215,8 +227,8 @@ export function GraceAiPage() {
                               </span>
                             )}
                             {m.confidence && (
-                              <span className="bg-success/15 text-success px-2 py-0.5 rounded-full font-medium">
-                                ความมั่นใจ {Math.round(m.confidence * 100)}%
+                              <span className="bg-warning/15 text-warning px-2 py-0.5 rounded-full font-medium">
+                                ความมั่นใจ (จำลอง) {Math.round(m.confidence * 100)}%
                               </span>
                             )}
                           </div>
@@ -250,7 +262,12 @@ export function GraceAiPage() {
                     onChange={(e) => setPrompt(e.target.value)}
                     className="rounded-input text-xs bg-background"
                   />
-                  <Button type="submit" size="sm" disabled={isThinking || !prompt.trim()} className="rounded-button gap-1.5 font-semibold shrink-0">
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={isThinking || !prompt.trim()}
+                    className="rounded-button gap-1.5 font-semibold shrink-0"
+                  >
                     <Send className="h-3.5 w-3.5" /> ส่งคำถาม
                   </Button>
                 </form>
@@ -288,39 +305,48 @@ export function GraceAiPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2 text-primary">
                     <Brain className="h-4 w-4" />
-                    <CardTitle className="text-xs font-bold uppercase tracking-wider">AI Health Check</CardTitle>
+                    <CardTitle className="text-xs font-bold uppercase tracking-wider">
+                      ข้อมูลที่ AI มองเห็นตอนนี้
+                    </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-xs">
                   <div className="flex items-center justify-between border-b border-[#C7D2FE]/60 pb-2">
-                    <span className="text-muted-foreground">ดรรชนีความน่าเชื่อถือ</span>
-                    <span className="font-bold text-success flex items-center gap-1">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> 98.5%
+                    <span className="text-muted-foreground">รายรับ + เงินถวาย</span>
+                    <span className="font-semibold text-foreground">
+                      {incomes.length + offerings.length} รายการ
                     </span>
                   </div>
                   <div className="flex items-center justify-between border-b border-[#C7D2FE]/60 pb-2">
-                    <span className="text-muted-foreground">การสแกนสลิปผ่าน AI</span>
-                    <span className="font-semibold text-foreground">ปกติ (200 OK)</span>
+                    <span className="text-muted-foreground">รายจ่าย</span>
+                    <span className="font-semibold text-foreground">{expenses.length} รายการ</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">รายการต้องสงสัย</span>
-                    <span className="font-semibold text-foreground">0 รายการ</span>
+                    <span className="text-muted-foreground">งบประมาณที่ตั้งไว้</span>
+                    <span className="font-semibold text-foreground">{budgets.length} หมวด</span>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="card-ledger border border-border">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">ข้อกำหนดธรรมาภิบาล AI</CardTitle>
+                  <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    ข้อกำหนดธรรมาภิบาล AI
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-xs text-muted-foreground leading-relaxed">
                   <div className="flex items-start gap-2">
                     <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <p>AI ทำหน้าที่ให้ข้อสังเกตและช่วยสแกนอ่านเอกสารเท่านั้น <strong>ไม่มีสิทธิ์อนุมัติหรือแก้ไขยอดเงินในบัญชีโดยตรง</strong></p>
+                    <p>
+                      AI ทำหน้าที่ให้ข้อสังเกตและช่วยสแกนอ่านเอกสารเท่านั้น{" "}
+                      <strong>ไม่มีสิทธิ์อนุมัติหรือแก้ไขยอดเงินในบัญชีโดยตรง</strong>
+                    </p>
                   </div>
                   <div className="flex items-start gap-2 pt-1">
                     <HelpCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <p>ทุกการบันทึกจาก AI ต้องผ่านการยืนยันจากเหรัญญิกและลงบันทึกใน Audit Trail เสมอ</p>
+                    <p>
+                      ทุกการบันทึกจาก AI ต้องผ่านการยืนยันจากเหรัญญิกและลงบันทึกใน Audit Trail เสมอ
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -335,10 +361,13 @@ export function GraceAiPage() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Receipt className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-base font-medium">สแกนอ่านสลิป & ใบเสร็จด้วย AI (OCR)</CardTitle>
+                  <CardTitle className="text-base font-medium">
+                    สแกนอ่านสลิป & ใบเสร็จด้วย AI (OCR)
+                  </CardTitle>
                 </div>
                 <CardDescription className="text-xs">
-                  อัปโหลดรูปสลิปโอนเงิน ใบกำกับภาษี หรือบิลเขียนมือ เพื่อให้อ่านยอดเงินและวันที่อัตโนมัติ
+                  อัปโหลดรูปสลิปโอนเงิน ใบกำกับภาษี หรือบิลเขียนมือ
+                  เพื่อให้อ่านยอดเงินและวันที่อัตโนมัติ
                 </CardDescription>
               </CardHeader>
 
@@ -348,8 +377,12 @@ export function GraceAiPage() {
                   onClick={() => document.getElementById("file-input")?.click()}
                 >
                   <UploadCloud className="h-8 w-8 text-primary mx-auto mb-2" />
-                  <p className="text-xs font-semibold text-foreground">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">รองรับ JPG, PNG, WEBP (สูงสุด 10MB)</p>
+                  <p className="text-xs font-semibold text-foreground">
+                    คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    รองรับ JPG, PNG, WEBP (สูงสุด 10MB)
+                  </p>
                   <input
                     id="file-input"
                     type="file"
@@ -367,7 +400,12 @@ export function GraceAiPage() {
                       <FileText className="h-4 w-4 text-primary shrink-0" />
                       <span className="font-semibold truncate">{selectedFile.name}</span>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedFile(null)} className="h-7 text-xs text-destructive">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedFile(null)}
+                      className="h-7 text-xs text-destructive"
+                    >
                       ยกเลิก
                     </Button>
                   </div>
@@ -397,8 +435,8 @@ export function GraceAiPage() {
                 <CardTitle className="text-base font-medium flex items-center justify-between">
                   <span>ผลลัพธ์การอ่านข้อมูล (Parsed OCR Result)</span>
                   {ocrResult && (
-                    <Badge className="bg-success/15 text-success border-0">
-                      Confidence {Math.round((ocrResult.confidence ?? 0.95) * 100)}%
+                    <Badge className="bg-warning/15 text-warning border-0">
+                      Confidence (จำลอง) {Math.round((ocrResult.confidence ?? 0.95) * 100)}%
                     </Badge>
                   )}
                 </CardTitle>
@@ -413,26 +451,44 @@ export function GraceAiPage() {
                       </div>
                       <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
                         <span className="text-muted-foreground">รายการ/รายละเอียด</span>
-                        <span className="font-semibold text-foreground">{ocrResult.merchantName}</span>
+                        <span className="font-semibold text-foreground">
+                          {ocrResult.merchantName}
+                        </span>
                       </div>
                       <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
                         <span className="text-muted-foreground">วันที่ในสลิป</span>
-                        <span className="num-display font-semibold text-foreground">{ocrResult.date}</span>
+                        <span className="num-display font-semibold text-foreground">
+                          {ocrResult.date}
+                        </span>
                       </div>
                       <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
                         <span className="text-muted-foreground">หมวดหมู่แนะนำ</span>
                         <span className="font-semibold text-foreground">{ocrResult.category}</span>
                       </div>
                       <div className="flex justify-between items-baseline pt-1">
-                        <span className="text-muted-foreground font-semibold">จำนวนเงินที่อ่านได้</span>
-                        <span className="num-display text-lg font-bold text-success">{thb(ocrResult.amount ?? 0)}</span>
+                        <span className="text-muted-foreground font-semibold">
+                          จำนวนเงินที่อ่านได้
+                        </span>
+                        <span className="num-display text-lg font-bold text-success">
+                          {thb(ocrResult.amount ?? 0)}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="flex gap-2 pt-2">
-                      <Button size="sm" className="flex-1 rounded-button font-semibold" onClick={() => toast.success("นำข้อมูลไปลงบันทึกเรียบร้อยแล้ว")}>
-                        นำเข้าเป็นบันทึกรายรับ/เงินถวาย
+                    <div className="space-y-1.5 pt-2">
+                      <Button
+                        asChild
+                        size="sm"
+                        variant="outline"
+                        className="w-full rounded-button font-semibold"
+                      >
+                        <Link to="/income">
+                          ไปบันทึกรายรับด้วยตนเอง (ยังไม่รองรับนำเข้าอัตโนมัติ)
+                        </Link>
                       </Button>
+                      <p className="text-center text-[10px] text-muted-foreground">
+                        ค่าด้านบนเป็นข้อมูลจำลอง — กรอกยอดจริงเองที่หน้ารายรับ/เงินถวาย
+                      </p>
                     </div>
                   </div>
                 ) : (
