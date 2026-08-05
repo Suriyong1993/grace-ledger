@@ -14,6 +14,13 @@
     "skills": {
       "command": "npx",
       "args": ["-y", "@anthropic/skills-mcp"]
+    },
+    "designmd": {
+      "command": "npx",
+      "args": ["-y", "designmd-mcp"],
+      "env": {
+        "DESIGNMD_API_KEY": "dk_a0ed4f17ef712c10ff37a561b94c681d8af27759"
+      }
     }
   }
 }
