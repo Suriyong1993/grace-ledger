@@ -37,10 +37,12 @@ dist-ssr
 
 # Project specific
 .agents/
-Refer/
+refer/
+scratch/
 .uploads/
 .vercel
 .vercel-tmp
 .qoder
 supabase/.temp
+n8n-free-templates/
 
