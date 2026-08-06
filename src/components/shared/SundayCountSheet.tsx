@@ -287,7 +287,7 @@ export function SundayCountSheet() {
   return (
     <div className="space-y-5">
       {/* Header — ledger sheet title band */}
-      <div className="flex animate-fade-up flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
         <div className="min-w-0">
           <p className="kicker">ประจำวันอาทิตย์</p>
           <h2 className="font-display mt-1.5 text-lg font-semibold tracking-tight text-foreground">
@@ -330,7 +330,7 @@ export function SundayCountSheet() {
 
         {/* ========== Tab 1: Member Matrix ========== */}
         <TabsContent value="member-list" className="mt-5">
-          <section className="card-ledger animate-fade-up">
+          <section className="card-ledger">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3.5">
               <div>
                 <p className="kicker">ขั้นตอนที่ 1 · รายการถวายรายบุคคล</p>
@@ -475,7 +475,7 @@ export function SundayCountSheet() {
         {/* ========== Tab 2: Cash Count ========== */}
         <TabsContent value="cash-count" className="mt-5">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <section className="card-ledger animate-fade-up lg:col-span-2">
+            <section className="card-ledger lg:col-span-2">
               <div className="border-b border-border px-5 py-3.5">
                 <p className="kicker">ขั้นตอนที่ 2 · ใบนับธนบัตรและเหรียญ</p>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -560,7 +560,7 @@ export function SundayCountSheet() {
             </section>
 
             {/* Cash Reconciliation */}
-            <section className="card-ledger animate-fade-up self-start">
+            <section className="card-ledger self-start">
               <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
                 <p className="kicker">กระทบยอดเงินสด</p>
                 <Calculator className="h-4 w-4 text-muted-foreground/50" strokeWidth={1.75} />
@@ -623,7 +623,7 @@ export function SundayCountSheet() {
 
         {/* ========== Tab 3: Summary ========== */}
         <TabsContent value="summary" className="mt-5">
-          <section className="card-ledger animate-fade-up">
+          <section className="card-ledger">
             <div className="border-b border-border px-5 py-3.5">
               <p className="kicker">ขั้นตอนที่ 3 · สรุปยอดประจำวัน &amp; ผู้นับเงิน</p>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -744,7 +744,7 @@ export function SundayCountSheet() {
 
         {/* ========== Tab 4: Validation & Save ========== */}
         <TabsContent value="validation" className="mt-5">
-          <section className="card-ledger animate-fade-up">
+          <section className="card-ledger">
             <div className="border-b border-border px-5 py-3.5">
               <p className="kicker">ขั้นตอนที่ 4 · ตรวจสอบความถูกต้องก่อนบันทึก</p>
               <p className="mt-1 text-xs text-muted-foreground">

@@ -39,7 +39,7 @@ const DialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         // Mobile: full-screen sheet. sm+: centered modal (v3.0 Dialog responsive rule).
-        "fixed inset-0 z-50 grid h-full w-full max-w-none translate-x-0 translate-y-0 gap-4 overflow-y-auto border-0 bg-background p-6 shadow-none duration-150 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100",
+        "fixed inset-0 z-50 grid h-full w-full max-w-none translate-x-0 translate-y-0 gap-4 overflow-y-auto border-0 bg-background p-6 duration-150 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100",
         "sm:inset-auto sm:left-[50%] sm:top-[50%] sm:h-auto sm:w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-dialog sm:border sm:border-border sm:p-6 sm:shadow-elevated sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
         className,
       )}

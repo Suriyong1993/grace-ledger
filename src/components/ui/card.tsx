@@ -4,14 +4,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "rounded-card border border-border/80 bg-card text-card-foreground shadow-2xs transition-all duration-200",
+  "rounded-card border border-border bg-card text-card-foreground transition-colors duration-150",
   {
     variants: {
       variant: {
         default: "",
         stat: "p-6",
-        interactive:
-          "cursor-pointer hover:shadow-card hover:border-border hover:-translate-y-0.5 active:translate-y-0 active:shadow-2xs",
+        interactive: "cursor-pointer hover:border-primary/50 active:scale-[0.99]",
       },
     },
     defaultVariants: {

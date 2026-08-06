@@ -195,7 +195,7 @@ function ReportsPage() {
             className={cn(
               "h-auto rounded-md px-3 py-1.5 text-xs font-medium",
               period === p
-                ? "bg-card text-foreground shadow-sm hover:bg-card"
+                ? "bg-card text-foreground hover:bg-card"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

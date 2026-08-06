@@ -67,21 +67,21 @@ function NavRow({
           "group/nav-row relative pl-3 transition-all duration-150 rounded-button",
           compact ? "h-8 text-xs" : "h-9 text-[13px]",
           active
-            ? ["bg-primary/8 font-semibold text-primary", "dark:bg-primary/12"]
-            : [
-                "text-muted-foreground font-medium",
-                "hover:translate-x-px hover:bg-muted hover:text-foreground",
-              ],
+            ? [
+                "bg-sidebar-accent font-semibold text-sidebar-accent-foreground",
+                "dark:bg-sidebar-accent",
+              ]
+            : ["text-muted-foreground font-medium", "hover:bg-secondary hover:text-foreground"],
         )}
       >
         <Link to={item.to} className="flex items-center gap-2.5">
           {/* Icon with subtle background when active */}
           <span
             className={cn(
-              "grid shrink-0 place-items-center rounded-md transition-all duration-150",
+              "grid shrink-0 place-items-center rounded-md transition-colors duration-150",
               compact ? "h-5 w-5" : "h-6 w-6",
               active
-                ? "bg-primary/12 text-primary"
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
                 : "text-muted-foreground/60 group-hover/nav-row:text-foreground",
             )}
           >
@@ -104,9 +104,9 @@ export function AppSidebar() {
   const isActive = (to: string) => path === to || path.startsWith(to + "/");
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/60 bg-sidebar">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
       {/* ── Header: Wordmark ── */}
-      <SidebarHeader className="border-b border-border/60 px-3 py-3">
+      <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
         <Link
           to="/dashboard"
           className="group flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-muted/60"
@@ -146,7 +146,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* ── Footer: System nav ── */}
-      <SidebarFooter className="border-t border-border/60 py-2">
+      <SidebarFooter className="border-t border-sidebar-border py-2">
         {!collapsed && <p className="kicker px-3 pb-1.5">ระบบ</p>}
         <SidebarMenu className="gap-0.5">
           {NAV_SYSTEM.map((item) => (

@@ -14,7 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createMember } from "@/services/church";
 
 interface MemberFormDialogProps {
@@ -59,7 +65,7 @@ export function MemberFormDialog({ trigger }: MemberFormDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button size="sm" className="gap-2 rounded-button font-semibold shadow-sm">
+          <Button size="sm" className="gap-2 rounded-button font-semibold">
             <UserPlus className="h-4 w-4" />
             ลงทะเบียนสมาชิกใหม่
           </Button>

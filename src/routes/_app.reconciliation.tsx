@@ -325,7 +325,7 @@ function ReconciliationPage() {
       ) : (
         <>
           {/* ============ SUMMARY STATEMENT ============ */}
-          <section className="card-ledger animate-fade-up">
+          <section className="card-ledger">
             <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
               <p className="kicker">งบแสดงฐานะการเงิน</p>
               <span className="num-display text-xs text-muted-foreground">
@@ -387,7 +387,7 @@ function ReconciliationPage() {
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* ============ CHANNEL BREAKDOWN ============ */}
-            <section className="card-ledger animate-fade-up">
+            <section className="card-ledger">
               <div className="border-b border-border px-5 py-3.5">
                 <p className="kicker">เงินถวายแยกตามช่องทาง</p>
               </div>
@@ -421,7 +421,7 @@ function ReconciliationPage() {
             </section>
 
             {/* ============ FUND BREAKDOWN ============ */}
-            <section className="card-ledger animate-fade-up">
+            <section className="card-ledger">
               <div className="border-b border-border px-5 py-3.5">
                 <p className="kicker">ยอดคงเหลือแยกตามกองทุน</p>
               </div>
@@ -474,7 +474,7 @@ function ReconciliationPage() {
           </div>
 
           {/* ============ SIGN-OFF: RECONCILIATION CHECK ============ */}
-          <section className="card-ledger animate-fade-up">
+          <section className="card-ledger">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-3.5">
               <div>
                 <p className="kicker">ลงนามกระทบยอด (per fund, ผูก Audit Trail จริง)</p>

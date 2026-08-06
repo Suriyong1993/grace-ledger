@@ -46,73 +46,73 @@
   /* ── Radius ──
      Base scale (sm/md/lg/xl/2xl) derived from --radius for generic
      elements; named tokens below are the explicit v3.0 element radii. */
-  --radius-sm:  calc(var(--radius) - 4px);  /* 8px */
-  --radius-md:  var(--radius);              /* 12px */
-  --radius-lg:  calc(var(--radius) + 4px);  /* 16px */
-  --radius-xl:  calc(var(--radius) + 8px);  /* 20px */
+  --radius-sm: calc(var(--radius) - 4px); /* 8px */
+  --radius-md: var(--radius); /* 12px */
+  --radius-lg: calc(var(--radius) + 4px); /* 16px */
+  --radius-xl: calc(var(--radius) + 8px); /* 20px */
   --radius-2xl: calc(var(--radius) + 12px); /* 24px */
   --radius-full: 9999px;
 
   /* Explicit vNext element radii — tightened from v3.0's 18/16/24
      (read as "soft toy" next to Linear/Stripe/Mercury references).
      See docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md §4. */
-  --radius-button: 0.75rem;    /* 12px */
-  --radius-input:  0.625rem;   /* 10px */
-  --radius-card:   1rem;       /* 16px */
-  --radius-dialog: 1.25rem;    /* 20px */
-  --radius-sheet:  1.5rem;     /* 24px */
+  --radius-button: 0.75rem; /* 12px */
+  --radius-input: 0.625rem; /* 10px */
+  --radius-card: 1rem; /* 16px */
+  --radius-dialog: 1.25rem; /* 20px */
+  --radius-sheet: 1.5rem; /* 24px */
 
   /* ── Base semantic colors ── */
-  --color-background:        var(--background);
-  --color-foreground:        var(--foreground);
-  --color-card:              var(--card);
-  --color-card-foreground:   var(--card-foreground);
-  --color-popover:           var(--popover);
-  --color-popover-foreground:var(--popover-foreground);
-  --color-primary:           var(--primary);
-  --color-primary-foreground:var(--primary-foreground);
-  --color-secondary:         var(--secondary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted:             var(--muted);
-  --color-muted-foreground:  var(--muted-foreground);
-  --color-accent:            var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-destructive:       var(--destructive);
+  --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-border:            var(--border);
-  --color-input:             var(--input);
-  --color-ring:              var(--ring);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
   /* ── Finance-specific semantic colors ── */
-  --color-income:            var(--income);
+  --color-income: var(--income);
   --color-income-foreground: var(--income-foreground);
-  --color-income-muted:      var(--income-muted);
-  --color-expense:           var(--expense);
-  --color-expense-foreground:var(--expense-foreground);
-  --color-expense-muted:     var(--expense-muted);
-  --color-offering:          var(--offering);
+  --color-income-muted: var(--income-muted);
+  --color-expense: var(--expense);
+  --color-expense-foreground: var(--expense-foreground);
+  --color-expense-muted: var(--expense-muted);
+  --color-offering: var(--offering);
   --color-offering-foreground: var(--offering-foreground);
-  --color-offering-muted:    var(--offering-muted);
+  --color-offering-muted: var(--offering-muted);
 
   /* ── Approval workflow status colors ── */
-  --color-pending:           var(--pending);
-  --color-pending-foreground:var(--pending-foreground);
-  --color-pending-muted:     var(--pending-muted);
-  --color-approved:          var(--approved);
-  --color-approved-foreground:var(--approved-foreground);
-  --color-approved-muted:    var(--approved-muted);
-  --color-rejected:          var(--rejected);
-  --color-rejected-foreground:var(--rejected-foreground);
-  --color-rejected-muted:    var(--rejected-muted);
+  --color-pending: var(--pending);
+  --color-pending-foreground: var(--pending-foreground);
+  --color-pending-muted: var(--pending-muted);
+  --color-approved: var(--approved);
+  --color-approved-foreground: var(--approved-foreground);
+  --color-approved-muted: var(--approved-muted);
+  --color-rejected: var(--rejected);
+  --color-rejected-foreground: var(--rejected-foreground);
+  --color-rejected-muted: var(--rejected-muted);
 
   /* ── Status / utility ── */
-  --color-success:           var(--success);
-  --color-success-foreground:var(--success-foreground);
-  --color-warning:           var(--warning);
-  --color-warning-foreground:var(--warning-foreground);
-  --color-info:              var(--info);
-  --color-info-foreground:   var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
 
   /* ── Chart colors ── */
   --color-chart-1: var(--chart-1);
@@ -122,19 +122,19 @@
   --color-chart-5: var(--chart-5);
 
   /* ── Sidebar ── */
-  --color-sidebar:                  var(--sidebar);
-  --color-sidebar-foreground:       var(--sidebar-foreground);
-  --color-sidebar-primary:          var(--sidebar-primary);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent:           var(--sidebar-accent);
-  --color-sidebar-accent-foreground:var(--sidebar-accent-foreground);
-  --color-sidebar-border:           var(--sidebar-border);
-  --color-sidebar-ring:             var(--sidebar-ring);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
   /* ── Typography ── */
-  --font-sans:    "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
 
 /* ═══════════════════════════════════════════
@@ -145,172 +145,179 @@
   --radius: 0.75rem; /* 12px base — softer, premium (v2.0 was 6px) */
 
   /* ── Motion easings (Emil Kowalski) ── */
-  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* ── Base palette — White / Warm Gray / Slate ── */
-  --background:          oklch(0.985 0.004 80);   /* warm near-white */
-  --foreground:          oklch(0.19 0.014 258);   /* slate — body text */
-  --card:                oklch(1 0 0);            /* pure white cards */
-  --card-foreground:     oklch(0.19 0.014 258);
-  --popover:             oklch(1 0 0);
-  --popover-foreground:  oklch(0.19 0.014 258);
+  --background: oklch(0.985 0.004 80); /* warm near-white */
+  --foreground: oklch(0.19 0.014 258); /* slate — body text */
+  --card: oklch(1 0 0); /* pure white cards */
+  --card-foreground: oklch(0.19 0.014 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.014 258);
 
   /* Primary: muted Blue — Stripe/Linear-grade authority */
-  --primary:             oklch(0.53 0.17 258);
-  --primary-foreground:  oklch(0.99 0 0);
+  --primary: oklch(0.53 0.17 258);
+  --primary-foreground: oklch(0.99 0 0);
 
-  --secondary:           oklch(0.96 0.005 80);    /* warm gray surface */
-  --secondary-foreground:oklch(0.28 0.012 258);
+  --secondary: oklch(0.96 0.005 80); /* warm gray surface */
+  --secondary-foreground: oklch(0.28 0.012 258);
 
-  --muted:               oklch(0.965 0.004 80);   /* warm gray */
-  --muted-foreground:    oklch(0.5 0.014 258);    /* slate mid-gray */
+  --muted: oklch(0.965 0.004 80); /* warm gray */
+  --muted-foreground: oklch(0.5 0.014 258); /* slate mid-gray */
 
-  --accent:              oklch(0.94 0.02 258);    /* light blue tint */
-  --accent-foreground:   oklch(0.32 0.1 258);
+  --accent: oklch(0.94 0.02 258); /* light blue tint */
+  --accent-foreground: oklch(0.32 0.1 258);
 
-  --destructive:         oklch(0.55 0.17 25);     /* muted Red */
+  --destructive: oklch(0.55 0.17 25); /* muted Red */
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border:              oklch(0.9 0.006 80);     /* warm gray border */
-  --input:               oklch(0.92 0.005 80);
-  --ring:                oklch(0.53 0.17 258);    /* same as primary */
+  --border: oklch(0.9 0.006 80); /* warm gray border */
+  --input: oklch(0.92 0.005 80);
+  --ring: oklch(0.53 0.17 258); /* same as primary */
 
   /* ── Finance colors ── */
-  --income:              oklch(0.5 0.13 155);     /* Emerald */
-  --income-foreground:   oklch(0.99 0 0);
-  --income-muted:        oklch(0.95 0.035 155);
+  --income: oklch(0.5 0.13 155); /* Emerald */
+  --income-foreground: oklch(0.99 0 0);
+  --income-muted: oklch(0.95 0.035 155);
 
-  --expense:             oklch(0.55 0.17 25);     /* Red */
-  --expense-foreground:  oklch(0.99 0 0);
-  --expense-muted:       oklch(0.95 0.035 25);
+  --expense: oklch(0.55 0.17 25); /* Red */
+  --expense-foreground: oklch(0.99 0 0);
+  --expense-muted: oklch(0.95 0.035 25);
 
-  --offering:            oklch(0.7 0.13 80);      /* Amber */
+  --offering: oklch(0.7 0.13 80); /* Amber */
   --offering-foreground: oklch(0.16 0.01 80);
-  --offering-muted:      oklch(0.97 0.045 90);
+  --offering-muted: oklch(0.97 0.045 90);
 
   /* ── Workflow status colors ── */
-  --pending:             oklch(0.7 0.13 80);      /* Amber — รอการอนุมัติ */
-  --pending-foreground:  oklch(0.16 0.01 80);
-  --pending-muted:       oklch(0.97 0.045 90);
+  --pending: oklch(0.7 0.13 80); /* Amber — รอการอนุมัติ */
+  --pending-foreground: oklch(0.16 0.01 80);
+  --pending-muted: oklch(0.97 0.045 90);
 
-  --approved:            oklch(0.5 0.13 155);     /* Emerald — อนุมัติแล้ว */
+  --approved: oklch(0.5 0.13 155); /* Emerald — อนุมัติแล้ว */
   --approved-foreground: oklch(0.99 0 0);
-  --approved-muted:      oklch(0.95 0.035 155);
+  --approved-muted: oklch(0.95 0.035 155);
 
-  --rejected:            oklch(0.55 0.17 25);     /* Red — ปฏิเสธ */
+  --rejected: oklch(0.55 0.17 25); /* Red — ปฏิเสธ */
   --rejected-foreground: oklch(0.99 0 0);
-  --rejected-muted:      oklch(0.95 0.035 25);
+  --rejected-muted: oklch(0.95 0.035 25);
 
   /* ── Utility status ── */
-  --success:             oklch(0.5 0.13 155);
-  --success-foreground:  oklch(0.99 0 0);
-  --warning:             oklch(0.7 0.13 80);
-  --warning-foreground:  oklch(0.16 0.01 80);
-  --info:                oklch(0.58 0.12 222);    /* Sky — distinct from primary */
-  --info-foreground:     oklch(0.99 0 0);
+  --success: oklch(0.5 0.13 155);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.7 0.13 80);
+  --warning-foreground: oklch(0.16 0.01 80);
+  --info: oklch(0.58 0.12 222); /* Sky — distinct from primary */
+  --info-foreground: oklch(0.99 0 0);
 
   /* ── Charts ── */
-  --chart-1: oklch(0.53 0.17 258);  /* Blue — primary */
-  --chart-2: oklch(0.5 0.13 155);   /* Emerald — income */
-  --chart-3: oklch(0.55 0.17 25);   /* Red — expense */
-  --chart-4: oklch(0.7 0.13 80);    /* Amber — offering */
-  --chart-5: oklch(0.6 0.11 195);   /* Teal — 5th accent, distinct from primary blue */
+  --chart-1: oklch(0.53 0.17 258); /* Blue — primary */
+  --chart-2: oklch(0.5 0.13 155); /* Emerald — income */
+  --chart-3: oklch(0.55 0.17 25); /* Red — expense */
+  --chart-4: oklch(0.7 0.13 80); /* Amber — offering */
+  --chart-5: oklch(0.6 0.11 195); /* Teal — 5th accent, distinct from primary blue */
 
   /* ── Sidebar ── */
-  --sidebar:                   oklch(0.975 0.004 80);
-  --sidebar-foreground:        oklch(0.19 0.014 258);
-  --sidebar-primary:           oklch(0.53 0.17 258);
-  --sidebar-primary-foreground:oklch(0.99 0 0);
-  --sidebar-accent:            oklch(0.93 0.015 258);
+  --sidebar: oklch(0.975 0.004 80);
+  --sidebar-foreground: oklch(0.19 0.014 258);
+  --sidebar-primary: oklch(0.53 0.17 258);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.93 0.015 258);
   --sidebar-accent-foreground: oklch(0.32 0.09 258);
-  --sidebar-border:            oklch(0.9 0.006 80);
-  --sidebar-ring:              oklch(0.53 0.17 258);
+  --sidebar-border: oklch(0.9 0.006 80);
+  --sidebar-ring: oklch(0.53 0.17 258);
 }
 
 /* ═══════════════════════════════════════════
    DARK MODE
-   Deep Slate background — Linear.app inspired
+   Balanced (Linear/Arc) — Understated Luxury
+   Emerald accent, slate surfaces, border-based depth
 ═══════════════════════════════════════════ */
 .dark {
-  --background:          oklch(0.16 0.012 258);
-  --foreground:          oklch(0.96 0.004 258);
-  --card:                oklch(0.2 0.012 258);
-  --card-foreground:     oklch(0.96 0.004 258);
-  --popover:             oklch(0.22 0.012 258);
-  --popover-foreground:  oklch(0.96 0.004 258);
+  --background: oklch(0.13 0.012 258); /* slate เข้ม */
+  --foreground: oklch(0.97 0.004 258); /* off-white */
+  --card: oklch(0.16 0.012 258); /* slate เข้มกว่า bg นิด */
+  --card-foreground: oklch(0.97 0.004 258);
+  --popover: oklch(0.18 0.012 258);
+  --popover-foreground: oklch(0.97 0.004 258);
 
-  --primary:             oklch(0.68 0.15 258);    /* Lighter blue for dark bg */
-  --primary-foreground:  oklch(0.12 0.02 258);
+  /* Primary: Emerald — CTA, active, positive flow */
+  --primary: oklch(0.6 0.15 155);
+  --primary-foreground: oklch(0.12 0.02 155);
 
-  --secondary:           oklch(0.26 0.012 258);
-  --secondary-foreground:oklch(0.92 0.006 258);
+  /* Secondary: slate อ่อนสำหรับ surface */
+  --secondary: oklch(0.22 0.012 258);
+  --secondary-foreground: oklch(0.9 0.006 258);
 
-  --muted:               oklch(0.23 0.012 258);
-  --muted-foreground:    oklch(0.64 0.012 258);
+  --muted: oklch(0.19 0.012 258);
+  --muted-foreground: oklch(0.6 0.012 258);
+  --accent: oklch(0.24 0.04 155); /* emerald tint */
+  --accent-foreground: oklch(0.82 0.09 155);
 
-  --accent:              oklch(0.28 0.04 258);
-  --accent-foreground:   oklch(0.82 0.09 258);
-
-  --destructive:         oklch(0.64 0.16 25);
+  --destructive: oklch(0.64 0.16 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border:              oklch(1 0 0 / 8%);
-  --input:               oklch(1 0 0 / 10%);
-  --ring:                oklch(0.68 0.15 258);
+  --border: oklch(1 0 0 / 10%); /* white-alpha */
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.6 0.15 155); /* emerald */
 
   /* ── Finance colors (dark) ── */
-  --income:              oklch(0.6 0.13 155);
-  --income-foreground:   oklch(0.12 0.02 155);
-  --income-muted:        oklch(0.24 0.05 155);
+  --income: oklch(0.65 0.14 155); /* emerald สว่าง */
+  --income-foreground: oklch(0.12 0.02 155);
+  --income-muted: oklch(0.24 0.06 155);
 
-  --expense:             oklch(0.64 0.16 25);
-  --expense-foreground:  oklch(0.12 0.02 25);
-  --expense-muted:       oklch(0.24 0.05 25);
+  --expense: oklch(0.64 0.16 25);
+  --expense-foreground: oklch(0.12 0.02 25);
+  --expense-muted: oklch(0.24 0.06 25);
 
-  --offering:            oklch(0.76 0.12 80);
+  --offering: oklch(0.76 0.12 80);
   --offering-foreground: oklch(0.14 0.02 80);
-  --offering-muted:      oklch(0.24 0.05 80);
+  --offering-muted: oklch(0.24 0.06 80);
 
   /* ── Workflow status (dark) ── */
-  --pending:             oklch(0.76 0.12 80);
-  --pending-foreground:  oklch(0.14 0.02 80);
-  --pending-muted:       oklch(0.24 0.05 80);
+  --pending: oklch(0.76 0.12 80);
+  --pending-foreground: oklch(0.14 0.02 80);
+  --pending-muted: oklch(0.24 0.06 80);
 
-  --approved:            oklch(0.6 0.13 155);
+  --approved: oklch(0.65 0.14 155);
   --approved-foreground: oklch(0.12 0.02 155);
-  --approved-muted:      oklch(0.24 0.05 155);
+  --approved-muted: oklch(0.24 0.06 155);
 
-  --rejected:            oklch(0.64 0.16 25);
+  --rejected: oklch(0.64 0.16 25);
   --rejected-foreground: oklch(0.12 0.02 25);
-  --rejected-muted:      oklch(0.24 0.05 25);
+  --rejected-muted: oklch(0.24 0.06 25);
 
   /* ── Utility status (dark) ── */
-  --success:             oklch(0.6 0.13 155);
-  --success-foreground:  oklch(0.12 0.02 155);
-  --warning:             oklch(0.76 0.12 80);
-  --warning-foreground:  oklch(0.14 0.02 80);
-  --info:                oklch(0.66 0.11 222);
-  --info-foreground:     oklch(0.12 0.02 222);
+  --success: oklch(0.65 0.14 155);
+  --success-foreground: oklch(0.12 0.02 155);
+  --warning: oklch(0.76 0.12 80);
+  --warning-foreground: oklch(0.14 0.02 80);
+  --info: oklch(0.66 0.11 222);
+  --info-foreground: oklch(0.12 0.02 222);
 
   /* ── Charts (dark) ── */
-  --chart-1: oklch(0.68 0.15 258);
-  --chart-2: oklch(0.6 0.13 155);
-  --chart-3: oklch(0.64 0.16 25);
-  --chart-4: oklch(0.76 0.12 80);
-  --chart-5: oklch(0.66 0.1 195);
+  --chart-1: oklch(0.6 0.15 155); /* emerald — primary */
+  --chart-2: oklch(0.65 0.14 155); /* emerald — income */
+  --chart-3: oklch(0.64 0.16 25); /* red — expense */
+  --chart-4: oklch(0.76 0.12 80); /* amber — offering */
+  --chart-5: oklch(0.66 0.1 195); /* teal */
 
-  /* ── Sidebar (dark) ── */
-  --sidebar:                   oklch(0.18 0.012 258);
-  --sidebar-foreground:        oklch(0.96 0.004 258);
-  --sidebar-primary:           oklch(0.68 0.15 258);
-  --sidebar-primary-foreground:oklch(0.12 0.02 258);
-  --sidebar-accent:            oklch(0.26 0.05 258);
-  --sidebar-accent-foreground: oklch(0.82 0.09 258);
-  --sidebar-border:            oklch(1 0 0 / 8%);
-  --sidebar-ring:              oklch(0.68 0.15 258);
+  /* ── Sidebar ── */
+  --sidebar: oklch(0.11 0.012 258); /* เข้มกว่า page bg */
+  --sidebar-foreground: oklch(0.97 0.004 258);
+  --sidebar-primary: oklch(0.6 0.15 155);
+  --sidebar-primary-foreground: oklch(0.12 0.02 155);
+  --sidebar-accent: oklch(0.22 0.05 155);
+  --sidebar-accent-foreground: oklch(0.82 0.09 155);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.6 0.15 155);
+
+  /* ── Surface elevation ── */
+  --surface-elevated: oklch(0.19 0.012 258); /* ยกขึ้นจาก card */
+  --border-subtle: oklch(1 0 0 / 6%); /* ขอบจางๆ สำหรับ table cell */
+  --glow-primary: 0 0 20px -4px oklch(0.6 0.15 155 / 0.2);
 }
 
 /* ═══════════════════════════════════════════
@@ -339,7 +346,12 @@
   }
 
   /* Headings — semi-bold, tight tracking, balanced line breaks */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -414,34 +426,27 @@
 
 /* Shadows — v3.0: no heavy shadows, very soft depth only */
 @utility shadow-xs {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  box-shadow: none;
 }
-
 @utility shadow-sm-card {
-  box-shadow:
-    0 1px 2px 0 rgb(0 0 0 / 0.04),
-    0 1px 2px -1px rgb(0 0 0 / 0.03);
+  box-shadow: none;
 }
-
 @utility shadow-card {
-  box-shadow:
-    0 1px 2px 0 rgb(0 0 0 / 0.04),
-    0 3px 10px -4px rgb(0 0 0 / 0.04);
+  box-shadow: none;
 }
-
+@utility shadow-2xs {
+  box-shadow: none;
+}
 @utility shadow-elevated {
-  box-shadow:
-    0 1px 4px -1px rgb(0 0 0 / 0.05),
-    0 6px 16px -6px rgb(0 0 0 / 0.06);
+  box-shadow: none;
 }
-
 @utility shadow-primary-glow {
-  box-shadow: 0 0 24px -4px oklch(0.53 0.17 258 / 0.25);
+  box-shadow: none;
 }
 
 /* Typography utilities */
 @utility kicker {
-  font-size: 0.6875rem;         /* 11px */
+  font-size: 0.6875rem; /* 11px */
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -452,9 +457,13 @@
 /* Numeric display — critical for financial data */
 @utility num-display {
   font-variant-numeric: lining-nums tabular-nums slashed-zero;
-  font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1, "ss01" 1;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1,
+    "zero" 1,
+    "ss01" 1;
   letter-spacing: -0.01em;
-  font-family: "Inter", var(--font-sans);  /* Inter has excellent numerals */
+  font-family: "Inter", var(--font-sans); /* Inter has excellent numerals */
 }
 
 /* Finance amount variants */
@@ -501,14 +510,18 @@
 /* Hover lift — desktop only (pointer: fine) */
 @media (hover: hover) and (pointer: fine) {
   .hover-lift {
-    transition: background-color 150ms ease, box-shadow 150ms ease;
+    transition:
+      background-color 150ms ease,
+      box-shadow 150ms ease;
   }
   .hover-lift:hover {
     background-color: var(--color-muted);
   }
 
   .hover-card-lift {
-    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+    transition:
+      transform 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
   }
   .hover-card-lift:hover {
     transform: translateY(-1px);
@@ -527,61 +540,131 @@
 ═══════════════════════════════════════════ */
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fade-down {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60%  { transform: translateX(-6px); }
-  40%, 80%  { transform: translateX(6px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
 }
 
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.53 0.17 258 / 0); }
-  50%       { box-shadow: 0 0 0 6px oklch(0.53 0.17 258 / 0.15); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.53 0.17 258 / 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px oklch(0.53 0.17 258 / 0.15);
+  }
 }
 
-@utility animate-fade-up       { animation: fade-up 0.3s var(--ease-out) both; }
-@utility animate-fade-in       { animation: fade-in 0.25s ease both; }
-@utility animate-fade-down     { animation: fade-down 0.3s var(--ease-out) both; }
-@utility animate-scale-in      { animation: scale-in 0.25s var(--ease-out) both; }
-@utility animate-shake         { animation: shake 0.35s ease-in-out; }
-@utility animate-slide-right   { animation: slide-in-right 0.3s var(--ease-out) both; }
-@utility animate-pulse-glow    { animation: pulse-glow 2s ease-in-out infinite; }
+@utility animate-fade-up {
+  animation: fade-up 0.3s var(--ease-out) both;
+}
+@utility animate-fade-in {
+  animation: fade-in 0.25s ease both;
+}
+@utility animate-fade-down {
+  animation: fade-down 0.3s var(--ease-out) both;
+}
+@utility animate-scale-in {
+  animation: scale-in 0.25s var(--ease-out) both;
+}
+@utility animate-shake {
+  animation: shake 0.35s ease-in-out;
+}
+@utility animate-slide-right {
+  animation: slide-in-right 0.3s var(--ease-out) both;
+}
+@utility animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
 
 /* ── Staggered entrance for list children ── */
 @layer utilities {
   .stagger > * {
     animation: fade-up 0.35s var(--ease-out) both;
   }
-  .stagger > *:nth-child(2) { animation-delay: 40ms; }
-  .stagger > *:nth-child(3) { animation-delay: 80ms; }
-  .stagger > *:nth-child(4) { animation-delay: 120ms; }
-  .stagger > *:nth-child(5) { animation-delay: 160ms; }
-  .stagger > *:nth-child(6) { animation-delay: 200ms; }
-  .stagger > *:nth-child(7) { animation-delay: 240ms; }
-  .stagger > *:nth-child(8) { animation-delay: 280ms; }
+  .stagger > *:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 160ms;
+  }
+  .stagger > *:nth-child(6) {
+    animation-delay: 200ms;
+  }
+  .stagger > *:nth-child(7) {
+    animation-delay: 240ms;
+  }
+  .stagger > *:nth-child(8) {
+    animation-delay: 280ms;
+  }
 
   /* Respect user motion preference */
   @media (prefers-reduced-motion: reduce) {

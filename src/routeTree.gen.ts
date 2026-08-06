@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppStaffRouteImport } from './routes/_app.staff'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppReconciliationRouteImport } from './routes/_app.reconciliation'
@@ -28,6 +29,10 @@ import { Route as AppBudgetRouteImport } from './routes/_app.budget'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
 import { Route as AppApprovalsRouteImport } from './routes/_app.approvals'
 import { Route as AppAiRouteImport } from './routes/_app.ai'
+import { Route as AppRecordIncomeStep4RouteImport } from './routes/_app.record-income.step-4'
+import { Route as AppRecordIncomeStep3RouteImport } from './routes/_app.record-income.step-3'
+import { Route as AppRecordIncomeStep2RouteImport } from './routes/_app.record-income.step-2'
+import { Route as AppRecordIncomeStep1RouteImport } from './routes/_app.record-income.step-1'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -42,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppStaffRoute = AppStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
@@ -123,6 +133,26 @@ const AppAiRoute = AppAiRouteImport.update({
   path: '/ai',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRecordIncomeStep4Route = AppRecordIncomeStep4RouteImport.update({
+  id: '/record-income/step-4',
+  path: '/record-income/step-4',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRecordIncomeStep3Route = AppRecordIncomeStep3RouteImport.update({
+  id: '/record-income/step-3',
+  path: '/record-income/step-3',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRecordIncomeStep2Route = AppRecordIncomeStep2RouteImport.update({
+  id: '/record-income/step-2',
+  path: '/record-income/step-2',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRecordIncomeStep1Route = AppRecordIncomeStep1RouteImport.update({
+  id: '/record-income/step-1',
+  path: '/record-income/step-1',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -143,6 +173,11 @@ export interface FileRoutesByFullPath {
   '/reconciliation': typeof AppReconciliationRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
+  '/staff': typeof AppStaffRoute
+  '/record-income/step-1': typeof AppRecordIncomeStep1Route
+  '/record-income/step-2': typeof AppRecordIncomeStep2Route
+  '/record-income/step-3': typeof AppRecordIncomeStep3Route
+  '/record-income/step-4': typeof AppRecordIncomeStep4Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -163,6 +198,11 @@ export interface FileRoutesByTo {
   '/reconciliation': typeof AppReconciliationRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
+  '/staff': typeof AppStaffRoute
+  '/record-income/step-1': typeof AppRecordIncomeStep1Route
+  '/record-income/step-2': typeof AppRecordIncomeStep2Route
+  '/record-income/step-3': typeof AppRecordIncomeStep3Route
+  '/record-income/step-4': typeof AppRecordIncomeStep4Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -185,6 +225,11 @@ export interface FileRoutesById {
   '/_app/reconciliation': typeof AppReconciliationRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
+  '/_app/staff': typeof AppStaffRoute
+  '/_app/record-income/step-1': typeof AppRecordIncomeStep1Route
+  '/_app/record-income/step-2': typeof AppRecordIncomeStep2Route
+  '/_app/record-income/step-3': typeof AppRecordIncomeStep3Route
+  '/_app/record-income/step-4': typeof AppRecordIncomeStep4Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -207,6 +252,11 @@ export interface FileRouteTypes {
     | '/reconciliation'
     | '/reports'
     | '/settings'
+    | '/staff'
+    | '/record-income/step-1'
+    | '/record-income/step-2'
+    | '/record-income/step-3'
+    | '/record-income/step-4'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -227,6 +277,11 @@ export interface FileRouteTypes {
     | '/reconciliation'
     | '/reports'
     | '/settings'
+    | '/staff'
+    | '/record-income/step-1'
+    | '/record-income/step-2'
+    | '/record-income/step-3'
+    | '/record-income/step-4'
   id:
     | '__root__'
     | '/'
@@ -248,6 +303,11 @@ export interface FileRouteTypes {
     | '/_app/reconciliation'
     | '/_app/reports'
     | '/_app/settings'
+    | '/_app/staff'
+    | '/_app/record-income/step-1'
+    | '/_app/record-income/step-2'
+    | '/_app/record-income/step-3'
+    | '/_app/record-income/step-4'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -278,6 +338,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/staff': {
+      id: '/_app/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof AppStaffRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/settings': {
       id: '/_app/settings'
@@ -391,6 +458,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/record-income/step-4': {
+      id: '/_app/record-income/step-4'
+      path: '/record-income/step-4'
+      fullPath: '/record-income/step-4'
+      preLoaderRoute: typeof AppRecordIncomeStep4RouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/record-income/step-3': {
+      id: '/_app/record-income/step-3'
+      path: '/record-income/step-3'
+      fullPath: '/record-income/step-3'
+      preLoaderRoute: typeof AppRecordIncomeStep3RouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/record-income/step-2': {
+      id: '/_app/record-income/step-2'
+      path: '/record-income/step-2'
+      fullPath: '/record-income/step-2'
+      preLoaderRoute: typeof AppRecordIncomeStep2RouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/record-income/step-1': {
+      id: '/_app/record-income/step-1'
+      path: '/record-income/step-1'
+      fullPath: '/record-income/step-1'
+      preLoaderRoute: typeof AppRecordIncomeStep1RouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -411,6 +506,11 @@ interface AppRouteChildren {
   AppReconciliationRoute: typeof AppReconciliationRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppStaffRoute: typeof AppStaffRoute
+  AppRecordIncomeStep1Route: typeof AppRecordIncomeStep1Route
+  AppRecordIncomeStep2Route: typeof AppRecordIncomeStep2Route
+  AppRecordIncomeStep3Route: typeof AppRecordIncomeStep3Route
+  AppRecordIncomeStep4Route: typeof AppRecordIncomeStep4Route
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -430,6 +530,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppReconciliationRoute: AppReconciliationRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppStaffRoute: AppStaffRoute,
+  AppRecordIncomeStep1Route: AppRecordIncomeStep1Route,
+  AppRecordIncomeStep2Route: AppRecordIncomeStep2Route,
+  AppRecordIncomeStep3Route: AppRecordIncomeStep3Route,
+  AppRecordIncomeStep4Route: AppRecordIncomeStep4Route,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

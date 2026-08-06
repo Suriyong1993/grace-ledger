@@ -14,7 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createBudget } from "@/services/church";
 
 interface CreateBudgetDialogProps {
@@ -34,7 +40,8 @@ export function CreateBudgetDialog({ trigger }: CreateBudgetDialogProps) {
     mutationFn: async () => {
       const numAmount = parseFloat(amount);
       if (!name.trim()) throw new Error("กรุณากรอกชื่อหมวดงบประมาณ");
-      if (isNaN(numAmount) || numAmount <= 0) throw new Error("กรุณากรอกจำนวนเงินงบประมาณที่ถูกต้อง");
+      if (isNaN(numAmount) || numAmount <= 0)
+        throw new Error("กรุณากรอกจำนวนเงินงบประมาณที่ถูกต้อง");
 
       return await createBudget({
         name: name.trim(),
@@ -59,7 +66,7 @@ export function CreateBudgetDialog({ trigger }: CreateBudgetDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button size="sm" className="gap-2 rounded-button font-semibold shadow-sm">
+          <Button size="sm" className="gap-2 rounded-button font-semibold">
             <Plus className="h-4 w-4" />
             ตั้งงบประมาณ
           </Button>

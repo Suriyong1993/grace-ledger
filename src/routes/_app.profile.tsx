@@ -20,7 +20,7 @@ function ProfilePage() {
       <PageHeader kicker="ระบบ" title="โปรไฟล์" description="บัญชีและสิทธิ์การใช้งานของคุณ" />
 
       {/* Identity */}
-      <section className="card-ledger animate-fade-up">
+      <section className="card-ledger">
         <div className="flex flex-wrap items-center gap-4 px-5 py-5">
           <span className="grid h-14 w-14 shrink-0 place-items-center bg-primary/10 text-xl font-semibold text-primary">
             {user.name[0]}

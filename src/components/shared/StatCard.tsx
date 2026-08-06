@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
-import { NumberTicker } from "@/components/ui/number-ticker";
 import { cn } from "@/lib/utils";
+import { thb } from "@/lib/format";
 
 interface Props {
   label: string;
@@ -11,7 +11,6 @@ interface Props {
   icon?: LucideIcon;
   tone?: "primary" | "secondary" | "accent" | "success" | "danger" | "warning";
   trend?: number;
-  /** decimal places when `value` is a number (animated ticker) */
   decimals?: number;
 }
 
@@ -25,11 +24,11 @@ const VALUE_TONE: Record<NonNullable<Props["tone"]>, string> = {
 };
 
 const ICON_BG: Record<NonNullable<Props["tone"]>, string> = {
-  primary: "bg-primary/8 text-primary",
-  secondary: "bg-muted/60 text-muted-foreground",
+  primary: "bg-accent text-primary",
+  secondary: "bg-secondary text-muted-foreground",
   accent: "bg-accent text-accent-foreground",
-  success: "bg-success/8 text-success",
-  danger: "bg-destructive/8 text-destructive",
+  success: "bg-success/10 text-success",
+  danger: "bg-destructive/10 text-destructive",
   warning: "bg-warning/10 text-warning",
 };
 
@@ -54,10 +53,10 @@ export function StatCard({
 }: Props) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.99 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-      className="group relative flex overflow-hidden rounded-card border border-border/60 bg-card shadow-2xs transition-all duration-200 hover:border-border hover:shadow-xs"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+      className="group relative flex overflow-hidden rounded-card border border-border bg-card transition-colors duration-150 hover:border-primary/40"
     >
       {/* Left accent strip — financial terminal style */}
       <div
@@ -69,11 +68,11 @@ export function StatCard({
 
       <div className="flex-1 p-5">
         <div className="flex items-start justify-between gap-3">
-          <p className="kicker text-muted-foreground/70">{label}</p>
+          <p className="kicker text-muted-foreground">{label}</p>
           {Icon && (
             <div
               className={cn(
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-110",
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
                 ICON_BG[tone],
               )}
             >
@@ -88,11 +87,7 @@ export function StatCard({
             VALUE_TONE[tone],
           )}
         >
-          {typeof value === "number" ? (
-            <NumberTicker value={value} decimalPlaces={decimals} />
-          ) : (
-            value
-          )}
+          {typeof value === "number" ? thb(value) : value}
         </p>
 
         {(hint || typeof trend === "number") && (
@@ -100,8 +95,10 @@ export function StatCard({
             {typeof trend === "number" && (
               <span
                 className={cn(
-                  "num-display inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
-                  trend >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
+                  "num-display inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[11px] font-semibold",
+                  trend >= 0
+                    ? "border-success text-success bg-transparent"
+                    : "border-destructive text-destructive bg-transparent",
                 )}
               >
                 {trend >= 0 ? (

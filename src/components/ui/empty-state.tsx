@@ -13,7 +13,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="animate-fade-up flex flex-col items-center gap-4 rounded-card border border-dashed border-border/60 bg-card/30 px-8 py-16 text-center">
+    <div className="flex flex-col items-center gap-4 rounded-card border border-dashed border-border/60 bg-card/30 px-8 py-16 text-center">
       {/* Icon with layered ring treatment */}
       <div className="relative flex h-14 w-14 items-center justify-center">
         <div className="absolute inset-0 rounded-xl border border-border/40 bg-muted/40" />

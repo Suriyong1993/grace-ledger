@@ -110,7 +110,7 @@ export function RecentTransactionsTable({
   const pendingCount = displayTxs.filter((t) => t.status === "pending").length;
 
   return (
-    <div className="card-ledger overflow-hidden">
+    <div className="rounded-card border border-border bg-card overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 px-5 py-4">
         <div>
@@ -129,7 +129,7 @@ export function RecentTransactionsTable({
               className={cn(
                 "h-auto rounded-md px-2.5 py-1 text-[11px] font-medium",
                 filter === tab
-                  ? "bg-card text-foreground shadow-xs hover:bg-card"
+                  ? "bg-card text-foreground hover:bg-card"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
@@ -165,18 +165,16 @@ export function RecentTransactionsTable({
                 onClick={() => onSelectTx?.(tx)}
                 className={cn(
                   "group relative flex cursor-pointer items-center gap-3 px-5 py-3.5",
-                  "transition-colors duration-150 hover:bg-muted/40",
+                  "transition-colors duration-150 hover:bg-secondary/50",
                   // Left border accent
                   "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-r before:transition-all before:duration-150",
                   isPending
-                    ? "before:bg-pending"
+                    ? "before:bg-warning"
                     : isIncome
-                      ? "before:bg-income before:opacity-0 hover:before:opacity-100"
-                      : "before:bg-expense before:opacity-0 hover:before:opacity-100",
-                  isPending && "bg-pending/[0.025]",
-                  "animate-fade-up",
+                      ? "before:bg-success before:opacity-0 hover:before:opacity-100"
+                      : "before:bg-destructive before:opacity-0 hover:before:opacity-100",
+                  isPending && "bg-warning/[0.04]",
                 )}
-                style={{ animationDelay: `${index * 35}ms` }}
               >
                 {/* Kind icon */}
                 <div

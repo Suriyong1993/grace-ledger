@@ -124,12 +124,10 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
               <div
                 key={fund.id}
                 className={cn(
-                  "card-ledger group flex cursor-pointer flex-col gap-3 p-4",
-                  "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card",
+                  "rounded-card border border-border bg-card group flex cursor-pointer flex-col gap-3 p-4",
+                  "transition-colors duration-150 hover:border-primary/40",
                   palette.hoverBorder,
-                  "animate-fade-up",
                 )}
-                style={{ animationDelay: `${i * 60}ms` }}
               >
                 {/* Top row: icon + menu */}
                 <div className="flex items-start justify-between">

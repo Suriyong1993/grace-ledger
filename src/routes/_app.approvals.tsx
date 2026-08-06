@@ -320,7 +320,7 @@ function PendingRow({
   return (
     <div
       className={cn(
-        "card-ledger flex items-center gap-3 p-4 transition-all duration-200 animate-fade-up",
+        "card-ledger flex items-center gap-3 p-4 transition-all duration-200",
         selected && "border-primary/40 bg-primary/[0.03]",
       )}
       style={{ animationDelay: `${index * 40}ms` }}

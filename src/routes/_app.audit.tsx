@@ -175,7 +175,7 @@ function AuditPage() {
             <Badge
               variant="outline"
               className={cn(
-                "gap-1.5 rounded-full px-3 py-1 text-xs font-medium shadow-2xs",
+                "gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
                 verifyResult === null
                   ? "border-border bg-muted text-muted-foreground"
                   : verifyResult.valid
@@ -332,7 +332,7 @@ function AuditPage() {
                 className={cn(
                   "h-auto rounded-lg px-3 py-1 text-xs font-medium",
                   severityFilter === sev
-                    ? "bg-primary text-primary-foreground font-semibold shadow-xs hover:bg-primary hover:text-primary-foreground"
+                    ? "bg-primary text-primary-foreground font-semibold hover:bg-primary hover:text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
@@ -374,7 +374,7 @@ function AuditPage() {
           {groups.map((g) => (
             <section
               key={g.key}
-              className="rounded-xl border border-border bg-card shadow-xs overflow-hidden"
+              className="rounded-xl border border-border bg-card overflow-hidden"
             >
               <div className="flex items-center justify-between border-b border-border/60 bg-muted/30 px-5 py-3">
                 <p className="kicker text-muted-foreground/80">{g.label}</p>

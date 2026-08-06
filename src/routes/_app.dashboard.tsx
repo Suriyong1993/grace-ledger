@@ -406,7 +406,7 @@ export function Dashboard() {
                       className={cn(
                         "h-auto rounded-md px-2.5 py-1 text-[11px] font-medium",
                         period === p
-                          ? "bg-card text-foreground shadow-xs hover:bg-card"
+                          ? "bg-card text-foreground hover:bg-card"
                           : "text-muted-foreground hover:text-foreground",
                       )}
                     >

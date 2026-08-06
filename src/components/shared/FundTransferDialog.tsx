@@ -161,7 +161,7 @@ export function FundTransferDialog({
             </Button>
           )}
         </DialogTrigger>
-        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-none border-border shadow-none">
+        <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-none border-border">
           <DialogHeader>
             <p className="kicker mb-1 flex items-center gap-2">
               <span aria-hidden className="inline-block h-px w-5 bg-primary" />
@@ -184,7 +184,7 @@ export function FundTransferDialog({
                       <FormLabel className="kicker">จาก · ต้นทาง</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="mt-2 h-9 w-full border-border bg-card shadow-none">
+                          <SelectTrigger className="mt-2 h-9 w-full border-border bg-card">
                             <SelectValue placeholder="เลือกกองทุนต้นทาง" />
                           </SelectTrigger>
                         </FormControl>
@@ -223,7 +223,7 @@ export function FundTransferDialog({
                       <FormLabel className="kicker">ไป · ปลายทาง</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="mt-2 h-9 w-full border-border bg-card shadow-none">
+                          <SelectTrigger className="mt-2 h-9 w-full border-border bg-card">
                             <SelectValue placeholder="เลือกกองทุนปลายทาง" />
                           </SelectTrigger>
                         </FormControl>
@@ -254,7 +254,7 @@ export function FundTransferDialog({
                         <Input
                           type="number"
                           step="0.01"
-                          className="num-display h-10 bg-card text-base font-semibold shadow-none"
+                          className="num-display h-10 bg-card text-base font-semibold"
                           {...field}
                         />
                       </FormControl>
@@ -274,11 +274,7 @@ export function FundTransferDialog({
                     <FormItem>
                       <FormLabel>วันที่โอน</FormLabel>
                       <FormControl>
-                        <Input
-                          type="date"
-                          className="num-display h-10 bg-card shadow-none"
-                          {...field}
-                        />
+                        <Input type="date" className="num-display h-10 bg-card" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -294,7 +290,7 @@ export function FundTransferDialog({
                     <FormLabel>เลขที่อ้างอิง</FormLabel>
                     <FormControl>
                       <Input
-                        className="num-display h-10 bg-card shadow-none"
+                        className="num-display h-10 bg-card"
                         placeholder="REF-2026-0001"
                         {...field}
                       />
@@ -309,7 +305,7 @@ export function FundTransferDialog({
                   <FormItem>
                     <FormLabel>คำอธิบาย</FormLabel>
                     <FormControl>
-                      <Textarea className="bg-card shadow-none" rows={2} {...field} />
+                      <Textarea className="bg-card" rows={2} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -337,7 +333,7 @@ export function FundTransferDialog({
       </Dialog>
 
       <AlertDialog open={!!confirm} onOpenChange={(v) => !v && setConfirm(null)}>
-        <AlertDialogContent className="max-w-md rounded-none border-border shadow-none">
+        <AlertDialogContent className="max-w-md rounded-none border-border">
           <AlertDialogHeader>
             <p className="kicker mb-1 flex items-center gap-2">
               <span aria-hidden className="inline-block h-px w-5 bg-primary" />

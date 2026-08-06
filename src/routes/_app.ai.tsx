@@ -205,7 +205,7 @@ export function GraceAiPage() {
                       className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed ${
                         m.sender === "user"
                           ? "bg-primary text-primary-foreground rounded-br-none font-medium"
-                          : "bg-gradient-to-br from-[#EEF2FF] to-[#FAFBFF] border border-[#C7D2FE] text-foreground rounded-bl-none shadow-sm"
+                          : "bg-muted text-foreground rounded-bl-none"
                       }`}
                     >
                       {m.sender === "ai" && (

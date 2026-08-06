@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
+  LayoutGrid,
   LayoutDashboard,
   ArrowDownCircle,
   ArrowUpCircle,
@@ -34,7 +35,10 @@ export interface NavGroup {
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "ภาพรวม",
-    items: [{ to: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard }],
+    items: [
+      { to: "/staff", label: "หน้าแรกเจ้าหน้าที่", icon: LayoutGrid },
+      { to: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
+    ],
   },
   {
     label: "รายการเงิน",

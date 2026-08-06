@@ -12,15 +12,12 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-6 md:mb-8 animate-fade-up">
+    <header className="mb-6 md:mb-8">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 pb-5">
         <div className="min-w-0">
           {kicker && (
-            <p className="kicker mb-3 flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="inline-block h-px w-8 rounded-full bg-gradient-to-r from-primary to-primary/20"
-              />
+            <p className="kicker mb-3 flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
               {kicker}
             </p>
           )}
@@ -36,7 +33,7 @@ export function PageHeader({
         {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
       </div>
       {/* Editorial gradient rule — gold → transparent */}
-      <div className="h-px w-full bg-gradient-to-r from-primary/40 via-border/80 to-transparent" />
+      <div className="h-px w-full bg-border" />
     </header>
   );
 }

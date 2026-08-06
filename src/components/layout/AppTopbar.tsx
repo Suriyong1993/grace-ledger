@@ -52,7 +52,7 @@ export function AppTopbar() {
   const roleBadge = user?.role ? (ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.auditor) : "";
 
   return (
-    <header className="glass-topbar sticky top-0 z-30">
+    <header className="sticky top-0 z-30 border-b border-border bg-background backdrop-blur-sm">
       <div className="grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 md:px-6">
         {/* Left: Sidebar trigger */}
         <div className="flex items-center gap-1">
@@ -65,7 +65,7 @@ export function AppTopbar() {
           variant="outline"
           id="topbar-search-trigger"
           onClick={() => palette.setOpen(true)}
-          className="group hidden h-9 w-full max-w-xs justify-start gap-2 bg-muted/50 px-3 font-normal text-muted-foreground hover:border-primary/40 hover:bg-muted md:flex"
+          className="group hidden h-9 w-full max-w-xs justify-start gap-2 bg-secondary px-3 font-normal text-muted-foreground hover:border-border hover:bg-muted md:flex"
         >
           <Search
             className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
@@ -123,8 +123,8 @@ export function AppTopbar() {
                 variant="outline"
                 id="topbar-user-menu"
                 className={cn(
-                  "h-9 gap-2 bg-card px-2 shadow-xs",
-                  "hover:border-primary/30 hover:bg-muted/60 active-press",
+                  "h-9 gap-2 bg-card px-2 border border-border",
+                  "hover:border-border hover:bg-secondary active-press",
                 )}
               >
                 <Avatar className="h-6 w-6 rounded-md shrink-0">

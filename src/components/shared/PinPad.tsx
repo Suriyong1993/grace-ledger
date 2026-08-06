@@ -77,13 +77,7 @@ export function PinPad({
 
       <div className="grid grid-cols-3 gap-3">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((n) => (
-          <Button
-            key={n}
-            variant="secondary"
-            size="lg"
-            className="h-16 text-2xl font-semibold rounded-2xl bg-card hover:bg-accent shadow-sm"
-            onClick={() => press(n)}
-          >
+          <Button key={n} variant="secondary" size="lg" onClick={() => press(n)}>
             {n}
           </Button>
         ))}
@@ -95,12 +89,7 @@ export function PinPad({
         >
           ล้าง
         </Button>
-        <Button
-          variant="secondary"
-          size="lg"
-          className="h-16 text-2xl font-semibold rounded-2xl bg-card hover:bg-accent shadow-sm"
-          onClick={() => press("0")}
-        >
+        <Button variant="secondary" size="lg" onClick={() => press("0")}>
           0
         </Button>
         <Button

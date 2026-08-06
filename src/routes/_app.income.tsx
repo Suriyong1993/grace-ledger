@@ -278,7 +278,7 @@ function IncomePage() {
                             <FormItem>
                               <FormLabel>วันที่</FormLabel>
                               <FormControl>
-                                <Input type="date" className="bg-card shadow-none" {...field} />
+                                <Input type="date" className="bg-card" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -294,7 +294,7 @@ function IncomePage() {
                                 <Input
                                   type="number"
                                   step="0.01"
-                                  className="num-display bg-card shadow-none"
+                                  className="num-display bg-card"
                                   {...field}
                                 />
                               </FormControl>
@@ -311,7 +311,7 @@ function IncomePage() {
                             <FormLabel>หมวดหมู่</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger className="bg-card shadow-none">
+                                <SelectTrigger className="bg-card">
                                   <SelectValue placeholder="เลือกหมวดหมู่" />
                                 </SelectTrigger>
                               </FormControl>
@@ -335,7 +335,7 @@ function IncomePage() {
                             <FormLabel>กองทุน</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger className="bg-card shadow-none">
+                                <SelectTrigger className="bg-card">
                                   <SelectValue placeholder="เลือกกองทุน" />
                                 </SelectTrigger>
                               </FormControl>
@@ -358,7 +358,7 @@ function IncomePage() {
                           <FormItem>
                             <FormLabel>รายละเอียด</FormLabel>
                             <FormControl>
-                              <Textarea rows={3} className="bg-card shadow-none" {...field} />
+                              <Textarea rows={3} className="bg-card" {...field} />
                             </FormControl>
                           </FormItem>
                         )}
@@ -458,7 +458,7 @@ function IncomePage() {
           />
 
           <TabsContent value="income" className="mt-0">
-            <section className="rounded-card border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+            <section className="rounded-card border border-border bg-card overflow-hidden">
               <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
                 <p className="kicker font-medium text-muted-foreground/80">รายรับทั้งหมด</p>
                 <p className="num-display text-xs font-semibold text-muted-foreground">
@@ -515,7 +515,7 @@ function IncomePage() {
           </TabsContent>
 
           <TabsContent value="offering" className="mt-0">
-            <section className="rounded-card border border-border/80 bg-card shadow-2xs overflow-hidden animate-fade-up">
+            <section className="rounded-card border border-border bg-card overflow-hidden">
               <div className="flex items-center justify-between border-b border-border/80 bg-muted/20 px-5 py-3.5">
                 <p className="kicker font-medium text-muted-foreground/80">เงินถวายทั้งหมด</p>
                 <p className="num-display text-xs font-semibold text-muted-foreground">

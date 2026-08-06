@@ -7,7 +7,7 @@ export function BottomNav() {
   const path = useCurrentPath();
   const isActive = (to: string) => path === to || path.startsWith(to + "/");
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="grid h-14 grid-cols-5">
         {MOBILE_NAV.map((item) => {
           const active = isActive(item.to);
@@ -17,7 +17,7 @@ export function BottomNav() {
               to={item.to}
               className={cn(
                 "relative flex flex-col items-center justify-center gap-0.5 text-[10px]",
-                active ? "font-medium text-foreground" : "text-muted-foreground",
+                active ? "font-medium text-primary" : "text-muted-foreground",
               )}
             >
               {active && <span aria-hidden className="absolute top-0 h-0.5 w-8 bg-primary" />}

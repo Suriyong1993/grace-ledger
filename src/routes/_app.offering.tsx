@@ -492,7 +492,7 @@ function OfferingPage() {
         <TabsContent value="all-records" className="mt-6 space-y-4">
           <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหาเงินถวาย..." />
 
-          <section className="card-ledger animate-fade-up">
+          <section className="card-ledger">
             <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
               <p className="kicker">รายการเงินถวายทั้งหมด</p>
               <p className="num-display text-xs text-muted-foreground">{rows.length} รายการ</p>

@@ -73,7 +73,7 @@ export function DashboardGaugeChart({
   const { percentage, radius, strokeWidth, halfCircumference, strokeDashoffset } = gauge;
 
   return (
-    <div className="card-ledger p-5 flex flex-col justify-between space-y-5 animate-fade-up">
+    <div className="rounded-card border border-border bg-card p-5 flex flex-col justify-between space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

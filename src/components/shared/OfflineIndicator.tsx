@@ -48,7 +48,7 @@ export function OfflineIndicator() {
     >
       <div
         className={cn(
-          "flex items-center gap-2 rounded-sm px-4 py-2 text-xs font-medium shadow-lg",
+          "flex items-center gap-2 rounded-sm px-4 py-2 text-xs font-medium",
           isOffline
             ? "bg-destructive text-destructive-foreground"
             : "bg-success text-success-foreground",

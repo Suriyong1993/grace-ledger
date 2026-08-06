@@ -1,97 +1,66 @@
-# DESIGN.md — Grace Ledger
+# DESIGN.md — Grace Ledger Single Source of Truth
 
-> สรุปโทนสีและสไตล์ UI **ตามที่ implement จริง** ใน `src/styles.css` และ component
-> ปัจจุบัน (ไม่ใช่เอกสารเชิง aspiration) ณ วันที่วิเคราะห์: 2026-08-05
->
-> อ้างอิงจาก: `src/styles.css`, `src/components/ui/*.tsx`,
-> `DESIGN_SYSTEM_V3.md`, `DESIGN_TOKENS.md`, `COMPONENT_LIBRARY.md`,
-> `MOTION_GUIDELINES.md`, `RESPONSIVE_GUIDELINES.md`,
-> `docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md`
->
-> ⚠️ **หมายเหตุความคลาดเคลื่อน**: `DESIGN_TOKENS.md`/`DESIGN_SYSTEM_V3.md` ยัง
-> ระบุค่า radius แบบ v3.0 เดิม (การ์ด 24px / ปุ่ม 18px / input 16px) แต่
-> `src/styles.css` ถูกอัปเดตเป็นค่า **vNext** ที่เล็กลงแล้ว (การ์ด 16px / ปุ่ม
-> 12px / input 10px) ตามคอมมิต `67e291f` และ
-> `docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md` §4 — เอกสารนี้ยึดค่าจริงใน
-> CSS เป็นหลัก (ตามกฎ "ถ้าเอกสารกับโค้ดขัดกัน โค้ดชนะ" ที่ `DESIGN_TOKENS.md`
-> เขียนไว้เอง)
+> อัปเดต: 2026-08-06
+> รวม: LedgerCraft (designmd) + DESIGN_TOKENS.md + DESIGN_SYSTEM_V3.md + COMPONENT_LIBRARY.md + MOTION_GUIDELINES.md
+> เป้าหมาย: **ป้องกัน AI slop** — ทุกหน้าต้องยึดเอกสารนี้เป็นหลัก ห้ามใช้ aesthetic ทั่วไปที่ AI มักใส่
 
 ---
 
-## 1. หลักการกำกับ (Governing Principle)
+## 1. หลักการกำกับ — 5 คำนิยาม
 
-**นี่คือซอฟต์แวร์การเงิน — usability สำคัญกว่าความสวยงามเสมอ** การตัดสินใจ
-ด้าน design ใดก็ตามที่ลดความเร็วในการกรอกข้อมูล ความอ่านง่าย ความตรวจสอบได้
-(auditability) หรือความชัดเจนทางการเงิน จะถูกปฏิเสธ ไม่ว่าจะดู premium แค่ไหน
+**Calm · Exact · Spacious · Quiet · Honest**
 
-**DNA**: Apple HIG × Stripe Dashboard × Linear × Mercury × Revolut × Notion —
-ผสาน "Gridgeist" thesis ของ vNext (ตัวเลข/ตารางคือ hero ไม่ใช่การ์ดตกแต่ง)
+นี่คือซอฟต์แวร์การเงิน — ห้ามแลก usability กับความสวยงามเด็ดขาด
+ทุกการตัดสินใจด้าน design ที่ทำให้ความเร็วกรอกข้อมูล ความอ่านง่าย ความตรวจสอบได้ (auditability) หรือความชัดเจนทางการเงินลดลง = **ปฏิเสฐทันที**
 
-5 คำนิยาม design language (จาก vNext masterplan): **calm, exact, spacious,
-quiet, honest**
+**ห้าม:**
+- Decorative illustration, playful iconography, gradient ที่ไม่จำเป็น
+- Animation ที่ยาวกว่า 300ms (ยกเว้น page transition)
+- Shadow หนัก (heavy shadow) ที่ไหนทั้งระบบ
+- สีจัดจ้าน (oversaturated) ทุกสีต้อง muted
+- ขอบมนเกิน 4px สำหรับตารางและ cell (บาง element อนุญาต ดู §4)
 
 ---
 
-## 2. ระบบสี (Color System)
+## 2. ระบบสี
 
-พื้นฐานเป็นกลาง (White / Warm Gray / Slate) + สี semantic แบบ muted 5 สี
-ไม่มีสีจัดจ้าน (oversaturated) เลย ทุกสีประกาศเป็น CSS custom property ด้วย
-`oklch()` ใน `:root` (light) / `.dark` (dark) แล้ว re-export เป็น Tailwind
-utility ผ่าน `@theme inline`
-
-### 2.1 Base palette — Light mode
-
+### 2.1 Base — Light mode
 | Token | ค่า oklch | บทบาท |
 |---|---|---|
-| `--background` | `oklch(0.985 0.004 80)` | พื้นหลังหน้า — ขาวอมเหลืองอ่อนมาก (warm near-white) |
+| `--background` | `oklch(0.985 0.004 80)` | พื้นหลัง — warm near-white |
 | `--foreground` | `oklch(0.19 0.014 258)` | ข้อความหลัก — slate เข้ม |
-| `--card` | `oklch(1 0 0)` | พื้นผิวการ์ด — ขาวบริสุทธิ์ |
-| `--primary` | `oklch(0.53 0.17 258)` | **น้ำเงิน muted** — CTA, active state, ระดับ Stripe/Linear |
-| `--secondary` | `oklch(0.96 0.005 80)` | พื้นผิวเทาอุ่น (warm gray) |
-| `--muted` | `oklch(0.965 0.004 80)` | พื้นผิวรอง เทาอุ่นอ่อนกว่า secondary |
-| `--muted-foreground` | `oklch(0.5 0.014 258)` | ข้อความรอง — slate กลาง |
-| `--accent` | `oklch(0.94 0.02 258)` | ฟ้าอ่อนมาก (tint) |
-| `--destructive` | `oklch(0.55 0.17 25)` | **แดง muted** |
-| `--border` | `oklch(0.9 0.006 80)` | เส้นขอบเทาอุ่น |
-| `--input` | `oklch(0.92 0.005 80)` | พื้นหลัง input |
-| `--ring` | `oklch(0.53 0.17 258)` | focus ring — เท่ากับ primary |
+| `--card` | `oklch(1 0 0)` | การ์ด — ขาวบริสุทธิ์ |
+| `--primary` | `oklch(0.53 0.17 258)` | น้ำเงิน muted — CTA, active state |
+| `--secondary` | `oklch(0.96 0.005 80)` | เทาอุ่น |
+| `--muted` | `oklch(0.965 0.004 80)` | เทาอุ่นอ่อนกว่า |
+| `--border` | `oklch(0.9 0.006 80)` | เส้นขอบ |
 
-### 2.2 สีการเงิน (Finance-specific)
-
+### 2.2 Finance-specific — **สีการเงินต้องใช้ตามนี้เท่านั้น**
 | Token | ค่า oklch | ความหมาย |
 |---|---|---|
-| `--income` / `--approved` / `--success` | `oklch(0.5 0.13 155)` | **มรกต (Emerald)** — เงินไหลเข้า / อนุมัติแล้ว |
-| `--expense` / `--rejected` / `--destructive` | `oklch(0.55 0.17 25)` | **แดง (Red)** — เงินไหลออก / ปฏิเสธ |
-| `--offering` / `--pending` / `--warning` | `oklch(0.7 0.13 80)` | **อำพัน (Amber)** — เงินถวาย / รออนุมัติ |
-| `--info` | `oklch(0.58 0.12 222)` | **ฟ้า (Sky)** — ข้อมูลทั่วไป แยกจาก primary ชัดเจน |
+| `--income` / `--approved` | `oklch(0.5 0.13 155)` | **Emerald** — รายรับ, เครดิต, อนุมัติแล้ว |
+| `--expense` / `--rejected` | `oklch(0.55 0.17 25)` | **Red** — รายจ่าย, เดบิต, ปฏิเสธ |
+| `--offering` / `--pending` | `oklch(0.7 0.13 80)` | **Amber** — เงินถวาย, รออนุมัติ |
+| `--info` | `oklch(0.58 0.12 222)` | **Sky** — ข้อมูลทั่วไป (แยกจาก primary) |
 
-แต่ละสีมี `-foreground` (ข้อความบนพื้นสีนั้น) และ `-muted` (พื้นหลัง badge)
-เช่น `--income-muted: oklch(0.95 0.035 155)` สำหรับพื้นหลัง badge สีเขียวอ่อน
+**กติกา:** ห้ามใช้สีเขียวนอกเหนือจาก income/approved, ห้ามใช้สีแดงนอกเหนือจาก expense/rejected
+ทุกสีมี `-foreground` และ `-muted` ให้ใช้ (เช่น `--income-muted` สำหรับ badge)
 
-### 2.3 Chart palette (5 สี)
-
+### 2.3 Chart palette
 | Token | ค่า | สี |
 |---|---|---|
-| `--chart-1` | `oklch(0.53 0.17 258)` | น้ำเงิน (primary) |
-| `--chart-2` | `oklch(0.5 0.13 155)` | มรกต (income) |
-| `--chart-3` | `oklch(0.55 0.17 25)` | แดง (expense) |
-| `--chart-4` | `oklch(0.7 0.13 80)` | อำพัน (offering) |
-| `--chart-5` | `oklch(0.6 0.11 195)` | เขียวอมฟ้า (teal) — accent ที่ 5 แยกจาก primary |
+| `--chart-1` | `oklch(0.53 0.17 258)` | น้ำเงิน |
+| `--chart-2` | `oklch(0.5 0.13 155)` | มรกต |
+| `--chart-3` | `oklch(0.55 0.17 25)` | แดง |
+| `--chart-4` | `oklch(0.7 0.13 80)` | อำพัน |
+| `--chart-5` | `oklch(0.6 0.11 195)` | เขียวอมฟ้า (teal) |
 
 ### 2.4 Dark mode
+พื้นหลัง `oklch(0.16 0.012 258)` แนว Linear.app, สี semantic ถูกยกความสว่างขึ้น, `--border` ใช้ white-alpha 8%
 
-พื้นหลัง slate เข้ม (`oklch(0.16 0.012 258)`) แนว Linear.app สีความหมายเดิม
-ทั้งหมดถูกยกความสว่าง (lightness) ขึ้นเพื่อคงคอนทราสต์บนพื้นเข้ม เช่น
-`--primary` จาก L=0.53 → 0.68, `--income` จาก L=0.5 → 0.6, ส่วน `--border`
-เปลี่ยนไปใช้ white-alpha แทน (`oklch(1 0 0 / 8%)`)
-
-### 2.5 กติกาการใช้สี
-
-- **ห้าม hardcode** ค่า hex/oklch ในโค้ด component (className, inline style,
-  SVG `stopColor`) ต้องอ้างอิง CSS variable (`var(--color-primary)`) หรือ
-  Tailwind utility (`bg-primary`, `text-warning`) เสมอ — รอบ v3.0 พบไฟล์ที่
-  ละเมิดกฎนี้ 6 ไฟล์ (ค่าเก่าจาก v2.0 ที่หลุด sync)
-- สถานะ (status) ต้องสื่อด้วย **สี + ไอคอนเสมอ** ไม่ใช้สีอย่างเดียว
+### 2.5 กติกา hardcode
+**ห้าม hardcode hex/oklch ใน component** — ต้องอ้างอิง CSS variable หรือ Tailwind utility เสมอ
+(ใช้ `var(--color-primary)` หรือ `bg-primary` เท่านั้น)
 
 ---
 
@@ -101,169 +70,277 @@ utility ผ่าน `@theme inline`
 |---|---|
 | `--font-sans` / `--font-display` | `"Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif` |
 | `--font-mono` | `"JetBrains Mono", "Fira Code", ui-monospace, monospace` |
-| ขนาด body | **15px** (ไม่ใช่ 16px default ของ Tailwind — เผื่อผู้ใช้สูงอายุ/อาสาสมัครคริสตจักร) |
-| line-height | 1.6 (body), 1.25 (heading) |
+| Body font size | **15px** (ไม่ใช่ 16px default) |
+| Line-height | 1.6 (body), 1.25 (heading) |
 
 - **Latin/UI/ตัวเลข**: Inter
-- **ภาษาไทย**: Sarabun (จงใจคงไว้ — Inter render ภาษาไทยได้ไม่ดี แอปนี้เป็น
-  Thai-first) โหลดจาก Google Fonts ใน `src/routes/__root.tsx` (`Sarabun`
-  weight 300–700, `Inter` variable font)
-- **ตัวเลข**: ใช้ `tabular-nums` เสมอผ่าน utility `.num-display` หรือ
-  `MoneyText` component — ตัวเลขการเงินคือจุดโฟกัสหลักของทุกหน้า
-  (`font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1, "ss01" 1`)
+- **ภาษาไทย**: Sarabun (Inter render ภาษาไทยไม่ดี)
+- **ตัวเลข**: ใช้ `.num-display` utility เสมอ — `tabular-nums`, `font-feature-settings: "tnum" 1`
 - Heading: `font-weight: 600`, `letter-spacing: -0.02em`, `text-wrap: balance`
 
 ---
 
-## 4. Radius Scale — ⚠️ ค่าปัจจุบัน (vNext, tightened)
+## 4. Radius — **มีข้อยกเว้น อ่านให้ดี**
 
-`src/styles.css` ปัจจุบัน (base `--radius: 0.75rem` = 12px):
+LedgerCraft แนะนำ 4px แต่ Grace Ledger ใช้ค่าที่มนกว่า (เหมาะกับแอคคริสตจักร ไม่ใช่ pure enterprise):
 
-| Element | Token | ค่าจริงใน CSS | ค่าที่ DESIGN_TOKENS.md เก่าระบุ |
+| Element | Token | ค่า | หมายเหตุ |
 |---|---|---|---|
-| การ์ด | `--radius-card` | **1rem (16px)** | ~~24px~~ (v3.0 เดิม, เอกสารยังไม่อัปเดต) |
-| ปุ่ม | `--radius-button` | **0.75rem (12px)** | ~~18px~~ |
-| Input/Select | `--radius-input` | **0.625rem (10px)** | ~~16px~~ |
-| Dialog | `--radius-dialog` | **1.25rem (20px)** | ~~28px~~ |
-| Sheet/Drawer | `--radius-sheet` | **1.5rem (24px)** | ~~32px~~ |
-| Badge | `rounded-full` (pill) | — | ตรงกัน |
+| การ์ด | `--radius-card` | **16px** | ใช้ border แทน shadow |
+| ปุ่ม | `--radius-button` | **12px** | ไม่ใช่ 4px แบบ LedgerCraft |
+| Input/Select | `--radius-input` | **10px** | |
+| Dialog | `--radius-dialog` | **20px** | |
+| Sheet/Drawer | `--radius-sheet` | **24px** | |
+| Badge, Pill | `rounded-full` | — | |
+| ตาราง, cell | **0px** | — | ห้ามมน, ใช้ border แยกแทน |
 
-เหตุผล (จาก `GRACE_LEDGER_VNEXT_MASTERPLAN.md` §4): ค่าการ์ด 24px/ปุ่ม 18px
-เดิมดู "soft toy" เกินไปเมื่อเทียบกับ reference set (Linear/Stripe) จึงลดลง
-โดยคง token name เดิม เปลี่ยนแค่ค่า — cascade ทั้งแอปด้วยไฟล์เดียว
+Generic scale: `rounded-sm` 8px / `rounded-md` 12px / `rounded-lg` 16px / `rounded-xl` 20px / `rounded-2xl` 24px
 
-Generic scale (ไม่มี named token): `rounded-sm` 8px / `rounded-md` 12px /
-`rounded-lg` 16px / `rounded-xl` 20px / `rounded-2xl` 24px / `rounded-full`
+**กติกา:** ห้ามใช้ radius > 4px กับตารางข้อมูล — ใช้ border เป็น depth indicator แทน
 
 ---
 
 ## 5. Spacing
 
-ไม่มี custom token — ใช้ scale เริ่มต้นของ Tailwind v4 (`4px` multiplier)
-ซึ่งตรงกับกติกา 8px-grid อยู่แล้ว: `p-1`=4px, `p-2`=8px, `p-3`=12px,
-`p-4`=16px, `p-6`=24px, `p-8`=32px, `p-12`=48px, `p-16`=64px, `p-24`=96px
+Tailwind v4 default scale (4px multiplier) — ไม่มี custom token
+`p-1`=4px, `p-2`=8px, `p-3`=12px, `p-4`=16px, `p-6`=24px, `p-8`=32px, `p-12`=48px, `p-24`=96px
+
+**กติกา:** ตารางใช้ `px-5 py-3` (20px/12px) เป็น compact default สำหรับ cell
 
 ---
 
 ## 6. Elevation (เงา)
 
-ปรัชญา vNext: **border เหนือกว่า shadow** — ใช้เงาเฉพาะจุดที่มี overlap จริง
-(drawer, dialog, popover) การ์ดเรียบใช้ border เท่านั้น ไม่แต่งเงาเพิ่ม
+ปรัชญา: **Border เหนือกว่า shadow** — ใช้เงาเฉพาะจุด overlap จริง (drawer, dialog, popover)
 
 ```css
 shadow-xs:       0 1px 2px 0 rgb(0 0 0 / 0.03)
 shadow-sm-card:  0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.03)
 shadow-card:     0 1px 2px 0 rgb(0 0 0 / 0.04), 0 3px 10px -4px rgb(0 0 0 / 0.04)
 shadow-elevated: 0 1px 4px -1px rgb(0 0 0 / 0.05), 0 6px 16px -6px rgb(0 0 0 / 0.06)
-shadow-primary-glow: 0 0 24px -4px oklch(0.53 0.17 258 / 0.25)
 ```
 
-ไม่มีเงาหนัก (heavy shadow) ที่ไหนในระบบ — เจตนา "เงียบ" (quiet) ตามคำนิยาม
-design language
+การ์ดเรียบใช้ border เท่านั้น — **ไม่มีเงาหนักที่ไหนในระบบ**
 
 ---
 
 ## 7. Icons
 
-**Lucide React เท่านั้น** ขนาด 16/20/24/32px ตามบริบท `strokeWidth: 1.5`
-เป็นค่าเริ่มต้น, `2` เฉพาะ active state
+**Lucide React เท่านั้น** — ขนาด 16/20/24/32px ตามบริบท, `strokeWidth: 1.5` เป็น default, `2` เฉพาะ active state
 
 ---
 
 ## 8. Motion
 
-**Framer Motion เป็น JS animation library เดียว** (GSAP ถูกถอดออกทั้งหมดใน
-v3.0 rollout) ร่วมกับ CSS keyframe utility ชุดเล็กสำหรับ entrance effect
-แบบ non-interactive
+**Framer Motion** เป็น JS library เดียว (GSAP ถูกถอดแล้ว) + CSS keyframe utility สำหรับ entrance
 
 ```css
 --ease-out:    cubic-bezier(0.23, 1, 0.32, 1)   /* หลัก — Emil Kowalski curve */
 --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)
 --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1)
---ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1) /* ใช้น้อยมาก ไม่ใช่ default */
+--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1) /* ใช้น้อยมาก */
 ```
 
 | ประเภท | ระยะเวลา | Easing |
 |---|---|---|
-| Micro (press/hover) | 100–150ms | `ease` / `--ease-out` |
+| Micro (press/hover) | 100–150ms | `--ease-out` |
 | Component (dialog/sheet) | 200–250ms | `--ease-out` |
 | Page transition | 250–300ms | `--ease-out` |
 | Stagger (list mount) | delay 40ms/item | `--ease-out` |
 
-กติกาเหล็ก: ห้ามเกิน 400ms ต่อ interaction, ห้ามใช้ `bounce`/`elastic` กับ
-business UI, ห้ามใช้ `animate-spin`/`animate-bounce` เพื่อการตกแต่ง, ต้อง
-เคารพ `prefers-reduced-motion: reduce` เสมอ (มี guard ระดับ global อยู่แล้ว
-ใน `src/styles.css`)
-
-Keyframe หลักที่มี: `fade-up`, `fade-in`, `fade-down`, `scale-in`, `shake`,
-`slide-in-right`, `pulse-glow` + `.stagger` สำหรับ list children
+**กติกาเหล็ก:**
+- ห้ามเกิน 400ms ต่อ interaction
+- ห้าม bounce/elastic กับ business UI
+- ห้าม animate-spin/animate-bounce เพื่อ decoration
+- ต้องเคารพ `prefers-reduced-motion: reduce` เสมอ
+- **ห้าม NumberTicker animation** กับยอดเงินหลัก (ดูไป flashy เกินไปสำหรับแอปการเงิน)
 
 ---
 
-## 9. Component Reference (สรุปจาก COMPONENT_LIBRARY.md)
+## 9. Component Reference
 
-| Component | Radius (ตามค่า vNext จริง) | Height/ขนาด | หมายเหตุ |
-|---|---|---|---|
-| **Button** (`ui/button.tsx`) | `rounded-button` 12px | `default` 44px, `sm` 36px, `lg` 48px, `icon` 44×44 | variant: default/secondary/outline/ghost/destructive/link — ห้ามใช้ raw `<button>` |
-| **Input/Textarea/Select** | `rounded-input` 10px | 44px min | label อยู่เหนือ field เสมอ ห้ามใช้ placeholder แทน label |
-| **Card** (`ui/card.tsx`) | `rounded-card` 16px | variant: default/stat/interactive | `interactive` = hover-lift + translate-y -0.5, border-only ไม่มีเงาหนัก |
-| **Dialog** | `rounded-dialog` 20px | full-screen บนมือถือ (`<sm`), centered บน `sm+` | action ทำลายข้อมูล (void/reject/delete) ต้องผ่าน dialog นี้เสมอ |
-| **Drawer/Sheet** | `rounded-sheet` 24px (directional) | overlay `bg-black/40 backdrop-blur-md` | Drawer = bottom sheet มือถือ, Sheet = side panel ทุก breakpoint |
-| **Table** | — | — | ใช้กับ transaction log / audit trail; การ์ด grid ยังใช้ได้กับ entity ที่เน้นตัวเลขใหญ่ (Funds/Budget/Projects) |
-| **Badge** | `rounded-full` (pill) | — | variant: default/secondary/destructive/outline/success/warning/info; `StatusBadge` เป็น typed wrapper |
-| **Skeleton** | — | — | ใช้ composite template (`TableSkeleton`, `DashboardSkeleton` ฯลฯ) แทนการ hand-roll loop |
-| **Chart** (`ui/chart.tsx`) | — | Recharts wrapper | ยกเว้น `DashboardGaugeChart.tsx` ที่เป็น hand-drawn SVG โดยเจตนา |
+### Buttons
+- **Primary**: `bg-primary text-primary-foreground`, hover: `bg-primary/90`
+- **Secondary**: `bg-secondary text-secondary-foreground`, border
+- **Outline**: border, ghost text
+- **Destructive**: `bg-destructive text-destructive-foreground`
+- **Size**: default 44px, sm 36px (เฉพาะ action ในแถวตาราง), lg 48px
+- **กติกา**: ห้ามใช้ raw `<button>` — ใช้ `ui/button.tsx` เสมอ
+
+### Inputs
+- **Default**: 1px border `#CBD5E1`, white fill, 32px height
+- **Focus**: 1px border `var(--color-primary)`, 2px ring
+- **Error**: 1px border `var(--color-destructive)`
+- **Label** อยู่เหนือ field เสมอ — ห้ามใช้ placeholder แทน label
+
+### Cards
+- Background: white, border 1px `var(--color-border)`, radius 16px
+- ไม่มี shadow หนัก — ใช้ border เป็น depth
+- Hover: border เข้มขึ้น + translate-y -0.5 (interactive variant เท่านั้น)
+
+### Tables
+- **ใช้กับ transaction log / audit trail** — ห้ามใช้กับ entity ที่เน้นตัวเลขใหญ่ (Funds/Budget/Projects ใช้ grid ของการ์ดแทน)
+- กฎ LedgerCraft บังคับ:
+  - Right-align ทุก numerical column
+  - ใช้ตำแหน่งทศนิยมที่สม่ำเสมอในแต่ละคอลัมน์ (2 ตำแหน่งสำหรับเงิน, 4 สำหรับภาษี)
+  - ใช้ tabular-nums ทุกตัวเลข
+  - สลับพื้นหลังแถว (#FFFFFF / #F1F5F9) เมื่อมีมากกว่า 5 แถว
+  - Sticky header + frozen first column สำหรับตารางกว้าง
+  - Sort indicator ทุกคอลัมน์ + ตารางต้อง sortable เป็น default
+
+### StatCard (KPI summary)
+- ใช้ `border` + `bordered accent strip` (ซ้าย) แทน gradient background
+- Value: `num-display font-display text-[28px] md:text-[32px] font-bold`
+- **ไม่มี NumberTicker animation** — แสดงค่าตรง ๆ
+- Trend indicator ใช้ `bg-success/10` หรือ `bg-destructive/10` + TrendingUp/Down icon
+
+### PageHeader
+- Kicker: `.kicker` utility (11px uppercase tracking-wider)
+- Title: `font-display text-[26px] md:text-[32px] font-bold`
+- Description: `text-sm text-muted-foreground`
+- Actions: อยู่ขวา ไม่ใต้ title
+
+### StatusBadge
+- ใช้สี + ไอคอนเสมอ (ไม่ใช่สีอย่างเดียว)
+- Paid = emerald bg + text + border
+- Overdue = amber bg + text + border
+- Draft = slate bg + text + border
+
+### EmptyState
+- ทุกหน้าที่ fetch data ต้องมี 3 state: **Loading (skeleton)** / **Error + retry** / **Empty + action**
+- **ห้าม** silently fallback เป็นข้อมูลปลอม (fake demo data)
 
 ---
 
 ## 10. Responsive
 
-**ลำดับความสำคัญ: Desktop/laptop ก่อน, iPad เท่าเทียมกันเป็นอันดับสอง,
-มือถือใช้งานได้แต่เป็นรอง** — เพราะเป็นซอฟต์แวร์การเงินที่เน้นตารางหนาแน่น
-และ workflow อนุมัติหลายขั้นตอน ไม่ใช่แอปเสพเนื้อหา
+**Desktop/laptop ก่อน, iPad เท่าเทียม, มือถือเป็นรอง**
 
-Breakpoint มาตรฐาน Tailwind ไม่ปรับแต่ง: `sm` 640 / `md` 768 / `lg` 1024
-(**เทียบเท่า iPad — ได้รับการดูแลระดับ first-class**) / `xl` 1280 / `2xl`
-1536 (ยังมี gap — ยังไม่ได้ tuning เฉพาะ `2xl` ทุกหน้า)
+Breakpoint: `sm` 640 / `md` 768 / `lg` 1024 (iPad) / `xl` 1280 / `2xl` 1536
 
-| Layout shell | มือถือ (`<md`) | Desktop/iPad (`lg+`) |
+| Layout | <md | md+ |
 |---|---|---|
-| Navigation | `BottomNav` (5 รายการ + Sheet "เพิ่มเติม") | `AppSidebar` (collapsible icon rail) + `AppTopbar` |
+| Navigation | BottomNav | AppSidebar (icon rail) + AppTopbar |
 
-Touch target ขั้นต่ำ **44px เสมอ** ทั้งมือถือและ desktop (ไม่ลดขนาดแม้มี mouse)
-ยกเว้น `Button size="sm"` (36px) ที่เจตนาไว้สำหรับปุ่ม action ในแถวตารางที่แน่น
+Touch target ขั้นต่ำ **44px** ทั้ง desktop และ mobile (ยกเว้น Button size="sm" 36px สำหรับ action ในแถวตาราง)
 
 ---
 
 ## 11. Accessibility
 
-WCAG AA contrast ขั้นต่ำ, keyboard navigation ครบ, `:focus-visible` ring
-มองเห็นชัด (`outline: 2px solid var(--color-ring)`), screen-reader ผ่าน
-Radix/shadcn primitives, touch target 44px (ยกเว้นตามที่ระบุด้านบน)
+- WCAG AA contrast ขั้นต่ำ
+- Keyboard navigation ครบ
+- `:focus-visible` ring มองเห็นชัด (2px solid var(--color-ring))
+- Screen-reader ผ่าน Radix/shadcn primitives
 
 ---
 
-## 12. Async-state contract (vNext, บังคับทุกหน้าที่ fetch data)
+## 12. Anti-Slop Rules — **บังคับทุกหน้า**
 
-ทุกหน้าที่โหลดข้อมูลต้อง render 3 สถานะแยกกันชัดเจน ห้าม fallthrough แบบ implicit:
+### สิ่งที่ห้ามทำ (AI มักทำ):
 
-1. **Loading** — skeleton ที่ตรงกับ layout จริง
-2. **Error** — ข้อความ + ปุ่ม retry ห้าม silent fallback เป็นค่า 0/ข้อมูลปลอม
-3. **Empty** — คำอธิบาย + action เดียวที่แก้ปัญหาได้
+1. ❌ **Gradient background บน hero/card** — ใช้ flat color + border
+2. ❌ **NumberTicker animation กับเงิน** — ดู flashy ไป แสดงตัวเลขตรง ๆ
+3. ❌ **Glassmorphism / backdrop-blur** เกินจำเป็น — ใช้เฉพาะ topbar
+4. ❌ **Drop-shadow glow บน icon/logo** — ห้าม decoration ที่ไม่จำเป็น
+5. ❌ **Hover scale-110 บนไอคอน** — ไม่จำเป็นสำหรับ data-dense UI
+6. ❌ **Bounce/spring animation** — ไม่ใช่เกมหรือ social media
+7. ❌ **Decorative SVG/illustration** — นี่คือซอฟต์แวร์บัญชี
+8. ❌ **Fake demo data เมื่อว่าง** — ต้องมี EmptyState + action
+9. ❌ **Mixed debit/credit color** — green = credit, red = debit เสมอ
+10. ❌ **Rounding totals** — แสดงค่าจริงเสมอ ไม่ปัด
+11. ❌ **Compact table padding ต่ำกว่า py-3 px-5** — ต้องอ่านง่าย
+12. ❌ **Sticky first column ของตาราง transaction** — บังคับถ้ากว้าง
 
-กติกานี้เกิดจาก audit ที่พบปัญหาร้ายแรงสุด: มี component ที่ silently สลับไป
-แสดงข้อมูลธุรกรรมปลอม (fake demo data) เมื่อข้อมูลจริงว่างเปล่า
+### สิ่งที่ต้ำทำ (LedgerCraft principles):
+
+1. ✅ **ตัวเลขคือ hero** — ไม่ใช่การ์ดตกแต่ง
+2. ✅ **Right-align ทุก numerical column**
+3. ✅ **Tabular-nums เสมอ**
+4. ✅ **Alternating row backgrounds** เมื่อ > 5 แถว
+5. ✅ **Consistent decimal places** ในแต่ละคอลัมน์
+6. ✅ **Border เป็น depth** ไม่ใช่ shadow
+7. ✅ **สี muted** ไม่ oversaturated
+8. ✅ **สี + ไอคอน** สำหรับ status เสมอ
 
 ---
 
-## 13. แหล่งอ้างอิงฉบับเต็ม
+## 13. ตัวอย่าง Pattern ที่ถูกต้อง
 
-| เอกสาร | เนื้อหา |
+### ✅ ตาราง transaction
+```tsx
+<Table>
+  <TableHeader className="sticky top-0 z-10 bg-card">
+    <TableRow>
+      <TableHead className="w-[120px]">วันที่</TableHead>
+      <TableHead>รายละเอียด</TableHead>
+      <TableHead>หมวดหมู่</TableHead>
+      <TableHead className="text-right">จำนวน</TableHead>
+      <TableHead className="text-center">สถานะ</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {rows.map((r) => (
+      <TableRow key={r.id}>
+        <TableCell className="num-display">{fmtDate(r.date)}</TableCell>
+        <TableCell>{r.description}</TableCell>
+        <TableCell>{r.category}</TableCell>
+        <TableCell className="text-right num-display">
+          <MoneyText value={r.amount} />
+        </TableCell>
+        <TableCell className="text-center">
+          <StatusBadge status={r.status} />
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+```
+
+### ✅ การ์ด KPI
+```tsx
+<div className="rounded-card border border-border/60 bg-card p-5">
+  <p className="kicker text-muted-foreground">รายรับเดือนนี้</p>
+  <p className="num-display font-display mt-2 text-[28px] font-bold text-success">
+    {thb(incomeMonth)}
+  </p>
+  <p className="mt-2 text-xs text-muted-foreground">{incomes.length} รายการ</p>
+</div>
+```
+
+### ✅ EmptyState
+```tsx
+<EmptyState
+  icon={ArrowDownCircle}
+  title="ยังไม่มีรายรับ"
+  description="เริ่มบันทึกรายรับเพื่อดูข้อมูลที่นี่"
+  action={<Button onClick={() => setOpen(true)}>บันทึกรายรับ</Button>}
+/>
+```
+
+---
+
+## 14. การใช้เอกสารนี้
+
+**ทุกครั้งที่สร้างหรือแก้ไข UI:**
+1. อ่าน §12 (Anti-Slop Rules) ก่อนเป็นอันดับแรก
+2. ใช้สีจาก §2 เท่านั้น
+3. ใช้ radius จาก §4 เท่านั้น
+4. ใช้ motion จาก §8 เท่านั้น
+5. ตรวจสอบกับ §12 อีกครั้งก่อน commit
+
+**ถ้าเอกสารนี้ขัดกับโค้ดปัจจุบัน → ให้โค้ดชนะ แล้วอัปเดตเอกสารนี้**
+
+---
+
+## 15. ไฟล์ที่เกี่ยวข้อง
+
+| ไฟล์ | สถานะ |
 |---|---|
-| `src/styles.css` | **Source of truth ตัวจริง** — ทุกค่าที่ implement |
-| `DESIGN_SYSTEM_V3.md` | หลักการ/ปรัชญาระดับสูง (ค่า radius บางส่วนล้าสมัย ดู §4) |
-| `DESIGN_TOKENS.md` | ตาราง token (ค่า radius ล้าสมัย ดู §4) |
-| `COMPONENT_LIBRARY.md` | สถานะ migration ของแต่ละ component แบบละเอียด |
-| `MOTION_GUIDELINES.md` | duration/easing ฉบับเต็ม + reference implementation |
-| `RESPONSIVE_GUIDELINES.md` | breakpoint strategy + testing checklist |
-| `docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md` | ทิศทาง vNext ปัจจุบัน (Gridgeist thesis, radius tightening, async-state contract) |
+| `src/styles.css` | ✅ Source of truth ค่าจริง — อัปเดตแล้ว |
+| `DESIGN_TOKENS.md` | ⚠️ ล้าสมัยบางส่วน (radius เก่า) — ให้เอกสารนี้ชนะ |
+| `DESIGN_SYSTEM_V3.md` | ✅ หลักการระดับสูง — ยังใช้ได้ |
+| `COMPONENT_LIBRARY.md` | ✅ สถานะ migration component |
+| `MOTION_GUIDELINES.md` | ✅ รายละเอียด motion + implementation |
+| `RESPONSIVE_GUIDELINES.md` | ✅ Breakpoint strategy + testing checklist |
+| `docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md` | ✅ ทิศทาง vNext |

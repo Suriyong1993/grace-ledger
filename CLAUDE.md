@@ -4,13 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## 🚀 Current Phase: Sprint 2 (HTML Prototype)
+## 🚀 Current Phase: vNext Redesign (ledger-grid system)
 
-**Status**: Phase A (Infrastructure) complete. Ready for prototype development.
+**Status**: FS-001 (Finance Staff Home) and Record Income Wizard (`_app.record-income.step-1` through `step-4`, backed by `src/lib/recordIncomeWizard.ts`) are built. Redesign is now spreading page-by-page across the whole app per the vNext masterplan — most of `src/components/` and `src/routes/` are mid-migration to the new tokens/components (see `git status` for the current in-flight set). Next queued work: premium dark mode pass (plan + spec below).
 
-**What to do**: Build FS-001 (Finance Staff Home) and Record Income Wizard (FS-002 through FS-005).
+**Design source of truth**: `DESIGN.md` (repo root) — supersedes `docs/design/prototype/DESIGN-SYSTEM-V2.md` and the old DESIGN_TOKENS/DESIGN_SYSTEM_V3/COMPONENT_LIBRARY/MOTION_GUIDELINES docs it consolidates. Read it before touching colors, radius, spacing, elevation, type, icons, or motion — it exists specifically to prevent generic AI-slop UI in this app.
 
-**Reference**: Read `.claude/sprint-2-instructions.md` first.
+**Reference**: `.claude/sprint-2-instructions.md` (original prototype scope) and `docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md` (current redesign scope/IA/rollout — approved direction as of 2026-08-05, "evolve, not rebuild").
+
+**Active work item**: Premium dark mode — `docs/superpowers/plans/2026-08-06-grace-ledger-premium-dark-mode.md` (task-by-task plan) and `docs/superpowers/specs/2026-08-06-grace-ledger-premium-dark-mode-design.md` (design spec). Emerald primary accent, slate background, border-based depth (no glassmorphism, no heavy shadow), ≤250ms motion, WCAG AA minimum.
 
 **Key docs**:
 - `docs/TECH_LEAD_NOTE.md` — Why we're doing this
@@ -144,3 +146,5 @@ Already installed and linked to this project — invoke by name rather than re-d
 - `ENGINEERING_BACKLOG.md` — current known gaps/bugs (route handlers, auth bypass, budget mapping, etc.) — check before assuming something is unimplemented.
 - `docs/business/AUTHORIZATION_MODEL.md`, `docs/business/BUSINESS_RULES.md`, `docs/business/ACCOUNTING_ENGINE.md` — business rule source of truth for approvals, accounting, and audit design.
 - `docs/architecture/` — architecture decisions and target-state docs.
+- `DESIGN.md` — UI design system source of truth (colors, radius, spacing, elevation, type, motion). See "Current Phase" banner above.
+- `docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md` — current redesign IA/scope/rollout plan.
