@@ -9,8 +9,9 @@ This directory contains the original interactive prototype, component showcase, 
 | [`Grace Ledger.dc.html`](./Grace%20Ledger.dc.html) | Interactive HTML prototype covering all 13 screens |
 | [`support.js`](./support.js) | Supporting JS script for interactive prototype state transitions |
 | [`Design System.dc.html`](./Design%20System.dc.html) | Interactive component showcase for UI states and tokens |
-| [`DESIGN-SYSTEM-V2.md`](./DESIGN-SYSTEM-V2.md) | Design System v2 specification reference |
 | [`github.md`](./github.md) | Mapping of prototype screens to codebase routes |
+
+> `DESIGN-SYSTEM-V2.md` has been removed — its content is superseded by `DESIGN.md` at the repo root.
 
 ---
 
@@ -35,6 +36,4 @@ This directory contains the original interactive prototype, component showcase, 
 ---
 
 ## Design System Architecture
-- Primary Design System: [`DESIGN_SYSTEM_V3.md`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/DESIGN_SYSTEM_V3.md)
-- Design Tokens: [`DESIGN_TOKENS.md`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/DESIGN_TOKENS.md)
-- Component Specs: [`COMPONENT_LIBRARY.md`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/COMPONENT_LIBRARY.md)
+- Single source of truth: [`DESIGN.md`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/DESIGN.md) — consolidates the former `DESIGN_SYSTEM_V3.md`, `DESIGN_TOKENS.md`, `COMPONENT_LIBRARY.md`, and `MOTION_GUIDELINES.md` (all removed).
