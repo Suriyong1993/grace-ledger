@@ -1,16 +1,15 @@
 /**
  * RecentTransactionsTable.tsx
  *
- * Renders recent financial entries with premium row design:
- * - Left border flash on hover (color per transaction type)
- * - Pending rows: amber left border persistent + background tint
- * - Stagger entrance animation per row
- * - Right-aligned tabular amounts with min-width for alignment
- * - Category pill tag in meta line
+ * Finexy-style recent transactions table:
+ * - Clean table rows with order-ID, icon, description, amount, status dot, date
+ * - Filter pill tabs: ทั้งหมด / รายรับ / รายจ่าย / รออนุมัติ
+ * - Pending rows get amber left-border flash
+ * - Right-aligned tabular amounts with color coding
  */
 
 import { useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, ChevronRight, HandHeart } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,7 @@ import type { TxStatus } from "@/lib/types";
 
 export interface TransactionRow {
   id: string;
-  kind: "income" | "expense";
+  kind: "income" | "expense" | "offering";
   date: string;
   amount: number;
   description?: string;
@@ -41,7 +40,7 @@ const DEFAULT_TXS: TransactionRow[] = [
     kind: "income",
     date: "2024-01-15",
     amount: 45000,
-    description: "เงินบริจาคสัปดาห์ที่ 2 ประจำเดือนมกราคม",
+    description: "เงินบริจาคสัปดาห์ที่ 2 มกราคม",
     categoryName: "เงินบริจาคประจำสัปดาห์",
     status: "approved",
     createdBy: "คุณสมชาย ใจดี",
@@ -51,7 +50,7 @@ const DEFAULT_TXS: TransactionRow[] = [
     kind: "expense",
     date: "2024-01-14",
     amount: 12500,
-    description: "ค่าซ่อมบำรุงระบบเครื่องเสียงห้องประชุมใหญ่",
+    description: "ค่าซ่อมบำรุงระบบเครื่องเสียง",
     categoryName: "ค่าซ่อมบำรุง",
     vendor: "หจก. ซาวด์เอ็นจิเนียริ่ง",
     status: "approved",
@@ -72,7 +71,7 @@ const DEFAULT_TXS: TransactionRow[] = [
     kind: "expense",
     date: "2024-01-12",
     amount: 8900,
-    description: "ชำระค่าไฟฟ้าอาคารคริสตจักรประจำเดือนมกราคม",
+    description: "ชำระค่าไฟฟ้าอาคารคริสตจักร มกราคม",
     categoryName: "ค่าสาธารณูปโภค",
     vendor: "การไฟฟ้าส่วนภูมิภาค",
     status: "approved",
@@ -89,20 +88,38 @@ const FILTER_LABELS: Record<FilterTab, string> = {
   pending: "รออนุมัติ",
 };
 
+function KindIcon({ kind }: { kind: "income" | "expense" | "offering" }) {
+  if (kind === "income") {
+    return (
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#FEF0EB] text-[#E8450A]">
+        <ArrowDownLeft className="h-4 w-4" strokeWidth={2.25} />
+      </div>
+    );
+  }
+  if (kind === "offering") {
+    return (
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-50 text-amber-600">
+        <HandHeart className="h-4 w-4" strokeWidth={1.75} />
+      </div>
+    );
+  }
+  return (
+    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+      <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
+    </div>
+  );
+}
+
 export function RecentTransactionsTable({
   transactions = DEFAULT_TXS,
   onSelectTx,
 }: RecentTransactionsTableProps) {
-  // NOTE: `transactions` must never be silently replaced with demo data —
-  // an empty array means "no real transactions" and must render the real
-  // empty state below, not fabricated rows. DEFAULT_TXS only applies when
-  // the prop itself is omitted (e.g. isolated component preview).
   const displayTxs = transactions;
   const [filter, setFilter] = useState<FilterTab>("all");
 
   const filtered = displayTxs.filter((tx) => {
     if (filter === "income") return tx.kind === "income";
-    if (filter === "expense") return tx.kind === "expense";
+    if (filter === "expense") return tx.kind === "expense" || tx.kind === "offering";
     if (filter === "pending") return tx.status === "pending";
     return true;
   });
@@ -110,16 +127,16 @@ export function RecentTransactionsTable({
   const pendingCount = displayTxs.filter((t) => t.status === "pending").length;
 
   return (
-    <div className="rounded-card border border-border bg-card overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 px-5 py-4">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">รายการการเงินล่าสุด</h3>
-          <p className="text-xs text-muted-foreground">บันทึกรับ-จ่าย และสถานะการอนุมัติ</p>
+          <h3 className="text-sm font-bold text-foreground">รายการการเงินล่าสุด</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">บันทึกรับ-จ่ายและสถานะการอนุมัติ</p>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-0.5 rounded-lg bg-muted/60 p-1">
+        <div className="flex items-center gap-0.5 rounded-xl bg-muted/60 p-1">
           {(Object.keys(FILTER_LABELS) as FilterTab[]).map((tab) => (
             <Button
               key={tab}
@@ -127,15 +144,15 @@ export function RecentTransactionsTable({
               size="sm"
               onClick={() => setFilter(tab)}
               className={cn(
-                "h-auto rounded-md px-2.5 py-1 text-[11px] font-medium",
+                "h-auto rounded-lg px-2.5 py-1 text-[11px] font-medium",
                 filter === tab
-                  ? "bg-card text-foreground hover:bg-card"
-                  : "text-muted-foreground hover:text-foreground",
+                  ? "bg-foreground text-background hover:bg-foreground/90"
+                  : "text-muted-foreground hover:text-foreground hover:bg-card",
               )}
             >
               {FILTER_LABELS[tab]}
               {tab === "pending" && pendingCount > 0 && (
-                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-pending px-1 text-[9px] font-bold text-pending-foreground">
+                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E8450A] px-1 text-[9px] font-bold text-white">
                   {pendingCount}
                 </span>
               )}
@@ -144,8 +161,27 @@ export function RecentTransactionsTable({
         </div>
       </div>
 
+      {/* Table header */}
+      <div className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-3 border-b border-border/30 bg-muted/30 px-5 py-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-12">
+          ID
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          รายการ
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground text-right min-w-[88px]">
+          จำนวนเงิน
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground min-w-[72px]">
+          สถานะ
+        </span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground min-w-[72px] text-right">
+          วันที่
+        </span>
+      </div>
+
       {/* Rows */}
-      <div className="divide-y divide-border/40">
+      <div className="divide-y divide-border/30">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground">
@@ -155,75 +191,65 @@ export function RecentTransactionsTable({
             <p className="mt-0.5 text-xs text-muted-foreground/70">ลองเปลี่ยนตัวกรอง</p>
           </div>
         ) : (
-          filtered.map((tx, index) => {
+          filtered.map((tx) => {
             const isIncome = tx.kind === "income";
             const isPending = tx.status === "pending";
+            const shortId = tx.id.replace("tx-", "#").padStart(4, "0");
 
             return (
               <div
                 key={tx.id}
                 onClick={() => onSelectTx?.(tx)}
                 className={cn(
-                  "group relative flex cursor-pointer items-center gap-3 px-5 py-3.5",
-                  "transition-colors duration-150 hover:bg-secondary/50",
-                  // Left border accent
-                  "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-r before:transition-all before:duration-150",
-                  isPending
-                    ? "before:bg-warning"
-                    : isIncome
-                      ? "before:bg-success before:opacity-0 hover:before:opacity-100"
-                      : "before:bg-destructive before:opacity-0 hover:before:opacity-100",
-                  isPending && "bg-warning/[0.04]",
+                  "group relative grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-3 px-5 py-3.5",
+                  "cursor-pointer transition-colors duration-100 hover:bg-muted/40",
+                  isPending && "bg-amber-50/50 dark:bg-amber-950/10",
+                  isPending &&
+                    "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-amber-400",
                 )}
               >
-                {/* Kind icon */}
-                <div
-                  className={cn(
-                    "grid h-9 w-9 shrink-0 place-items-center rounded-xl",
-                    isIncome ? "bg-income-muted text-income" : "bg-expense-muted text-expense",
-                  )}
-                >
-                  {isIncome ? (
-                    <ArrowDownLeft className="h-4 w-4" strokeWidth={2} />
-                  ) : (
-                    <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
-                  )}
+                {/* ID */}
+                <div className="flex items-center gap-2 w-12">
+                  <span className="text-[10px] font-mono text-muted-foreground/70 font-semibold">
+                    {shortId}
+                  </span>
                 </div>
 
                 {/* Description + meta */}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-foreground transition-colors group-hover:text-primary">
-                    {tx.description || tx.categoryName || (isIncome ? "รายรับ" : "รายจ่าย")}
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-1.5 overflow-hidden">
-                    <span className="shrink-0 text-[11px] text-muted-foreground">
-                      {fmtDate(tx.date)}
-                    </span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <KindIcon kind={tx.kind as "income" | "expense" | "offering"} />
+                  <div className="min-w-0">
+                    <p className="truncate text-[13px] font-semibold text-foreground group-hover:text-[#E8450A] transition-colors">
+                      {tx.description || tx.categoryName || (isIncome ? "รายรับ" : "รายจ่าย")}
+                    </p>
                     {tx.categoryName && (
-                      <>
-                        <span className="text-muted-foreground/40">·</span>
-                        <span className="truncate rounded bg-muted px-1.5 py-px text-[10px] font-medium text-muted-foreground">
-                          {tx.categoryName}
-                        </span>
-                      </>
+                      <span className="mt-0.5 inline-block truncate rounded-md bg-muted px-1.5 py-px text-[10px] font-medium text-muted-foreground">
+                        {tx.categoryName}
+                      </span>
                     )}
                   </div>
                 </div>
 
-                {/* Status + amount */}
-                <div className="flex shrink-0 items-center gap-3">
+                {/* Amount */}
+                <p
+                  className={cn(
+                    "num-display min-w-[88px] text-right text-[13px] font-bold",
+                    isIncome ? "text-[#22C55E]" : "text-foreground",
+                  )}
+                >
+                  {isIncome ? "+" : "−"}
+                  <MoneyText value={tx.amount} />
+                </p>
+
+                {/* Status */}
+                <div className="min-w-[72px]">
                   <StatusBadge status={tx.status} variant="dot" />
-                  <p
-                    className={cn(
-                      "num-display min-w-[88px] text-right text-sm font-bold",
-                      isIncome ? "amount-income" : "amount-expense",
-                    )}
-                  >
-                    {isIncome ? "+" : "−"}
-                    <MoneyText value={tx.amount} />
-                  </p>
-                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30 transition-colors group-hover:text-foreground" />
                 </div>
+
+                {/* Date */}
+                <p className="min-w-[72px] text-right text-[11px] text-muted-foreground">
+                  {fmtDate(tx.date)}
+                </p>
               </div>
             );
           })

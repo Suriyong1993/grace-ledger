@@ -42,7 +42,7 @@ export function OfflineIndicator() {
   return (
     <div
       className={cn(
-        "fixed bottom-20 left-1/2 z-50 -translate-x-1/2 transition-all duration-300 md:bottom-4",
+        "fixed bottom-20 left-1/2 z-50 -translate-x-1/2 transition-all duration-200 md:bottom-4",
         isOffline ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
       )}
     >

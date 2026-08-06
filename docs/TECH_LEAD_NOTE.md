@@ -2,7 +2,7 @@
 
 **Date**: 2026-08-04  
 **Phase**: A (Infrastructure Complete)  
-**Status**: Ready to transition to Prototype Development  
+**Status**: Ready to transition to Prototype Development
 
 ---
 
@@ -13,7 +13,7 @@ Phase A was **not** created to build a documentation system.
 Phase A exists so the team can:
 
 - Make decisions consistently
-- Capture evidence consistently  
+- Capture evidence consistently
 - Move to user validation as quickly as possible
 
 **If documentation becomes the primary work item, Phase A has failed.**
@@ -53,11 +53,11 @@ When priorities conflict, always choose the higher item:
 
 Examples:
 
-| Conflict | Resolution |
-|---|---|
-| User pain vs. clean code | Fix user pain first |
-| User pain vs. documentation | Fix user pain first |
-| Workflow vs. database design | Prioritize workflow |
+| Conflict                         | Resolution             |
+| -------------------------------- | ---------------------- |
+| User pain vs. clean code         | Fix user pain first    |
+| User pain vs. documentation      | Fix user pain first    |
+| Workflow vs. database design     | Prioritize workflow    |
 | Product feature vs. architecture | Build for product need |
 
 ---
@@ -81,6 +81,7 @@ Implementation Detail
 **Never start from technology.**
 
 Wrong approach:
+
 ```
 "We need a Knowledge Graph"
 → "Let's build it"
@@ -89,6 +90,7 @@ Wrong approach:
 ```
 
 Right approach:
+
 ```
 "Users can't find document X"
 → "Search would help"
@@ -104,12 +106,12 @@ Right approach:
 
 Examples:
 
-| Document | "Complete" When | Not When |
-|---|---|---|
-| Hypothesis | Testable + actionable | Perfectly written |
-| UXDR | Directs design + test | Every detail specified |
-| Test Plan | Scenarios are clear | Coverage is exhaustive |
-| LEARNING_LOG | Observation recorded | All analysis done |
+| Document     | "Complete" When       | Not When               |
+| ------------ | --------------------- | ---------------------- |
+| Hypothesis   | Testable + actionable | Perfectly written      |
+| UXDR         | Directs design + test | Every detail specified |
+| Test Plan    | Scenarios are clear   | Coverage is exhaustive |
+| LEARNING_LOG | Observation recorded  | All analysis done      |
 
 Perfectionism is the enemy of learning.
 
@@ -141,7 +143,7 @@ Examples:
 ✅ "IDs keep duplicating in PRs" → Add CI check  
 ✅ "Can't trace which test validated this" → Link TEST_PLAN entries  
 ❌ "Graphs might be useful someday" → Don't build  
-❌ "JSON export for AI" → Don't build (no pain)  
+❌ "JSON export for AI" → Don't build (no pain)
 
 **Deferred items are in BACKLOG.md.** They stay there until pain moves them.
 
@@ -159,7 +161,7 @@ Right approach:
 Prototype → User Test → Backend (only what passed validation)
 ```
 
-If 80% of backend features will be wrong post-validation, 
+If 80% of backend features will be wrong post-validation,
 build the 20% that definitely works first.
 
 ---
@@ -182,12 +184,12 @@ If not: It increases sophistication without reducing effort. Defer it.
 
 ## Success Timeline
 
-| Milestone | Definition |
-|---|---|
-| **Sprint 2** | FS-001 (Finance Home) working; staff can start to record transaction |
-| **Sprint 3** | Staff completes ฿15,000 offering in <3 min without accounting terms |
-| **Sprint 4** | Leaders approve transactions in workflow; 2-approval validation works |
-| **Sprint 5+** | Backend implementation (only what validation proved necessary) |
+| Milestone     | Definition                                                            |
+| ------------- | --------------------------------------------------------------------- |
+| **Sprint 2**  | FS-001 (Finance Home) working; staff can start to record transaction  |
+| **Sprint 3**  | Staff completes ฿15,000 offering in <3 min without accounting terms   |
+| **Sprint 4**  | Leaders approve transactions in workflow; 2-approval validation works |
+| **Sprint 5+** | Backend implementation (only what validation proved necessary)        |
 
 Success = Users doing real work, not infrastructure completion.
 
@@ -210,11 +212,12 @@ This keeps decisions traceable and prevents "why did we do this?" confusion 6 mo
 Escalate to Product Lead if:
 
 - User testing contradicts a core hypothesis
-- Required change affects multiple UXDR entries  
+- Required change affects multiple UXDR entries
 - Infrastructure needed urgently (genuine blocker, not convenience)
 - Timeline pressure from stakeholders
 
 Don't escalate for:
+
 - Minor UX tweaks (iterate with users)
 - Documentation questions (follow GOVERNANCE.md)
 - "Nice to have" features (add to BACKLOG.md)

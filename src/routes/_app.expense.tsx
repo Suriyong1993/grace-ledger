@@ -605,7 +605,7 @@ function ExpensePage() {
               {selectedExpense.attachmentDataUrl && (
                 <div className="space-y-2">
                   <span className="kicker">หลักฐานสลิป / ใบเสร็จแนบ</span>
-                  <div className="card-ledger p-2 overflow-hidden bg-black/5 dark:bg-black/40">
+                  <div className="card-ledger p-2 overflow-hidden bg-muted/40">
                     <img
                       src={selectedExpense.attachmentDataUrl}
                       alt="Receipt Slip"

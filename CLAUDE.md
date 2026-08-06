@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Active work item**: Premium dark mode — `docs/superpowers/plans/2026-08-06-grace-ledger-premium-dark-mode.md` (task-by-task plan) and `docs/superpowers/specs/2026-08-06-grace-ledger-premium-dark-mode-design.md` (design spec). Emerald primary accent, slate background, border-based depth (no glassmorphism, no heavy shadow), ≤250ms motion, WCAG AA minimum.
 
 **Key docs**:
+
 - `docs/TECH_LEAD_NOTE.md` — Why we're doing this
 - `docs/PHASE-0-HYPOTHESES.md` — User assumptions
 - `docs/ux/UXDR.md` — Design decisions
@@ -85,6 +86,7 @@ One layer inconsistency to know about: `income.service.ts`, `expense.service.ts`
 ### Journal engine is the only path for financial state changes
 
 `src/server/domain/journal.ts` (`JournalService`) is the sole entry point for creating/approving/voiding financial transactions. Key invariants enforced in `createEntry`/`approveEntry`:
+
 - Debits must equal credits (`UnbalancedEntryError`), at least 2 lines, no future posting dates.
 - Row locks (`SELECT ... FOR UPDATE`) on the fiscal period and fund rows to prevent races.
 - Approval thresholds live in `src/server/auth/permissions.ts` (`APPROVAL_THRESHOLDS`): ≤ ฿5,000 and ฿5,000–50,000 both need one `admin`/`super_admin` approval; > ฿50,000 requires **dual** `super_admin` approval via `approval_1_id`/`approval_2_id`, and self-approval is blocked (`SelfApprovalError`).
@@ -98,7 +100,7 @@ One layer inconsistency to know about: `income.service.ts`, `expense.service.ts`
 
 ### Audit trail: per-church SHA-256 hash chain
 
-`src/server/services/audit.service.ts` (`AuditService`) computes each entry's hash from a JSON payload that includes the *previous* entry's hash for that `church_id` (chains are per-church, not global, to avoid a serialization bottleneck). `verifyChain()` recomputes hashes oldest-to-newest and reports the first break; entries with `current_hash IS NULL` are legacy (pre-hash-chaining) and are skipped, not treated as breaks. Audit logs are insert-only — never update/delete rows in `audit_log`.
+`src/server/services/audit.service.ts` (`AuditService`) computes each entry's hash from a JSON payload that includes the _previous_ entry's hash for that `church_id` (chains are per-church, not global, to avoid a serialization bottleneck). `verifyChain()` recomputes hashes oldest-to-newest and reports the first break; entries with `current_hash IS NULL` are legacy (pre-hash-chaining) and are skipped, not treated as breaks. Audit logs are insert-only — never update/delete rows in `audit_log`.
 
 ### Schema/migrations: two parallel definitions
 

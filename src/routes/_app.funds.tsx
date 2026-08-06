@@ -144,14 +144,9 @@ function FundsPage() {
                   balance < 0 && "border-destructive/30",
                 )}
               >
-                {/* Left accent — gold positive, red negative */}
+                {/* Top accent — primary positive, red negative */}
                 <div
-                  className={cn(
-                    "h-0.5 w-full",
-                    balance >= 0
-                      ? "bg-gradient-to-r from-primary/60 to-transparent"
-                      : "bg-gradient-to-r from-destructive/60 to-transparent",
-                  )}
+                  className={cn("h-0.5 w-full", balance >= 0 ? "bg-primary" : "bg-destructive")}
                 />
                 <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3.5">
                   <p className="truncate text-[13px] font-semibold text-foreground">{f.name}</p>

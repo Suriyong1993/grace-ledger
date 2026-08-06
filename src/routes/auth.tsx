@@ -3,7 +3,7 @@
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
-import { Delete, ArrowLeft, ChevronRight, Cross, Users, BookOpen, Heart } from "lucide-react";
+import { Delete, ArrowLeft, ChevronRight, Cross } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useAuth, fetchLoginUsers, type LoginUser } from "@/lib/auth";
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 const PAD_BUTTON =
-  "h-14 rounded-lg border border-border bg-card text-lg font-medium num-display transition-colors duration-150 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed";
+  "h-14 rounded-lg text-lg font-medium num-display transition-colors duration-150 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed";
 
 function AuthPage() {
   const { user: authUser, signIn } = useAuth();
@@ -125,7 +125,7 @@ function AuthPage() {
   return (
     <div className="flex min-h-dvh">
       {/* Left brand panel — church identity */}
-      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-card via-card to-background relative overflow-hidden">
+      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-card relative overflow-hidden">
         {/* Subtle cross watermark */}
         <div className="absolute -right-20 -top-20 opacity-[0.03]">
           <Cross className="h-96 w-96" strokeWidth={1} />
@@ -143,22 +143,31 @@ function AuthPage() {
 
         <div className="relative max-w-md">
           <p className="kicker text-muted-foreground">สมุดบัญชีแห่งความสัตย์</p>
-          <h1 className="mt-4 font-display text-[2.5rem] font-semibold leading-tight tracking-tight">
+          <h1 className="mt-5 font-display text-[3rem] font-semibold leading-[1.08] tracking-tight">
             การเงินที่โปร่งใส
             <br />
             บริหารด้วยความรับผิดชอบ
           </h1>
-          <ul className="mt-8 space-y-4 text-sm text-muted-foreground">
+          <ul className="mt-10 space-y-5 text-sm text-muted-foreground">
             <li className="flex items-center gap-3">
-              <BookOpen className="h-4 w-4 text-primary/60" strokeWidth={2} />
+              <span
+                className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                aria-hidden
+              />
               บันทึกรายรับ-จ่าย-ถวาย ถูกต้อง รัดกุม
             </li>
             <li className="flex items-center gap-3">
-              <Users className="h-4 w-4 text-primary/60" strokeWidth={2} />
+              <span
+                className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                aria-hidden
+              />
               ควบคุมสิทธิ์ผู้ใช้งานตามบทบาท
             </li>
             <li className="flex items-center gap-3">
-              <Heart className="h-4 w-4 text-primary/60" strokeWidth={2} />
+              <span
+                className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                aria-hidden
+              />
               รายงานสรุปสำหรับคณะกรรมการศจ.
             </li>
           </ul>
@@ -172,7 +181,7 @@ function AuthPage() {
 
       {/* Right login panel — personal, role-focused */}
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-[360px]">
+        <div className="w-full max-w-[400px]">
           {/* Mobile brand */}
           <div className="mb-10 flex items-center gap-3 lg:hidden">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
@@ -185,12 +194,12 @@ function AuthPage() {
           </div>
 
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-10">
             <p className="kicker flex items-center gap-2">
-              <Users className="h-3 w-3 text-primary" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
               เข้าสู่ระบบ
             </p>
-            <h2 className="mt-3 font-display text-[22px] font-semibold tracking-tight">
+            <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight">
               {selectedUser ? "ยืนยันตัวตนด้วย PIN" : "เลือกบัญชีผู้ใช้"}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -209,37 +218,40 @@ function AuthPage() {
 
           {/* Step 1: User selection — role-focused */}
           {!selectedUser && (
-            <div className="rounded-lg border border-border bg-card divide-y divide-border">
-              {loginUsers.length === 0 &&
-                Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 px-4 py-3">
-                    <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-3 w-2/5 animate-pulse rounded bg-muted" />
-                      <div className="h-2.5 w-1/4 animate-pulse rounded bg-muted" />
+            <div className="overflow-hidden rounded-lg border border-border bg-card">
+              <div className="h-0.5 w-full bg-primary" aria-hidden />
+              <div className="divide-y divide-border">
+                {loginUsers.length === 0 &&
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 px-4 py-3">
+                      <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-2/5 animate-pulse rounded bg-muted" />
+                        <div className="h-2.5 w-1/4 animate-pulse rounded bg-muted" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              {loginUsers.map((u) => (
-                <Button
-                  key={u.id}
-                  type="button"
-                  variant="ghost"
-                  onClick={() => handleSelectUser(u)}
-                  className="group h-auto w-full justify-start gap-3 rounded-none px-4 py-4 text-left font-normal first:rounded-t-lg last:rounded-b-lg"
-                >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
-                    {u.name.slice(0, 2)}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium">{u.name}</span>
-                    <span className="block text-xs text-muted-foreground">
-                      {ROLE_LABEL[u.role] || u.role}
+                  ))}
+                {loginUsers.map((u) => (
+                  <Button
+                    key={u.id}
+                    type="button"
+                    variant="ghost"
+                    onClick={() => handleSelectUser(u)}
+                    className="group h-auto w-full justify-start gap-3 rounded-none px-4 py-4 text-left font-normal first:rounded-t-lg last:rounded-b-lg"
+                  >
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
+                      {u.name.slice(0, 2)}
                     </span>
-                  </span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:translate-x-0.5 group-hover:text-primary transition-all duration-150" />
-                </Button>
-              ))}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium">{u.name}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {ROLE_LABEL[u.role] || u.role}
+                      </span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:translate-x-0.5 group-hover:text-primary transition-all duration-150" />
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -281,9 +293,6 @@ function AuthPage() {
                     }}
                     transition={{ duration: 0.15 }}
                     className="h-3 w-3 rounded-full bg-primary"
-                    style={{
-                      boxShadow: i < pin.length ? "0 0 8px var(--color-primary)" : "none",
-                    }}
                   />
                 ))}
               </div>

@@ -52,30 +52,42 @@ export function AppTopbar() {
   const roleBadge = user?.role ? (ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.auditor) : "";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background backdrop-blur-sm">
+    <header className="sticky top-0 z-30 border-b border-border bg-background">
       <div className="grid h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 md:px-6">
         {/* Left: Sidebar trigger */}
         <div className="flex items-center gap-1">
           <SidebarTrigger className="text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" />
         </div>
 
-        {/* Center: Search bar (desktop) */}
-        <Button
-          type="button"
-          variant="outline"
-          id="topbar-search-trigger"
-          onClick={() => palette.setOpen(true)}
-          className="group hidden h-9 w-full max-w-xs justify-start gap-2 bg-secondary px-3 font-normal text-muted-foreground hover:border-border hover:bg-muted md:flex"
-        >
-          <Search
-            className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
-            strokeWidth={2}
-          />
-          <span className="flex-1 truncate text-left text-xs">ค้นหารายการ, สมาชิก, กองทุน…</span>
-          <kbd className="hidden items-center gap-0.5 rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:inline-flex">
-            <CommandIcon className="h-2.5 w-2.5" /> K
-          </kbd>
-        </Button>
+        {/* Center: Quick nav pills (desktop) */}
+        <div className="hidden md:flex items-center gap-1">
+          {[
+            { to: "/dashboard", label: "ภาพรวม" },
+            { to: "/income", label: "รายรับ" },
+            { to: "/expense", label: "รายจ่าย" },
+            { to: "/offering", label: "เงินถวาย" },
+            { to: "/reports", label: "รายงาน" },
+          ].map(({ to, label }) => {
+            const active =
+              typeof window !== "undefined"
+                ? window.location.pathname === to || window.location.pathname.startsWith(to + "/")
+                : false;
+            return (
+              <a
+                key={to}
+                href={to}
+                className={[
+                  "px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors",
+                  active
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                ].join(" ")}
+              >
+                {label}
+              </a>
+            );
+          })}
+        </div>
 
         {/* Right: Actions + User */}
         <div className="flex items-center gap-1.5 justify-self-end">

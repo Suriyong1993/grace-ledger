@@ -10,10 +10,10 @@ disagreed with each other and with this) — reasoning:
 - This is financial software with dense tables and multi-step approval
   workflows — data-entry-heavy, not content-consumption-heavy.
 - The codebase's actual breakpoint usage already skewed toward `sm`/`md`
-  (mobile/tablet) *without* deliberate desktop/ultrawide design attention
+  (mobile/tablet) _without_ deliberate desktop/ultrawide design attention
   — that gap is what v3.0 fixes, not a reason to deprioritize desktop.
 - MasterPrompt.txt's "every screen usable one-handed" requirement is
-  satisfied as a *constraint* (44px touch targets, working bottom nav),
+  satisfied as a _constraint_ (44px touch targets, working bottom nav),
   not as the primary design frame.
 
 ## Breakpoints
@@ -37,13 +37,13 @@ flagged for this).
 
 ## Component-level responsive rules
 
-| Component | Mobile | Desktop/iPad |
-|---|---|---|
-| Dialog | Full-screen (`inset-0`, no radius, no border) | Centered modal (`sm+`: `rounded-dialog`, bordered, `shadow-elevated`) |
-| Sheet | Full-width on the trigger side | Fixed max-width panel (`sm:max-w-md`) |
-| Table | Horizontal scroll; prefer hiding/collapsing low-priority columns over truncating financial values | Full column set |
-| Card grids | Single column | `sm`/`lg`/`xl` progressively add columns (see individual routes' `grid-cols-*`) |
-| Button/Input | 44px min height always (touch target) | Same — no shrinking below 44px just because pointer is available |
+| Component    | Mobile                                                                                            | Desktop/iPad                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Dialog       | Full-screen (`inset-0`, no radius, no border)                                                     | Centered modal (`sm+`: `rounded-dialog`, bordered, `shadow-elevated`)           |
+| Sheet        | Full-width on the trigger side                                                                    | Fixed max-width panel (`sm:max-w-md`)                                           |
+| Table        | Horizontal scroll; prefer hiding/collapsing low-priority columns over truncating financial values | Full column set                                                                 |
+| Card grids   | Single column                                                                                     | `sm`/`lg`/`xl` progressively add columns (see individual routes' `grid-cols-*`) |
+| Button/Input | 44px min height always (touch target)                                                             | Same — no shrinking below 44px just because pointer is available                |
 
 ## Testing checklist (per screen, before considering it "done")
 

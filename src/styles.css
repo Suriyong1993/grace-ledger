@@ -58,7 +58,7 @@
      See docs/design/GRACE_LEDGER_VNEXT_MASTERPLAN.md §4. */
   --radius-button: 0.75rem; /* 12px */
   --radius-input: 0.625rem; /* 10px */
-  --radius-card: 1rem; /* 16px */
+  --radius-card: 1.25rem; /* 20px */
   --radius-dialog: 1.25rem; /* 20px */
   --radius-sheet: 1.5rem; /* 24px */
 
@@ -83,6 +83,11 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+
+  /* ── Finexy Orange accent ── */
+  --color-gl-orange: var(--gl-orange);
+  --color-gl-orange-foreground: var(--gl-orange-foreground);
+  --color-gl-orange-muted: var(--gl-orange-muted);
 
   /* ── Finance-specific semantic colors ── */
   --color-income: var(--income);
@@ -131,6 +136,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* ── Surface elevation (dark mode; unset in light) ── */
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border-subtle: var(--border-subtle);
+
   /* ── Typography ── */
   --font-sans: "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Inter", "Sarabun", ui-sans-serif, system-ui, sans-serif;
@@ -143,6 +152,11 @@
 ═══════════════════════════════════════════ */
 :root {
   --radius: 0.75rem; /* 12px base — softer, premium (v2.0 was 6px) */
+
+  /* ── Finexy Orange accent — dashboard hero, active states ── */
+  --gl-orange: #e8450a;
+  --gl-orange-foreground: #ffffff;
+  --gl-orange-muted: #fef0eb;
 
   /* ── Motion easings (Emil Kowalski) ── */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -219,15 +233,16 @@
   --chart-4: oklch(0.7 0.13 80); /* Amber — offering */
   --chart-5: oklch(0.6 0.11 195); /* Teal — 5th accent, distinct from primary blue */
 
-  /* ── Sidebar ── */
-  --sidebar: oklch(0.975 0.004 80);
-  --sidebar-foreground: oklch(0.19 0.014 258);
-  --sidebar-primary: oklch(0.53 0.17 258);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.93 0.015 258);
-  --sidebar-accent-foreground: oklch(0.32 0.09 258);
-  --sidebar-border: oklch(0.9 0.006 80);
-  --sidebar-ring: oklch(0.53 0.17 258);
+  /* ── Sidebar — Finexy dark sidebar (both light & dark use dark sidebar) ── */
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: oklch(0.92 0.006 258);
+  --sidebar-primary: #e8450a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #e8450a;
+  --sidebar-border: #2e2e2e;
+  --sidebar-ring: #e8450a;
+  --sidebar-icon: #6b6b6b;
 }
 
 /* ═══════════════════════════════════════════
@@ -304,15 +319,16 @@
   --chart-4: oklch(0.76 0.12 80); /* amber — offering */
   --chart-5: oklch(0.66 0.1 195); /* teal */
 
-  /* ── Sidebar ── */
-  --sidebar: oklch(0.11 0.012 258); /* เข้มกว่า page bg */
-  --sidebar-foreground: oklch(0.97 0.004 258);
-  --sidebar-primary: oklch(0.6 0.15 155);
-  --sidebar-primary-foreground: oklch(0.12 0.02 155);
-  --sidebar-accent: oklch(0.22 0.05 155);
-  --sidebar-accent-foreground: oklch(0.82 0.09 155);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.6 0.15 155);
+  /* ── Sidebar — keep same dark style in dark mode ── */
+  --sidebar: #141414;
+  --sidebar-foreground: oklch(0.92 0.006 258);
+  --sidebar-primary: #e8450a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #232323;
+  --sidebar-accent-foreground: #e8450a;
+  --sidebar-border: #272727;
+  --sidebar-ring: #e8450a;
+  --sidebar-icon: #5a5a5a;
 
   /* ── Surface elevation ── */
   --surface-elevated: oklch(0.19 0.012 258); /* ยกขึ้นจาก card */
@@ -400,6 +416,9 @@
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 1px 2px -1px rgb(0 0 0 / 0.03);
 }
 
 @utility card-glass {
@@ -424,21 +443,27 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
-/* Shadows — v3.0: no heavy shadows, very soft depth only */
+/* Shadows — soft, layered depth for light-mode premium SaaS cards */
 @utility shadow-xs {
-  box-shadow: none;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
 }
 @utility shadow-sm-card {
-  box-shadow: none;
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 1px 2px -1px rgb(0 0 0 / 0.03);
 }
 @utility shadow-card {
-  box-shadow: none;
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 3px 10px -4px rgb(0 0 0 / 0.04);
 }
 @utility shadow-2xs {
-  box-shadow: none;
+  box-shadow: 0 1px 1px 0 rgb(0 0 0 / 0.02);
 }
 @utility shadow-elevated {
-  box-shadow: none;
+  box-shadow:
+    0 1px 4px -1px rgb(0 0 0 / 0.05),
+    0 6px 16px -6px rgb(0 0 0 / 0.06);
 }
 @utility shadow-primary-glow {
   box-shadow: none;
@@ -727,4 +752,13 @@
 }
 @utility divider-y {
   border-right: 1px solid var(--color-border);
+}
+
+@utility surface-elevated {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+}
+
+@utility border-subtle {
+  border-color: var(--color-border-subtle);
 }

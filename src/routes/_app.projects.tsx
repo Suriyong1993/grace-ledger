@@ -119,7 +119,7 @@ function ProjectsPage() {
                       </div>
                       <div className="h-1 bg-muted">
                         <div
-                          className="h-full bg-primary transition-all duration-500"
+                          className="h-full bg-primary transition-all duration-200"
                           style={{ width: `${p.progress}%` }}
                         />
                       </div>
@@ -138,7 +138,7 @@ function ProjectsPage() {
                       <div className="h-1 bg-muted">
                         <div
                           className={cn(
-                            "h-full transition-all duration-500",
+                            "h-full transition-all duration-200",
                             pct > 90 ? "bg-destructive" : "bg-primary",
                           )}
                           style={{ width: `${pct}%` }}

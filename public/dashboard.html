@@ -1,0 +1,1511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finexy – Financial Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --orange: #e8450a;
+        --bg: #edeef0;
+        --white: #ffffff;
+        --card: #ffffff;
+        --sidebar-bg: #1a1a1a;
+        --sidebar-icon: #6b6b6b;
+        --text-dark: #111111;
+        --text-mid: #555555;
+        --text-light: #999999;
+        --green: #22c55e;
+        --red: #ef4444;
+        --border: #e5e7eb;
+        --radius: 14px;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        overflow: hidden;
+      }
+
+      /* ─── SIDEBAR ─────────────────────────────── */
+      .sidebar {
+        width: 64px;
+        background: var(--sidebar-bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 18px 0;
+        gap: 6px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 10;
+      }
+
+      .sidebar .logo-wrap {
+        width: 38px;
+        height: 38px;
+        background: var(--orange);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+      }
+      .sidebar .logo-wrap svg {
+        width: 20px;
+        height: 20px;
+        fill: #fff;
+      }
+
+      .sidebar .sep {
+        width: 32px;
+        height: 1px;
+        background: #2e2e2e;
+        margin: 8px 0;
+      }
+
+      .sidebar .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--sidebar-icon);
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .sidebar .icon-btn:hover {
+        background: #2a2a2a;
+        color: #ccc;
+      }
+      .sidebar .icon-btn.active {
+        background: #2a2a2a;
+        color: var(--orange);
+      }
+      .sidebar .icon-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .sidebar .bottom {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* ─── MAIN LAYOUT ─────────────────────────── */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ─── TOP NAV ─────────────────────────────── */
+      .topnav {
+        background: var(--white);
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 28px;
+        gap: 32px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .topnav .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--text-dark);
+      }
+      .topnav .brand .dot {
+        width: 28px;
+        height: 28px;
+        background: var(--orange);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .topnav .brand .dot svg {
+        width: 14px;
+        fill: #fff;
+      }
+
+      .topnav nav {
+        display: flex;
+        gap: 4px;
+        flex: 1;
+      }
+      .topnav nav a {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--text-mid);
+        text-decoration: none;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .topnav nav a.active {
+        background: var(--text-dark);
+        color: #fff;
+      }
+      .topnav nav a:hover:not(.active) {
+        background: var(--bg);
+      }
+
+      .topnav .actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-left: auto;
+      }
+      .topnav .actions .icon-action {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-mid);
+      }
+      .topnav .actions .icon-action svg {
+        width: 16px;
+      }
+      .topnav .profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .topnav .profile .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f97316, #ef4444);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+      }
+      .topnav .profile-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .topnav .profile-info .name {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-dark);
+        line-height: 1.2;
+      }
+      .topnav .profile-info .email {
+        font-size: 11px;
+        color: var(--text-light);
+      }
+
+      /* ─── CONTENT AREA ────────────────────────── */
+      .content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .greeting h1 {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-dark);
+      }
+      .greeting p {
+        font-size: 13px;
+        color: var(--text-mid);
+        margin-top: 3px;
+      }
+
+      /* ─── GRID LAYOUT ─────────────────────────── */
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 320px 1fr 300px;
+        gap: 16px;
+      }
+
+      /* ─── CARDS ───────────────────────────────── */
+      .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 20px;
+      }
+
+      /* Balance Card */
+      .balance-card .label {
+        font-size: 12px;
+        color: var(--text-light);
+        font-weight: 500;
+      }
+      .balance-card .amount {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 6px 0 4px;
+      }
+      .balance-card .trend {
+        font-size: 12px;
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .balance-card .trend span.desc {
+        color: var(--text-light);
+      }
+      .balance-card .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .btn-dark {
+        background: var(--text-dark);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.2s;
+      }
+      .btn-dark:hover {
+        opacity: 0.85;
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--text-dark);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+      }
+      .btn-outline:hover {
+        background: var(--bg);
+      }
+      .currency-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg);
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-dark);
+        cursor: pointer;
+      }
+
+      /* Wallets */
+      .wallets-section {
+        margin-top: 16px;
+        border-top: 1px solid var(--border);
+        padding-top: 14px;
+      }
+      .wallets-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .wallets-header span {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+      .wallets-header small {
+        font-size: 11px;
+        color: var(--text-light);
+      }
+      .wallet-row {
+        display: flex;
+        gap: 10px;
+      }
+      .wallet-item {
+        flex: 1;
+      }
+      .wallet-item .currency-flag {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+      }
+      .wallet-item .flag {
+        font-size: 14px;
+      }
+      .wallet-item .w-amount {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .wallet-item .w-limit {
+        font-size: 10.5px;
+        color: var(--text-light);
+        margin-top: 2px;
+      }
+      .wallet-item .status {
+        font-size: 10px;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .status.active {
+        color: var(--green);
+      }
+      .status.inactive {
+        color: var(--red);
+      }
+      .wallet-divider {
+        width: 1px;
+        background: var(--border);
+      }
+
+      /* Stats Cards (center top) */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .stat-card {
+        border-radius: var(--radius);
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card.orange {
+        background: var(--orange);
+        color: #fff;
+      }
+      .stat-card.white {
+        background: var(--card);
+      }
+      .stat-card .s-label {
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .stat-card.orange .s-label {
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .stat-card.white .s-label {
+        color: var(--text-mid);
+      }
+      .stat-card .s-amount {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 8px 0 4px;
+      }
+      .stat-card.white .s-amount {
+        color: var(--text-dark);
+      }
+      .stat-card .s-trend {
+        font-size: 11.5px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .stat-card.orange .s-trend {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .stat-card.white .s-trend {
+        color: var(--text-light);
+      }
+      .stat-card .s-icon {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .stat-card.orange .s-icon {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
+      .stat-card.white .s-icon {
+        background: var(--bg);
+        color: var(--text-mid);
+      }
+      .stat-card .s-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+      .up {
+        color: var(--green) !important;
+      }
+      .down {
+        color: var(--red) !important;
+      }
+
+      /* Income Chart Card */
+      .income-card {
+      }
+      .income-card h3 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .income-card p {
+        font-size: 11.5px;
+        color: var(--text-light);
+        margin-top: 3px;
+      }
+      .chart-legend {
+        display: flex;
+        gap: 14px;
+        font-size: 11px;
+        color: var(--text-mid);
+      }
+      .chart-legend span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+      }
+      .legend-dot.profit {
+        background: var(--orange);
+      }
+      .legend-dot.loss {
+        background: var(--text-dark);
+      }
+
+      /* Bar Chart */
+      .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 130px;
+      }
+      .bar-group {
+        display: flex;
+        gap: 2px;
+        align-items: flex-end;
+      }
+      .bar {
+        border-radius: 4px 4px 0 0;
+        width: 10px;
+        transition: opacity 0.2s;
+        cursor: pointer;
+      }
+      .bar:hover {
+        opacity: 0.75;
+      }
+      .bar.profit {
+        background: var(--orange);
+      }
+      .bar.loss {
+        background: var(--text-dark);
+      }
+      .chart-x {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+        font-size: 10px;
+        color: var(--text-light);
+      }
+      .chart-x span {
+        width: 22px;
+        text-align: center;
+      }
+      .chart-y {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: space-between;
+        height: 130px;
+        font-size: 10px;
+        color: var(--text-light);
+      }
+      .chart-container {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      /* Spending Limit */
+      .spending-card .s-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 14px;
+      }
+      .progress-bar {
+        height: 6px;
+        background: var(--bg);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--orange);
+        border-radius: 4px;
+      }
+      .spending-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11.5px;
+        color: var(--text-mid);
+      }
+      .spending-labels strong {
+        color: var(--text-dark);
+      }
+
+      /* My Cards */
+      .cs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      .cs-header span {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .cs-header a {
+        font-size: 12px;
+        color: var(--text-mid);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .credit-cards {
+        display: flex;
+        gap: 10px;
+      }
+      .credit-card {
+        flex: 1;
+        border-radius: 14px;
+        padding: 14px;
+        min-height: 88px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .credit-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      }
+      .credit-card.dark {
+        background: linear-gradient(135deg, #1f1f1f 0%, #333 100%);
+        color: #fff;
+      }
+      .credit-card.orange-card {
+        background: linear-gradient(135deg, var(--orange) 0%, #c0380a 100%);
+        color: #fff;
+      }
+      .active-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2px 8px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .card-bottom {
+        position: absolute;
+        bottom: 10px;
+        left: 12px;
+        right: 12px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .card-bottom-item .c-label {
+        font-size: 8.5px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .card-bottom-item .c-val {
+        font-size: 9.5px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .mc-logo {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+      }
+      .mc-logo .circle {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+      }
+      .mc-logo .circle.red {
+        background: #eb001b;
+        opacity: 0.9;
+      }
+      .mc-logo .circle.orange-c {
+        background: #f79e1b;
+        margin-left: -7px;
+        opacity: 0.9;
+      }
+      .card-sparkle {
+        font-size: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+        opacity: 0.6;
+      }
+
+      /* Activity Table */
+      .activity-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      .activity-header h2 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .search-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 22px;
+        padding: 7px 14px;
+        font-size: 12.5px;
+        color: var(--text-light);
+        cursor: pointer;
+      }
+      .search-pill svg {
+        width: 14px;
+      }
+      .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 22px;
+        padding: 7px 14px;
+        font-size: 12.5px;
+        color: var(--text-mid);
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+      .filter-btn:hover {
+        background: var(--bg);
+      }
+      .filter-btn svg {
+        width: 14px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead th {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-light);
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+        cursor: pointer;
+      }
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: #fafafa;
+      }
+      tbody td {
+        padding: 10px 12px;
+        font-size: 12.5px;
+        color: var(--text-dark);
+        vertical-align: middle;
+      }
+      .order-id {
+        color: var(--text-light);
+        font-size: 12px;
+      }
+      .activity-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+      .activity-name {
+        display: flex;
+        align-items: center;
+      }
+      .activity-name span {
+        font-weight: 500;
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        font-weight: 500;
+      }
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .status-dot.completed {
+        background: var(--green);
+      }
+      .status-dot.pending {
+        background: #f59e0b;
+      }
+      .status-dot.in-progress {
+        background: var(--orange);
+      }
+      .price {
+        font-weight: 600;
+      }
+      .more-btn {
+        color: var(--text-light);
+        font-size: 16px;
+        cursor: pointer;
+        letter-spacing: 1px;
+      }
+      .cb {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        border: 1.5px solid var(--border);
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .cb.checked {
+        background: var(--orange);
+        border-color: var(--orange);
+      }
+
+      /* Scrollbar */
+      .content::-webkit-scrollbar {
+        width: 5px;
+      }
+      .content::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 4px;
+      }
+
+      /* Animations */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .card,
+      .stat-card {
+        animation: fadeUp 0.35s ease both;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="sidebar">
+      <div class="logo-wrap">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+      </div>
+
+      <div class="icon-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <path d="M2 10h20" />
+        </svg>
+      </div>
+
+      <div class="bottom">
+        <div class="sep"></div>
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
+        </div>
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" />
+          </svg>
+        </div>
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN ═══ -->
+    <div class="main">
+      <!-- TOP NAV -->
+      <header class="topnav">
+        <div class="brand">
+          <div class="dot">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+          </div>
+          Finexy
+        </div>
+        <nav>
+          <a href="#" class="active">Overview</a>
+          <a href="#">Activity</a>
+          <a href="#">Manage</a>
+          <a href="#">Program</a>
+          <a href="#">Account</a>
+          <a href="#">Reports</a>
+        </nav>
+        <div class="actions">
+          <div class="icon-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </div>
+          <div class="icon-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+          </div>
+          <div class="icon-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div class="profile">
+            <div class="avatar-placeholder">SR</div>
+            <div class="profile-info">
+              <div class="name">Sajibur Rahman</div>
+              <div class="email">sajibur.rahman@gm…</div>
+            </div>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#aaa"
+              stroke-width="2"
+              style="width: 13px; margin-left: 2px"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div class="content">
+        <!-- Greeting -->
+        <div class="greeting">
+          <h1>Good morning, Sajibur 👋</h1>
+          <p>Stay on top of your tasks, monitor progress, and track status.</p>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+          <!-- ── LEFT COLUMN ── -->
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <!-- Balance Card -->
+            <div class="card balance-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start">
+                <span class="label">Total Balance</span>
+                <div class="currency-pill">
+                  🇺🇸 USD
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    style="width: 10px"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+              </div>
+              <div class="amount">$689,372.00</div>
+              <div class="trend">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  style="width: 12px"
+                >
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+                5% <span class="desc">&nbsp;than last month</span>
+              </div>
+              <div class="actions">
+                <button class="btn-dark">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    style="width: 14px"
+                  >
+                    <polyline points="17 1 21 5 17 9" />
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                    <polyline points="7 23 3 19 7 15" />
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                  </svg>
+                  Transfer
+                </button>
+                <button class="btn-outline">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    style="width: 14px"
+                  >
+                    <polyline points="17 1 21 5 17 9" />
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                    <polyline points="7 23 3 19 7 15" />
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                  </svg>
+                  Request
+                </button>
+              </div>
+
+              <!-- Wallets -->
+              <div class="wallets-section">
+                <div class="wallets-header">
+                  <span>Wallets</span>
+                  <small>Total 6 wallets</small>
+                </div>
+                <div class="wallet-row">
+                  <div class="wallet-item">
+                    <div class="currency-flag"><span class="flag">🇺🇸</span> USD</div>
+                    <div class="w-amount">$22,678.00</div>
+                    <div class="w-limit">Limit is $10k a month</div>
+                    <div class="status active">Active</div>
+                  </div>
+                  <div class="wallet-divider"></div>
+                  <div class="wallet-item">
+                    <div class="currency-flag"><span class="flag">🇩🇪</span> EUR</div>
+                    <div class="w-amount">€18,345.00</div>
+                    <div class="w-limit">Limit is €8k a month</div>
+                    <div class="status active">Active</div>
+                  </div>
+                  <div class="wallet-divider"></div>
+                  <div class="wallet-item">
+                    <div class="currency-flag"><span class="flag">🇬🇧</span> GBP</div>
+                    <div class="w-amount">£15,000.00</div>
+                    <div class="w-limit">Limit is £7.5k a month</div>
+                    <div class="status inactive">Inactive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spending Limit -->
+            <div class="card spending-card">
+              <div class="s-title">Monthly Spending Limit</div>
+              <div class="progress-bar"><div class="progress-fill" style="width: 25.5%"></div></div>
+              <div class="spending-labels">
+                <span><strong>$1,400.00</strong> spent out of</span>
+                <span><strong>$5,500.00</strong></span>
+              </div>
+            </div>
+
+            <!-- My Cards -->
+            <div class="card">
+              <div class="cs-header">
+                <span>My Cards</span>
+                <a href="#">+ Add new</a>
+              </div>
+              <div class="credit-cards">
+                <div class="credit-card dark">
+                  <div class="active-badge">● Active</div>
+                  <div style="margin-top: 32px">
+                    <div
+                      style="
+                        font-size: 9.5px;
+                        color: rgba(255, 255, 255, 0.5);
+                        letter-spacing: 2px;
+                        margin-bottom: 10px;
+                      "
+                    >
+                      •••• •••• •••• 6782
+                    </div>
+                  </div>
+                  <div class="card-bottom">
+                    <div class="card-bottom-item">
+                      <div class="c-label">Card Number</div>
+                      <div class="c-val">•••• •••• 6782</div>
+                    </div>
+                    <div class="card-bottom-item">
+                      <div class="c-label">EXP</div>
+                      <div class="c-val">09/29</div>
+                    </div>
+                    <div class="card-bottom-item">
+                      <div class="c-label">CVV</div>
+                      <div class="c-val">611</div>
+                    </div>
+                  </div>
+                  <div class="mc-logo">
+                    <div class="circle red"></div>
+                    <div class="circle orange-c"></div>
+                  </div>
+                </div>
+                <div class="credit-card orange-card">
+                  <div class="active-badge">● Active</div>
+                  <div class="card-sparkle">✦</div>
+                  <div class="card-bottom">
+                    <div class="card-bottom-item">
+                      <div class="c-label">Card Number</div>
+                      <div class="c-val">•••• •••• 4356</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── CENTER COLUMN ── -->
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+              <div class="stat-card orange">
+                <div class="s-label">Total Earnings</div>
+                <div class="s-amount">$950</div>
+                <div class="s-trend">▲ 7%&nbsp;&nbsp;This month</div>
+                <div class="s-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card white">
+                <div class="s-label">Total Spending</div>
+                <div class="s-amount">$700</div>
+                <div class="s-trend down">▼ 5%&nbsp;&nbsp;This month</div>
+                <div class="s-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card white">
+                <div class="s-label">Total Income</div>
+                <div class="s-amount">$1,050</div>
+                <div class="s-trend up">▲ 8%&nbsp;&nbsp;This month</div>
+                <div class="s-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card white">
+                <div class="s-label">Total Revenue</div>
+                <div class="s-amount">$850</div>
+                <div class="s-trend up">▲ 4%&nbsp;&nbsp;This month</div>
+                <div class="s-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" />
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="card">
+              <div class="activity-header">
+                <h2>Recent Activities</h2>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <div class="search-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    Search
+                  </div>
+                  <button class="filter-btn">
+                    Filter
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="4" y1="6" x2="20" y2="6" />
+                      <line x1="8" y1="12" x2="16" y2="12" />
+                      <line x1="11" y1="18" x2="13" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 30px"></th>
+                    <th>Order ID</th>
+                    <th>Activity</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><div class="cb"></div></td>
+                    <td class="order-id">INV_000076</td>
+                    <td>
+                      <div class="activity-name">
+                        <div class="activity-icon" style="background: #ebf5ff">📱</div>
+                        <span>Mobile App Purchase</span>
+                      </div>
+                    </td>
+                    <td class="price">$25,500</td>
+                    <td>
+                      <span class="status-badge"
+                        ><span class="status-dot completed"></span> Completed</span
+                      >
+                    </td>
+                    <td style="color: var(--text-light); font-size: 11.5px">
+                      17 Apr, 2026 03:45 PM
+                    </td>
+                    <td class="more-btn">···</td>
+                  </tr>
+                  <tr>
+                    <td><div class="cb"></div></td>
+                    <td class="order-id">INV_000075</td>
+                    <td>
+                      <div class="activity-name">
+                        <div class="activity-icon" style="background: #fff3e0">🏨</div>
+                        <span>Hotel Booking</span>
+                      </div>
+                    </td>
+                    <td class="price">$32,750</td>
+                    <td>
+                      <span class="status-badge"
+                        ><span class="status-dot pending"></span> Pending</span
+                      >
+                    </td>
+                    <td style="color: var(--text-light); font-size: 11.5px">
+                      15 Apr, 2026 11:30 AM
+                    </td>
+                    <td class="more-btn">···</td>
+                  </tr>
+                  <tr>
+                    <td><div class="cb"></div></td>
+                    <td class="order-id">INV_000074</td>
+                    <td>
+                      <div class="activity-name">
+                        <div class="activity-icon" style="background: #f3e8ff">✈️</div>
+                        <span>Flight Ticket Booking</span>
+                      </div>
+                    </td>
+                    <td class="price">$40,200</td>
+                    <td>
+                      <span class="status-badge"
+                        ><span class="status-dot completed"></span> Completed</span
+                      >
+                    </td>
+                    <td style="color: var(--text-light); font-size: 11.5px">
+                      15 Apr, 2026 12:00 PM
+                    </td>
+                    <td class="more-btn">···</td>
+                  </tr>
+                  <tr>
+                    <td><div class="cb checked"></div></td>
+                    <td class="order-id">INV_000073</td>
+                    <td>
+                      <div class="activity-name">
+                        <div class="activity-icon" style="background: #fff9c4">🛒</div>
+                        <span>Grocery Purchase</span>
+                      </div>
+                    </td>
+                    <td class="price">$50,200</td>
+                    <td>
+                      <span class="status-badge"
+                        ><span class="status-dot in-progress"></span> In Progress</span
+                      >
+                    </td>
+                    <td style="color: var(--text-light); font-size: 11.5px">
+                      14 Apr, 2026 09:15 PM
+                    </td>
+                    <td class="more-btn">···</td>
+                  </tr>
+                  <tr>
+                    <td><div class="cb"></div></td>
+                    <td class="order-id">INV_000073</td>
+                    <td>
+                      <div class="activity-name">
+                        <div class="activity-icon" style="background: #ffe8e8">💻</div>
+                        <span>Software License</span>
+                      </div>
+                    </td>
+                    <td class="price">$15,900</td>
+                    <td>
+                      <span class="status-badge"
+                        ><span class="status-dot completed"></span> Completed</span
+                      >
+                    </td>
+                    <td style="color: var(--text-light); font-size: 11.5px">
+                      10 Apr, 2026 06:00 AM
+                    </td>
+                    <td class="more-btn">···</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── RIGHT COLUMN (Income Chart) ── -->
+          <div class="card income-card">
+            <h3>Total Income</h3>
+            <p>View your income in a certain period of time</p>
+
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 14px;
+                margin-bottom: 6px;
+              "
+            >
+              <span style="font-size: 12.5px; font-weight: 700; color: var(--text-dark)"
+                >Profit and Loss</span
+              >
+              <div class="chart-legend">
+                <span><span class="legend-dot profit"></span> Profit</span>
+                <span><span class="legend-dot loss"></span> Loss</span>
+              </div>
+            </div>
+
+            <div class="chart-container">
+              <!-- Y Axis -->
+              <div class="chart-y">
+                <span>0</span>
+                <span>10k</span>
+                <span>20k</span>
+                <span>30k</span>
+                <span>40k</span>
+                <span>50k</span>
+              </div>
+              <!-- Bars + X axis -->
+              <div style="flex: 1">
+                <div class="bar-chart" id="barChart"></div>
+                <div class="chart-x">
+                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span> <span>May</span
+                  ><span>Jun</span><span>Jul</span><span>Aug</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini stats -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px">
+              <div style="background: var(--bg); border-radius: 10px; padding: 12px">
+                <div style="font-size: 10.5px; color: var(--text-light)">Total Profit</div>
+                <div
+                  style="
+                    font-size: 17px;
+                    font-weight: 800;
+                    color: var(--text-dark);
+                    margin-top: 4px;
+                  "
+                >
+                  $24.5k
+                </div>
+                <div style="font-size: 10.5px; color: var(--green); margin-top: 2px">▲ 12.4%</div>
+              </div>
+              <div style="background: var(--bg); border-radius: 10px; padding: 12px">
+                <div style="font-size: 10.5px; color: var(--text-light)">Total Loss</div>
+                <div
+                  style="
+                    font-size: 17px;
+                    font-weight: 800;
+                    color: var(--text-dark);
+                    margin-top: 4px;
+                  "
+                >
+                  $8.2k
+                </div>
+                <div style="font-size: 10.5px; color: var(--red); margin-top: 2px">▼ 3.1%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /dashboard-grid -->
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
+
+    <script>
+      // ─── Build Bar Chart ───────────────────────────────────────────────
+      const chartData = [
+        { profit: 72, loss: 48 },
+        { profit: 58, loss: 38 },
+        { profit: 82, loss: 62 },
+        { profit: 48, loss: 72 },
+        { profit: 88, loss: 42 },
+        { profit: 76, loss: 58 },
+        { profit: 62, loss: 78 },
+        { profit: 86, loss: 48 },
+      ];
+      const maxH = 120;
+      const chart = document.getElementById("barChart");
+      chartData.forEach((d) => {
+        const group = document.createElement("div");
+        group.className = "bar-group";
+        group.style.flex = "1";
+        group.style.justifyContent = "center";
+
+        const pb = document.createElement("div");
+        pb.className = "bar profit";
+        pb.style.height = (d.profit / 100) * maxH + "px";
+        pb.style.flex = "1";
+
+        const lb = document.createElement("div");
+        lb.className = "bar loss";
+        lb.style.height = (d.loss / 100) * maxH + "px";
+        lb.style.flex = "1";
+
+        group.appendChild(pb);
+        group.appendChild(lb);
+        chart.appendChild(group);
+      });
+
+      // ─── Sidebar icon toggle ───────────────────────────────────────────
+      document.querySelectorAll(".sidebar .icon-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".sidebar .icon-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+      });
+
+      // ─── Nav toggle ───────────────────────────────────────────────────
+      document.querySelectorAll(".topnav nav a").forEach((a) => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          document.querySelectorAll(".topnav nav a").forEach((x) => x.classList.remove("active"));
+          a.classList.add("active");
+        });
+      });
+
+      // ─── Checkbox toggle ──────────────────────────────────────────────
+      document.querySelectorAll(".cb").forEach((cb) => {
+        cb.addEventListener("click", () => cb.classList.toggle("checked"));
+      });
+    </script>
+  </body>
+</html>

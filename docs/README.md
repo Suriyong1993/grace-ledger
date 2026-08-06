@@ -2,7 +2,7 @@
 
 **Purpose**: Central hub for product decisions, assumptions, and design rationale.  
 **Audience**: Product, Engineering, QA, Future Team Members  
-**Governance**: See GOVERNANCE.md  
+**Governance**: See GOVERNANCE.md
 
 ---
 
@@ -83,34 +83,35 @@ Every hypothesis flows through the system like this:
 ```
 HYPOTHESIS (H-001)
   "Staff think in events, not accounting"
-  
+
   ↓ Shapes Design Decision
-  
+
 UXDR (UXDR-001)
   "Event-based workflow (not journal-based)"
-  
+
   ↓ Implemented as
-  
+
 PROTOTYPE SCREEN (FS-001)
   "Finance Home with event buttons"
-  
+
   ↓ Tested by
-  
+
 TEST SCENARIO (TS-001)
   "Finance Staff Records Offering"
-  
+
   ↓ Results in
-  
+
 RESULT (R-001)
   "Task completed in 2:45, no accounting questions"
-  
+
   ↓ Feeds back into
-  
+
 ITERATION (I-001)
   "H-001 Confirmed ✓ — Staff naturally think in events"
 ```
 
 **Why this matters**: If you change your mind about H-001, you immediately know:
+
 - Which UX to change (UXDR-001)
 - Which screens to update (FS-001)
 - Which tests to re-run (TS-001)
@@ -123,27 +124,28 @@ No "discovery" phase, no "where did this come from?"
 
 ### Hypotheses (PHASE-0-HYPOTHESES.md)
 
-| State | Meaning | Action |
-|---|---|---|
-| **Not Validated** | Assumption, not yet tested | Review before Phase 1 |
-| **Testing** | Currently in user test | Don't change; record results |
-| **Confirmed ✓** | User test passed | Implement with confidence |
-| **Failed ✗** | User test contradicted it | Revise and re-test |
-| **Superseded** | Replaced by better hypothesis | Keep for history |
+| State             | Meaning                       | Action                       |
+| ----------------- | ----------------------------- | ---------------------------- |
+| **Not Validated** | Assumption, not yet tested    | Review before Phase 1        |
+| **Testing**       | Currently in user test        | Don't change; record results |
+| **Confirmed ✓**   | User test passed              | Implement with confidence    |
+| **Failed ✗**      | User test contradicted it     | Revise and re-test           |
+| **Superseded**    | Replaced by better hypothesis | Keep for history             |
 
 ### UX Decisions (UXDR.md)
 
-| State | Meaning | Action |
-|---|---|---|
-| **Proposed** | Awaiting approval | Review in design meeting |
-| **Accepted** | Team agreed | Build prototype |
-| **Validated** | User test confirmed | Implement |
-| **Rejected** | User test contradicted | Create new UXDR, don't edit old |
-| **Superseded** | Replaced by new decision | Link both for history |
+| State          | Meaning                  | Action                          |
+| -------------- | ------------------------ | ------------------------------- |
+| **Proposed**   | Awaiting approval        | Review in design meeting        |
+| **Accepted**   | Team agreed              | Build prototype                 |
+| **Validated**  | User test confirmed      | Implement                       |
+| **Rejected**   | User test contradicted   | Create new UXDR, don't edit old |
+| **Superseded** | Replaced by new decision | Link both for history           |
 
 ### Never Edit Old Decisions
 
 Once a decision is published (even if just proposed), it's immutable. If you disagree:
+
 - Create a new UXDR (e.g., UXDR-014: "Reverts UXDR-004")
 - Explain why old decision is wrong
 - Link both documents
@@ -179,7 +181,7 @@ Example:
 **Version**: 1.0  
 **Date**: 2026-08-04  
 **Traceability**: H-001, FS-001, TS-001  
-**Related**: MENTAL_MODELS.md, UXDR-002  
+**Related**: MENTAL_MODELS.md, UXDR-002
 ```
 
 ---
@@ -189,12 +191,14 @@ Example:
 ### ❌ Copy-Pasting Between Docs
 
 BAD:
+
 ```
 UXDR-001: "Staff think in events..."
 UXDR-002: "Staff think in events... (same text)"
 ```
 
 GOOD:
+
 ```
 UXDR-001: "Staff think in events..."
 UXDR-002: "Builds on UXDR-001 — see H-001"
@@ -203,11 +207,13 @@ UXDR-002: "Builds on UXDR-001 — see H-001"
 ### ❌ Ambiguous Terms
 
 BAD:
+
 ```
 "Transaction time should be fast"
 ```
 
 GOOD:
+
 ```
 "Completion time < 3 minutes (see GLOSSARY.md: Completion Time)"
 ```
@@ -215,6 +221,7 @@ GOOD:
 ### ❌ Editing Old Decisions
 
 BAD:
+
 ```
 UXDR-001 (created 2026-08-04)
         ↓
@@ -222,6 +229,7 @@ UXDR-001 EDITED 2026-09-15 (nobody knows what changed)
 ```
 
 GOOD:
+
 ```
 UXDR-001 (created 2026-08-04, Superseded by UXDR-014)
         ↓
@@ -231,12 +239,14 @@ UXDR-014 (created 2026-09-15, "Reverts UXDR-001 because...")
 ### ❌ Orphaned Documents
 
 BAD:
+
 ```
 Created: DESIGN_PRINCIPLES.md
 Nobody links to it.
 ```
 
 GOOD:
+
 ```
 Created: DESIGN_PRINCIPLES.md
 Links from: DECISION_INDEX.md, UXDR-001, UXDR-003
@@ -252,15 +262,15 @@ Single file, multiple versions in history:
 # UXDR-001: Event-Based Workflow
 
 **Version**: 1.2  
-**Status**: Accepted  
+**Status**: Accepted
 
 ## Version History
 
-| Version | Date | Change | Reason |
-|---|---|---|---|
-| 1.0 | 2026-08-04 | Initial | Phase 0 hypothesis |
-| 1.1 | 2026-08-10 | Clarified "Event" definition | Added GLOSSARY reference |
-| 1.2 | 2026-08-15 | Added success metrics | Feedback from design review |
+| Version | Date       | Change                       | Reason                      |
+| ------- | ---------- | ---------------------------- | --------------------------- |
+| 1.0     | 2026-08-04 | Initial                      | Phase 0 hypothesis          |
+| 1.1     | 2026-08-10 | Clarified "Event" definition | Added GLOSSARY reference    |
+| 1.2     | 2026-08-15 | Added success metrics        | Feedback from design review |
 
 ## Current Content (v1.2)
 
@@ -283,6 +293,7 @@ Approver: Project Sponsor
 ```
 
 If you disagree with a decision:
+
 1. Comment in the document (markdown comment)
 2. Tag owner
 3. If no consensus, escalate to Approver
@@ -291,12 +302,12 @@ If you disagree with a decision:
 
 ## 📆 Review Cadence
 
-| When | What | Owner |
-|---|---|---|
-| Before Phase 1 | All Hypotheses + UXDR | Product Manager |
-| After Phase 1 | Test Results + Iterations | Product + QA |
-| Monthly | Orphaned docs, consistency | Tech Lead |
-| At code review | Reference docs in PR comments | Engineer |
+| When           | What                          | Owner           |
+| -------------- | ----------------------------- | --------------- |
+| Before Phase 1 | All Hypotheses + UXDR         | Product Manager |
+| After Phase 1  | Test Results + Iterations     | Product + QA    |
+| Monthly        | Orphaned docs, consistency    | Tech Lead       |
+| At code review | Reference docs in PR comments | Engineer        |
 
 ---
 
@@ -331,7 +342,7 @@ Template for new UXDR:
 **Version**: 1.0  
 **Date**: YYYY-MM-DD  
 **Traceability**: H-XXX  
-**Related**: [Other docs]  
+**Related**: [Other docs]
 
 ## Decision
 
@@ -348,8 +359,8 @@ Template for new UXDR:
 
 ## Success Metrics
 
-| Metric | Target |
-|---|---|
+| Metric     | Target   |
+| ---------- | -------- |
 | [Metric 1] | [Target] |
 
 ## Status
@@ -362,24 +373,29 @@ Not yet validated (Phase 1 testing)
 ## 🎓 Learning Path for New Team Members
 
 **Day 1:**
+
 - Read this README
 - Read GOVERNANCE.md
 - Read GLOSSARY.md
 
 **Day 2:**
+
 - Read PHASE-0-HYPOTHESES.md
 - Read MENTAL_MODELS.md
 
 **Day 3:**
+
 - Read UXDR.md (focus on UXDRs related to your task)
 - Read TEST_PLAN.md
 
 **Day 4:**
+
 - Pick a task from DECISION_INDEX.md
 - Follow the chain: H → UXDR → Test → Result
 - Ask questions if anything is unclear
 
 **By Day 5:**
+
 - New team member should be able to:
   - Explain why a UX decision was made
   - Know what success looks like

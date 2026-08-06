@@ -18,7 +18,7 @@ function AppLayout() {
   if (!user) return <Navigate to="/auth" replace />;
 
   return (
-    <SidebarProvider defaultOpen>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-dvh flex w-full bg-background">
         <AppSidebar />
         <SidebarInset className="min-w-0">

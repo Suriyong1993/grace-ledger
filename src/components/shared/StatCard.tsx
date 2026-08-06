@@ -1,8 +1,10 @@
 import type { LucideIcon } from "lucide-react";
-import { TrendingDown, TrendingUp } from "lucide-react";
+import type { ReactNode } from "react";
+import { TrendingDown, TrendingUp, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { thb } from "@/lib/format";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   label: string;
@@ -12,6 +14,8 @@ interface Props {
   tone?: "primary" | "secondary" | "accent" | "success" | "danger" | "warning";
   trend?: number;
   decimals?: number;
+  /** Optional info tooltip shown next to the label (e.g. explains a calculated total) */
+  tooltip?: ReactNode;
 }
 
 const VALUE_TONE: Record<NonNullable<Props["tone"]>, string> = {
@@ -24,7 +28,7 @@ const VALUE_TONE: Record<NonNullable<Props["tone"]>, string> = {
 };
 
 const ICON_BG: Record<NonNullable<Props["tone"]>, string> = {
-  primary: "bg-accent text-primary",
+  primary: "bg-accent/20 text-primary",
   secondary: "bg-secondary text-muted-foreground",
   accent: "bg-accent text-accent-foreground",
   success: "bg-success/10 text-success",
@@ -50,13 +54,14 @@ export function StatCard({
   tone = "secondary",
   trend,
   decimals = 0,
+  tooltip,
 }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-      className="group relative flex overflow-hidden rounded-card border border-border bg-card transition-colors duration-150 hover:border-primary/40"
+      className="group relative flex overflow-hidden rounded-card border border-border bg-card shadow-card transition-all duration-150 hover:border-primary/50 hover:shadow-elevated"
     >
       {/* Left accent strip — financial terminal style */}
       <div
@@ -68,7 +73,21 @@ export function StatCard({
 
       <div className="flex-1 p-5">
         <div className="flex items-start justify-between gap-3">
-          <p className="kicker text-muted-foreground">{label}</p>
+          {tooltip ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="kicker flex items-center gap-1.5 text-muted-foreground">
+                  {label}
+                  <Info className="h-3 w-3 text-muted-foreground/60" />
+                </p>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[240px] normal-case">
+                {tooltip}
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <p className="kicker text-muted-foreground">{label}</p>
+          )}
           {Icon && (
             <div
               className={cn(

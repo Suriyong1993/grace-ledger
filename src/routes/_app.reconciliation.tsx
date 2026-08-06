@@ -407,7 +407,7 @@ function ReconciliationPage() {
                       <div className="h-1 bg-muted">
                         <div
                           style={{ width: `${pct}%` }}
-                          className="h-full bg-primary transition-all duration-500"
+                          className="h-full bg-primary transition-all duration-200"
                         />
                       </div>
                     </div>

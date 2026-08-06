@@ -2,7 +2,7 @@
 
 **Purpose**: Every term has one meaning. Consistency prevents "did you mean X or Y?"  
 **Maintenance**: When a new term is introduced, add it here + link back to source doc.  
-**Authority**: This is the source of truth. Reference this, don't invent definitions.  
+**Authority**: This is the source of truth. Reference this, don't invent definitions.
 
 ---
 
@@ -17,11 +17,13 @@ A user-initiated financial action recorded in Grace Ledger. Examples: receiving 
 **System perspective**: Event generates a balanced journal entry automatically.
 
 **Types**:
+
 - Income event: รับเงิน (Receiving money)
 - Expense event: บันทึกรายจ่าย (Recording expense)
 - Transfer event: โอนเงิน (Moving money between funds)
 
 **NOT the same as**:
+
 - Transaction (can mean event or internal system operation)
 - Journal Entry (system output, not user input)
 
@@ -34,10 +36,12 @@ A user-initiated financial action recorded in Grace Ledger. Examples: receiving 
 Ambiguous term. Avoid unless context is clear.
 
 **In Grace Ledger context**:
+
 - User-level: synonymous with "Event"
 - System-level: can refer to journal entry or event
 
 **Better alternatives**:
+
 - Use "Event" for user actions (รับเงิน, จ่ายค่าไฟ)
 - Use "Journal Entry" for accounting records
 - Use "Record" as verb (staff "record" events)
@@ -51,6 +55,7 @@ Ambiguous term. Avoid unless context is clear.
 System-generated accounting record. Never created manually by staff.
 
 **Structure**:
+
 - Debit line (amount, account)
 - Credit line (amount, account)
 - Lines must balance (Dr = Cr)
@@ -58,6 +63,7 @@ System-generated accounting record. Never created manually by staff.
 **User visibility**: Hidden from Finance Staff and Leaders. Visible to Admin/Auditor only.
 
 **Generation**: System auto-generates from Event. Example:
+
 ```
 Event: รับถวาย ฿15,000 (cash)
 Auto-generated Journal Entry:
@@ -74,6 +80,7 @@ Auto-generated Journal Entry:
 Money given by church members for general church use.
 
 **Categories**:
+
 - Sunday worship offering (ถวายวันอาทิตย์)
 - Special offering (ถวายพิเศษ)
 - Tithe (สิบลด)
@@ -90,6 +97,7 @@ Money given by church members for general church use.
 Money spent by the church for operational purposes.
 
 **Categories**:
+
 - Utilities (ค่าไฟ, ค่าน้ำ)
 - Salaries (เงินเดือน)
 - Maintenance (ค่าซ่อมแซม)
@@ -106,6 +114,7 @@ Money spent by the church for operational purposes.
 A separate pot of money within the church. Used for budget tracking and segregation.
 
 **Examples**:
+
 - General Fund
 - Building Fund
 - Missions Fund
@@ -126,6 +135,7 @@ Physical or digital proof of a financial transaction.
 **Requirement**: Every transaction must have receipt attached.
 
 **Formats**:
+
 - Photo (receipt, envelope, bank slip)
 - PDF (invoice, receipt scan)
 - Screenshot (digital payment confirmation)
@@ -141,10 +151,12 @@ Physical or digital proof of a financial transaction.
 Authorization by a leader to proceed with a recorded transaction.
 
 **Structure**:
+
 - 1 approval: for transactions ≤ ฿5,000 and ฿5-50k
 - 2 approvals: for transactions > ฿50,000
 
 **Rules**:
+
 - Must be different people (no self-approval)
 - Sequential or parallel (flexible)
 - Cannot be undone (irreversible)
@@ -162,6 +174,7 @@ Authorization by a leader to proceed with a recorded transaction.
 Current state of a transaction in the approval pipeline.
 
 **States**:
+
 - Draft: Created but not submitted
 - Pending Approval: Submitted, awaiting leader review
 - Partially Approved: 1 of 2 leaders approved
@@ -206,6 +219,7 @@ Time elapsed from user starts task to task completion.
 Mental effort required to use the system.
 
 **Reduction techniques**:
+
 - Hide accounting jargon
 - Use sequential wizard (not all-at-once form)
 - Pre-select defaults where possible
@@ -224,11 +238,13 @@ Mental effort required to use the system.
 Step-by-step form flow. User progresses linearly: Step 1 → 2 → 3 → 4 → Done.
 
 **Advantages**:
+
 - Chunks information
 - Reduces decision fatigue
 - Clear progress indication
 
 **Disadvantages**:
+
 - Requires more clicks than single-page form
 - Harder to go back and edit
 
@@ -243,6 +259,7 @@ Step-by-step form flow. User progresses linearly: Step 1 → 2 → 3 → 4 → D
 Unique identifier for a prototype/UI screen. Format: `[Role Abbreviation]-[Number]`
 
 **Examples**:
+
 - `FS-001`: Finance Staff Home
 - `FS-002`: Record Income Wizard Step 1
 - `LD-001`: Leader Approval Queue
@@ -259,6 +276,7 @@ Unique identifier for a prototype/UI screen. Format: `[Role Abbreviation]-[Numbe
 Interactive mockup of UI, built before backend development.
 
 **Characteristics**:
+
 - Clickable (but not connected to database)
 - Uses mock data (not real data)
 - Implements key flows (recording event, approving)
@@ -276,6 +294,7 @@ Interactive mockup of UI, built before backend development.
 Fake but realistic data used in prototype.
 
 **Examples**:
+
 - Sample offering: "Sunday Worship - ฿15,000 - 2026-08-04"
 - Sample leader approvals: "Approved by Pastor Somchai at 10:15 AM"
 
@@ -292,10 +311,12 @@ Fake but realistic data used in prototype.
 An assumption about users or the system that needs validation.
 
 **Examples**:
+
 - "Staff think in events, not accounting"
 - "< 3 minute completion time is achievable"
 
 **Status**:
+
 - Not Validated: Initial assumption
 - Testing: Currently in user test
 - Confirmed: User test passed
@@ -312,6 +333,7 @@ A design choice made to implement a hypothesis.
 **Format**: UXDR (UX Decision Record)
 
 **Examples**:
+
 - UXDR-001: Event-based workflow
 - UXDR-004: Timeline approval status
 
@@ -326,6 +348,7 @@ A design choice made to implement a hypothesis.
 Ability to trace a decision from hypothesis → design → prototype → test → result.
 
 **Chain**:
+
 ```
 H-001 (Hypothesis)
   ↓
@@ -349,6 +372,7 @@ R-001 (Result)
 Single authoritative document for a piece of information.
 
 **Examples**:
+
 - < 3 min target: Lives in TEST_PLAN.md, referenced elsewhere
 - H-001 definition: Lives in PHASE-0-HYPOTHESES.md, referenced elsewhere
 - "Offering" definition: Lives in GLOSSARY.md (this file), referenced everywhere
@@ -366,6 +390,7 @@ Clear assignment of responsibility for a document.
 **Required**: Every document lists owner (name + email)
 
 **Responsibility**:
+
 - Keep document accurate and current
 - Review quarterly
 - Respond to questions about the document
@@ -394,6 +419,7 @@ A specific task a user performs to validate a hypothesis.
 Measurable thresholds determining if hypothesis is confirmed.
 
 **Examples**:
+
 - Task completion: < 3 minutes
 - Error rate: < 5%
 - Accuracy: ≥ 98%
@@ -408,12 +434,14 @@ Measurable thresholds determining if hypothesis is confirmed.
 Checkpoint after Phase 1 testing: proceed to backend development, or iterate UX?
 
 **Go Criteria**:
+
 - ✓ Completion time < 3 min
 - ✓ 0 accounting questions
 - ✓ ≥ 90% task success
 - ✓ No major usability blockers
 
 **No-Go Criteria**:
+
 - ✗ Completion time > 4 min
 - ✗ Multiple accounting questions
 - ✗ < 70% task success
@@ -492,6 +520,7 @@ Immutable record of all transactions, approvals, and system changes.
 Current state of a document.
 
 **Values**:
+
 - **Not Validated**: Hypothesis not yet tested
 - **Proposed**: Design decision awaiting approval
 - **Accepted**: Team approved design decision
@@ -530,16 +559,16 @@ Document version number. Format: `Major.Minor`
 
 ## Quick Reference Table
 
-| Term | Context | Definition | See Also |
-|---|---|---|---|
-| Event | User action | Financial action (income, expense, transfer) | Transaction |
-| Journal Entry | Accounting | Auto-generated Dr/Cr record | Debit, Credit |
-| Approval | Workflow | Leader authorization to proceed | Approval Status |
-| Completion Time | Metric | Time to finish task | < 3 min target |
-| Wizard | UI | Step-by-step form flow | Screen ID |
-| Hypothesis | Product | Assumption to validate | PHASE-0-HYPOTHESES |
-| UXDR | Decision | UX design choice | UXDR.md |
-| Traceability | Process | Link hypothesis → design → test → result | DECISION_INDEX |
+| Term            | Context     | Definition                                   | See Also           |
+| --------------- | ----------- | -------------------------------------------- | ------------------ |
+| Event           | User action | Financial action (income, expense, transfer) | Transaction        |
+| Journal Entry   | Accounting  | Auto-generated Dr/Cr record                  | Debit, Credit      |
+| Approval        | Workflow    | Leader authorization to proceed              | Approval Status    |
+| Completion Time | Metric      | Time to finish task                          | < 3 min target     |
+| Wizard          | UI          | Step-by-step form flow                       | Screen ID          |
+| Hypothesis      | Product     | Assumption to validate                       | PHASE-0-HYPOTHESES |
+| UXDR            | Decision    | UX design choice                             | UXDR.md            |
+| Traceability    | Process     | Link hypothesis → design → test → result     | DECISION_INDEX     |
 
 ---
 
@@ -564,6 +593,7 @@ When a term is no longer used:
 3. Note which docs still use it (for migration)
 
 Example:
+
 ```
 ### Journal (deprecated)
 

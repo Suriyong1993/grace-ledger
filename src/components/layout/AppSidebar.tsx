@@ -12,8 +12,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import React from "react";
 
-/* GL wordmark — SVG-based, no emoji */
+/* GL wordmark — orange badge */
 function GraceLedgerMark({ size = 36 }: { size?: number }) {
   return (
     <svg
@@ -24,9 +25,7 @@ function GraceLedgerMark({ size = 36 }: { size?: number }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Grace Ledger"
     >
-      {/* Background */}
-      <rect width="36" height="36" rx="9" fill="currentColor" className="text-primary" />
-      {/* "GL" lettermark */}
+      <rect width="36" height="36" rx="9" fill="#E8450A" />
       <text
         x="18"
         y="24"
@@ -54,43 +53,39 @@ function NavRow({
 }) {
   return (
     <SidebarMenuItem className="relative">
-      {/* Active left border indicator */}
-      {active && (
-        <span className="absolute inset-y-1 left-0 w-0.5 rounded-r-full bg-primary" aria-hidden />
-      )}
-
       <SidebarMenuButton
         asChild
         isActive={active}
         tooltip={item.label}
         className={cn(
-          "group/nav-row relative pl-3 transition-all duration-150 rounded-button",
-          compact ? "h-8 text-xs" : "h-9 text-[13px]",
+          "group/nav-row relative transition-all duration-150 rounded-lg",
+          compact ? "h-8" : "h-10",
           active
-            ? [
-                "bg-sidebar-accent font-semibold text-sidebar-accent-foreground",
-                "dark:bg-sidebar-accent",
-              ]
-            : ["text-muted-foreground font-medium", "hover:bg-secondary hover:text-foreground"],
+            ? "bg-[#2a2a2a] text-[#E8450A]"
+            : "text-[#6b6b6b] hover:bg-[#242424] hover:text-[#cccccc]",
         )}
       >
-        <Link to={item.to} className="flex items-center gap-2.5">
-          {/* Icon with subtle background when active */}
+        <Link to={item.to} className="flex items-center gap-2.5 px-3">
+          {/* Active left indicator */}
+          {active && (
+            <span
+              className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-[#E8450A]"
+              aria-hidden
+            />
+          )}
           <span
             className={cn(
               "grid shrink-0 place-items-center rounded-md transition-colors duration-150",
               compact ? "h-5 w-5" : "h-6 w-6",
-              active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-muted-foreground/60 group-hover/nav-row:text-foreground",
+              active ? "text-[#E8450A]" : "text-[#6b6b6b] group-hover/nav-row:text-[#cccccc]",
             )}
           >
             <item.icon
-              className={compact ? "h-3 w-3" : "h-3.5 w-3.5"}
+              className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
               strokeWidth={active ? 2.25 : 1.75}
             />
           </span>
-          <span className="truncate">{item.label}</span>
+          <span className="truncate text-[13px] font-medium">{item.label}</span>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -104,24 +99,27 @@ export function AppSidebar() {
   const isActive = (to: string) => path === to || path.startsWith(to + "/");
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
+    <Sidebar
+      collapsible="icon"
+      className="border-r-0"
+      style={{ "--sidebar-width": "220px", "--sidebar-width-icon": "64px" } as React.CSSProperties}
+    >
       {/* ── Header: Wordmark ── */}
-      <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
+      <SidebarHeader className="border-b border-[#2e2e2e] px-3 py-3">
         <Link
           to="/dashboard"
-          className="group flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-muted/60"
+          className="group flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-[#242424]"
         >
-          {/* Logo with drop-shadow glow on hover */}
-          <div className="shrink-0 transition-all duration-200 group-hover:scale-105 group-hover:[filter:drop-shadow(0_0_8px_color-mix(in_oklch,var(--color-primary)_40%,transparent))]">
+          <div className="shrink-0">
             <GraceLedgerMark size={34} />
           </div>
 
           {!collapsed && (
             <div className="min-w-0">
-              <p className="font-display truncate text-sm font-bold tracking-tight text-foreground">
+              <p className="font-display truncate text-sm font-bold tracking-tight text-white">
                 Grace Ledger
               </p>
-              <p className="truncate text-[10px] font-medium text-muted-foreground/70">
+              <p className="truncate text-[10px] font-medium text-[#6b6b6b]">
                 ระบบการเงินคริสตจักร
               </p>
             </div>
@@ -133,7 +131,11 @@ export function AppSidebar() {
       <SidebarContent className="pt-2 pb-2">
         {NAV_GROUPS.map((group) => (
           <SidebarGroup key={group.label} className="py-1">
-            {!collapsed && <p className="kicker px-3 pb-1.5 pt-0.5">{group.label}</p>}
+            {!collapsed && (
+              <p className="px-3 pb-1.5 pt-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#4a4a4a]">
+                {group.label}
+              </p>
+            )}
             <SidebarGroupContent>
               <SidebarMenu className="gap-0.5">
                 {group.items.map((item) => (
@@ -146,8 +148,12 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* ── Footer: System nav ── */}
-      <SidebarFooter className="border-t border-sidebar-border py-2">
-        {!collapsed && <p className="kicker px-3 pb-1.5">ระบบ</p>}
+      <SidebarFooter className="border-t border-[#2e2e2e] py-2">
+        {!collapsed && (
+          <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#4a4a4a]">
+            ระบบ
+          </p>
+        )}
         <SidebarMenu className="gap-0.5">
           {NAV_SYSTEM.map((item) => (
             <NavRow key={item.to} item={item} active={isActive(item.to)} compact />

@@ -32,9 +32,9 @@ const STORAGE_KEY = "grace-ledger-theme";
 /**
  * Read stored theme, falling back to "system".
  */
-function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
-  return (localStorage.getItem(STORAGE_KEY) as Theme) ?? "system";
+function getStoredTheme(fallback: Theme): Theme {
+  if (typeof window === "undefined") return fallback;
+  return (localStorage.getItem(STORAGE_KEY) as Theme) ?? fallback;
 }
 
 /**
@@ -70,7 +70,7 @@ export function ThemeProvider({ children, defaultTheme = "system" }: ThemeProvid
 
   // On mount: read stored preference and system preference
   useEffect(() => {
-    const stored = getStoredTheme();
+    const stored = getStoredTheme(defaultTheme);
     setThemeState(stored);
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -83,7 +83,7 @@ export function ThemeProvider({ children, defaultTheme = "system" }: ThemeProvid
     setMounted(true);
 
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
+  }, [defaultTheme]);
 
   // Apply theme whenever stored theme or system preference changes
   useEffect(() => {

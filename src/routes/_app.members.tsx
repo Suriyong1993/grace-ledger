@@ -118,7 +118,7 @@ export function MembersPage() {
           description="ลองค้นหาด้วยชื่อ ครอบครัว แผนก หรือเบอร์โทร"
         />
       ) : (
-        <section className="card-ledger shadow-craft">
+        <section className="card-ledger">
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
             <p className="kicker">รายชื่อสมาชิก</p>
             <span className="num-display text-xs text-muted-foreground">{rows.length} คน</span>

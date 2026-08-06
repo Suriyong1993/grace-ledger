@@ -121,9 +121,7 @@ function BudgetPage() {
                   className={cn("card-ledger overflow-hidden", alert && "border-destructive/30")}
                 >
                   {/* Top accent strip for over-budget items */}
-                  {alert && (
-                    <div className="h-0.5 w-full bg-gradient-to-r from-destructive to-destructive/30" />
-                  )}
+                  {alert && <div className="h-0.5 w-full bg-destructive" />}
                   <div className="flex items-start justify-between gap-3 border-b border-border/60 px-5 py-3.5">
                     <div className="min-w-0">
                       <p className="truncate text-[13px] font-semibold text-foreground">{b.name}</p>
@@ -151,7 +149,7 @@ function BudgetPage() {
                     <div className="relative h-1.5 overflow-hidden rounded-full bg-muted">
                       <div
                         className={cn(
-                          "h-full rounded-full transition-all duration-700",
+                          "h-full rounded-full transition-all duration-200",
                           alert ? "bg-destructive" : pct >= 70 ? "bg-warning" : "bg-primary",
                         )}
                         style={{ width: `${pct}%` }}

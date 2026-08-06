@@ -2,7 +2,7 @@
 
 **Purpose**: Bridge between how users think about transactions and how the system implements them.  
 **Audience**: Product, Engineering, QA  
-**Why It Matters**: If these don't align, users will be confused. If they do, the UI will feel "natural."  
+**Why It Matters**: If these don't align, users will be confused. If they do, the UI will feel "natural."
 
 ---
 
@@ -51,12 +51,12 @@ If UI says "Create Journal Entry", staff will be confused. If UI says "Record Su
 
 ### Mapping to Events
 
-| Staff's Language (Thai) | Staff's Mental Model | System's Event Type | System's Journal Entry |
-|---|---|---|---|
-| รับถวาย ฿15,000 | Cash came in from offering | `income.received` | Dr. Cash +15000 / Cr. Offering +15000 |
-| จ่ายค่าไฟ ฿3,000 | We paid electric bill | `expense.recorded` | Dr. Utilities +3000 / Cr. Cash -3000 |
-| ฝากธนาคาร ฿50,000 | Moving cash from safe to bank | `transfer.initiated` | Dr. Bank +50000 / Cr. Cash -50000 |
-| รับค่ายศาสตราจารย์ ฿5,000 | Special donation | `income.special` | Dr. Cash +5000 / Cr. Special Donation +5000 |
+| Staff's Language (Thai)   | Staff's Mental Model          | System's Event Type  | System's Journal Entry                      |
+| ------------------------- | ----------------------------- | -------------------- | ------------------------------------------- |
+| รับถวาย ฿15,000           | Cash came in from offering    | `income.received`    | Dr. Cash +15000 / Cr. Offering +15000       |
+| จ่ายค่าไฟ ฿3,000          | We paid electric bill         | `expense.recorded`   | Dr. Utilities +3000 / Cr. Cash -3000        |
+| ฝากธนาคาร ฿50,000         | Moving cash from safe to bank | `transfer.initiated` | Dr. Bank +50000 / Cr. Cash -50000           |
+| รับค่ายศาสตราจารย์ ฿5,000 | Special donation              | `income.special`     | Dr. Cash +5000 / Cr. Special Donation +5000 |
 
 ---
 
@@ -82,26 +82,28 @@ If UI says "Create Journal Entry", staff will be confused. If UI says "Record Su
 ### Why This Matters
 
 Leaders need to see:
+
 - Transaction detail (amount, category, receipt)
 - Who recorded it
 - Who else approved
 - Clear [Approve] [Reject] buttons
 
 NOT:
+
 - Journal entries
 - Ledger accounts
 - Accounting terminology
 
 ### Mapping to Approval States
 
-| Leader's Mental State | UI Should Show | System's State |
-|---|---|---|
-| "ยังไม่เห็น" | Nothing (not in approval queue) | `draft` |
-| "รอดูแล้ว" | Transaction detail + [Approve/Reject] | `pending_approval` |
-| "ได้อนุมัติแล้ว" | ✓ Checkmark + timestamp | `approved_1` |
-| "รอคนที่สอง" | "Waiting for Leader 2" | `approved_1_pending_2` |
-| "ทั้งคู่อนุมัติแล้ว" | ✓ Both names + timestamps | `fully_approved` |
-| "ปฏิเสธ" | ✗ Rejected + reason | `rejected` |
+| Leader's Mental State | UI Should Show                        | System's State         |
+| --------------------- | ------------------------------------- | ---------------------- |
+| "ยังไม่เห็น"          | Nothing (not in approval queue)       | `draft`                |
+| "รอดูแล้ว"            | Transaction detail + [Approve/Reject] | `pending_approval`     |
+| "ได้อนุมัติแล้ว"      | ✓ Checkmark + timestamp               | `approved_1`           |
+| "รอคนที่สอง"          | "Waiting for Leader 2"                | `approved_1_pending_2` |
+| "ทั้งคู่อนุมัติแล้ว"  | ✓ Both names + timestamps             | `fully_approved`       |
+| "ปฏิเสธ"              | ✗ Rejected + reason                   | `rejected`             |
 
 ---
 
@@ -168,6 +170,7 @@ Admin uses journal entries for compliance, auditing, and debugging. Staff/Leader
 ### How UI Must Translate This
 
 **Staff View (Recording)**
+
 ```
 [รับเงิน]
   └─ ประเภท: ถวาย
@@ -179,6 +182,7 @@ Status: "รอการอนุมัติ"
 ```
 
 **Leader View (Approving)**
+
 ```
 Transaction: Sunday Offering ฿15,000
 
@@ -195,6 +199,7 @@ Approval Status:
 ```
 
 **What System Never Shows Users**
+
 ```
 ❌ Journal Entry:
    Dr. Cash                    15,000
@@ -212,28 +217,28 @@ Approval Status:
 
 ### Income Events
 
-| Event | Staff Mental Model | System Journal | Status Flow |
-|---|---|---|---|
-| `offering.sunday` | "รับถวายวันอาทิตย์" | Dr. Cash / Cr. Offering Income | pending → approved → executed |
-| `offering.special` | "รับถวายพิเศษ" | Dr. Cash / Cr. Special Offering | pending → approved → executed |
-| `tithe.received` | "รับสิบลด" | Dr. Cash / Cr. Tithe Income | pending → approved → executed |
-| `donation.grant` | "รับทุนสนับสนุน" | Dr. Cash / Cr. Grants | pending → approved → executed |
+| Event              | Staff Mental Model  | System Journal                  | Status Flow                   |
+| ------------------ | ------------------- | ------------------------------- | ----------------------------- |
+| `offering.sunday`  | "รับถวายวันอาทิตย์" | Dr. Cash / Cr. Offering Income  | pending → approved → executed |
+| `offering.special` | "รับถวายพิเศษ"      | Dr. Cash / Cr. Special Offering | pending → approved → executed |
+| `tithe.received`   | "รับสิบลด"          | Dr. Cash / Cr. Tithe Income     | pending → approved → executed |
+| `donation.grant`   | "รับทุนสนับสนุน"    | Dr. Cash / Cr. Grants           | pending → approved → executed |
 
 ### Expense Events
 
-| Event | Staff Mental Model | System Journal | Status Flow |
-|---|---|---|---|
-| `expense.utilities` | "จ่ายค่าไฟ" | Dr. Utilities / Cr. Cash | pending → approved → executed |
-| `expense.salary` | "จ่ายเงินเดือน" | Dr. Salaries / Cr. Cash | pending → approved → executed |
-| `expense.maintenance` | "จ่ายค่าซ่อมแซม" | Dr. Maintenance / Cr. Cash | pending → approved → executed |
-| `expense.other` | "จ่ายอื่นๆ" | Dr. Other / Cr. Cash | pending → approved → executed |
+| Event                 | Staff Mental Model | System Journal             | Status Flow                   |
+| --------------------- | ------------------ | -------------------------- | ----------------------------- |
+| `expense.utilities`   | "จ่ายค่าไฟ"        | Dr. Utilities / Cr. Cash   | pending → approved → executed |
+| `expense.salary`      | "จ่ายเงินเดือน"    | Dr. Salaries / Cr. Cash    | pending → approved → executed |
+| `expense.maintenance` | "จ่ายค่าซ่อมแซม"   | Dr. Maintenance / Cr. Cash | pending → approved → executed |
+| `expense.other`       | "จ่ายอื่นๆ"        | Dr. Other / Cr. Cash       | pending → approved → executed |
 
 ### Transfer Events
 
-| Event | Staff Mental Model | System Journal | Status Flow |
-|---|---|---|---|
-| `transfer.to_bank` | "ฝากธนาคาร" | Dr. Bank / Cr. Cash | pending → approved → executed |
-| `transfer.between_funds` | "โอนเงิน" | Dr. Fund B / Cr. Fund A | pending → approved → executed |
+| Event                    | Staff Mental Model | System Journal          | Status Flow                   |
+| ------------------------ | ------------------ | ----------------------- | ----------------------------- |
+| `transfer.to_bank`       | "ฝากธนาคาร"        | Dr. Bank / Cr. Cash     | pending → approved → executed |
+| `transfer.between_funds` | "โอนเงิน"          | Dr. Fund B / Cr. Fund A | pending → approved → executed |
 
 ---
 

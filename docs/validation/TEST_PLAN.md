@@ -3,7 +3,7 @@
 **Purpose**: Define concrete scenarios, tasks, and metrics for testing hypotheses with real users.  
 **Participants**: Finance Staff (2), Leaders (1)  
 **Duration**: ~90 minutes per session  
-**Timing**: As soon as HTML prototype is ready  
+**Timing**: As soon as HTML prototype is ready
 
 ---
 
@@ -43,14 +43,14 @@
 
 ### Measurements
 
-| Metric | Target | How to Measure |
-|---|---|---|
-| **Time to Complete** | < 3 min | Stopwatch from start to "Submit" |
-| **Help Requests** | < 1 | Count "I don't know what this means" |
-| **Misclicks** | 0–1 | Clicking wrong button, entering wrong field |
-| **Questions Asked** | < 2 | "What does X mean?" (unscripted) |
-| **Task Success** | Yes/No | Did they submit without errors? |
-| **Confidence** (1–5) | ≥ 4 | "How confident are you this is correct?" |
+| Metric               | Target  | How to Measure                              |
+| -------------------- | ------- | ------------------------------------------- |
+| **Time to Complete** | < 3 min | Stopwatch from start to "Submit"            |
+| **Help Requests**    | < 1     | Count "I don't know what this means"        |
+| **Misclicks**        | 0–1     | Clicking wrong button, entering wrong field |
+| **Questions Asked**  | < 2     | "What does X mean?" (unscripted)            |
+| **Task Success**     | Yes/No  | Did they submit without errors?             |
+| **Confidence** (1–5) | ≥ 4     | "How confident are you this is correct?"    |
 
 ### Observation Notes
 
@@ -89,14 +89,14 @@ During the task, observe and write down:
 
 ### Measurements (Same as Scenario A)
 
-| Metric | Target |
-|---|---|
+| Metric           | Target  |
+| ---------------- | ------- |
 | Time to Complete | < 3 min |
-| Help Requests | < 1 |
-| Misclicks | 0–1 |
-| Questions | < 2 |
-| Task Success | Yes/No |
-| Confidence | ≥ 4 |
+| Help Requests    | < 1     |
+| Misclicks        | 0–1     |
+| Questions        | < 2     |
+| Task Success     | Yes/No  |
+| Confidence       | ≥ 4     |
 
 ### Observation Notes
 
@@ -122,12 +122,12 @@ During the task, observe and write down:
 
 ### Measurements
 
-| Metric | Target | How to Measure |
-|---|---|---|
-| **Time to Approve** | < 2 min | Stopwatch from start to click |
-| **Comprehension** | 100% | Can they tell you: amount, category, receipt? |
-| **Approval Confidence** | ≥ 4 | Do they feel they reviewed it adequately? |
-| **Role Clarity** | Yes | Do they understand they're NOT recording? |
+| Metric                  | Target  | How to Measure                                |
+| ----------------------- | ------- | --------------------------------------------- |
+| **Time to Approve**     | < 2 min | Stopwatch from start to click                 |
+| **Comprehension**       | 100%    | Can they tell you: amount, category, receipt? |
+| **Approval Confidence** | ≥ 4     | Do they feel they reviewed it adequately?     |
+| **Role Clarity**        | Yes     | Do they understand they're NOT recording?     |
 
 ### Observation Notes
 
@@ -145,6 +145,7 @@ During the task, observe and write down:
 > "Tell me the status of these 3 transactions without asking questions."
 
 Show leader 3 transactions in different states:
+
 1. Draft (not submitted)
 2. Pending approval (1/2 done)
 3. Fully approved
@@ -157,12 +158,12 @@ Show leader 3 transactions in different states:
 
 ### Measurements
 
-| Metric | Target |
-|---|---|
+| Metric                    | Target                  |
+| ------------------------- | ----------------------- |
 | Status comprehension time | < 5 sec per transaction |
-| Accuracy (who approved?) | 100% |
-| Accuracy (who's waiting?) | 100% |
-| Confidence | ≥ 4 |
+| Accuracy (who approved?)  | 100%                    |
+| Accuracy (who's waiting?) | 100%                    |
+| Confidence                | ≥ 4                     |
 
 ### Success Criteria
 
@@ -209,11 +210,11 @@ Staff member looks for Chart of Accounts (which should be hidden).
 
 ### Measurements
 
-| Metric | Target |
-|---|---|
-| Time to realize it doesn't exist | < 1 min |
-| Reaction (confused? relieved?) | Note behavior |
-| Do they ask for it? | Should be: No |
+| Metric                           | Target        |
+| -------------------------------- | ------------- |
+| Time to realize it doesn't exist | < 1 min       |
+| Reaction (confused? relieved?)   | Note behavior |
+| Do they ask for it?              | Should be: No |
 
 ### Success Criteria
 
@@ -237,11 +238,11 @@ Staff member looks for Chart of Accounts (which should be hidden).
 
 ### Measurements
 
-| Metric | Target |
-|---|---|
+| Metric                | Target                            |
+| --------------------- | --------------------------------- |
 | Error message clarity | Can they understand what's wrong? |
-| Recovery time | < 30 sec to fix |
-| Frustration | Low (they understand the problem) |
+| Recovery time         | < 30 sec to fix                   |
+| Frustration           | Low (they understand the problem) |
 
 ### Success Criteria
 
@@ -263,10 +264,10 @@ Same as Scenario A, but on mobile.
 
 ### Measurements
 
-| Metric | Target |
-|---|---|
-| Time | < 3 min (same target as desktop) |
-| Usability issues | Note any mobile-specific problems |
+| Metric                      | Target                                         |
+| --------------------------- | ---------------------------------------------- |
+| Time                        | < 3 min (same target as desktop)               |
+| Usability issues            | Note any mobile-specific problems              |
 | Willingness to use on phone | "Would you record transactions on your phone?" |
 
 ### Note
@@ -277,16 +278,16 @@ Desktop-first, but if staff insist on mobile, test it.
 
 ## Metrics Summary Table
 
-| Scenario | Primary Metric | Target | Validation Rule |
-|---|---|---|---|
-| A (Offering) | Time to complete | < 3 min | ✅ Pass if avg < 3 min |
-| B (Expense) | Time to complete | < 3 min | ✅ Pass if avg < 3 min |
-| C (Approval) | Time to approve | < 2 min | ✅ Pass if avg < 2 min |
-| D (Status clarity) | Comprehension time | < 5 sec | ✅ Pass if 100% accuracy |
-| E (Mental model) | Qualitative match | Matches hypothesis | ✅ Pass if no contradictions |
-| F (Hidden features) | Feature discoverability | Can't find Chart of Accounts | ✅ Pass if hidden correctly |
-| G (Error recovery) | Message clarity | User understands error | ✅ Pass if 100% clarity |
-| H (Mobile) | Time (if applicable) | < 3 min | ⚠️ Optional test |
+| Scenario            | Primary Metric          | Target                       | Validation Rule              |
+| ------------------- | ----------------------- | ---------------------------- | ---------------------------- |
+| A (Offering)        | Time to complete        | < 3 min                      | ✅ Pass if avg < 3 min       |
+| B (Expense)         | Time to complete        | < 3 min                      | ✅ Pass if avg < 3 min       |
+| C (Approval)        | Time to approve         | < 2 min                      | ✅ Pass if avg < 2 min       |
+| D (Status clarity)  | Comprehension time      | < 5 sec                      | ✅ Pass if 100% accuracy     |
+| E (Mental model)    | Qualitative match       | Matches hypothesis           | ✅ Pass if no contradictions |
+| F (Hidden features) | Feature discoverability | Can't find Chart of Accounts | ✅ Pass if hidden correctly  |
+| G (Error recovery)  | Message clarity         | User understands error       | ✅ Pass if 100% clarity      |
+| H (Mobile)          | Time (if applicable)    | < 3 min                      | ⚠️ Optional test             |
 
 ---
 
@@ -294,20 +295,21 @@ Desktop-first, but if staff insist on mobile, test it.
 
 After testing 3 participants, review:
 
-| Test Type | Pass Condition | Fail Condition |
-|---|---|---|
-| **Transaction Time** | Avg < 3 min, 90th %-ile < 3:30 | Any participant > 4 min |
-| **Error Rate** | < 5% errors per transaction | > 10% errors |
-| **Accounting Confusion** | 0 questions about Dr/Cr | Any question about accounting terms |
-| **Approval Clarity** | 100% understand status | Any misunderstanding of approval state |
-| **Role Separation** | Staff never enter leader UI | Any accidental role crossing |
-| **Feature Completeness** | All tasks completed successfully | Any task blocked or impossible |
+| Test Type                | Pass Condition                   | Fail Condition                         |
+| ------------------------ | -------------------------------- | -------------------------------------- |
+| **Transaction Time**     | Avg < 3 min, 90th %-ile < 3:30   | Any participant > 4 min                |
+| **Error Rate**           | < 5% errors per transaction      | > 10% errors                           |
+| **Accounting Confusion** | 0 questions about Dr/Cr          | Any question about accounting terms    |
+| **Approval Clarity**     | 100% understand status           | Any misunderstanding of approval state |
+| **Role Separation**      | Staff never enter leader UI      | Any accidental role crossing           |
+| **Feature Completeness** | All tasks completed successfully | Any task blocked or impossible         |
 
 ---
 
 ## Go / No-Go Decision
 
 ### Go (Proceed to Backend Development)
+
 - ✅ Transaction time < 3 min
 - ✅ 0 accounting jargon questions
 - ✅ ≥ 90% task success rate
@@ -315,6 +317,7 @@ After testing 3 participants, review:
 - ✅ No major usability blockers
 
 ### No-Go (Iterate UX)
+
 - ❌ Transaction time > 4 min
 - ❌ Multiple accounting questions (indicates hypothesis wrong)
 - ❌ < 70% task success rate
@@ -357,15 +360,16 @@ If test fails:
 ### After Test
 
 1. **Summary Sheet** (per participant):
+
    ```
    Participant: Finance Staff #1
    Date: 2026-08-15
-   
+
    Task A-1 (Navigate to income): 12 sec
    Task A-2 (Select offering): 8 sec, 1 question ("What's ถวาย?")
    Task A-3 (Enter amount): 15 sec, 0 questions
    ...
-   
+
    Overall: Success, 2:45 total, 2 help requests, Confidence 4.5/5
    ```
 

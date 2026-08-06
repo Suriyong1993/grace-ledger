@@ -9,9 +9,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
 import {
-  Plus,
   RefreshCw,
   Search,
   ArrowDownCircle,
@@ -19,14 +17,12 @@ import {
   HandHeart,
   Clock,
   ArrowRight,
-  Info,
   AlertTriangle,
+  TrendingUp,
 } from "lucide-react";
-import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -48,11 +44,11 @@ import { fmtDate, dayjs } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { StatCard } from "@/components/shared/StatCard";
 import { useRealtime } from "@/hooks/useRealtime";
+import { useAuth } from "@/lib/auth";
 
 // Dashboard Components
-import { FundsGrid } from "@/components/dashboard/FundsGrid";
+import { DashboardBalanceCard } from "@/components/dashboard/DashboardBalanceCard";
 import {
   RecentTransactionsTable,
   type TransactionRow,
@@ -84,6 +80,7 @@ function byPeriod(dateStr: string, period: Period, now: dayjs.Dayjs) {
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [period, setPeriod] = useState<Period>("month");
   const [selectedTx, setSelectedTx] = useState<TransactionRow | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -248,47 +245,38 @@ export function Dashboard() {
     return result;
   }, [recentTransactions, searchQuery, period, now]);
 
+  // Greeting — time-of-day
+  const hour = now.hour();
+  const greeting = hour < 12 ? "สวัสดีตอนเช้า" : hour < 17 ? "สวัสดีตอนบ่าย" : "สวัสดีตอนเย็น";
+  const userName = user?.name || user?.email?.split("@")[0] || "";
+
   return (
     <div className="space-y-6">
-      {/* Top Action Header */}
-      <PageHeader
-        kicker="ภาพรวมการเงิน"
-        title="แดชบอร์ดคริสตจักร"
-        description="ระบบบริหารจัดการการเงินและตรวจสอบบัญชี"
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={refetchAll}
-              aria-label="รีเฟรชข้อมูล"
-              className="h-8 w-8 text-muted-foreground"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => navigate({ to: "/income" })}
-              className="gap-1 text-xs active-press"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              บันทึกรายรับ
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => navigate({ to: "/expense" })}
-              className="gap-1 text-xs active-press"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              บันทึกรายจ่าย
-            </Button>
-          </div>
-        }
-      />
+      {/* ── Greeting row ── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
+            {greeting}
+            {userName ? `, ${userName}` : ""} 👋
+          </h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            ภาพรวมการเงินคริสตจักร — {now.format("dddd D MMMM BBBB")}
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={refetchAll}
+          aria-label="รีเฟรชข้อมูล"
+          className="h-8 w-8 text-muted-foreground"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+        </Button>
+      </div>
 
-      {isError ? (
-        <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
+      {/* ── Error banner ── */}
+      {isError && (
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-destructive/30 bg-destructive/5 px-5 py-4">
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
             <p className="text-sm text-destructive">
@@ -305,98 +293,144 @@ export function Dashboard() {
             ลองใหม่
           </Button>
         </div>
-      ) : null}
+      )}
 
+      {/* ── Loading skeleton ── */}
       {isInitialLoading ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[128px] rounded-card" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              <Skeleton className="h-[180px] rounded-card" />
-              <Skeleton className="h-[360px] rounded-card" />
+        <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr_300px] gap-5 items-start">
+          <Skeleton className="h-[420px] rounded-2xl" />
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-[110px] rounded-2xl" />
+              ))}
             </div>
-            <div className="space-y-6">
-              <Skeleton className="h-[220px] rounded-card" />
-              <Skeleton className="h-[180px] rounded-card" />
-            </div>
+            <Skeleton className="h-[400px] rounded-2xl" />
           </div>
+          <Skeleton className="h-[420px] rounded-2xl" />
         </div>
       ) : (
         <>
-          {/* KPI row — cash balance hero + this month's income/expense + latest offering */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className="rounded-card border border-border bg-card p-5"
-            >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <p className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground">
-                    เงินสดคงเหลือรวม
-                    <Info className="h-3 w-3 text-muted-foreground/60" />
+          {/* ── 3-Column Finexy Layout ── */}
+          <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr_300px] gap-5 items-start">
+            {/* ── LEFT: Balance Hero + Fund Wallet Strip ── */}
+            <div>
+              <DashboardBalanceCard
+                totalBalance={totalBalanceNumber}
+                funds={funds}
+                incomeMonth={incomeMonth}
+              />
+            </div>
+
+            {/* ── CENTER: KPI Stats Grid + Search + Transactions Table ── */}
+            <div className="space-y-5">
+              {/* KPI 2x2 grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* รายรับเดือนนี้ — Orange accent (Finexy hero) */}
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      รายรับเดือนนี้
+                    </span>
+                    <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#FEF0EB] text-[#E8450A]">
+                      <ArrowDownCircle className="h-4 w-4" strokeWidth={1.75} />
+                    </div>
+                  </div>
+                  <p className="num-display mt-3 text-2xl font-extrabold tracking-tight text-foreground">
+                    <MoneyText value={incomeMonth} />
                   </p>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[240px]">
-                  ยอดยกมาต้นงวด + รายรับ + เงินถวาย − รายจ่าย รวมทุกกองทุน
-                </TooltipContent>
-              </Tooltip>
-              <p className="num-display font-display mt-2 text-[28px] font-semibold leading-none tracking-tight md:text-[32px]">
-                <MoneyText value={totalBalanceNumber} />
-              </p>
-              <p className="mt-3 text-xs text-muted-foreground">{funds.length} กองทุน</p>
-            </motion.div>
-            <StatCard
-              label="รายรับเดือนนี้"
-              value={incomeMonth}
-              icon={ArrowDownCircle}
-              tone="success"
-              hint="เทียบเดือนก่อน"
-            />
-            <StatCard
-              label="รายจ่ายเดือนนี้"
-              value={expenseMonth}
-              icon={ArrowUpCircle}
-              tone="danger"
-              hint={
-                annualBudget.total > 0
-                  ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
-                  : undefined
-              }
-            />
-            <StatCard
-              label="เงินถวายล่าสุด"
-              value={offeringTotal}
-              icon={HandHeart}
-              tone="warning"
-              hint="ยอดรวมทุกช่องทาง"
-            />
-          </div>
+                  <div className="mt-1.5 flex items-center gap-1 text-[11px] text-[#22C55E]">
+                    <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
+                    <span className="font-semibold">รายรับ</span>
+                    <span className="text-muted-foreground">เดือนปัจจุบัน</span>
+                  </div>
+                </div>
 
-          {/* Main 3-Column Layout Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
-            {/* Left 2-Columns: Operations & Transactions */}
-            <div className="xl:col-span-2 space-y-6">
-              {/* Church Funds Grid */}
-              <FundsGrid funds={funds} />
+                {/* รายจ่ายเดือนนี้ */}
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      รายจ่ายเดือนนี้
+                    </span>
+                    <div className="grid h-8 w-8 place-items-center rounded-lg bg-muted text-muted-foreground">
+                      <ArrowUpCircle className="h-4 w-4" strokeWidth={1.75} />
+                    </div>
+                  </div>
+                  <p className="num-display mt-3 text-2xl font-extrabold tracking-tight text-foreground">
+                    <MoneyText value={expenseMonth} />
+                  </p>
+                  <p
+                    className={cn(
+                      "mt-1.5 text-[11px] font-semibold",
+                      expenseMonth <= incomeMonth ? "text-[#22C55E]" : "text-[#EF4444]",
+                    )}
+                  >
+                    {annualBudget.total > 0
+                      ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
+                      : "รายจ่ายเดือนนี้"}
+                  </p>
+                </div>
 
-              {/* Scoped search + period filter for the transactions list below */}
+                {/* เงินถวาย */}
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">เงินถวายรวม</span>
+                    <div className="grid h-8 w-8 place-items-center rounded-lg bg-amber-50 text-amber-600">
+                      <HandHeart className="h-4 w-4" strokeWidth={1.75} />
+                    </div>
+                  </div>
+                  <p className="num-display mt-3 text-2xl font-extrabold tracking-tight text-foreground">
+                    <MoneyText value={offeringTotal} />
+                  </p>
+                  <p className="mt-1.5 text-[11px] font-semibold text-muted-foreground">
+                    ยอดรวมทุกช่องทาง
+                  </p>
+                </div>
+
+                {/* รออนุมัติ */}
+                <div
+                  className="rounded-2xl border border-border bg-card p-5 shadow-card cursor-pointer hover:border-[#E8450A]/40 transition-colors"
+                  onClick={() => navigate({ to: "/approvals" })}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">รออนุมัติ</span>
+                    <div
+                      className={cn(
+                        "grid h-8 w-8 place-items-center rounded-lg",
+                        pendingCount > 0
+                          ? "bg-[#FEF0EB] text-[#E8450A]"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      <Clock className="h-4 w-4" strokeWidth={1.75} />
+                    </div>
+                  </div>
+                  <p className="num-display mt-3 text-2xl font-extrabold tracking-tight text-foreground">
+                    {pendingCount}
+                  </p>
+                  <p
+                    className={cn(
+                      "mt-1.5 text-[11px] font-semibold",
+                      pendingCount > 0 ? "text-[#E8450A]" : "text-muted-foreground",
+                    )}
+                  >
+                    {pendingCount > 0 ? `${pendingCount} รายการรอดำเนินการ` : "ทุกรายการผ่านแล้ว"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Search + Period Filter */}
               <div className="flex flex-wrap items-center gap-2">
-                <div className="relative flex-1 min-w-[200px]">
+                <div className="relative flex-1 min-w-[180px]">
                   <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="ค้นหาในรายการล่าสุด..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-8 pl-8 text-xs"
+                    className="h-8 pl-8 text-xs rounded-xl"
                   />
                 </div>
-                <div className="flex items-center gap-0.5 rounded-lg bg-muted/60 p-1">
+                <div className="flex items-center gap-0.5 rounded-xl bg-muted/60 p-1">
                   {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
                     <Button
                       key={p}
@@ -404,10 +438,10 @@ export function Dashboard() {
                       size="sm"
                       onClick={() => setPeriod(p)}
                       className={cn(
-                        "h-auto rounded-md px-2.5 py-1 text-[11px] font-medium",
+                        "h-auto rounded-lg px-2.5 py-1 text-[11px] font-medium",
                         period === p
-                          ? "bg-card text-foreground hover:bg-card"
-                          : "text-muted-foreground hover:text-foreground",
+                          ? "bg-foreground text-background hover:bg-foreground/90"
+                          : "text-muted-foreground hover:text-foreground hover:bg-card",
                       )}
                     >
                       {PERIOD_LABELS[p]}
@@ -423,56 +457,13 @@ export function Dashboard() {
               />
             </div>
 
-            {/* Right 1-Column: Approvals, Gauge Chart & Financial Analytics */}
-            <div className="xl:col-span-1 space-y-6">
-              {/* Pending Approvals preview */}
-              <div className="card-ledger p-5">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold text-foreground">รอการอนุมัติ</p>
-                  {pendingCount > 0 && (
-                    <span className="num-display rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-semibold text-warning">
-                      {pendingCount} รายการ
-                    </span>
-                  )}
-                </div>
-                {pendingItems.length === 0 ? (
-                  <div className="flex flex-col items-center gap-2 py-6 text-center">
-                    <Clock className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />
-                    <p className="text-xs text-muted-foreground">ไม่มีรายการค้างอนุมัติ</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2.5">
-                    {pendingItems.slice(0, 3).map((t) => (
-                      <div key={t.id} className="rounded-lg border border-border/60 p-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="text-xs font-semibold leading-snug text-foreground">
-                            {t.description || "รายการ"}
-                          </p>
-                          <p
-                            className={cn(
-                              "num-display shrink-0 text-xs font-bold",
-                              t.kind === "income" ? "amount-income" : "amount-expense",
-                            )}
-                          >
-                            <MoneyText value={t.amount} />
-                          </p>
-                        </div>
-                        <p className="mt-1 text-[11px] text-muted-foreground">{fmtDate(t.date)}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <Button asChild variant="outline" className="mt-3 w-full">
-                  <Link to="/approvals">
-                    ไปที่คิวอนุมัติ
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              </div>
-
+            {/* ── RIGHT: Income/Expense Bar Chart ── */}
+            <div>
               <DashboardGaugeChart
                 totalBudget={annualBudget.total > 0 ? annualBudget.total : 2500000}
                 usedBudget={annualBudget.total > 0 ? annualBudget.used : 0}
+                incomes={incomes.map((i) => ({ date: i.date, amount: i.amount }))}
+                expenses={expenses.map((e) => ({ date: e.date, amount: e.amount }))}
               />
             </div>
           </div>

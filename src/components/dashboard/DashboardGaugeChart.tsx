@@ -1,191 +1,217 @@
 /**
- * DashboardGaugeChart.tsx
+ * DashboardGaugeChart.tsx — replaced with Finexy-style Income/Expense Bar Chart
  *
- * Semi-circular Speedometer/Gauge Chart component for Annual Budget Usage
- * Inspired by the Storage Gauge in the 3-column reference design.
- * Features:
- * - SVG semi-circular arc with dynamic stroke-dasharray calculations
- * - Category spending distribution list with icons & percentages
- * - Clean Deep Slate + Violet-Indigo theme integration
+ * Shows 6-month grouped bar chart (income=orange, expense=dark) using Recharts.
+ * Also shows mini stats and annual budget progress bar.
  */
 
+import { useMemo } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { cn } from "@/lib/utils";
-import { calculateGaugeArc, getGaugeStatusLabel } from "@/lib/gauge-utils";
-import { Zap, HeartHandshake, Wrench, GraduationCap, Sparkles, PieChart } from "lucide-react";
+import { dayjs } from "@/lib/format";
+import { calculateGaugeArc } from "@/lib/gauge-utils";
 
-interface CategorySpending {
-  name: string;
-  spent: number;
-  percentage: number;
-  icon: React.ElementType;
-  colorClass: string;
-  bgClass: string;
+interface MonthlyData {
+  month: string;
+  income: number;
+  expense: number;
+}
+
+function buildMonthlyData(
+  incomes: Array<{ date: string; amount: number }>,
+  expenses: Array<{ date: string; amount: number }>,
+): MonthlyData[] {
+  const now = dayjs();
+  const months: MonthlyData[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const m = now.subtract(i, "month");
+    const label = m.format("MMM");
+    const inc = incomes
+      .filter((x) => dayjs(x.date).isSame(m, "month"))
+      .reduce((s, x) => s + x.amount, 0);
+    const exp = expenses
+      .filter((x) => dayjs(x.date).isSame(m, "month"))
+      .reduce((s, x) => s + x.amount, 0);
+    months.push({ month: label, income: inc, expense: exp });
+  }
+  return months;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border border-border bg-card p-3 shadow-card text-xs">
+      <p className="font-semibold text-foreground mb-1">{label}</p>
+      {payload.map((p: { name: string; value: number; color: string }) => (
+        <div key={p.name} className="flex items-center gap-2 py-0.5">
+          <span className="h-2 w-2 rounded-full" style={{ background: p.color }} />
+          <span className="text-muted-foreground">
+            {p.name === "income" ? "รายรับ" : "รายจ่าย"}
+          </span>
+          <span className="font-bold text-foreground num-display ml-auto">
+            ฿{(p.value / 1000).toFixed(1)}k
+          </span>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 interface DashboardGaugeChartProps {
-  totalBudget: number;
-  usedBudget: number;
-  categories?: CategorySpending[];
+  totalBudget?: number;
+  usedBudget?: number;
+  incomes?: Array<{ date: string; amount: number }>;
+  expenses?: Array<{ date: string; amount: number }>;
 }
 
-const DEFAULT_CATEGORIES: CategorySpending[] = [
-  {
-    name: "ค่าสาธารณูปโภค",
-    spent: 89000,
-    percentage: 35,
-    icon: Zap,
-    colorClass: "text-offering",
-    bgClass: "bg-offering-muted",
-  },
-  {
-    name: "พันธกิจ & มิชชันนารี",
-    spent: 145000,
-    percentage: 30,
-    icon: HeartHandshake,
-    colorClass: "text-primary",
-    bgClass: "bg-primary/10",
-  },
-  {
-    name: "ค่าซ่อมบำรุงอาคาร",
-    spent: 34500,
-    percentage: 20,
-    icon: Wrench,
-    colorClass: "text-income",
-    bgClass: "bg-income-muted",
-  },
-  {
-    name: "กิจกรรม & การศึกษา",
-    spent: 22000,
-    percentage: 15,
-    icon: GraduationCap,
-    colorClass: "text-chart-5",
-    bgClass: "bg-chart-5/10",
-  },
-];
-
 export function DashboardGaugeChart({
+  incomes = [],
+  expenses = [],
   totalBudget = 2500000,
-  usedBudget = 1245600,
-  categories = DEFAULT_CATEGORIES,
+  usedBudget = 0,
 }: DashboardGaugeChartProps) {
+  const data = useMemo(() => buildMonthlyData(incomes, expenses), [incomes, expenses]);
+  const totalInc = incomes.reduce((s, x) => s + x.amount, 0);
+  const totalExp = expenses.reduce((s, x) => s + x.amount, 0);
   const gauge = calculateGaugeArc({ totalBudget, usedBudget });
-  const { percentage, radius, strokeWidth, halfCircumference, strokeDashoffset } = gauge;
+  const budgetPct = gauge.percentage;
+  const maxVal = Math.max(...data.map((d) => Math.max(d.income, d.expense)), 1);
+  const yMax = Math.ceil(maxVal / 10000) * 10000;
 
   return (
-    <div className="rounded-card border border-border bg-card p-5 flex flex-col justify-between space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
-            <PieChart className="h-4 w-4" strokeWidth={2} />
-          </div>
-          <div>
-            <h3 className="font-semibold text-sm text-foreground">งบประมาณประจำปี</h3>
-            <p className="text-[11px] text-muted-foreground">ปีงบประมาณปัจจุบัน</p>
-          </div>
-        </div>
-        <span className="badge-approved text-[11px] px-2.5 py-0.5 font-medium rounded-full">
-          {getGaugeStatusLabel(percentage)} ({percentage}%)
-        </span>
-      </div>
-
-      {/* Speedometer Gauge Visual */}
-      <div className="relative flex flex-col items-center justify-center pt-2">
-        <svg className="w-48 h-28 overflow-visible" viewBox="0 0 180 100">
-          <defs>
-            {/* v3.0 primary -> income gradient, tracks tokens via CSS vars */}
-            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style={{ stopColor: "var(--color-primary)" }} />
-              <stop offset="60%" style={{ stopColor: "var(--color-chart-5)" }} />
-              <stop offset="100%" style={{ stopColor: "var(--color-income)" }} />
-            </linearGradient>
-          </defs>
-
-          {/* Background Arc Track */}
-          <path
-            d="M 20 90 A 70 70 0 0 1 160 90"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            className="text-muted/60"
-          />
-
-          {/* Filled Progress Arc */}
-          <path
-            d="M 20 90 A 70 70 0 0 1 160 90"
-            fill="none"
-            stroke="url(#gaugeGradient)"
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-            strokeDasharray={halfCircumference}
-            strokeDashoffset={strokeDashoffset}
-            className="transition-all duration-1000 ease-out"
-          />
-        </svg>
-
-        {/* Center Text Overlay */}
-        <div className="absolute top-10 text-center">
-          <p className="num-display text-2xl font-bold tracking-tight text-foreground">
-            {percentage}%
-          </p>
-          <p className="text-[11px] font-medium text-muted-foreground">
-            ใช้ไป <MoneyText value={usedBudget} />
-          </p>
-        </div>
-
-        <p className="mt-1 text-xs text-muted-foreground font-medium">
-          จากงบประมาณทั้งหมด <MoneyText value={totalBudget} />
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-card flex flex-col gap-4">
+      <div>
+        <h3 className="text-sm font-bold text-foreground">รายรับ-รายจ่าย</h3>
+        <p className="text-[11.5px] text-muted-foreground mt-0.5">
+          ติดตามกระแสเงินสด 6 เดือนล่าสุด
         </p>
       </div>
 
-      {/* Category Breakdown List */}
-      <div className="space-y-2.5 pt-2 border-t border-border/60">
-        <p className="kicker text-[11px]">สัดส่วนตามหมวดหมู่</p>
-        <div className="space-y-2">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <div
-                key={cat.name}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={cn(
-                      "grid h-7 w-7 shrink-0 place-items-center rounded-md",
-                      cat.bgClass,
-                    )}
-                  >
-                    <Icon className={cn("h-3.5 w-3.5", cat.colorClass)} />
-                  </div>
-                  <span className="text-xs font-medium text-foreground truncate">{cat.name}</span>
-                </div>
-                <div className="shrink-0 text-right">
-                  <span className="num-display text-xs font-semibold text-foreground">
-                    <MoneyText value={cat.spent} />
-                  </span>
-                  <span className="ml-2 text-[10px] font-medium text-muted-foreground">
-                    {cat.percentage}%
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+      <div className="flex items-center justify-between">
+        <span className="text-[12px] font-semibold text-foreground">กำไรและขาดทุน</span>
+        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-sm bg-[#E8450A]" />
+            รายรับ
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-sm bg-foreground" />
+            รายจ่าย
+          </span>
         </div>
       </div>
 
-      {/* AI Anomaly / Insight Footer Card */}
-      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 flex items-start gap-2.5">
-        <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-        <div className="text-xs">
-          <p className="font-medium text-foreground">Grace AI Insight</p>
-          <p className="text-muted-foreground text-[11px] mt-0.5 leading-normal">
-            อัตราการใช้งบประมาณอยู่ในเกณฑ์ปกติ มีเงินสำรองสอดคล้องกับแผนการเงิน
+      <div className="h-[140px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} barGap={2} barSize={10}>
+            <CartesianGrid vertical={false} stroke="var(--color-border)" strokeDasharray="3 3" />
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              width={36}
+              tick={{ fontSize: 9, fill: "var(--color-muted-foreground)" }}
+              tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))}
+              domain={[0, yMax]}
+            />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
+            />
+            <Bar dataKey="income" fill="#E8450A" radius={[4, 4, 0, 0]} name="income" />
+            <Bar
+              dataKey="expense"
+              fill="var(--color-foreground)"
+              radius={[4, 4, 0, 0]}
+              name="expense"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border/40 bg-muted/30 p-3 transition-colors hover:bg-muted/50">
+          <p className="text-[10.5px] font-medium text-muted-foreground">รายรับรวม</p>
+          <p className="num-display mt-1 text-[17px] font-extrabold text-foreground">
+            <MoneyText value={totalInc} />
+          </p>
+          <p
+            className={cn(
+              "mt-0.5 text-[10.5px] font-semibold flex items-center gap-0.5",
+              totalInc >= totalExp ? "text-[#22C55E]" : "text-[#EF4444]",
+            )}
+          >
+            <span>{totalInc >= totalExp ? "▲" : "▼"}</span>
+            <span>{totalInc >= totalExp ? "กระแสบวก" : "กระแสลบ"}</span>
+          </p>
+        </div>
+        <div className="rounded-xl border border-border/40 bg-muted/30 p-3 transition-colors hover:bg-muted/50">
+          <p className="text-[10.5px] font-medium text-muted-foreground">รายจ่ายรวม</p>
+          <p className="num-display mt-1 text-[17px] font-extrabold text-foreground">
+            <MoneyText value={totalExp} />
+          </p>
+          <p
+            className={cn(
+              "mt-0.5 text-[10.5px] font-semibold",
+              totalExp <= totalInc ? "text-[#22C55E]" : "text-[#EF4444]",
+            )}
+          >
+            {totalBudget > 0
+              ? `${Math.round((usedBudget / totalBudget) * 100)}% ของงบปี`
+              : "ตามเป้าหมาย"}
           </p>
         </div>
       </div>
+
+      {totalBudget > 0 && (
+        <div className="border-t border-border/50 pt-3.5 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-foreground">งบประมาณประจำปี</span>
+            <span
+              className={cn(
+                "font-bold num-display",
+                budgetPct > 80
+                  ? "text-[#EF4444]"
+                  : budgetPct > 60
+                    ? "text-amber-500"
+                    : "text-[#E8450A]",
+              )}
+            >
+              {budgetPct}%
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted/80 p-0.5 border border-border/30">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all duration-500",
+                budgetPct > 80 ? "bg-[#EF4444]" : "bg-[#E8450A]",
+              )}
+              style={{ width: `${Math.min(budgetPct, 100)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[10.5px] text-muted-foreground">
+            <span>
+              ใช้ไป{" "}
+              <span className="num-display font-semibold text-foreground">
+                <MoneyText value={usedBudget} />
+              </span>
+            </span>
+            <span>
+              จาก{" "}
+              <span className="num-display font-semibold text-foreground">
+                <MoneyText value={totalBudget} />
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

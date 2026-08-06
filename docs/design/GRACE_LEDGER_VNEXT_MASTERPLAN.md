@@ -12,6 +12,7 @@ volunteer, and a board member all trust without thinking about it. It must feel 
 world-class fintech built for a customer who is not an accountant and does not want to become one.
 
 Two things have to be simultaneously true, and most finance software picks only one:
+
 - **Calm and fast for daily use** (recording an offering should take under a minute).
 - **Rigorous and provable for oversight** (every number must be traceable, every action
   attributable, nothing ever silently wrong).
@@ -47,10 +48,11 @@ Offering despite it being a core daily action).
 
 ## 3a. Gridgeist Thesis (governs all screens from here on)
 
-**Thesis**: *A precise ledger-grid finance tool — structured rows and quiet dividers carry the
-content, one restrained blue accent marks action and risk, cards are containers not decoration.*
+**Thesis**: _A precise ledger-grid finance tool — structured rows and quiet dividers carry the
+content, one restrained blue accent marks action and risk, cards are containers not decoration._
 
 **Ledger-grid system**:
+
 - **Structure**: real tabular grids for anything that is actually a list of records (transactions,
   approvals, audit log, budgets) — not card-grids standing in for tables. Borders organize columns;
   they don't outline every box.
@@ -75,6 +77,7 @@ content, one restrained blue accent marks action and risk, cards are containers 
 Five words: **calm, exact, spacious, quiet, honest.**
 
 Reference principles extracted (not copied) from Linear/Stripe/Mercury/Attio/Notion/Vercel:
+
 - Numbers are the protagonist. Nothing competes visually with a money figure on its own row.
 - Borders over shadows. Elevation is used sparingly and only to indicate literal overlap (drawers,
   dialogs, popovers) — not to decorate flat cards.
@@ -147,25 +150,25 @@ implementation phase (§9), not part of the four starting screens.
 
 ## 6. Screen Inventory
 
-| # | Screen | Route | Current avg score | vNext priority |
-|---|---|---|---|---|
-| 1 | Dashboard | /dashboard | 5.6 | **Phase 1** |
-| 2 | Receive Money (Income) | /income | 6.1 | **Phase 2** |
-| 3 | Pay Expense | /expense | 6.0 | **Phase 3** |
-| 4 | Approvals | /approvals | 6.7 | **Phase 4** |
-| 5 | Offering | /offering | 5.7 | Phase 5 |
-| 6 | Reconciliation | /reconciliation | 6.9 | Phase 5 |
-| 7 | Reports | /reports | 5.6 | Phase 5 |
-| 8 | Audit Log | /audit | 6.7 | Phase 5 |
-| 9 | Funds | /funds | 6.4 | Phase 6 |
-| 10 | Budget | /budget | 6.1 | Phase 6 |
-| 11 | Members | /members | 5.8 | Phase 6 (+ remove fake receipt button) |
-| 12 | Settings | /settings | 5.3 | Phase 6 (+ rename/scope honestly) |
-| 13 | Profile | /profile | 6.4 | Phase 6 |
-| 14 | Grace AI | /ai | 4.4 | **Trust-fix phase** — label experimental or disconnect fake OCR/chat before any visual polish |
-| 15 | LINE Setup | /line-setup | 4.7 | **Trust-fix phase** — same |
-| 16 | Nav/IA shell | AppNav/Sidebar/Topbar | — | Phase 7 (role-gating infra) |
-| 17 | Projects | /projects | not yet audited | Phase 6 |
+| #   | Screen                 | Route                 | Current avg score | vNext priority                                                                                |
+| --- | ---------------------- | --------------------- | ----------------- | --------------------------------------------------------------------------------------------- |
+| 1   | Dashboard              | /dashboard            | 5.6               | **Phase 1**                                                                                   |
+| 2   | Receive Money (Income) | /income               | 6.1               | **Phase 2**                                                                                   |
+| 3   | Pay Expense            | /expense              | 6.0               | **Phase 3**                                                                                   |
+| 4   | Approvals              | /approvals            | 6.7               | **Phase 4**                                                                                   |
+| 5   | Offering               | /offering             | 5.7               | Phase 5                                                                                       |
+| 6   | Reconciliation         | /reconciliation       | 6.9               | Phase 5                                                                                       |
+| 7   | Reports                | /reports              | 5.6               | Phase 5                                                                                       |
+| 8   | Audit Log              | /audit                | 6.7               | Phase 5                                                                                       |
+| 9   | Funds                  | /funds                | 6.4               | Phase 6                                                                                       |
+| 10  | Budget                 | /budget               | 6.1               | Phase 6                                                                                       |
+| 11  | Members                | /members              | 5.8               | Phase 6 (+ remove fake receipt button)                                                        |
+| 12  | Settings               | /settings             | 5.3               | Phase 6 (+ rename/scope honestly)                                                             |
+| 13  | Profile                | /profile              | 6.4               | Phase 6                                                                                       |
+| 14  | Grace AI               | /ai                   | 4.4               | **Trust-fix phase** — label experimental or disconnect fake OCR/chat before any visual polish |
+| 15  | LINE Setup             | /line-setup           | 4.7               | **Trust-fix phase** — same                                                                    |
+| 16  | Nav/IA shell           | AppNav/Sidebar/Topbar | —                 | Phase 7 (role-gating infra)                                                                   |
+| 17  | Projects               | /projects             | not yet audited   | Phase 6                                                                                       |
 
 ## 7. Component Inventory
 
@@ -175,9 +178,10 @@ detail-view pattern in the app and should become the template for Income/Offerin
 
 **Fix in place** (bug, not redesign): `RecentTransactionsTable` silently substitutes 4 hardcoded
 demo transactions whenever the real `transactions` array is empty (`displayTxs = transactions.length
+
 > 0 ? transactions : DEFAULT_TXS`) — this is the exact "fabricated data presented as real" trust
-violation flagged in the audit, just discovered in a shared component instead of a page. Fixed as
-part of Phase 1 (Dashboard) since that's the only current consumer.
+> violation flagged in the audit, just discovered in a shared component instead of a page. Fixed as
+> part of Phase 1 (Dashboard) since that's the only current consumer.
 
 **New, small, shared**: none required for Phase 1–4. No new abstraction until a second concrete need
 proves it (per project convention — no speculative components).

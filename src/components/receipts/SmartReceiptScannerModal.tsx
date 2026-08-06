@@ -154,7 +154,7 @@ export function SmartReceiptScannerModal({
         {/* Scanning Animation State */}
         {scanning && (
           <div className="py-12 text-center space-y-4">
-            <div className="mx-auto w-12 h-12 rounded-full bg-amber-500/10 grid place-items-center text-amber-500 animate-spin">
+            <div className="mx-auto w-12 h-12 rounded-full bg-warning/10 grid place-items-center text-warning animate-spin">
               <RefreshCw className="h-6 w-6" />
             </div>
             <div>

@@ -2,7 +2,7 @@
 
 **Purpose**: Rules for maintaining product documentation so it doesn't rot.  
 **Enforced By**: Tech Lead, Product Manager  
-**Review Cadence**: Monthly  
+**Review Cadence**: Monthly
 
 ---
 
@@ -11,6 +11,7 @@
 ### 1. Immutability
 
 Once published, a document is **never edited**. If you disagree:
+
 - Create a new document (e.g., UXDR-015 reverts UXDR-014)
 - Link both for history
 - Update DECISION_INDEX.md
@@ -23,11 +24,11 @@ Once published, a document is **never edited**. If you disagree:
 
 Every piece of information lives in ONE place.
 
-| Information | Lives In | Other docs | 
-|---|---|---|
-| < 3 minute target | TEST_PLAN.md (Metric M-001) | Link to M-001, don't copy |
-| H-001 definition | PHASE-0-HYPOTHESES.md | Reference, don't repeat |
-| "Offering" definition | GLOSSARY.md | Reference everywhere |
+| Information           | Lives In                    | Other docs                |
+| --------------------- | --------------------------- | ------------------------- |
+| < 3 minute target     | TEST_PLAN.md (Metric M-001) | Link to M-001, don't copy |
+| H-001 definition      | PHASE-0-HYPOTHESES.md       | Reference, don't repeat   |
+| "Offering" definition | GLOSSARY.md                 | Reference everywhere      |
 
 **Why?**: If it lives in 2 places, they'll diverge. When they diverge, which is the source of truth?
 
@@ -61,11 +62,11 @@ Every document must link to this chain.
 
 Write only what's necessary. Don't over-document.
 
-| ❌ Over-Documented | ✅ Right-Sized |
-|---|---|
-| "Step 1: Click the button" | "Click [Record Income]" |
-| Full accounting textbook | 1 paragraph explanation (see ACCOUNTING_RULES.md) |
-| Repeat same decision 3 times | Reference once, link elsewhere |
+| ❌ Over-Documented           | ✅ Right-Sized                                    |
+| ---------------------------- | ------------------------------------------------- |
+| "Step 1: Click the button"   | "Click [Record Income]"                           |
+| Full accounting textbook     | 1 paragraph explanation (see ACCOUNTING_RULES.md) |
+| Repeat same decision 3 times | Reference once, link elsewhere                    |
 
 **Why?**: Maintenance burden. More docs = more to keep in sync.
 
@@ -89,14 +90,14 @@ related: [Link to connected docs]
 
 ### Status Definitions
 
-| Status | Meaning | Next Action |
-|---|---|---|
-| **Not Validated** | Hypothesis, no user data yet | Review before Phase 1 |
-| **Proposed** | UX decision, not yet approved | Approval meeting needed |
-| **Accepted** | Team agrees on decision | Build prototype |
-| **Confirmed** | User testing passed | Implement with confidence |
-| **Rejected** | User testing contradicted it | Create new doc, don't edit |
-| **Superseded** | Replaced by newer decision | Keep for history, mark as such |
+| Status            | Meaning                       | Next Action                    |
+| ----------------- | ----------------------------- | ------------------------------ |
+| **Not Validated** | Hypothesis, no user data yet  | Review before Phase 1          |
+| **Proposed**      | UX decision, not yet approved | Approval meeting needed        |
+| **Accepted**      | Team agrees on decision       | Build prototype                |
+| **Confirmed**     | User testing passed           | Implement with confidence      |
+| **Rejected**      | User testing contradicted it  | Create new doc, don't edit     |
+| **Superseded**    | Replaced by newer decision    | Keep for history, mark as such |
 
 ---
 
@@ -141,6 +142,7 @@ related: [Link to connected docs]
 ### Scenario: "This UXDR is wrong. I want to change it."
 
 ❌ WRONG:
+
 ```
 Edit UXDR-001.md directly.
 Change text.
@@ -180,8 +182,9 @@ related: UXDR-004
 ```
 
 2. Update UXDR-004's footer:
+
 ```
-**Status**: Superseded  
+**Status**: Superseded
 **Superseded By**: UXDR-014
 ```
 
@@ -203,15 +206,16 @@ Single file, versioned history inside:
 
 ## Version History
 
-| Ver | Date | Change | Author | Reason |
-|---|---|---|---|---|
-| 1.0 | 2026-08-04 | Initial | PM | Phase 0 decision |
-| 1.1 | 2026-08-08 | Clarified scope | PM | Design review feedback |
-| 1.2 | 2026-08-12 | Added success metrics | QA | Added test plan ref |
-| 1.3 | 2026-08-15 | Updated owner | TL | Ownership change |
+| Ver | Date       | Change                | Author | Reason                 |
+| --- | ---------- | --------------------- | ------ | ---------------------- |
+| 1.0 | 2026-08-04 | Initial               | PM     | Phase 0 decision       |
+| 1.1 | 2026-08-08 | Clarified scope       | PM     | Design review feedback |
+| 1.2 | 2026-08-12 | Added success metrics | QA     | Added test plan ref    |
+| 1.3 | 2026-08-15 | Updated owner         | TL     | Ownership change       |
 ```
 
 RULES:
+
 - v1.0 = initial publication
 - v1.1, v1.2, ... = clarifications, links, typos (no meaning change)
 - Major meaning change? Create new UXDR instead (don't v2.0)
@@ -247,6 +251,7 @@ RULES:
 ### Scenario: Two UXDRs Seem to Contradict
 
 Example:
+
 ```
 UXDR-001: "Hide Journal entries from staff"
 UXDR-007: "Show ledger balance to staff"  (seems contradictory)
@@ -255,6 +260,7 @@ UXDR-007: "Show ledger balance to staff"  (seems contradictory)
 **Process**:
 
 1. Document the conflict in GOVERNANCE.md under "Known Issues":
+
 ```
 ## Known Issues
 
@@ -275,14 +281,15 @@ UXDR-007: "Show ledger balance to staff"  (seems contradictory)
 
 ## Who Has Authority?
 
-| Role | Authority | Scope |
-|---|---|---|
-| **Product Manager** | Approve hypotheses + UXDR | What we're building |
-| **Tech Lead** | Approve domain/architecture docs | How we're building it |
-| **QA Lead** | Approve test plans | How we validate it |
-| **Project Sponsor** | Resolve escalations | Tie-breaking |
+| Role                | Authority                        | Scope                 |
+| ------------------- | -------------------------------- | --------------------- |
+| **Product Manager** | Approve hypotheses + UXDR        | What we're building   |
+| **Tech Lead**       | Approve domain/architecture docs | How we're building it |
+| **QA Lead**         | Approve test plans               | How we validate it    |
+| **Project Sponsor** | Resolve escalations              | Tie-breaking          |
 
 If you disagree with a decision:
+
 1. Comment in the document (mention @owner)
 2. If no resolution in 48h, escalate to next level
 3. Keep discussion in docs (don't rehash in Slack)
@@ -297,6 +304,7 @@ GLOSSARY.md is the **source of truth** for every term.
 
 1. Check if it's already there
 2. If not, add to GLOSSARY.md:
+
 ```markdown
 ## Event
 
@@ -315,7 +323,7 @@ A financial action recorded by staff (Receiving money, paying bill, transferring
 ### Changing a Definition
 
 1. **If meaning hasn't changed**: Edit GLOSSARY directly, update version
-2. **If meaning has changed**: 
+2. **If meaning has changed**:
    - Create GLOSSARY-v2.md? No! Keep one GLOSSARY
    - Note in Version History what changed + why
    - Search for all usages, ensure they still make sense
@@ -328,19 +336,21 @@ A financial action recorded by staff (Receiving money, paying bill, transferring
 DECISION_INDEX.md is auto-generated reference table:
 
 ```markdown
-| Hypothesis | UXDR | Screen ID | Test | Result |
-|---|---|---|---|---|
-| H-001: Staff think events | UXDR-001, UXDR-002 | FS-001, FS-002 | TS-001 | R-001 ✓ |
-| H-002: Wizard < 3 min | UXDR-002 | FS-002, FS-003 | TS-002 | R-002 ✓ |
-| H-003: Hide accounts | UXDR-005 | FS-001 | TS-006 | (pending) |
+| Hypothesis                | UXDR               | Screen ID      | Test   | Result    |
+| ------------------------- | ------------------ | -------------- | ------ | --------- |
+| H-001: Staff think events | UXDR-001, UXDR-002 | FS-001, FS-002 | TS-001 | R-001 ✓   |
+| H-002: Wizard < 3 min     | UXDR-002           | FS-002, FS-003 | TS-002 | R-002 ✓   |
+| H-003: Hide accounts      | UXDR-005           | FS-001         | TS-006 | (pending) |
 ```
 
-**Purpose**: 
+**Purpose**:
+
 - One view of all decisions
 - See what's tested, what's pending
 - Spot gaps (hypothesis not covered by UXDR? Red flag)
 
 **Maintenance**:
+
 - Update when new hypothesis created
 - Update when UXDR added
 - Update TEST_RESULTS.md, reflect in DECISION_INDEX
@@ -380,6 +390,7 @@ When you `git commit` to docs/:
 
 ```markdown
 ### Metadata
+
 - [ ] type: [filled]
 - [ ] status: [filled]
 - [ ] owner: [filled]
@@ -388,23 +399,27 @@ When you `git commit` to docs/:
 - [ ] traceability: [filled if applicable]
 
 ### Linking
+
 - [ ] Document appears in README.md?
 - [ ] Document appears in DECISION_INDEX.md?
 - [ ] All referenced docs exist?
 - [ ] All reference links point to correct section?
 
 ### Glossary
+
 - [ ] All new terms added to GLOSSARY.md?
 - [ ] Terms used consistently throughout?
 - [ ] GLOSSARY.md shows "Used in: [this doc]"?
 
 ### Content
+
 - [ ] Single source of truth maintained (no duplication)?
 - [ ] Traceability chain complete (H→UXDR→Test)?
 - [ ] Metrics are measurable (not vague)?
 - [ ] Owner is clear (who can approve changes)?
 
 ### Maintenance
+
 - [ ] If updating old doc: new version number only, don't edit text?
 - [ ] If disagreeing: created new doc, linked old one?
 - [ ] If superseding: marked old as "Superseded", linked new?
@@ -428,6 +443,7 @@ related: UXDR-001, TEST_PLAN.md (TS-005)
 ---
 
 # UXDR-014: [Decision]
+
 ...
 ```
 

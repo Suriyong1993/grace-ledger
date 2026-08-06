@@ -56,7 +56,7 @@ export interface IncomeDestinationOption {
 }
 
 export const INCOME_DESTINATION_OPTIONS: IncomeDestinationOption[] = [
-  { value: "cash", label: "เงินสดสดใส", icon: Wallet },
+  { value: "cash", label: "เงินสด", icon: Wallet },
   { value: "bank", label: "บัญชีธนาคารคริสตจักร", icon: Landmark },
   { value: "qr", label: "สแกน QR PromptPay", icon: QrCode },
 ];

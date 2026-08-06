@@ -7,6 +7,7 @@
  */
 
 import { Landmark, Home, Users, BookOpen, MoreVertical, TrendingUp } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -90,12 +91,13 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
           <p className="text-xs text-muted-foreground">สรุปสถานะเงินทุนรายหมวด</p>
         </div>
         <Button
+          asChild
           variant="link"
           size="sm"
           className="h-auto p-0 text-xs font-medium"
           aria-label="ดูกองทุนทั้งหมด"
         >
-          ดูทั้งหมด ({displayFunds.length})
+          <Link to="/funds">ดูทั้งหมด ({displayFunds.length})</Link>
         </Button>
       </div>
 
@@ -124,8 +126,8 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
               <div
                 key={fund.id}
                 className={cn(
-                  "rounded-card border border-border bg-card group flex cursor-pointer flex-col gap-3 p-4",
-                  "transition-colors duration-150 hover:border-primary/40",
+                  "rounded-card border border-border bg-card shadow-card group flex cursor-pointer flex-col gap-3 p-4",
+                  "transition-all duration-150 hover:border-primary/40 hover:shadow-elevated",
                   palette.hoverBorder,
                 )}
               >
@@ -179,7 +181,7 @@ export function FundsGrid({ funds = DEFAULT_FUNDS }: FundsGridProps) {
                   {/* Subtle progress bar */}
                   <div className="h-1 w-full overflow-hidden rounded-full bg-border/60">
                     <div
-                      className={cn("h-full rounded-full transition-all duration-700", barColor)}
+                      className={cn("h-full rounded-full transition-all duration-200", barColor)}
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
