@@ -9,10 +9,12 @@ import {
   FileText,
   ShieldCheck,
   AlertCircle,
+  AlertTriangle,
   HelpCircle,
   Brain,
   Receipt,
   RotateCw,
+  TrendingUp,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { PageTransition } from "@/components/shared/PageTransition";
@@ -209,7 +211,7 @@ export function GraceAiPage() {
                       }`}
                     >
                       {m.sender === "ai" && (
-                        <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-[#C7D2FE]/60">
+                        <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-primary/20">
                           <Sparkles className="h-3.5 w-3.5 text-primary" />
                           <span className="font-bold text-primary text-[11px]">
                             Grace AI Insight
@@ -219,7 +221,7 @@ export function GraceAiPage() {
                       <p>{m.text}</p>
 
                       {m.sender === "ai" && (
-                        <div className="mt-3 pt-2 border-t border-[#C7D2FE]/40 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                        <div className="mt-3 pt-2 border-t border-primary/15 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
                           <div className="flex items-center gap-1.5">
                             {m.evidenceCount && (
                               <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
@@ -274,34 +276,43 @@ export function GraceAiPage() {
 
                 {/* Quick Suggestion Chips */}
                 <div className="flex flex-wrap gap-1.5 mt-2.5">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleSendPrompt("สรุปภาพรวมการเงินเดือนนี้")}
-                    className="text-[11px] bg-background border border-border hover:border-primary/40 px-2.5 py-1 rounded-full text-muted-foreground transition-colors"
+                    className="h-auto gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-normal text-muted-foreground"
                   >
-                    💡 สรุปภาพรวมการเงิน
-                  </button>
-                  <button
+                    <Sparkles className="h-3 w-3" />
+                    สรุปภาพรวมการเงิน
+                  </Button>
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleSendPrompt("มีงบประมาณหมวดไหนใกล้เต็มบ้าง")}
-                    className="text-[11px] bg-background border border-border hover:border-primary/40 px-2.5 py-1 rounded-full text-muted-foreground transition-colors"
+                    className="h-auto gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-normal text-muted-foreground"
                   >
-                    ⚠️ ตรวจสอบงบประมาณ
-                  </button>
-                  <button
+                    <AlertTriangle className="h-3 w-3" />
+                    ตรวจสอบงบประมาณ
+                  </Button>
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleSendPrompt("วิเคราะห์แนวโน้มเงินถวาย")}
-                    className="text-[11px] bg-background border border-border hover:border-primary/40 px-2.5 py-1 rounded-full text-muted-foreground transition-colors"
+                    className="h-auto gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-normal text-muted-foreground"
                   >
-                    📈 แนวโน้มเงินถวาย
-                  </button>
+                    <TrendingUp className="h-3 w-3" />
+                    แนวโน้มเงินถวาย
+                  </Button>
                 </div>
               </div>
             </Card>
 
             {/* Side AI Summary Cards */}
             <div className="space-y-4">
-              <Card className="card-ledger border border-border bg-gradient-to-br from-[#EEF2FF] to-[#FAFBFF] border-[#C7D2FE]">
+              <Card className="card-ledger border border-primary/25 bg-primary/5">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2 text-primary">
                     <Brain className="h-4 w-4" />
@@ -311,13 +322,13 @@ export function GraceAiPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 text-xs">
-                  <div className="flex items-center justify-between border-b border-[#C7D2FE]/60 pb-2">
+                  <div className="flex items-center justify-between border-b border-primary/15 pb-2">
                     <span className="text-muted-foreground">รายรับ + เงินถวาย</span>
                     <span className="font-semibold text-foreground">
                       {incomes.length + offerings.length} รายการ
                     </span>
                   </div>
-                  <div className="flex items-center justify-between border-b border-[#C7D2FE]/60 pb-2">
+                  <div className="flex items-center justify-between border-b border-primary/15 pb-2">
                     <span className="text-muted-foreground">รายจ่าย</span>
                     <span className="font-semibold text-foreground">{expenses.length} รายการ</span>
                   </div>
@@ -444,24 +455,24 @@ export function GraceAiPage() {
               <CardContent>
                 {ocrResult ? (
                   <div className="space-y-4 text-xs">
-                    <div className="bg-gradient-to-br from-[#EEF2FF] to-[#FAFBFF] p-4 rounded-xl border border-[#C7D2FE] space-y-2">
-                      <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
+                    <div className="bg-primary/5 p-4 rounded-xl border border-primary/25 space-y-2">
+                      <div className="flex justify-between border-b border-primary/15 pb-2">
                         <span className="text-muted-foreground">ประเภทเอกสาร</span>
                         <span className="font-bold text-primary">{ocrResult.docType}</span>
                       </div>
-                      <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
+                      <div className="flex justify-between border-b border-primary/15 pb-2">
                         <span className="text-muted-foreground">รายการ/รายละเอียด</span>
                         <span className="font-semibold text-foreground">
                           {ocrResult.merchantName}
                         </span>
                       </div>
-                      <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
+                      <div className="flex justify-between border-b border-primary/15 pb-2">
                         <span className="text-muted-foreground">วันที่ในสลิป</span>
                         <span className="num-display font-semibold text-foreground">
                           {ocrResult.date}
                         </span>
                       </div>
-                      <div className="flex justify-between border-b border-[#C7D2FE]/60 pb-2">
+                      <div className="flex justify-between border-b border-primary/15 pb-2">
                         <span className="text-muted-foreground">หมวดหมู่แนะนำ</span>
                         <span className="font-semibold text-foreground">{ocrResult.category}</span>
                       </div>
