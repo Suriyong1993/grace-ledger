@@ -1,11 +1,11 @@
 /**
  * RecentTransactionsTable.tsx
  *
- * Finexy-style recent transactions table:
- * - Clean table rows with order-ID, icon, description, amount, status dot, date
+ * Recent transactions table:
+ * - Compact rows with short-ID, icon, description, amount, status dot, date
  * - Filter pill tabs: ทั้งหมด / รายรับ / รายจ่าย / รออนุมัติ
- * - Pending rows get amber left-border flash
- * - Right-aligned tabular amounts with color coding
+ * - Pending rows get a warning-tone left-border flash
+ * - Right-aligned tabular amounts, green=credit / red=debit always
  */
 
 import { useState } from "react";
@@ -91,20 +91,20 @@ const FILTER_LABELS: Record<FilterTab, string> = {
 function KindIcon({ kind }: { kind: "income" | "expense" | "offering" }) {
   if (kind === "income") {
     return (
-      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#FEF0EB] text-[#E8450A]">
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-income-muted text-income">
         <ArrowDownLeft className="h-4 w-4" strokeWidth={2.25} />
       </div>
     );
   }
   if (kind === "offering") {
     return (
-      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-50 text-amber-600">
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-offering-muted text-offering">
         <HandHeart className="h-4 w-4" strokeWidth={1.75} />
       </div>
     );
   }
   return (
-    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-expense-muted text-expense">
       <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
     </div>
   );
@@ -127,7 +127,7 @@ export function RecentTransactionsTable({
   const pendingCount = displayTxs.filter((t) => t.status === "pending").length;
 
   return (
-    <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+    <div className="rounded-card border border-border bg-card shadow-card overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 px-5 py-4">
         <div>
@@ -152,7 +152,7 @@ export function RecentTransactionsTable({
             >
               {FILTER_LABELS[tab]}
               {tab === "pending" && pendingCount > 0 && (
-                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#E8450A] px-1 text-[9px] font-bold text-white">
+                <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-warning px-1 text-[9px] font-bold text-warning-foreground">
                   {pendingCount}
                 </span>
               )}
@@ -203,9 +203,9 @@ export function RecentTransactionsTable({
                 className={cn(
                   "group relative grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-3 px-5 py-3.5",
                   "cursor-pointer transition-colors duration-100 hover:bg-muted/40",
-                  isPending && "bg-amber-50/50 dark:bg-amber-950/10",
+                  isPending && "bg-warning/5",
                   isPending &&
-                    "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-amber-400",
+                    "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-warning",
                 )}
               >
                 {/* ID */}
@@ -219,7 +219,7 @@ export function RecentTransactionsTable({
                 <div className="flex items-center gap-2.5 min-w-0">
                   <KindIcon kind={tx.kind as "income" | "expense" | "offering"} />
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] font-semibold text-foreground group-hover:text-[#E8450A] transition-colors">
+                    <p className="truncate text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">
                       {tx.description || tx.categoryName || (isIncome ? "รายรับ" : "รายจ่าย")}
                     </p>
                     {tx.categoryName && (
@@ -234,7 +234,7 @@ export function RecentTransactionsTable({
                 <p
                   className={cn(
                     "num-display min-w-[88px] text-right text-[13px] font-bold",
-                    isIncome ? "text-[#22C55E]" : "text-foreground",
+                    isIncome ? "text-income" : "text-expense",
                   )}
                 >
                   {isIncome ? "+" : "−"}

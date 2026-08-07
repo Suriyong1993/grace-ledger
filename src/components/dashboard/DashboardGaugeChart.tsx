@@ -1,7 +1,7 @@
 /**
- * DashboardGaugeChart.tsx — replaced with Finexy-style Income/Expense Bar Chart
+ * DashboardGaugeChart.tsx — Income/Expense trend + annual budget progress
  *
- * Shows 6-month grouped bar chart (income=orange, expense=dark) using Recharts.
+ * Shows 6-month grouped bar chart (income=primary, expense=foreground) using Recharts.
  * Also shows mini stats and annual budget progress bar.
  */
 
@@ -81,7 +81,7 @@ export function DashboardGaugeChart({
   const yMax = Math.ceil(maxVal / 10000) * 10000;
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-card flex flex-col gap-4">
+    <div className="rounded-card border border-border bg-card p-5 shadow-card flex flex-col gap-4">
       <div>
         <h3 className="text-sm font-bold text-foreground">รายรับ-รายจ่าย</h3>
         <p className="text-[11.5px] text-muted-foreground mt-0.5">
@@ -93,7 +93,7 @@ export function DashboardGaugeChart({
         <span className="text-[12px] font-semibold text-foreground">กำไรและขาดทุน</span>
         <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-sm bg-[#E8450A]" />
+            <span className="h-2 w-2 rounded-sm bg-primary" />
             รายรับ
           </span>
           <span className="flex items-center gap-1.5">
@@ -125,7 +125,7 @@ export function DashboardGaugeChart({
               content={<CustomTooltip />}
               cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
             />
-            <Bar dataKey="income" fill="#E8450A" radius={[4, 4, 0, 0]} name="income" />
+            <Bar dataKey="income" fill="var(--color-primary)" radius={[4, 4, 0, 0]} name="income" />
             <Bar
               dataKey="expense"
               fill="var(--color-foreground)"
@@ -145,7 +145,7 @@ export function DashboardGaugeChart({
           <p
             className={cn(
               "mt-0.5 text-[10.5px] font-semibold flex items-center gap-0.5",
-              totalInc >= totalExp ? "text-[#22C55E]" : "text-[#EF4444]",
+              totalInc >= totalExp ? "text-success" : "text-destructive",
             )}
           >
             <span>{totalInc >= totalExp ? "▲" : "▼"}</span>
@@ -160,7 +160,7 @@ export function DashboardGaugeChart({
           <p
             className={cn(
               "mt-0.5 text-[10.5px] font-semibold",
-              totalExp <= totalInc ? "text-[#22C55E]" : "text-[#EF4444]",
+              totalExp <= totalInc ? "text-success" : "text-destructive",
             )}
           >
             {totalBudget > 0
@@ -178,10 +178,10 @@ export function DashboardGaugeChart({
               className={cn(
                 "font-bold num-display",
                 budgetPct > 80
-                  ? "text-[#EF4444]"
+                  ? "text-destructive"
                   : budgetPct > 60
-                    ? "text-amber-500"
-                    : "text-[#E8450A]",
+                    ? "text-warning"
+                    : "text-primary",
               )}
             >
               {budgetPct}%
@@ -191,7 +191,7 @@ export function DashboardGaugeChart({
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-500",
-                budgetPct > 80 ? "bg-[#EF4444]" : "bg-[#E8450A]",
+                budgetPct > 80 ? "bg-destructive" : "bg-primary",
               )}
               style={{ width: `${Math.min(budgetPct, 100)}%` }}
             />
