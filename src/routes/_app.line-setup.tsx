@@ -21,7 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { listLineUsers, listMembers } from "@/services/church";
+import { listLineUsers, listMembers, listOffering } from "@/services/church";
+import { thb, fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/line-setup")({
   head: () => ({ meta: [{ title: "ตั้งค่า LINE OA — Grace Ledger" }] }),
@@ -43,9 +44,20 @@ function LineSetupPage() {
   // Queries for live database metrics
   const lineUsersQ = useQuery({ queryKey: ["line-users"], queryFn: listLineUsers });
   const membersQ = useQuery({ queryKey: ["members"], queryFn: listMembers });
+  const offeringQ = useQuery({ queryKey: ["offering"], queryFn: listOffering });
 
   const lineUsers = lineUsersQ.data ?? [];
   const members = membersQ.data ?? [];
+  const offerings = offeringQ.data ?? [];
+
+  // Real latest-Sunday total — used only to preview the message *format*,
+  // not to claim anything was actually sent (no LINE connection exists yet).
+  const latestOfferingDate = offerings.reduce(
+    (latest, o) => (!latest || o.date > latest ? o.date : latest),
+    "",
+  );
+  const latestOfferings = offerings.filter((o) => o.date === latestOfferingDate);
+  const latestOfferingTotal = latestOfferings.reduce((s, o) => s + o.amount, 0);
 
   // LINE Bot features toggle state
   const [enableNotify, setEnableNotify] = useState(true);
@@ -236,54 +248,95 @@ function LineSetupPage() {
         </Card>
       </div>
 
-      {/* Automated Features Card */}
-      <Card className="card-ledger border border-border">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base font-medium">
-              ฟีเจอร์การแจ้งเตือนอัตโนมัติผ่าน LINE
-            </CardTitle>
-          </div>
-          <CardDescription className="text-xs">
-            เลือกเปิด-ปิดฟีเจอร์โต้ตอบอัตโนมัติของบอทคริสตจักร (ตัวอย่าง —
-            การเปลี่ยนค่าด้านล่างยังไม่ถูกบันทึก)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-4">
-            <div>
-              <p className="text-sm font-medium text-foreground">แจ้งเตือนสลิปถวาย / รายรับเข้า</p>
-              <p className="text-xs text-muted-foreground">
-                ส่งข้อความยืนยันเมื่อมีสลิปเงินถวายหรือรายรับถูกบันทึกเข้าระบบ
-              </p>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Automated Features Card */}
+        <Card className="card-ledger border border-border lg:col-span-2">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5 text-primary" />
+              <CardTitle className="text-base font-medium">
+                ฟีเจอร์การแจ้งเตือนอัตโนมัติผ่าน LINE
+              </CardTitle>
             </div>
-            <Switch checked={enableNotify} onCheckedChange={setEnableNotify} />
-          </div>
+            <CardDescription className="text-xs">
+              เลือกเปิด-ปิดฟีเจอร์โต้ตอบอัตโนมัติของบอทคริสตจักร (ตัวอย่าง —
+              การเปลี่ยนค่าด้านล่างยังไม่ถูกบันทึก)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  แจ้งเตือนสลิปถวาย / รายรับเข้า
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  ส่งข้อความยืนยันเมื่อมีสลิปเงินถวายหรือรายรับถูกบันทึกเข้าระบบ
+                </p>
+              </div>
+              <Switch checked={enableNotify} onCheckedChange={setEnableNotify} />
+            </div>
 
-          <div className="flex items-center justify-between border-b border-border pb-4">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                ระบบอ่านสลิปอัตโนมัติ (Slip OCR Reader)
-              </p>
-              <p className="text-xs text-muted-foreground">
-                ให้สมาชิกส่งรูปสลิปใน LINE แล้วบอทจะอ่านยอดเงิน วันที่ และผู้โอนอัตโนมัติ
-              </p>
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  ระบบอ่านสลิปอัตโนมัติ (Slip OCR Reader)
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  ให้สมาชิกส่งรูปสลิปใน LINE แล้วบอทจะอ่านยอดเงิน วันที่ และผู้โอนอัตโนมัติ
+                </p>
+              </div>
+              <Switch checked={enableSlipOCR} onCheckedChange={setEnableSlipOCR} />
             </div>
-            <Switch checked={enableSlipOCR} onCheckedChange={setEnableSlipOCR} />
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">รายงานสรุปยอดถวายประจำสัปดาห์</p>
-              <p className="text-xs text-muted-foreground">
-                ส่งรายงานสรุปยอดถวายวันอาทิตย์ให้ผู้ดูแลระบบและคณะเหรัญญิกทาง LINE Group
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">รายงานสรุปยอดถวายประจำสัปดาห์</p>
+                <p className="text-xs text-muted-foreground">
+                  ส่งรายงานสรุปยอดถวายวันอาทิตย์ให้ผู้ดูแลระบบและคณะเหรัญญิกทาง LINE Group
+                </p>
+              </div>
+              <Switch checked={enableWeeklyOffering} onCheckedChange={setEnableWeeklyOffering} />
             </div>
-            <Switch checked={enableWeeklyOffering} onCheckedChange={setEnableWeeklyOffering} />
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Message Preview Card — format preview only, built from real latest-Sunday data */}
+        {enableWeeklyOffering && (
+          <Card className="card-ledger border border-border lg:col-span-1">
+            <CardHeader>
+              <CardTitle className="kicker text-muted-foreground">
+                ตัวอย่างข้อความที่จะส่ง
+              </CardTitle>
+              <CardDescription className="text-[11px]">
+                รูปแบบข้อความเมื่อเชื่อมต่อ LINE จริงแล้ว — ยังไม่ได้ส่งจริง
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-xl bg-muted/50 p-3.5 text-xs leading-relaxed">
+                <p className="font-bold text-foreground">🔔 Grace Ledger — สรุปเงินถวาย</p>
+                {latestOfferingDate ? (
+                  <>
+                    <p className="mt-1.5 text-foreground">
+                      เงินถวาย {fmtDate(latestOfferingDate)}:{" "}
+                      <span className="num-display font-semibold">{thb(latestOfferingTotal)}</span>
+                    </p>
+                    <p className="mt-0.5 text-muted-foreground">
+                      จาก {latestOfferings.length} รายการที่บันทึกไว้
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-1.5 text-muted-foreground">
+                    ยังไม่มีข้อมูลเงินถวายให้แสดงตัวอย่าง
+                  </p>
+                )}
+              </div>
+              <p className="mt-2.5 text-[11px] text-muted-foreground">
+                ส่งอัตโนมัติหลังปิดรอบนับ · ไม่มีปุ่มอนุมัติในข้อความ (นโยบายความปลอดภัย)
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </PageTransition>
   );
 }
