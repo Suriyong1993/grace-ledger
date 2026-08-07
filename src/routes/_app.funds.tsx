@@ -43,7 +43,7 @@ function FundsPage() {
           income,
           offering,
           expense,
-          balance: f.openingBalance + income + offering - expense,
+          balance: (f.openingBalance ?? 0) + income + offering - expense,
         };
       }),
     [funds, inc, exp, off],

@@ -332,88 +332,92 @@ function PendingRow({
   return (
     <div
       className={cn(
-        "card-ledger flex items-center gap-3 p-4 transition-all duration-200",
+        "card-ledger flex flex-col gap-3 p-4 transition-all duration-200 sm:flex-row sm:items-center",
         selected && "border-primary/40 bg-primary/[0.03]",
       )}
       style={{ animationDelay: `${index * 40}ms` }}
     >
-      {selectable && (
-        <Checkbox
-          checked={selected}
-          onCheckedChange={() => onToggleSelect(item)}
-          aria-label="เลือกรายการนี้"
-        />
-      )}
-
-      {/* Kind icon */}
-      <div
-        className={cn(
-          "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
-          isIncome ? "bg-income-muted" : "bg-expense-muted",
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        {selectable && (
+          <Checkbox
+            checked={selected}
+            onCheckedChange={() => onToggleSelect(item)}
+            aria-label="เลือกรายการนี้"
+          />
         )}
-      >
-        {isIncome ? (
-          <ArrowDownLeft className="h-5 w-5 text-income" strokeWidth={1.75} />
-        ) : (
-          <ArrowUpLeft className="h-5 w-5 text-expense" strokeWidth={1.75} />
-        )}
-      </div>
 
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-semibold text-foreground">
-            {isIncome ? "รายรับ" : "รายจ่าย"}
-          </span>
-          {item.vendor && <span className="text-xs text-muted-foreground">{item.vendor}</span>}
-          {needsDualApproval && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
-              <Users2 className="h-3 w-3" strokeWidth={2} />
-              ต้องอนุมัติ 2 คน
-            </span>
+        {/* Kind icon */}
+        <div
+          className={cn(
+            "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
+            isIncome ? "bg-income-muted" : "bg-expense-muted",
+          )}
+        >
+          {isIncome ? (
+            <ArrowDownLeft className="h-5 w-5 text-income" strokeWidth={1.75} />
+          ) : (
+            <ArrowUpLeft className="h-5 w-5 text-expense" strokeWidth={1.75} />
           )}
         </div>
-        {item.description && (
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.description}</p>
-        )}
-        <p className="mt-0.5 text-[11px] text-muted-foreground/70">
-          {fmtDate(item.date)} · บันทึกโดย {item.createdBy}
-        </p>
-      </div>
 
-      {/* Amount */}
-      <div className="shrink-0 text-right">
-        <p
-          className={cn(
-            "num-display text-base font-bold",
-            isIncome ? "amount-income" : "amount-expense",
+        {/* Info */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm font-semibold text-foreground">
+              {isIncome ? "รายรับ" : "รายจ่าย"}
+            </span>
+            {item.vendor && <span className="text-xs text-muted-foreground">{item.vendor}</span>}
+            {needsDualApproval && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
+                <Users2 className="h-3 w-3" strokeWidth={2} />
+                ต้องอนุมัติ 2 คน
+              </span>
+            )}
+          </div>
+          {item.description && (
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.description}</p>
           )}
-        >
-          {isIncome ? "+" : "-"}
-          <MoneyText value={item.amount} />
-        </p>
-        <StatusBadge status="pending" variant="dot" className="mt-0.5" />
+          <p className="mt-0.5 text-[11px] text-muted-foreground/70">
+            {fmtDate(item.date)} · บันทึกโดย {item.createdBy}
+          </p>
+        </div>
       </div>
 
-      {/* Actions — always visible; the confirm dialog is where full detail + friction lives */}
-      <div className="flex shrink-0 items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-destructive/30 text-destructive hover:bg-destructive/10 active-press"
-          onClick={() => onReject(item)}
-        >
-          <XCircle className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-          ปฏิเสธ
-        </Button>
-        <Button
-          size="sm"
-          className="bg-approved text-approved-foreground hover:bg-approved/90 active-press"
-          onClick={() => onApprove(item)}
-        >
-          <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-          อนุมัติ
-        </Button>
+      <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
+        {/* Amount */}
+        <div className="shrink-0 text-right">
+          <p
+            className={cn(
+              "num-display text-base font-bold",
+              isIncome ? "amount-income" : "amount-expense",
+            )}
+          >
+            {isIncome ? "+" : "-"}
+            <MoneyText value={item.amount} />
+          </p>
+          <StatusBadge status="pending" variant="dot" className="mt-0.5" />
+        </div>
+
+        {/* Actions — always visible; the confirm dialog is where full detail + friction lives */}
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-destructive/30 text-destructive hover:bg-destructive/10 active-press"
+            onClick={() => onReject(item)}
+          >
+            <XCircle className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            ปฏิเสธ
+          </Button>
+          <Button
+            size="sm"
+            className="bg-approved text-approved-foreground hover:bg-approved/90 active-press"
+            onClick={() => onApprove(item)}
+          >
+            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            อนุมัติ
+          </Button>
+        </div>
       </div>
     </div>
   );

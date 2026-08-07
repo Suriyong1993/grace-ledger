@@ -309,13 +309,13 @@ function AuditPage() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="flex items-center justify-between p-3 rounded-xl border border-border bg-card">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl border border-border bg-card">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground ml-1" />
           <span className="text-xs font-semibold text-foreground">กรองตามระดับ:</span>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           {(["all", "info", "warning", "critical"] as const).map((sev) => {
             const labels = {
               all: `ทั้งหมด (${rows.length})`,
