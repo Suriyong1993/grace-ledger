@@ -84,11 +84,6 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
-  /* ── Finexy Orange accent ── */
-  --color-gl-orange: var(--gl-orange);
-  --color-gl-orange-foreground: var(--gl-orange-foreground);
-  --color-gl-orange-muted: var(--gl-orange-muted);
-
   /* ── Finance-specific semantic colors ── */
   --color-income: var(--income);
   --color-income-foreground: var(--income-foreground);
@@ -135,6 +130,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-icon: var(--sidebar-icon);
 
   /* ── Surface elevation (dark mode; unset in light) ── */
   --color-surface-elevated: var(--surface-elevated);
@@ -152,11 +148,6 @@
 ═══════════════════════════════════════════ */
 :root {
   --radius: 0.75rem; /* 12px base — softer, premium (v2.0 was 6px) */
-
-  /* ── Finexy Orange accent — dashboard hero, active states ── */
-  --gl-orange: #e8450a;
-  --gl-orange-foreground: #ffffff;
-  --gl-orange-muted: #fef0eb;
 
   /* ── Motion easings (Emil Kowalski) ── */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -233,16 +224,16 @@
   --chart-4: oklch(0.7 0.13 80); /* Amber — offering */
   --chart-5: oklch(0.6 0.11 195); /* Teal — 5th accent, distinct from primary blue */
 
-  /* ── Sidebar — Finexy dark sidebar (both light & dark use dark sidebar) ── */
-  --sidebar: #1a1a1a;
+  /* ── Sidebar — dark sidebar chrome regardless of page theme, emerald accent ── */
+  --sidebar: oklch(0.11 0.012 258);
   --sidebar-foreground: oklch(0.92 0.006 258);
-  --sidebar-primary: #e8450a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2a2a2a;
-  --sidebar-accent-foreground: #e8450a;
-  --sidebar-border: #2e2e2e;
-  --sidebar-ring: #e8450a;
-  --sidebar-icon: #6b6b6b;
+  --sidebar-primary: oklch(0.6 0.15 155);
+  --sidebar-primary-foreground: oklch(0.12 0.02 155);
+  --sidebar-accent: oklch(0.19 0.012 258);
+  --sidebar-accent-foreground: oklch(0.6 0.15 155);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.6 0.15 155);
+  --sidebar-icon: oklch(0.6 0.012 258);
 }
 
 /* ═══════════════════════════════════════════
@@ -319,16 +310,16 @@
   --chart-4: oklch(0.76 0.12 80); /* amber — offering */
   --chart-5: oklch(0.66 0.1 195); /* teal */
 
-  /* ── Sidebar — keep same dark style in dark mode ── */
-  --sidebar: #141414;
+  /* ── Sidebar — same dark chrome in dark mode, emerald accent ── */
+  --sidebar: oklch(0.11 0.012 258);
   --sidebar-foreground: oklch(0.92 0.006 258);
-  --sidebar-primary: #e8450a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #232323;
-  --sidebar-accent-foreground: #e8450a;
-  --sidebar-border: #272727;
-  --sidebar-ring: #e8450a;
-  --sidebar-icon: #5a5a5a;
+  --sidebar-primary: oklch(0.6 0.15 155);
+  --sidebar-primary-foreground: oklch(0.12 0.02 155);
+  --sidebar-accent: oklch(0.19 0.012 258);
+  --sidebar-accent-foreground: oklch(0.6 0.15 155);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.6 0.15 155);
+  --sidebar-icon: oklch(0.6 0.012 258);
 
   /* ── Surface elevation ── */
   --surface-elevated: oklch(0.19 0.012 258); /* ยกขึ้นจาก card */
