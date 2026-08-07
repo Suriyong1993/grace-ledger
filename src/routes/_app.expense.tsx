@@ -22,7 +22,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { StatCard } from "@/components/shared/StatCard";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -402,35 +402,15 @@ function ExpensePage() {
       ) : null}
 
       {expQ.isLoading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-[104px]" />
-          ))}
-        </div>
+        <Skeleton className="h-[52px] rounded-card" />
       ) : (
-        <div className="stagger grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-          <StatCard
-            label="รายจ่ายทั้งหมด"
-            value={thb(totalAll)}
-            tone="danger"
-            icon={ArrowUpRight}
-            hint={`${allRows.length} รายการ`}
-          />
-          <StatCard
-            label="รออนุมัติ"
-            value={thb(pendingTotal)}
-            tone="primary"
-            icon={Clock}
-            hint={`${pendingRows.length} รายการ`}
-          />
-          <StatCard
-            label="อนุมัติแล้ว"
-            value={thb(approvedTotal)}
-            tone="secondary"
-            icon={CheckCircle2}
-            hint="ยอดที่อนุมัติแล้ว"
-          />
-        </div>
+        <InlineStatBar
+          items={[
+            { label: "รายจ่ายทั้งหมด", value: totalAll, icon: ArrowUpRight, tone: "danger" },
+            { label: "รออนุมัติ", value: pendingTotal, icon: Clock, tone: "warning" },
+            { label: "อนุมัติแล้ว", value: approvedTotal, icon: CheckCircle2, tone: "success" },
+          ]}
+        />
       )}
 
       <DataToolbar query={q} onQueryChange={setQ} placeholder="ค้นหารายจ่าย..." />
@@ -476,11 +456,14 @@ function ExpensePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r) => (
+              {rows.map((r, i) => (
                 <TableRow
                   key={r.id}
                   onClick={() => setSelectedExpense(r)}
-                  className="cursor-pointer hover:bg-muted/40 transition-colors group"
+                  className={cn(
+                    "cursor-pointer hover:bg-muted/40 transition-colors group",
+                    rows.length > 5 && i % 2 === 1 && "bg-muted/15",
+                  )}
                 >
                   <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
                     {fmtDate(r.date)}
