@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Users, Download, Phone, Mail, ChevronRight, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -28,6 +29,7 @@ import { thb, fmtDate, today } from "@/lib/format";
 import { downloadCsv, toCsv } from "@/lib/csv";
 import { type Member } from "@/lib/types";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/members")({
   head: () => ({ meta: [{ title: "สมาชิก — ระบบจัดการการเงินคริสตจักร" }] }),
@@ -43,6 +45,12 @@ export function MembersPage() {
 
   const members = membersQ.data ?? [];
   const offerings = offeringQ.data ?? [];
+
+  const totalGivingAll = offerings
+    .filter((o) => !!o.memberId)
+    .reduce((sum, o) => sum + o.amount, 0);
+  const givingMemberCount = new Set(offerings.filter((o) => !!o.memberId).map((o) => o.memberId))
+    .size;
 
   const rows = members.filter((m) => {
     if (!query) return true;
@@ -87,6 +95,25 @@ export function MembersPage() {
         description={`รายชื่อสมาชิกทั้งหมด ${rows.length} คน · คลิกเพื่อดูประวัติการถวายและส่งออกไฟล์`}
         actions={<MemberFormDialog />}
       />
+
+      {!membersQ.isLoading && members.length > 0 && (
+        <InlineStatBar
+          items={[
+            { label: "สมาชิกทั้งหมด", value: String(members.length), icon: Users, tone: "default" },
+            {
+              label: "มีประวัติการถวาย",
+              value: String(givingMemberCount),
+              tone: "default",
+            },
+            {
+              label: "ยอดถวายรวม (ระบุชื่อ)",
+              value: totalGivingAll,
+              tone: "success",
+            },
+          ]}
+        />
+      )}
+
       <DataToolbar
         query={query}
         onQueryChange={setQuery}
@@ -135,13 +162,16 @@ export function MembersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((m) => {
+              {rows.map((m, i) => {
                 const totalGiving = getMemberTotal(m.id);
                 return (
                   <TableRow
                     key={m.id}
                     onClick={() => setSelectedMember(m)}
-                    className="cursor-pointer hover:bg-muted/40 transition-colors group"
+                    className={cn(
+                      "cursor-pointer hover:bg-muted/40 transition-colors group",
+                      rows.length > 5 && i % 2 === 1 && "bg-muted/15",
+                    )}
                   >
                     <TableCell className="pl-5">
                       <div className="flex items-center gap-3">
