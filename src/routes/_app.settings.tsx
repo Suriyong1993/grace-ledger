@@ -16,6 +16,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -181,8 +182,22 @@ function SettingsPage() {
         </div>
       ) : null}
 
+      {!isLoading && (
+        <InlineStatBar
+          items={[
+            { label: "หมวดหมู่ทั้งหมด", value: String(categories.length), tone: "default" },
+            {
+              label: "เปิดใช้งาน",
+              value: String(categories.filter((c) => c.isActive).length),
+              tone: "success",
+            },
+            { label: "ประเภทย่อยทั้งหมด", value: String(allSubs.length), tone: "default" },
+          ]}
+        />
+      )}
+
       {/* ── ข้อมูลระบบ ── */}
-      <Card className=" max-w-2xl">
+      <Card className="mt-6 max-w-2xl">
         <CardHeader>
           <CardTitle>ข้อมูลระบบ</CardTitle>
         </CardHeader>
@@ -199,7 +214,7 @@ function SettingsPage() {
       </Card>
 
       {/* ── จัดการหมวดหมู่เงินถวาย ── */}
-      <Card className=" max-w-2xl mt-6">
+      <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>จัดการหมวดหมู่เงินถวาย</CardTitle>
           <Dialog open={newCatOpen} onOpenChange={setNewCatOpen}>
