@@ -15,6 +15,9 @@ import {
 import { supabase } from "@/services/supabaseClient";
 import type { Role, User } from "@/lib/types";
 
+/** sessionStorage key for the path a user was on before being redirected to /auth */
+export const REDIRECT_STORAGE_KEY = "grace-ledger:auth-redirect";
+
 export type Permission =
   | "income.write"
   | "income.approve"
@@ -121,9 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen for auth state changes
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        fetchUserRecord(session.user.id);
+        // Wait for the church-user record before flipping loading off — otherwise
+        // there's a window where loading=false and user=null even though the
+        // session is valid, which the route guard reads as "logged out".
+        await fetchUserRecord(session.user.id);
       }
       setLoading(false);
     });

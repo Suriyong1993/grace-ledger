@@ -4,7 +4,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppTopbar } from "@/components/layout/AppTopbar";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { useAuth } from "@/lib/auth";
+import { useAuth, REDIRECT_STORAGE_KEY } from "@/lib/auth";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { DashboardSkeleton } from "@/components/shared/Skeleton";
 
@@ -15,7 +15,13 @@ export const Route = createFileRoute("/_app")({
 function AppLayout() {
   const { user, loading } = useAuth();
   if (loading) return <DashboardSkeleton />;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    // Remember where the user was headed so /auth can send them back after
+    // login instead of always landing on /dashboard.
+    const dest = window.location.pathname + window.location.search;
+    if (dest !== "/auth") sessionStorage.setItem(REDIRECT_STORAGE_KEY, dest);
+    return <Navigate to="/auth" replace />;
+  }
 
   return (
     <SidebarProvider defaultOpen={false}>

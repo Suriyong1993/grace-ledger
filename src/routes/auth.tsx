@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Delete, ArrowLeft, ChevronRight, Cross } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { useAuth, fetchLoginUsers, type LoginUser } from "@/lib/auth";
+import { useAuth, fetchLoginUsers, REDIRECT_STORAGE_KEY, type LoginUser } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,13 @@ export const Route = createFileRoute("/auth")({
   }),
   component: AuthPage,
 });
+
+/** Pops the stored pre-login destination, if any, falling back to /dashboard. */
+function consumeRedirectDestination(): string {
+  const dest = sessionStorage.getItem(REDIRECT_STORAGE_KEY);
+  sessionStorage.removeItem(REDIRECT_STORAGE_KEY);
+  return dest && dest !== "/auth" ? dest : "/dashboard";
+}
 
 const PAD_BUTTON =
   "h-14 rounded-lg text-lg font-medium num-display transition-colors duration-150 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:cursor-not-allowed";
@@ -32,7 +39,16 @@ function AuthPage() {
   const [shake, setShake] = useState(false);
 
   useEffect(() => {
-    if (authUser) navigate({ to: "/dashboard", replace: true });
+    if (authUser) {
+      const dest = consumeRedirectDestination();
+      if (dest === "/dashboard") {
+        navigate({ to: "/dashboard", replace: true });
+      } else {
+        // Arbitrary stored path (may include a query string) — a full
+        // navigation sidesteps the typed-router `to` constraint safely.
+        window.location.replace(dest);
+      }
+    }
   }, [authUser, navigate]);
 
   useEffect(() => {
@@ -52,7 +68,12 @@ function AuthPage() {
         const result = await signIn(user.email, fullPin);
         if (result) {
           toast.success(`สวัสดี ${result.name}`);
-          navigate({ to: "/dashboard", replace: true });
+          const dest = consumeRedirectDestination();
+          if (dest === "/dashboard") {
+            navigate({ to: "/dashboard", replace: true });
+          } else {
+            window.location.replace(dest);
+          }
         } else {
           setError("ไม่พบข้อมูลผู้ใช้ในระบบ");
           triggerShake();
