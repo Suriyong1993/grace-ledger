@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Download, Trash2, HandHeart, Sparkles, Wallet, AlertTriangle } from "lucide-react";
-import { StatCard } from "@/components/shared/StatCard";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { ChurchHandwrittenFormScannerModal } from "@/components/church/ChurchHandwrittenFormScannerModal";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { DataToolbar } from "@/components/shared/DataToolbar";
@@ -443,37 +443,24 @@ function OfferingPage() {
         </div>
       ) : null}
 
-      {offQ.isLoading ? (
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-[104px]" />
-          ))}
-        </div>
-      ) : (
-        <div className="stagger mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-          <StatCard
-            label="รวมทั้งหมด"
-            value={thb(total)}
-            tone="primary"
-            icon={HandHeart}
-            hint={`${rows.length} รายการ`}
+      <div className="mt-6">
+        {offQ.isLoading ? (
+          <Skeleton className="h-[52px] rounded-card" />
+        ) : (
+          <InlineStatBar
+            items={[
+              { label: "รวมทั้งหมด", value: total, icon: HandHeart, tone: "primary" },
+              { label: "จำนวนรายการ", value: rows.length, icon: Wallet, tone: "default" },
+              {
+                label: "เฉลี่ยต่อรายการ",
+                value: rows.length > 0 ? total / rows.length : 0,
+                icon: HandHeart,
+                tone: "default",
+              },
+            ]}
           />
-          <StatCard
-            label="จำนวนรายการ"
-            value={rows.length}
-            tone="secondary"
-            icon={Wallet}
-            hint="ทุกช่องทางรวมกัน"
-          />
-          <StatCard
-            label="เฉลี่ยต่อรายการ"
-            value={thb(rows.length > 0 ? total / rows.length : 0)}
-            tone="secondary"
-            icon={HandHeart}
-            hint="ยอดถวายเฉลี่ย"
-          />
-        </div>
-      )}
+        )}
+      </div>
 
       <Tabs defaultValue="sunday-sheet" className="mt-6">
         <TabsList className="flex h-auto w-full flex-wrap justify-start rounded-none">
@@ -527,8 +514,11 @@ function OfferingPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {rows.map((r) => (
-                      <TableRow key={r.id}>
+                    {rows.map((r, i) => (
+                      <TableRow
+                        key={r.id}
+                        className={rows.length > 5 && i % 2 === 1 ? "bg-muted/15" : undefined}
+                      >
                         <TableCell className="num-display whitespace-nowrap pl-5 text-muted-foreground">
                           {fmtDate(r.date)}
                         </TableCell>
