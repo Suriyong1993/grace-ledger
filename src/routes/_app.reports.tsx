@@ -14,7 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { StatCard } from "@/components/shared/StatCard";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -224,44 +224,23 @@ function ReportsPage() {
         </div>
       ) : null}
 
-      {/* Overview Stat Cards */}
+      {/* Overview Stats */}
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[104px]" />
-          ))}
-        </div>
+        <Skeleton className="h-[52px] rounded-card" />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard
-            label="รายรับรวม"
-            value={thb(totalIncome)}
-            hint={`${filteredIncomes.length} รายการ`}
-            icon={TrendingUp}
-            tone="success"
-          />
-          <StatCard
-            label="รายจ่ายรวม"
-            value={thb(totalExpense)}
-            hint={`${filteredExpenses.length} รายการ`}
-            icon={TrendingDown}
-            tone="danger"
-          />
-          <StatCard
-            label="เงินถวายรวม"
-            value={thb(totalOffering)}
-            hint={`${filteredOfferings.length} สัปดาห์`}
-            icon={PieIcon}
-            tone="primary"
-          />
-          <StatCard
-            label="ยอดคงเหลือสุทธิ"
-            value={thb(netBalance)}
-            hint={netBalance >= 0 ? "ดุลบวก" : "ดุลลบ"}
-            icon={FileBarChart2}
-            tone={netBalance >= 0 ? "success" : "danger"}
-          />
-        </div>
+        <InlineStatBar
+          items={[
+            { label: "รายรับรวม", value: totalIncome, icon: TrendingUp, tone: "success" },
+            { label: "รายจ่ายรวม", value: totalExpense, icon: TrendingDown, tone: "danger" },
+            { label: "เงินถวายรวม", value: totalOffering, icon: PieIcon, tone: "primary" },
+            {
+              label: "ยอดคงเหลือสุทธิ",
+              value: netBalance,
+              icon: FileBarChart2,
+              tone: netBalance >= 0 ? "success" : "danger",
+            },
+          ]}
+        />
       )}
 
       {/* Tabs for Detailed Reports */}
@@ -416,8 +395,8 @@ function ReportsPage() {
               <CardTitle className="text-base font-medium">สรุปค่าใช้จ่ายแยกตามหมวดหมู่</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {Object.entries(
+              {(() => {
+                const totals = Object.entries(
                   filteredExpenses.reduce(
                     (acc, curr) => {
                       const cat = catName(curr.categoryId);
@@ -426,16 +405,38 @@ function ReportsPage() {
                     },
                     {} as Record<string, number>,
                   ),
-                ).map(([category, amount]) => (
-                  <div
-                    key={category}
-                    className="flex items-center justify-between border-b border-border pb-2 text-xs"
-                  >
-                    <span className="font-medium">{category}</span>
-                    <span className="num-display font-semibold">{thb(amount)}</span>
+                ).sort((a, b) => b[1] - a[1]);
+                const max = Math.max(...totals.map(([, amount]) => amount), 1);
+
+                if (totals.length === 0) {
+                  return (
+                    <p className="py-4 text-center text-xs text-muted-foreground">
+                      ยังไม่มีรายจ่ายในช่วงเวลานี้
+                    </p>
+                  );
+                }
+
+                return (
+                  <div className="space-y-4">
+                    {totals.map(([category, amount]) => (
+                      <div key={category} className="space-y-1.5">
+                        <div className="flex items-baseline justify-between gap-3 text-xs">
+                          <span className="font-medium text-foreground">{category}</span>
+                          <span className="num-display font-semibold text-foreground">
+                            {thb(amount)}
+                          </span>
+                        </div>
+                        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-destructive"
+                            style={{ width: `${Math.max((amount / max) * 100, 2)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </CardContent>
           </Card>
         </TabsContent>
