@@ -450,7 +450,7 @@ function OfferingPage() {
           <InlineStatBar
             items={[
               { label: "รวมทั้งหมด", value: total, icon: HandHeart, tone: "primary" },
-              { label: "จำนวนรายการ", value: rows.length, icon: Wallet, tone: "default" },
+              { label: "จำนวนรายการ", value: String(rows.length), icon: Wallet, tone: "default" },
               {
                 label: "เฉลี่ยต่อรายการ",
                 value: rows.length > 0 ? total / rows.length : 0,

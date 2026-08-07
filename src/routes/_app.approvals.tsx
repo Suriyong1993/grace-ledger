@@ -13,10 +13,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { CheckCircle2, XCircle, ArrowDownLeft, ArrowUpLeft, AlertTriangle } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  ArrowDownLeft,
+  ArrowUpLeft,
+  AlertTriangle,
+  Users2,
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,6 +50,9 @@ import { fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Income, Expense } from "@/lib/types";
 import { useAuth } from "@/lib/auth";
+
+/** Above this, JournalService requires dual super_admin approval — see src/server/auth/permissions.ts APPROVAL_THRESHOLDS */
+const DUAL_APPROVAL_THRESHOLD = 50000;
 
 export const Route = createFileRoute("/_app/approvals")({
   head: () => ({
@@ -316,6 +327,7 @@ function PendingRow({
   onToggleSelect,
 }: PendingRowProps) {
   const isIncome = item.kind === "income";
+  const needsDualApproval = item.amount > DUAL_APPROVAL_THRESHOLD;
 
   return (
     <div
@@ -354,6 +366,12 @@ function PendingRow({
             {isIncome ? "รายรับ" : "รายจ่าย"}
           </span>
           {item.vendor && <span className="text-xs text-muted-foreground">{item.vendor}</span>}
+          {needsDualApproval && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
+              <Users2 className="h-3 w-3" strokeWidth={2} />
+              ต้องอนุมัติ 2 คน
+            </span>
+          )}
         </div>
         {item.description && (
           <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.description}</p>
@@ -542,26 +560,27 @@ function ApprovalsPage() {
 
       {/* Summary bar */}
       {!isLoading && pendingItems.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="card-subtle p-4">
-            <p className="kicker">รายการทั้งหมด</p>
-            <p className="mt-1 num-display text-2xl font-bold text-foreground">
-              {pendingItems.length}
-            </p>
-          </div>
-          <div className="card-subtle p-4">
-            <p className="kicker">รายรับรออนุมัติ</p>
-            <p className="mt-1 num-display text-2xl font-bold amount-income">
-              {pendingItems.filter((i) => i.kind === "income").length}
-            </p>
-          </div>
-          <div className="card-subtle p-4 col-span-2 sm:col-span-1">
-            <p className="kicker">รายจ่ายรออนุมัติ</p>
-            <p className="mt-1 num-display text-2xl font-bold amount-expense">
-              {pendingItems.filter((i) => i.kind === "expense").length}
-            </p>
-          </div>
-        </div>
+        <InlineStatBar
+          items={[
+            { label: "รายการทั้งหมด", value: String(pendingItems.length), tone: "default" },
+            {
+              label: "รายรับรออนุมัติ",
+              value: String(pendingItems.filter((i) => i.kind === "income").length),
+              tone: "success",
+            },
+            {
+              label: "รายจ่ายรออนุมัติ",
+              value: String(pendingItems.filter((i) => i.kind === "expense").length),
+              tone: "danger",
+            },
+            {
+              label: "ต้องอนุมัติ 2 คน",
+              value: String(pendingItems.filter((i) => i.amount > DUAL_APPROVAL_THRESHOLD).length),
+              icon: Users2,
+              tone: "warning",
+            },
+          ]}
+        />
       )}
 
       {/* Loading state */}
