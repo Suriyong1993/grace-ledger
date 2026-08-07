@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, PiggyBank, TrendingUp, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { StatCard } from "@/components/shared/StatCard";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -60,11 +60,7 @@ function BudgetPage() {
 
       {q.isLoading ? (
         <>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-28" />
-            ))}
-          </div>
+          <Skeleton className="h-[52px] rounded-card" />
           <div className="grid gap-4 md:grid-cols-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-44" />
@@ -80,34 +76,24 @@ function BudgetPage() {
       ) : (
         <>
           {/* Page-level stats */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard
-              label="งบประมาณรวม"
-              value={thb(totalAmount)}
-              icon={PiggyBank}
-              hint={`${budgets.length} รายการ`}
-            />
-            <StatCard
-              label="ใช้ไปแล้ว"
-              value={thb(totalUsed)}
-              icon={TrendingUp}
-              hint="เบิกจ่ายสะสม"
-            />
-            <StatCard
-              label="คงเหลือรวม"
-              value={thb(totalAmount - totalUsed)}
-              icon={Wallet}
-              tone={totalAmount - totalUsed < 0 ? "danger" : "secondary"}
-              hint="งบที่ยังใช้ได้"
-            />
-            <StatCard
-              label="ใกล้เต็ม"
-              value={nearFull}
-              icon={AlertTriangle}
-              tone={nearFull > 0 ? "danger" : "secondary"}
-              hint="ใช้ไปแล้ว ≥ 90% ของงบ"
-            />
-          </div>
+          <InlineStatBar
+            items={[
+              { label: "งบประมาณรวม", value: totalAmount, icon: PiggyBank, tone: "default" },
+              { label: "ใช้ไปแล้ว", value: totalUsed, icon: TrendingUp, tone: "primary" },
+              {
+                label: "คงเหลือรวม",
+                value: totalAmount - totalUsed,
+                icon: Wallet,
+                tone: totalAmount - totalUsed < 0 ? "danger" : "success",
+              },
+              {
+                label: "ใกล้เต็ม (≥90%)",
+                value: String(nearFull),
+                icon: AlertTriangle,
+                tone: nearFull > 0 ? "danger" : "default",
+              },
+            ]}
+          />
 
           {/* Budget vs actual cards */}
           <div className="stagger grid gap-4 md:grid-cols-2">
