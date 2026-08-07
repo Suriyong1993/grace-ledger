@@ -386,10 +386,16 @@ function AuditPage() {
               {/* Timeline feed */}
               <ul className="relative divide-y divide-border/40 pl-14">
                 <div className="pointer-events-none absolute inset-y-0 left-[2.75rem] w-px bg-border/40" />
-                {g.items.map((a) => {
+                {g.items.map((a, i) => {
                   const severity = inferSeverity(a.action, a.details);
                   return (
-                    <li key={a.id} className="relative flex items-start gap-4 py-3.5 pr-5">
+                    <li
+                      key={a.id}
+                      className={cn(
+                        "relative flex items-start gap-4 py-3.5 pr-5",
+                        g.items.length > 5 && i % 2 === 1 && "bg-muted/15",
+                      )}
+                    >
                       {/* Timeline dot */}
                       <div className="absolute -left-[1.625rem] top-[1.125rem] flex h-3 w-3 items-center justify-center">
                         <div
