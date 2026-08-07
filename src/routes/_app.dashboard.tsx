@@ -10,16 +10,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useRef, useEffect } from "react";
-import {
-  RefreshCw,
-  Search,
-  Wallet,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  HandHeart,
-  AlertTriangle,
-  Plus,
-} from "lucide-react";
+import { RefreshCw, Search, HandHeart, AlertTriangle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -50,6 +41,7 @@ import { useRealtime } from "@/hooks/useRealtime";
 import { useAuth } from "@/lib/auth";
 
 // Dashboard Components
+import { HeroBalanceCard } from "@/components/dashboard/HeroBalanceCard";
 import { FundsGrid } from "@/components/dashboard/FundsGrid";
 import {
   RecentTransactionsTable,
@@ -323,10 +315,9 @@ export function Dashboard() {
       {/* ── Loading skeleton ── */}
       {isInitialLoading ? (
         <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-[120px] rounded-card" />
-            ))}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
+            <Skeleton className="h-[180px] rounded-card" />
+            <Skeleton className="h-[180px] rounded-card" />
           </div>
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
             <div className="space-y-5">
@@ -341,37 +332,22 @@ export function Dashboard() {
         </div>
       ) : (
         <>
-          {/* ── KPI row ── */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard
-              label="ยอดคงเหลือรวม"
-              value={totalBalanceNumber}
-              hint={`${funds.length} กองทุน`}
-              icon={Wallet}
-              tone="primary"
-            />
-            <StatCard
-              label="รายรับเดือนนี้"
-              value={incomeMonth}
-              hint="เดือนปัจจุบัน"
-              icon={ArrowDownCircle}
-              tone="success"
-            />
-            <StatCard
-              label="รายจ่ายเดือนนี้"
-              value={expenseMonth}
-              hint={
-                annualBudget.total > 0
-                  ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
-                  : "เดือนปัจจุบัน"
-              }
-              icon={ArrowUpCircle}
-              tone="secondary"
+          {/* ── Hero row: one number that matters most, one secondary ── */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr] items-stretch">
+            <HeroBalanceCard
+              totalBalance={totalBalanceNumber}
+              fundCount={funds.length}
+              incomeMonth={incomeMonth}
+              expenseMonth={expenseMonth}
             />
             <StatCard
               label="เงินถวายรวม"
               value={offeringTotal}
-              hint="ยอดรวมทุกช่องทาง"
+              hint={
+                annualBudget.total > 0
+                  ? `งบใช้ไป ${Math.round((annualBudget.used / annualBudget.total) * 100)}% ของปี`
+                  : "ยอดรวมทุกช่องทาง"
+              }
               icon={HandHeart}
               tone="warning"
             />

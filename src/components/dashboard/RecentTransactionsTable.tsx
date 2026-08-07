@@ -191,7 +191,7 @@ export function RecentTransactionsTable({
             <p className="mt-0.5 text-xs text-muted-foreground/70">ลองเปลี่ยนตัวกรอง</p>
           </div>
         ) : (
-          filtered.map((tx) => {
+          filtered.map((tx, i) => {
             const isIncome = tx.kind === "income";
             const isPending = tx.status === "pending";
             const shortId = tx.id.replace("tx-", "#").padStart(4, "0");
@@ -203,7 +203,7 @@ export function RecentTransactionsTable({
                 className={cn(
                   "group relative grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-3 px-5 py-3.5",
                   "cursor-pointer transition-colors duration-100 hover:bg-muted/40",
-                  isPending && "bg-warning/5",
+                  isPending ? "bg-warning/5" : filtered.length > 5 && i % 2 === 1 && "bg-muted/15",
                   isPending &&
                     "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-warning",
                 )}
