@@ -12,7 +12,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { MoneyText } from "@/components/shared/MoneyText";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
-import { StatCard } from "@/components/shared/StatCard";
+import { InlineStatBar } from "@/components/shared/InlineStatBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -58,7 +58,7 @@ import {
 } from "@/services/church";
 import { listOffering, listOfferingCategories } from "@/services/church";
 import { useAuth } from "@/lib/auth";
-import { fmtDate, today, thb } from "@/lib/format";
+import { fmtDate, today } from "@/lib/format";
 import { downloadCsv, toCsv } from "@/lib/csv";
 import { CHANNEL_LABEL } from "@/lib/types";
 import {
@@ -407,35 +407,15 @@ function IncomePage() {
       ) : null}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-[104px]" />
-          ))}
-        </div>
+        <Skeleton className="h-[52px] rounded-card" />
       ) : (
-        <div className="stagger grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-          <StatCard
-            label="รายรับ"
-            value={thb(totalIncome)}
-            tone="success"
-            icon={ArrowDownLeft}
-            hint={`${incomes.length} รายการ`}
-          />
-          <StatCard
-            label="เงินถวาย"
-            value={thb(totalOffering)}
-            tone="primary"
-            icon={HandHeart}
-            hint={`${offerings.length} รายการ`}
-          />
-          <StatCard
-            label="รวมทั้งหมด"
-            value={thb(totalAll)}
-            tone="secondary"
-            icon={Wallet}
-            hint={`รวม ${incomes.length + offerings.length} รายการ`}
-          />
-        </div>
+        <InlineStatBar
+          items={[
+            { label: "รายรับ", value: totalIncome, icon: ArrowDownLeft, tone: "success" },
+            { label: "เงินถวาย", value: totalOffering, icon: HandHeart, tone: "primary" },
+            { label: "รวมทั้งหมด", value: totalAll, icon: Wallet, tone: "default" },
+          ]}
+        />
       )}
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
@@ -488,8 +468,11 @@ function IncomePage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {incomeRows.map((r) => (
-                      <TableRow key={r.id}>
+                    {incomeRows.map((r, i) => (
+                      <TableRow
+                        key={r.id}
+                        className={incomeRows.length > 5 && i % 2 === 1 ? "bg-muted/15" : undefined}
+                      >
                         <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
                           {fmtDate(r.date)}
                         </TableCell>
@@ -545,8 +528,13 @@ function IncomePage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {offeringRows.map((r) => (
-                      <TableRow key={r.id}>
+                    {offeringRows.map((r, i) => (
+                      <TableRow
+                        key={r.id}
+                        className={
+                          offeringRows.length > 5 && i % 2 === 1 ? "bg-muted/15" : undefined
+                        }
+                      >
                         <TableCell className="whitespace-nowrap px-5 py-3 text-muted-foreground">
                           {fmtDate(r.date)}
                         </TableCell>
