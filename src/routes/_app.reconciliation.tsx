@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertTriangle, Circle } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { MoneyText } from "@/components/shared/MoneyText";
@@ -244,6 +244,17 @@ function ReconciliationPage() {
   const reconciliations = reconciliationsQ.data ?? [];
   const recByFund = (fundId: string) => reconciliations.find((r) => r.fundId === fundId);
 
+  // Close-progress strip — derived entirely from data already fetched above,
+  // no new endpoint (there is no "certify" action on the server yet).
+  const reconciledFundCount = funds.filter((f) => recByFund(f.id)).length;
+  const allFundsReconciled = funds.length > 0 && reconciledFundCount === funds.length;
+  const currentPeriod = periodsQ.data?.find((p) => p.id === signOffPeriodId);
+  const PERIOD_STATUS_LABEL: Record<PeriodView["status"], string> = {
+    open: "งวดเปิดอยู่",
+    closed: "ปิดงวดแล้ว",
+    reconciled: "กระทบยอดครบแล้ว",
+  };
+
   return (
     <div className="space-y-6 md:space-y-8">
       <PageHeader
@@ -292,6 +303,43 @@ function ReconciliationPage() {
           </div>
         }
       />
+
+      {!isLoading && funds.length > 0 && (
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-card border border-border bg-card px-5 py-3.5 text-xs">
+          <span className="flex items-center gap-1.5 text-success">
+            <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+            บันทึกรายการแล้ว
+          </span>
+          <span
+            className={cn(
+              "flex items-center gap-1.5",
+              allFundsReconciled ? "text-success" : "text-muted-foreground",
+            )}
+          >
+            {allFundsReconciled ? (
+              <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+            ) : (
+              <Circle className="h-3.5 w-3.5" strokeWidth={2} />
+            )}
+            กระทบยอดแล้ว {reconciledFundCount}/{funds.length} กองทุน
+          </span>
+          {currentPeriod && (
+            <span
+              className={cn(
+                "flex items-center gap-1.5",
+                currentPeriod.status === "open" ? "text-muted-foreground" : "text-success",
+              )}
+            >
+              {currentPeriod.status === "open" ? (
+                <Circle className="h-3.5 w-3.5" strokeWidth={2} />
+              ) : (
+                <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+              )}
+              {PERIOD_STATUS_LABEL[currentPeriod.status]}
+            </span>
+          )}
+        </div>
+      )}
 
       {isError ? (
         <div className="flex items-center justify-between gap-4 rounded-card border border-destructive/30 bg-destructive/5 px-5 py-4">
@@ -436,8 +484,11 @@ function ReconciliationPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {fundRows.map((f) => (
-                    <TableRow key={f.name}>
+                  {fundRows.map((f, i) => (
+                    <TableRow
+                      key={f.name}
+                      className={fundRows.length > 5 && i % 2 === 1 ? "bg-muted/15" : undefined}
+                    >
                       <TableCell className="font-medium text-foreground">{f.name}</TableCell>
                       <TableCell className="num-display text-right text-muted-foreground">
                         {thb(f.openingBalance)}
