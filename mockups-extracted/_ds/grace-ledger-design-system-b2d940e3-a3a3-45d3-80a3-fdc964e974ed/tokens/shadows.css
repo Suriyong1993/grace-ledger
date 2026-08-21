@@ -1,0 +1,9 @@
+:root{
+  /* Border beats shadow — these are intentionally faint; used only where
+     real overlap happens (dialogs, popovers, elevated hero surfaces). */
+  --shadow-xs:0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-sm-card:0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.03);
+  --shadow-card:0 1px 2px 0 rgb(0 0 0 / 0.04), 0 3px 10px -4px rgb(0 0 0 / 0.04);
+  --shadow-elevated:0 1px 4px -1px rgb(0 0 0 / 0.05), 0 6px 16px -6px rgb(0 0 0 / 0.06);
+  --shadow-hover-card:0 4px 12px -2px rgb(0 0 0 / 0.06), 0 8px 24px -4px rgb(0 0 0 / 0.05);
+}

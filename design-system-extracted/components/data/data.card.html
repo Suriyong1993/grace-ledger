@@ -1,0 +1,29 @@
+<!-- @dsCard group="Components" viewport="700x320" name="Cards, StatCard, MoneyText" subtitle="Data-display primitives" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:20px;background:var(--background);font-family:'Sarabun',sans-serif;display:flex;flex-direction:column;gap:16px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Card, StatCard, MoneyText } = window.GraceLedgerDesignSystem_b2d940;
+function App(){
+  return (<>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"12px"}}>
+      <StatCard label="รายรับเดือนนี้" value="฿245,000.00" tone="success" trend={12.4} hint="38 รายการ"/>
+      <StatCard label="รายจ่ายเดือนนี้" value="฿98,200.00" tone="danger" trend={-4.1} hint="21 รายการ"/>
+      <StatCard label="รอการอนุมัติ" value="6 รายการ" tone="warning"/>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"12px"}}>
+      <Card title="กองทุนทั่วไป" description="เปิดเมื่อ ม.ค. 2568">
+        <MoneyText value={128450} />
+      </Card>
+      <Card variant="interactive" title="เงินถวายอาทิตย์นี้">
+        <div style={{display:"flex",gap:"16px"}}><MoneyText value={5000} tone="income"/><MoneyText value={1200} tone="expense"/></div>
+      </Card>
+    </div>
+  </>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>

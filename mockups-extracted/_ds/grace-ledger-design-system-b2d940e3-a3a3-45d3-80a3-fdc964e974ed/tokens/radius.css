@@ -1,0 +1,15 @@
+:root{
+  --radius:0.75rem;         /* 12px base */
+  --radius-sm:0.5rem;       /* 8px */
+  --radius-md:0.75rem;      /* 12px */
+  --radius-lg:1rem;         /* 16px */
+  --radius-xl:1.25rem;      /* 20px */
+  --radius-2xl:1.5rem;      /* 24px */
+  --radius-button:1.125rem; /* 18px */
+  --radius-input:0.875rem;  /* 14px */
+  --radius-card:1.5rem;     /* 24px */
+  --radius-dialog:1.75rem;  /* 28px */
+  --radius-sheet:2rem;      /* 32px */
+  --radius-full:9999px;
+  --radius-table:0px;       /* tables/cells never round — border is the depth cue */
+}

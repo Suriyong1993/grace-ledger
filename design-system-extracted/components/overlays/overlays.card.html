@@ -1,0 +1,18 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Dialog" subtitle="Confirmation / short-form modal" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:0;background:var(--muted);font-family:'Sarabun',sans-serif;height:300px;overflow:hidden}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Dialog, Input, Button } = window.GraceLedgerDesignSystem_b2d940;
+function App(){
+  return (<Dialog open={true} title="สร้างกองทุนใหม่" description="เพิ่มกองทุนสำหรับติดตามยอดแยกจากกองทุนทั่วไป" onClose={()=>{}}
+    footer={<><Button variant="outline">ยกเลิก</Button><Button>บันทึก</Button></>}>
+    <Input label="ชื่อกองทุน" placeholder="เช่น กองทุนพันธกิจ"/>
+  </Dialog>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>

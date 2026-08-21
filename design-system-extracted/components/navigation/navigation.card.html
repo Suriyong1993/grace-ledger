@@ -1,0 +1,19 @@
+<!-- @dsCard group="Components" viewport="700x220" name="PageHeader & Tabs" subtitle="Page structure primitives" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:20px;background:var(--background);font-family:'Sarabun',sans-serif}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { PageHeader, Tabs, Button } = window.GraceLedgerDesignSystem_b2d940;
+function App(){
+  const [v,setV]=React.useState("month");
+  return (<>
+    <PageHeader kicker="ภาพรวม" title="แดชบอร์ด" description="สรุปการเงินคริสตจักรของคุณ" actions={<Button size="sm">+ บันทึกรายรับ</Button>}/>
+    <Tabs items={[{value:"month",label:"รายเดือน"},{value:"year",label:"รายปี"}]} value={v} onChange={setV}/>
+  </>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>

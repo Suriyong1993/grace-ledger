@@ -1,0 +1,30 @@
+<!-- @dsCard group="Components" viewport="700x220" name="Buttons" subtitle="Variants, sizes, states" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:20px;background:var(--background);display:flex;flex-direction:column;gap:14px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Button } = window.GraceLedgerDesignSystem_b2d940;
+function App(){
+  return (<>
+    <div style={{display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
+      <Button>บันทึกรายรับ</Button>
+      <Button variant="secondary">ยกเลิก</Button>
+      <Button variant="outline">ดูรายละเอียด</Button>
+      <Button variant="ghost">เพิ่มเติม</Button>
+      <Button variant="destructive">ปฏิเสธ</Button>
+      <Button disabled>ไม่พร้อมใช้งาน</Button>
+    </div>
+    <div style={{display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
+      <Button size="sm">sm 36px</Button>
+      <Button size="default">default 44px</Button>
+      <Button size="lg">lg 48px</Button>
+      <Button size="icon">＋</Button>
+    </div>
+  </>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>

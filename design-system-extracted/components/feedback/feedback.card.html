@@ -1,0 +1,25 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Badges & empty state" subtitle="Badge, StatusBadge, EmptyState" -->
+<!DOCTYPE html><html><head><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:20px;background:var(--background);font-family:'Sarabun',sans-serif;display:flex;flex-direction:column;gap:16px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Badge, StatusBadge, EmptyState, Button } = window.GraceLedgerDesignSystem_b2d940;
+function App(){
+  return (<>
+    <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+      <Badge variant="success">อนุมัติแล้ว</Badge><Badge variant="warning">รอดำเนินการ</Badge>
+      <Badge variant="destructive">ปฏิเสธ</Badge><Badge variant="outline">Draft</Badge><Badge variant="info">ข้อมูล</Badge>
+    </div>
+    <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+      <StatusBadge status="draft"/><StatusBadge status="pending"/><StatusBadge status="approved"/>
+      <StatusBadge status="rejected"/><StatusBadge status="voided"/>
+    </div>
+    <EmptyState title="ยังไม่มีรายรับ" description="เริ่มบันทึกรายรับเพื่อดูข้อมูลที่นี่" action={<Button size="sm">บันทึกรายรับ</Button>}/>
+  </>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>

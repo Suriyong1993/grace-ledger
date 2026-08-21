@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+<link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+<script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#EDE8E1}
+a{color:var(--primary);text-decoration:none}
+a:hover{color:var(--primary-dark)}
+</style>
+</helmet>
+
+<section style="padding:56px 60px 34px;max-width:1180px;font-family:var(--font-sans);color:var(--foreground)">
+<p class="kicker" style="margin:0 0 10px">Grace Ledger · Church Financial OS</p>
+<h1 style="margin:0;font-family:var(--font-display);font-size:38px;font-weight:600;letter-spacing:-0.02em;line-height:1.15;text-wrap:balance">Mobile mockups — 18 หน้าจอ ใน 5 ชุดงานจริงของโบสถ์</h1>
+<p style="margin:14px 0 0;font-size:15px;line-height:1.6;color:var(--muted-foreground);max-width:680px;text-wrap:pretty">iPhone 390×844 · ภาษาไทยทั้งหมด ตัวเลขเป็นเลขอารบิกด้วย Inter (<span class="num-display">฿</span> 2 ตำแหน่ง ไม่ปัดเศษ) · สีส้มแบรนด์ใช้เฉพาะปุ่มหลักและสถานะที่กำลังใช้งาน · สีเงิน–รายรับเขียว รายจ่ายแดง รอดำเนินการเหลือง เท่านั้น</p>
+<sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:30px">
+<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px 20px">
+<p class="kicker" style="margin:0 0 8px">สมมติฐาน</p>
+<p style="margin:0;font-size:13px;line-height:1.65;color:var(--muted-foreground)">ผู้ใช้หลักคือเหรัญญิกที่ยืนอยู่หลังนมัสการ ใช้มือเดียว · ทุกงานที่ทำบ่อยอยู่ไม่เกิน 3 แตะจากหน้าหลัก · ความซับซ้อนทางบัญชี (ผังบัญชี เดบิต/เครดิต) ไม่ปรากฏบนหน้าจอเลย</p>
+</div>
+<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px 20px">
+<p class="kicker" style="margin:0 0 8px">โครงสร้าง</p>
+<p style="margin:0;font-size:13px;line-height:1.65;color:var(--muted-foreground)">Bottom nav 5 ปลายทาง: หน้าหลัก · การเงิน · กองทุน · รายงาน · เพิ่มเติม — งานที่เหลือ (สมาชิก อนุมัติ ตรวจสอบย้อนหลัง ตั้งค่า) เข้าถึงจาก “ต้องตรวจสอบ” บนหน้าหลัก และ sheet ใน “เพิ่มเติม”</p>
+</div>
+<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px 20px">
+<p class="kicker" style="margin:0 0 8px">กฎการออกแบบ</p>
+<p style="margin:0;font-size:13px;line-height:1.65;color:var(--muted-foreground)">พื้นหลังไม่เกิน 2 สี (ขาว + off-white) · เส้นขอบเป็นตัวบอกระดับชั้น เงาใช้เฉพาะที่ซ้อนกันจริง · ปุ่มและแถวแตะได้สูงอย่างน้อย 44px · ไม่มีกราฟที่ไม่ช่วยให้เข้าใจเร็วขึ้น</p>
+</div>
+</div>
+</sc-if>
+</section>
+
+<section style="padding:0 60px 44px;font-family:var(--font-sans);color:var(--foreground)">
+<div style="display:flex;align-items:baseline;gap:12px;margin:0 0 22px">
+<span style="font:600 11px var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:#171717;color:#fff;padding:4px 9px;border-radius:6px">ชุดที่ 1</span>
+<span style="font-family:var(--font-display);font-size:16px;font-weight:600">ศูนย์บัญชาการการเงิน · ดูเงิน แล้วเจาะลึก</span>
+<span style="font-size:13px;color:var(--muted-foreground)">หน้าหลัก → รายการเงิน → รายละเอียด + ประวัติการตรวจสอบ</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">01</span><span style="font-size:13px;font-weight:600">หน้าหลัก</span><span style="font-size:12px;color:var(--muted-foreground)">Home</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 12px;display:flex;align-items:center;gap:12px">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12.5px;color:var(--muted-foreground)">สวัสดีตอนเช้า</div>
+      <div style="font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-0.01em;margin-top:1px">คุณสมชาย · เหรัญญิก</div>
+    </div>
+    <div style="position:relative;width:44px;height:44px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);display:grid;place-items:center">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.5 20a2 2 0 0 0 3 0"/></svg>
+      <span style="position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:var(--radius-full);background:var(--primary);border:1.5px solid var(--card)"></span>
+    </div>
+    <div style="width:44px;height:44px;border-radius:var(--radius-full);background:var(--accent);color:var(--accent-foreground);display:grid;place-items:center;font-family:var(--font-display);font-weight:600;font-size:14px">สช</div>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:4px 20px 14px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-elevated);padding:20px">
+      <p class="kicker" style="margin:0">ยอดเงินคงเหลือทั้งหมด</p>
+      <p class="num-display" style="margin:10px 0 0;font-family:var(--font-display);font-size:38px;font-weight:700;line-height:1;letter-spacing:-0.02em">฿248,560.00</p>
+      <p style="margin:8px 0 0;font-size:12px;color:var(--muted-foreground)">3 บัญชีธนาคาร + เงินสดในมือ · ข้อมูล ณ 08:12 น.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div>
+          <div style="font-size:11.5px;color:var(--muted-foreground)">รายรับเดือนนี้</div>
+          <div class="num-display" style="font-size:16px;font-weight:600;color:var(--income);margin-top:4px">+฿18,450.00</div>
+        </div>
+        <div>
+          <div style="font-size:11.5px;color:var(--muted-foreground)">รายจ่ายเดือนนี้</div>
+          <div class="num-display" style="font-size:16px;font-weight:600;color:var(--expense);margin-top:4px">−฿12,820.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div style="background:var(--primary);color:var(--primary-foreground);border-radius:var(--radius-lg);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;min-height:72px;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span style="font-size:11px;font-weight:600;text-align:center;line-height:1.25">บันทึก<br>เงินถวาย</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;min-height:72px;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>
+        <span style="font-size:11px;font-weight:500;text-align:center;line-height:1.25">บันทึก<br>รายจ่าย</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;min-height:72px;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>
+        <span style="font-size:11px;font-weight:500;text-align:center;line-height:1.25">โอน<br>ระหว่างกองทุน</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;min-height:72px;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span style="font-size:11px;font-weight:500;text-align:center;line-height:1.25">รายการ<br>ทั้งหมด</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+        <span style="font-family:var(--font-display);font-size:14.5px;font-weight:600">ต้องการให้คุณตรวจสอบ</span>
+        <span class="num-display" style="font-size:12px;font-weight:600;color:var(--pending)">3 เรื่อง</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--pending-muted);color:var(--warning);display:grid;place-items:center;flex-shrink:0">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">3 รายการรออนุมัติจากคุณ</div>
+            <div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">รวม ฿73,500.00 · เก่าสุด 2 วัน</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--offering-muted);color:var(--offering);display:grid;place-items:center;flex-shrink:0">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="7" width="18" height="11" rx="2.5"/><circle cx="12" cy="12.5" r="2.2"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">นับเงินถวายวันอาทิตย์ ยังไม่ยืนยัน</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ต้องมีผู้ยืนยัน 2 คน · มีแล้ว 1 คน</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);color:var(--info);display:grid;place-items:center;flex-shrink:0">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 13h7M9 17h4"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">รายงานการเงินเดือนกรกฎาคม พร้อมแล้ว</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">รอการตรวจทานก่อนปิดงวด</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+        <span style="font-family:var(--font-display);font-size:14.5px;font-weight:600">กองทุน</span>
+        <span style="font-size:12px;color:var(--primary);font-weight:600">ดูทั้งหมด</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px">
+          <div style="font-size:12.5px;color:var(--muted-foreground)">กองทุนทั่วไป</div>
+          <div class="num-display" style="font-size:16px;font-weight:600;margin-top:4px">฿128,450.00</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px">
+          <div style="font-size:12.5px;color:var(--muted-foreground)">กองทุนพันธกิจ</div>
+          <div class="num-display" style="font-size:16px;font-weight:600;margin-top:4px">฿42,300.00</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px">
+          <div style="font-size:12.5px;color:var(--muted-foreground)">กองทุนอาคาร</div>
+          <div class="num-display" style="font-size:16px;font-weight:600;margin-top:4px">฿65,800.00</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 14px">
+          <div style="font-size:12.5px;color:var(--muted-foreground)">กองทุนเยาวชน</div>
+          <div class="num-display" style="font-size:16px;font-weight:600;margin-top:4px">฿12,010.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+        <span style="font-family:var(--font-display);font-size:14.5px;font-weight:600">ความเคลื่อนไหวล่าสุด</span>
+        <span style="font-size:12px;color:var(--primary);font-weight:600">ดูทั้งหมด</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:4px 16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--income-muted);color:var(--income);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">เงินถวายวันอาทิตย์</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">กองทุนทั่วไป · เงินสด · วันนี้</div>
+          </div>
+          <div class="num-display" style="font-size:14.5px;font-weight:600;color:var(--income)">+฿18,450.00</div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--expense-muted);color:var(--expense);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">ค่าไฟฟ้าเดือนกรกฎาคม</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">กองทุนทั่วไป · โอน · 12 ส.ค.</div>
+          </div>
+          <div class="num-display" style="font-size:14.5px;font-weight:600;color:var(--expense)">−฿4,280.00</div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);color:var(--muted-foreground);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">โอนเข้ากองทุนอาคาร</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">จากกองทุนทั่วไป · 11 ส.ค.</div>
+          </div>
+          <div class="num-display" style="font-size:14.5px;font-weight:600">฿50,000.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);padding:9px 6px 30px;border-top:1px solid var(--border);background:color-mix(in oklch, var(--card) 92%, transparent);backdrop-filter:blur(12px)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--primary);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg><span style="font-size:10.5px;font-weight:600">หน้าหลัก</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/></svg><span style="font-size:10.5px">การเงิน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/></svg><span style="font-size:10.5px">กองทุน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span style="font-size:10.5px">รายงาน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg><span style="font-size:10.5px">เพิ่มเติม</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">02</span><span style="font-size:13px;font-weight:600">รายการเงิน</span><span style="font-size:12px;color:var(--muted-foreground)">Transactions</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 10px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="flex:1"><div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em">รายการเงิน</div>
+      <div class="num-display" style="font-size:12px;color:var(--muted-foreground);margin-top:2px">สิงหาคม 2026 · 148 รายการ</div></div>
+      <div style="width:44px;height:44px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;height:44px;padding:0 14px;border:1px solid var(--input);border-radius:var(--radius-input);background:var(--background)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+      <span style="font-size:14px;color:var(--muted-foreground)">ค้นหารายการ ผู้บันทึก หรือจำนวนเงิน</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;overflow:hidden">
+      <span style="font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:var(--radius-full);background:var(--primary);color:var(--primary-foreground);white-space:nowrap">ทั้งหมด</span>
+      <span style="font-size:12.5px;padding:7px 13px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);white-space:nowrap">รายรับ</span>
+      <span style="font-size:12.5px;padding:7px 13px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);white-space:nowrap">รายจ่าย</span>
+      <span style="font-size:12.5px;padding:7px 13px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);white-space:nowrap">โอน</span>
+      <span style="font-size:12.5px;padding:7px 13px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--card);white-space:nowrap">รออนุมัติ</span>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:14px 20px 14px;display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;gap:10px">
+      <div style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px">
+        <div style="font-size:11.5px;color:var(--muted-foreground)">รายรับเดือนนี้</div>
+        <div class="num-display" style="font-size:15.5px;font-weight:600;color:var(--income);margin-top:3px">+฿18,450.00</div>
+      </div>
+      <div style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px">
+        <div style="font-size:11.5px;color:var(--muted-foreground)">รายจ่ายเดือนนี้</div>
+        <div class="num-display" style="font-size:15.5px;font-weight:600;color:var(--expense);margin-top:3px">−฿12,820.00</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="kicker" style="margin:0 0 8px">วันนี้ · 14 สิงหาคม</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:2px 16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 0">
+          <div style="width:36px;height:36px;border-radius:12px;background:var(--income-muted);color:var(--income);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">เงินถวายวันอาทิตย์</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">กองทุนทั่วไป · ถวายทรัพย์ · เงินสด</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="num-display" style="font-size:14.5px;font-weight:600;color:var(--income)">+฿18,450.00</div>
+            <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="pending" hint-size="auto,20px"></x-import>
+          </div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 0">
+          <div style="width:36px;height:36px;border-radius:12px;background:var(--expense-muted);color:var(--expense);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">ซื้ออุปกรณ์ห้องเยาวชน</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">กองทุนเยาวชน · พันธกิจเยาวชน · โอน</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="num-display" style="font-size:14.5px;font-weight:600;color:var(--expense)">−฿8,500.00</div>
+            <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="pending" hint-size="auto,20px"></x-import>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="kicker" style="margin:0 0 8px">เมื่อวาน · 13 สิงหาคม</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:2px 16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 0">
+          <div style="width:36px;height:36px;border-radius:12px;background:var(--secondary);color:var(--muted-foreground);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">โอนเข้ากองทุนอาคาร</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">จากกองทุนทั่วไป · โอนภายใน</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="num-display" style="font-size:14.5px;font-weight:600">฿50,000.00</div>
+            <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="approved" hint-size="auto,20px"></x-import>
+          </div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 0">
+          <div style="width:36px;height:36px;border-radius:12px;background:var(--expense-muted);color:var(--expense);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">ค่าไฟฟ้าเดือนกรกฎาคม</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">กองทุนทั่วไป · สาธารณูปโภค · โอน</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="num-display" style="font-size:14.5px;font-weight:600;color:var(--expense)">−฿4,280.00</div>
+            <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="approved" hint-size="auto,20px"></x-import>
+          </div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 0">
+          <div style="width:36px;height:36px;border-radius:12px;background:var(--income-muted);color:var(--income);display:grid;place-items:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:500">ถวายพันธกิจมิชชั่น</div>
+            <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">กองทุนพันธกิจ · QR พร้อมเพย์</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="num-display" style="font-size:14.5px;font-weight:600;color:var(--income)">+฿2,300.00</div>
+            <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="approved" hint-size="auto,20px"></x-import>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);padding:9px 6px 30px;border-top:1px solid var(--border);background:color-mix(in oklch, var(--card) 92%, transparent);backdrop-filter:blur(12px)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg><span style="font-size:10.5px">หน้าหลัก</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--primary);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/></svg><span style="font-size:10.5px;font-weight:600">การเงิน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/></svg><span style="font-size:10.5px">กองทุน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span style="font-size:10.5px">รายงาน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg><span style="font-size:10.5px">เพิ่มเติม</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">03</span><span style="font-size:13px;font-weight:600">รายละเอียดรายการ</span><span style="font-size:12px;color:var(--muted-foreground)">Transaction detail + audit</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 12px;display:flex;align-items:center;gap:12px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:16px;font-weight:600">รายละเอียดรายการ</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">EXP-0248</div></div>
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="18" r="1.4"/></svg></div>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:16px 20px 16px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <span style="font-size:12.5px;color:var(--muted-foreground)">รายจ่าย · ซื้ออุปกรณ์ห้องเยาวชน</span>
+      <span class="num-display" style="font-family:var(--font-display);font-size:34px;font-weight:700;color:var(--expense);line-height:1">−฿8,500.00</span>
+      <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="pending" hint-size="auto,22px"></x-import>
+      <span style="font-size:11.5px;color:var(--muted-foreground);text-align:center">รออนุมัติจากศิษยาภิบาล · ส่งเมื่อ 14 ส.ค. 09:31</span>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:4px 16px">
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0"><span style="font-size:13px;color:var(--muted-foreground)">กองทุน</span><span style="font-size:13.5px;font-weight:500">กองทุนเยาวชน</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0"><span style="font-size:13px;color:var(--muted-foreground)">หมวด</span><span style="font-size:13.5px;font-weight:500">พันธกิจเยาวชน</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0"><span style="font-size:13px;color:var(--muted-foreground)">บัญชี</span><span style="font-size:13.5px;font-weight:500">ธ.กรุงไทย ···4821</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0"><span style="font-size:13px;color:var(--muted-foreground)">วันที่</span><span class="num-display" style="font-size:13.5px;font-weight:500">14 ส.ค. 2026</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0"><span style="font-size:13px;color:var(--muted-foreground)">ผู้บันทึก</span><span style="font-size:13.5px;font-weight:500">นรินทร์ (ธุรการ)</span></div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px">
+      <p class="kicker" style="margin:0 0 10px">เอกสารแนบ</p>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:52px;height:64px;border-radius:10px;border:1px solid var(--border);background:var(--secondary);display:grid;place-items:center;color:var(--muted-foreground);font-size:10px">ใบเสร็จ</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:500">receipt-yth-0248.jpg</div>
+          <div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">1.2 MB · แนบโดยนรินทร์</div>
+        </div>
+        <span style="font-size:12.5px;font-weight:600;color:var(--primary)">เปิดดู</span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px">
+      <p class="kicker" style="margin:0 0 14px">ประวัติการตรวจสอบ</p>
+      <div style="display:flex;gap:12px">
+        <div style="width:9px;display:flex;flex-direction:column;align-items:center;padding-top:4px"><span style="width:9px;height:9px;border-radius:var(--radius-full);background:var(--pending)"></span><span style="flex:1;width:1px;background:var(--border)"></span></div>
+        <div style="flex:1;padding-bottom:16px"><div style="font-size:13.5px;font-weight:500">รอการอนุมัติ</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ส่งถึงศิษยาภิบาลสมชาย · 14 ส.ค. 09:31</div></div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <div style="width:9px;display:flex;flex-direction:column;align-items:center;padding-top:4px"><span style="width:9px;height:9px;border-radius:var(--radius-full);background:var(--border)"></span><span style="flex:1;width:1px;background:var(--border)"></span></div>
+        <div style="flex:1;padding-bottom:16px"><div style="font-size:13.5px;font-weight:500">แนบใบเสร็จ</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">นรินทร์ · 14 ส.ค. 09:28</div></div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <div style="width:9px;display:flex;flex-direction:column;align-items:center;padding-top:4px"><span style="width:9px;height:9px;border-radius:var(--radius-full);background:var(--border)"></span></div>
+        <div style="flex:1"><div style="font-size:13.5px;font-weight:500">สร้างรายการ</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">นรินทร์ · 14 ส.ค. 09:24</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card);display:flex;gap:10px">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" dc-props="{{ flexBtn }}" hint-size="100%,44px">ขอแก้ไข</x-import>
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" dc-props="{{ flexBtn }}" hint-size="100%,44px">อนุมัติรายการนี้</x-import>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+</section>
+
+
+<section style="padding:0 60px 44px;font-family:var(--font-sans);color:var(--foreground)">
+<div style="display:flex;align-items:baseline;gap:12px;margin:0 0 22px">
+<span style="font:600 11px var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:#171717;color:#fff;padding:4px 9px;border-radius:6px">ชุดที่ 2</span>
+<span style="font-family:var(--font-display);font-size:16px;font-weight:600">เงินถวายวันอาทิตย์ · จากถุงถวายถึงบันทึกที่ยืนยันแล้ว</span>
+<span style="font-size:13px;color:var(--muted-foreground)">บันทึก → ตรวจทาน → นับเงิน → ยืนยัน (รวมสถานะยอดไม่ตรง)</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">04</span><span style="font-size:13px;font-weight:600">บันทึกเงินถวาย</span><span style="font-size:12px;color:var(--muted-foreground)">ขั้นที่ 1</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+      <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:16px;font-weight:600">เงินถวายวันอาทิตย์</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">อาทิตย์ 14 สิงหาคม 2026 · รอบเช้า</div></div>
+      <span class="num-display" style="font-size:12px;font-weight:600;color:var(--muted-foreground)">1 / 3</span>
+    </div>
+    <div style="display:flex;gap:5px;margin-top:14px">
+      <span style="flex:1;height:3px;border-radius:2px;background:var(--primary)"></span>
+      <span style="flex:1;height:3px;border-radius:2px;background:var(--border)"></span>
+      <span style="flex:1;height:3px;border-radius:2px;background:var(--border)"></span>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--offering-muted);border:1px solid color-mix(in oklch, var(--offering) 35%, transparent);border-radius:var(--radius-card);padding:18px 20px">
+      <p class="kicker" style="margin:0;color:var(--offering-foreground);opacity:.75">รวมที่กรอกแล้ว</p>
+      <p class="num-display" style="margin:8px 0 0;font-family:var(--font-display);font-size:32px;font-weight:700;line-height:1;color:var(--offering-foreground)">฿18,450.00</p>
+      <p style="margin:6px 0 0;font-size:11.5px;color:var(--offering-foreground);opacity:.7">5 หมวด · แตะช่องเพื่อแก้ไข</p>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">หมวดการถวาย</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:2px 16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 0;min-height:44px">
+          <span style="flex:1;font-size:14px;font-weight:500">ถวายทรัพย์ทั่วไป</span>
+          <span class="num-display" style="min-width:104px;text-align:right;font-size:15px;font-weight:600;padding:8px 12px;border:1px solid var(--primary);border-radius:var(--radius-input);background:var(--card)">9,200.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 0;min-height:44px">
+          <span style="flex:1;font-size:14px;font-weight:500">สิบลด</span>
+          <span class="num-display" style="min-width:104px;text-align:right;font-size:15px;font-weight:600;padding:8px 12px;border:1px solid var(--input);border-radius:var(--radius-input);background:var(--card)">5,400.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 0;min-height:44px">
+          <span style="flex:1;font-size:14px;font-weight:500">พันธกิจมิชชั่น</span>
+          <span class="num-display" style="min-width:104px;text-align:right;font-size:15px;font-weight:600;padding:8px 12px;border:1px solid var(--input);border-radius:var(--radius-input);background:var(--card)">2,300.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 0;min-height:44px">
+          <span style="flex:1;font-size:14px;font-weight:500">กองทุนอาคาร</span>
+          <span class="num-display" style="min-width:104px;text-align:right;font-size:15px;font-weight:600;padding:8px 12px;border:1px solid var(--input);border-radius:var(--radius-input);background:var(--card)">1,050.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 0;min-height:44px">
+          <span style="flex:1;font-size:14px;font-weight:500">พันธกิจเยาวชน</span>
+          <span class="num-display" style="min-width:104px;text-align:right;font-size:15px;font-weight:600;padding:8px 12px;border:1px solid var(--input);border-radius:var(--radius-input);background:var(--card)">500.00</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--primary);font-size:13px;font-weight:600;min-height:44px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>เพิ่มหมวดอื่น
+      </div>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">ช่องทางที่รับ</p>
+      <div style="display:flex;gap:8px">
+        <span style="flex:1;text-align:center;font-size:13px;font-weight:600;padding:12px 0;border-radius:var(--radius-input);background:var(--primary);color:var(--primary-foreground)">เงินสด</span>
+        <span style="flex:1;text-align:center;font-size:13px;padding:12px 0;border-radius:var(--radius-input);border:1px solid var(--border);background:var(--card)">โอน</span>
+        <span style="flex:1;text-align:center;font-size:13px;padding:12px 0;border-radius:var(--radius-input);border:1px solid var(--border);background:var(--card)">QR</span>
+        <span style="flex:1;text-align:center;font-size:13px;padding:12px 0;border-radius:var(--radius-input);border:1px solid var(--border);background:var(--card)">อื่น ๆ</span>
+      </div>
+      <p style="margin:8px 0 0;font-size:11.5px;color:var(--muted-foreground)">เงินสดจะถูกส่งไปขั้นตอนนับเงินอัตโนมัติ</p>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;gap:8px">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="lg" dc-props="{{ fullBtn }}" hint-size="100%,48px">ต่อไป · ตรวจทาน</x-import>
+    <span style="text-align:center;font-size:11.5px;color:var(--muted-foreground)">บันทึกร่างอัตโนมัติทุก 10 วินาที</span>
+  </div>
+</div>
+</x-import>
+</div>
+
+<sc-if value="{{ showFlowArrows }}" hint-placeholder-val="{{ true }}">
+<div style="align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted-foreground);padding-top:24px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 12h15l-5-5M19 12l-5 5"/></svg>
+<span style="font-size:11px">ตรวจทาน</span>
+</div>
+</sc-if>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">05</span><span style="font-size:13px;font-weight:600">ตรวจทานก่อนบันทึก</span><span style="font-size:12px;color:var(--muted-foreground)">Bottom sheet</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;position:relative;background:var(--background);font-family:var(--font-sans);color:var(--foreground);overflow:hidden">
+  <div style="padding:58px 20px 0;filter:blur(0.4px);opacity:.45">
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:600">เงินถวายวันอาทิตย์</div>
+    <div class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">อาทิตย์ 14 สิงหาคม 2026</div>
+    <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);height:120px"></div>
+    <div style="margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);height:180px"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(23,23,23,0.34)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top-left-radius:var(--radius-sheet);border-top-right-radius:var(--radius-sheet);box-shadow:var(--shadow-elevated);padding:10px 20px 30px;display:flex;flex-direction:column;gap:14px">
+    <div style="align-self:center;width:40px;height:4px;border-radius:2px;background:var(--border)"></div>
+    <div>
+      <div style="font-family:var(--font-display);font-size:19px;font-weight:600;letter-spacing:-0.02em">ตรวจทานก่อนบันทึก</div>
+      <div style="font-size:12.5px;color:var(--muted-foreground);margin-top:3px">ตรวจตัวเลขให้ตรงกับที่นับได้ ก่อนส่งเข้าระบบบัญชี</div>
+    </div>
+    <div style="background:var(--background);border:1px solid var(--border);border-radius:var(--radius-lg);padding:4px 14px">
+      <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font-size:13px;color:var(--muted-foreground)">ถวายทรัพย์ทั่วไป</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿9,200.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font-size:13px;color:var(--muted-foreground)">สิบลด</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿5,400.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font-size:13px;color:var(--muted-foreground)">พันธกิจมิชชั่น</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿2,300.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font-size:13px;color:var(--muted-foreground)">กองทุนอาคาร</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿1,050.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font-size:13px;color:var(--muted-foreground)">พันธกิจเยาวชน</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿500.00</span></div>
+      <div style="height:1px;background:var(--border)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:12px 0"><span style="font-size:14px;font-weight:600">รวมทั้งหมด</span><span class="num-display" style="font-family:var(--font-display);font-size:20px;font-weight:700">฿18,450.00</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--background)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V8a4 4 0 0 1 8 0v2"/></svg>
+      <span style="flex:1;font-size:12.5px;color:var(--muted-foreground)">บันทึกโดย <span style="color:var(--foreground);font-weight:500">คุณสมชาย</span> · จะปรากฏในประวัติการตรวจสอบทันที</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="lg" dc-props="{{ fullBtn }}" hint-size="100%,48px">ยืนยันและส่งไปนับเงิน</x-import>
+      <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="ghost" dc-props="{{ fullBtn }}" hint-size="100%,44px">กลับไปแก้ไข</x-import>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<sc-if value="{{ showFlowArrows }}" hint-placeholder-val="{{ true }}">
+<div style="align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted-foreground);padding-top:24px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 12h15l-5-5M19 12l-5 5"/></svg>
+<span style="font-size:11px">นับเงิน</span>
+</div>
+</sc-if>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">06</span><span style="font-size:13px;font-weight:600">นับเงินสด</span><span style="font-size:12px;color:var(--muted-foreground)">ยอดตรง</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:16px;font-weight:600">นับเงินสด</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">อาทิตย์ 14 สิงหาคม · รอบเช้า</div></div>
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Badge" variant="outline" hint-size="auto,22px">กำลังนับ</x-import>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div>
+      <p class="kicker" style="margin:0 0 8px">ธนบัตรและเหรียญ</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:2px 16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;min-height:44px">
+          <span class="num-display" style="width:52px;font-size:14px;font-weight:600">1000</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted-foreground)">−</span>
+            <span class="num-display" style="min-width:34px;text-align:center;font-size:16px;font-weight:600">10</span>
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center;color:var(--foreground)">+</span>
+          </div>
+          <span class="num-display" style="width:82px;text-align:right;font-size:13.5px;color:var(--muted-foreground)">฿10,000.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;min-height:44px">
+          <span class="num-display" style="width:52px;font-size:14px;font-weight:600">500</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted-foreground)">−</span>
+            <span class="num-display" style="min-width:34px;text-align:center;font-size:16px;font-weight:600">12</span>
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center">+</span>
+          </div>
+          <span class="num-display" style="width:82px;text-align:right;font-size:13.5px;color:var(--muted-foreground)">฿6,000.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;min-height:44px">
+          <span class="num-display" style="width:52px;font-size:14px;font-weight:600">100</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted-foreground)">−</span>
+            <span class="num-display" style="min-width:34px;text-align:center;font-size:16px;font-weight:600">24</span>
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center">+</span>
+          </div>
+          <span class="num-display" style="width:82px;text-align:right;font-size:13.5px;color:var(--muted-foreground)">฿2,400.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;min-height:44px">
+          <span class="num-display" style="width:52px;font-size:14px;font-weight:600">50</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted-foreground)">−</span>
+            <span class="num-display" style="min-width:34px;text-align:center;font-size:16px;font-weight:600">5</span>
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center">+</span>
+          </div>
+          <span class="num-display" style="width:82px;text-align:right;font-size:13.5px;color:var(--muted-foreground)">฿250.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;min-height:44px">
+          <span class="num-display" style="width:52px;font-size:14px;font-weight:600">20</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center;color:var(--muted-foreground)">−</span>
+            <span class="num-display" style="min-width:34px;text-align:center;font-size:16px;font-weight:600">8</span>
+            <span style="width:34px;height:34px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center">+</span>
+          </div>
+          <span class="num-display" style="width:82px;text-align:right;font-size:13.5px;color:var(--muted-foreground)">฿160.00</span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;min-height:44px">
+          <span style="width:52px;font-size:14px;font-weight:600">เหรียญ</span>
+          <span style="flex:1;font-size:11.5px;color:var(--muted-foreground)">กรอกยอดรวม</span>
+          <span class="num-display" style="width:110px;text-align:right;font-size:15px;font-weight:600;padding:8px 12px;border:1px solid var(--input);border-radius:var(--radius-input)">−390.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px">
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:13px;color:var(--muted-foreground)">ยอดที่ควรได้</span><span class="num-display" style="font-size:14px;font-weight:600">฿18,450.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:13px;color:var(--muted-foreground)">ยอดที่นับได้</span><span class="num-display" style="font-size:14px;font-weight:600">฿18,450.00</span></div>
+      <div style="height:1px;background:var(--border);margin:8px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:14px;font-weight:600">ผลต่าง</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;color:var(--income);font-weight:600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span class="num-display" style="font-size:16px">฿0.00</span></span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px">
+      <p class="kicker" style="margin:0 0 12px">ผู้ร่วมนับและยืนยัน</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:32px;height:32px;border-radius:var(--radius-full);background:var(--accent);color:var(--accent-foreground);display:grid;place-items:center;font-size:12px;font-weight:600">สช</span>
+          <span style="flex:1;font-size:13.5px;font-weight:500">คุณสมชาย · เหรัญญิก</span>
+          <span style="color:var(--income)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:32px;height:32px;border-radius:var(--radius-full);background:var(--secondary);color:var(--secondary-foreground);display:grid;place-items:center;font-size:12px;font-weight:600">อร</span>
+          <span style="flex:1;font-size:13.5px;font-weight:500">คุณอรพิน · กรรมการการเงิน</span>
+          <span style="color:var(--income)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;gap:8px">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="lg" dc-props="{{ fullBtn }}" hint-size="100%,48px">ยืนยันการนับเงิน</x-import>
+    <span style="text-align:center;font-size:11.5px;color:var(--muted-foreground)">เมื่อยืนยันแล้วจะแก้ไขได้เฉพาะผู้ดูแลการเงิน</span>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">07</span><span style="font-size:13px;font-weight:600">นับเงินสด</span><span style="font-size:12px;color:var(--muted-foreground)">สถานะยอดไม่ตรง</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:16px;font-weight:600">นับเงินสด</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">อาทิตย์ 14 สิงหาคม · รอบเช้า</div></div>
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Badge" variant="warning" hint-size="auto,22px">ยอดไม่ตรง</x-import>
+  </div>
+
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--warning);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px">
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:13px;color:var(--muted-foreground)">ยอดที่ควรได้</span><span class="num-display" style="font-size:14px;font-weight:600">฿18,450.00</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:13px;color:var(--muted-foreground)">ยอดที่นับได้</span><span class="num-display" style="font-size:14px;font-weight:600">฿18,250.00</span></div>
+      <div style="height:1px;background:var(--border);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:14px;font-weight:600">ผลต่าง</span>
+        <span class="num-display" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--warning)">−฿200.00</span>
+      </div>
+      <p style="margin:12px 0 0;font-size:12.5px;line-height:1.6;color:var(--muted-foreground)">นับได้น้อยกว่ายอดที่บันทึกไว้ ฿200.00 — ลองนับใบละ 100 อีกครั้ง หรือระบุเหตุผลไว้ให้ผู้ตรวจสอบทราบ</p>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">สิ่งที่ทำได้</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);display:grid;place-items:center;color:var(--muted-foreground)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 12a8 8 0 1 1 3 6.2"/><path d="M4 8v4h4"/></svg></div>
+          <span style="flex:1;font-size:14px;font-weight:500">นับใหม่อีกครั้ง</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);display:grid;place-items:center;color:var(--muted-foreground)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 19V6a1 1 0 0 1 1-1h9l4 4v10z"/><path d="M9 12h6"/></svg></div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">ระบุเหตุผลของผลต่าง</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">บันทึกไว้ในประวัติการตรวจสอบ</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);display:grid;place-items:center;color:var(--muted-foreground)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v10M8 10l4 4 4-4"/><path d="M5 19h14"/></svg></div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">แก้ยอดที่บันทึกไว้</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ต้องได้รับอนุมัติจากผู้ดูแลการเงิน</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>
+      <span style="font-size:12.5px;line-height:1.6;color:var(--muted-foreground)">การยืนยันขณะที่ยอดไม่ตรงจะถูกทำเครื่องหมายไว้ในรายงานเดือนนี้ และต้องมีผู้ยืนยันสองคนเสมอ</span>
+    </div>
+  </div>
+
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;gap:8px">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="lg" variant="outline" dc-props="{{ fullBtn }}" hint-size="100%,48px">ยืนยันพร้อมบันทึกผลต่าง</x-import>
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="ghost" dc-props="{{ fullBtn }}" hint-size="100%,44px">นับใหม่</x-import>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+</section>
+
+<section style="padding:0 60px 44px;font-family:var(--font-sans);color:var(--foreground)">
+<div style="display:flex;align-items:baseline;gap:12px;margin:0 0 22px">
+<span style="font:600 11px var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:#171717;color:#fff;padding:4px 9px;border-radius:6px">ชุดที่ 3</span>
+<span style="font-family:var(--font-display);font-size:16px;font-weight:600">กองทุนและงบประมาณ · เงินมาจากไหน ไปที่ไหน</span>
+<span style="font-size:13px;color:var(--muted-foreground)">กองทุน → รายละเอียดกองทุน → งบประมาณปี</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">08</span><span style="font-size:13px;font-weight:600">กองทุน</span><span style="font-size:12px;color:var(--muted-foreground)">Funds</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em">กองทุน</div>
+    <div style="font-size:12px;color:var(--muted-foreground);margin-top:2px">เงินทุกบาทอยู่ในกองทุนใดกองทุนหนึ่งเสมอ</div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-elevated);padding:18px 20px">
+      <p class="kicker" style="margin:0">รวมทุกกองทุน</p>
+      <p class="num-display" style="margin:8px 0 0;font-family:var(--font-display);font-size:30px;font-weight:700;line-height:1">฿248,560.00</p>
+      <p style="margin:6px 0 0;font-size:11.5px;color:var(--muted-foreground)">4 กองทุนที่ใช้งาน · ปรับปรุงล่าสุดวันนี้ 08:12</p>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">กองทุนทั่วไป</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ค่าใช้จ่ายประจำ · สาธารณูปโภค · เงินเดือน</div></div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿128,450.00</div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <span class="num-display" style="font-size:12px;color:var(--income)">+฿11,900.00 เข้า</span>
+        <span class="num-display" style="font-size:12px;color:var(--expense)">−฿8,540.00 ออก</span>
+        <span style="font-size:12px;color:var(--muted-foreground);margin-left:auto">เดือนนี้</span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">กองทุนพันธกิจ</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">มิชชั่นและงานประกาศ</div></div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿42,300.00</div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <span class="num-display" style="font-size:12px;color:var(--income)">+฿4,300.00 เข้า</span>
+        <span class="num-display" style="font-size:12px;color:var(--expense)">−฿2,000.00 ออก</span>
+        <span style="font-size:12px;color:var(--muted-foreground);margin-left:auto">เดือนนี้</span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">กองทุนอาคาร</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">เป้าหมาย ฿1,000,000.00</div></div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿65,800.00</div>
+      </div>
+      <div>
+        <div style="height:6px;border-radius:3px;background:var(--secondary);overflow:hidden"><span style="display:block;height:100%;width:6.6%;background:var(--primary)"></span></div>
+        <div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:6px">6.6% ของเป้าหมาย</div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">กองทุนเยาวชน</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">มีรายการรออนุมัติ 1 รายการ</div></div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿12,010.00</div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center">
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="pending" hint-size="auto,20px"></x-import>
+        <span class="num-display" style="font-size:12px;color:var(--muted-foreground)">฿8,500.00 รอการอนุมัติ</span>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);padding:9px 6px 30px;border-top:1px solid var(--border);background:color-mix(in oklch, var(--card) 92%, transparent);backdrop-filter:blur(12px)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg><span style="font-size:10.5px">หน้าหลัก</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/></svg><span style="font-size:10.5px">การเงิน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--primary);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/></svg><span style="font-size:10.5px;font-weight:600">กองทุน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span style="font-size:10.5px">รายงาน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg><span style="font-size:10.5px">เพิ่มเติม</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">09</span><span style="font-size:13px;font-weight:600">รายละเอียดกองทุน</span><span style="font-size:12px;color:var(--muted-foreground)">กองทุนพันธกิจ</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:16px;font-weight:600">กองทุนพันธกิจ</div><div style="font-size:11.5px;color:var(--muted-foreground)">มิชชั่นและงานประกาศ</div></div>
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="18" r="1.4"/></svg></div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-elevated);padding:20px">
+      <p class="kicker" style="margin:0">คงเหลือในกองทุน</p>
+      <p class="num-display" style="margin:8px 0 0;font-family:var(--font-display);font-size:32px;font-weight:700;line-height:1">฿42,300.00</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">เข้าเดือนนี้</div><div class="num-display" style="font-size:15.5px;font-weight:600;color:var(--income);margin-top:3px">+฿4,300.00</div></div>
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">ออกเดือนนี้</div><div class="num-display" style="font-size:15.5px;font-weight:600;color:var(--expense);margin-top:3px">−฿2,000.00</div></div>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+        <span style="font-size:14px;font-weight:600">งบพันธกิจปี 2026</span>
+        <span class="num-display" style="font-size:12.5px;color:var(--muted-foreground)">฿128,000.00 / ฿250,000.00</span>
+      </div>
+      <div style="height:8px;border-radius:4px;background:var(--secondary);overflow:hidden"><span style="display:block;height:100%;width:51.2%;background:var(--primary)"></span></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">ใช้ไป 51.2%</span>
+        <span class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">เหลือ ฿122,000.00</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">เงินเข้ามาจากไหน · เดือนนี้</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:2px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><span style="font-size:13.5px">ถวายพันธกิจวันอาทิตย์</span><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--income)">+฿2,300.00</span></div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><span style="font-size:13.5px">ถวายเจาะจงจากสมาชิก</span><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--income)">+฿2,000.00</span></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">เงินออกไปไหน · เดือนนี้</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:2px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><span style="font-size:13.5px">สนับสนุนมิชชันนารีภาคเหนือ</span><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--expense)">−฿1,500.00</span></div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><span style="font-size:13.5px">ค่าเดินทางทีมประกาศ</span><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--expense)">−฿500.00</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card);display:flex;gap:10px">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" dc-props="{{ flexBtn }}" hint-size="100%,44px">ดูรายการทั้งหมด</x-import>
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" dc-props="{{ flexBtn }}" hint-size="100%,44px">บันทึกรายจ่าย</x-import>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">10</span><span style="font-size:13px;font-weight:600">งบประมาณ</span><span style="font-size:12px;color:var(--muted-foreground)">Budget 2026</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em">งบประมาณ 2026</div>
+    <div style="font-size:12px;color:var(--muted-foreground);margin-top:2px">ผ่านมาแล้ว 8 เดือนจาก 12 เดือน</div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-elevated);padding:20px">
+      <p class="kicker" style="margin:0">งบทั้งปี</p>
+      <p class="num-display" style="margin:8px 0 0;font-family:var(--font-display);font-size:30px;font-weight:700;line-height:1">฿1,200,000.00</p>
+      <div style="height:8px;border-radius:4px;background:var(--secondary);overflow:hidden;margin-top:16px"><span style="display:block;height:100%;width:54%;background:var(--primary)"></span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">ใช้ไปแล้ว</div><div class="num-display" style="font-size:16px;font-weight:600;margin-top:3px">฿648,200.00</div></div>
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">คงเหลือ</div><div class="num-display" style="font-size:16px;font-weight:600;color:var(--income);margin-top:3px">฿551,800.00</div></div>
+      </div>
+      <p style="margin:14px 0 0;font-size:12px;color:var(--muted-foreground);line-height:1.6">ใช้ไป 54% ขณะที่ผ่านปีมา 67% — อยู่ในกรอบที่วางไว้</p>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">ตามหมวดงบ</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:6px 18px">
+        <div style="padding:14px 0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-size:14px;font-weight:500">พันธกิจ</span><span class="num-display" style="font-size:12.5px;color:var(--muted-foreground)">฿240,000.00 / ฿400,000.00</span></div>
+          <div style="height:6px;border-radius:3px;background:var(--secondary);overflow:hidden"><span style="display:block;height:100%;width:60%;background:var(--primary)"></span></div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="padding:14px 0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-size:14px;font-weight:500">ดำเนินงาน</span><span class="num-display" style="font-size:12.5px;color:var(--muted-foreground)">฿180,000.00 / ฿300,000.00</span></div>
+          <div style="height:6px;border-radius:3px;background:var(--secondary);overflow:hidden"><span style="display:block;height:100%;width:60%;background:var(--primary)"></span></div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="padding:14px 0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-size:14px;font-weight:500">มิชชั่น</span><span class="num-display" style="font-size:12.5px;color:var(--muted-foreground)">฿128,000.00 / ฿250,000.00</span></div>
+          <div style="height:6px;border-radius:3px;background:var(--secondary);overflow:hidden"><span style="display:block;height:100%;width:51.2%;background:var(--primary)"></span></div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="padding:14px 0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-size:14px;font-weight:500">อาคารและซ่อมบำรุง</span><span class="num-display" style="font-size:12.5px;color:var(--muted-foreground)">฿100,200.00 / ฿150,000.00</span></div>
+          <div style="height:6px;border-radius:3px;background:var(--secondary);overflow:hidden"><span style="display:block;height:100%;width:66.8%;background:var(--warning)"></span></div>
+          <div style="font-size:11.5px;color:var(--warning);margin-top:7px">ใช้เร็วกว่าแผน — เหลือ ฿49,800.00 สำหรับ 4 เดือน</div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="padding:14px 0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-size:14px;font-weight:500">เยาวชนและการศึกษา</span><span class="num-display" style="font-size:12.5px;color:var(--muted-foreground)">฿0.00 / ฿100,000.00</span></div>
+          <div style="height:6px;border-radius:3px;background:var(--secondary);overflow:hidden"></div>
+          <div style="font-size:11.5px;color:var(--muted-foreground);margin-top:7px">ยังไม่มีการใช้จ่ายในหมวดนี้</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card)">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" dc-props="{{ fullBtn }}" hint-size="100%,44px">เปิดรายงานงบประมาณ</x-import>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+</section>
+
+<section style="padding:0 60px 44px;font-family:var(--font-sans);color:var(--foreground)">
+<div style="display:flex;align-items:baseline;gap:12px;margin:0 0 22px">
+<span style="font:600 11px var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:#171717;color:#fff;padding:4px 9px;border-radius:6px">ชุดที่ 4</span>
+<span style="font-family:var(--font-display);font-size:16px;font-weight:600">ความรับผิดชอบ · อนุมัติ ตรวจสอบย้อนหลัง แจ้งเตือน</span>
+<span style="font-size:13px;color:var(--muted-foreground)">รออนุมัติ → หน้าตัดสินใจ → ประวัติทั้งโบสถ์ → การแจ้งเตือน</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">11</span><span style="font-size:13px;font-weight:600">รายการที่รออนุมัติ</span><span style="font-size:12px;color:var(--muted-foreground)">Approvals</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div>
+      <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:18px;font-weight:600">รายการที่รออนุมัติ</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground)">3 รายการ · รวม ฿73,500.00</div></div>
+    </div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11.5px;color:var(--muted-foreground)">คำขอเบิกจ่าย · กองทุนเยาวชน</div>
+          <div style="font-size:15px;font-weight:600;margin-top:3px">ซื้ออุปกรณ์ห้องเยาวชน</div>
+        </div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿8,500.00</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:26px;height:26px;border-radius:var(--radius-full);background:var(--secondary);display:grid;place-items:center;font-size:10.5px;font-weight:600">นร</span>
+        <span style="font-size:12px;color:var(--muted-foreground);flex:1">นรินทร์ · ขอมา 2 วันก่อน · มีใบเสร็จแนบ</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">ดูรายละเอียด</x-import>
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">อนุมัติ</x-import>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11.5px;color:var(--muted-foreground)">คำขอเบิกจ่าย · กองทุนพันธกิจ</div>
+          <div style="font-size:15px;font-weight:600;margin-top:3px">ค่าเดินทางทริปมิชชั่นภาคเหนือ</div>
+        </div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿15,000.00</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:26px;height:26px;border-radius:var(--radius-full);background:var(--secondary);display:grid;place-items:center;font-size:10.5px;font-weight:600">พร</span>
+        <span style="font-size:12px;color:var(--muted-foreground);flex:1">พรทิพย์ · ขอมาเมื่อวาน · ยังไม่มีใบเสร็จ</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">ดูรายละเอียด</x-import>
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">อนุมัติ</x-import>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11.5px;color:var(--muted-foreground)">โอนระหว่างกองทุน</div>
+          <div style="font-size:15px;font-weight:600;margin-top:3px">กองทุนทั่วไป → กองทุนอาคาร</div>
+        </div>
+        <div class="num-display" style="font-family:var(--font-display);font-size:19px;font-weight:700">฿50,000.00</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:26px;height:26px;border-radius:var(--radius-full);background:var(--secondary);display:grid;place-items:center;font-size:10.5px;font-weight:600">อร</span>
+        <span style="font-size:12px;color:var(--muted-foreground);flex:1">อรพิน · ตามมติที่ประชุม 10 ส.ค.</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">ดูรายละเอียด</x-import>
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">อนุมัติ</x-import>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V8a4 4 0 0 1 8 0v2"/></svg>
+      <span style="font-size:12.5px;line-height:1.6;color:var(--muted-foreground)">คุณอนุมัติในฐานะศิษยาภิบาล — ทุกการอนุมัติจะบันทึกชื่อ เวลา และอุปกรณ์ที่ใช้ไว้ถาวร</span>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<sc-if value="{{ showFlowArrows }}" hint-placeholder-val="{{ true }}">
+<div style="align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted-foreground);padding-top:24px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 12h15l-5-5M19 12l-5 5"/></svg>
+<span style="font-size:11px">ตัดสินใจ</span>
+</div>
+</sc-if>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">12</span><span style="font-size:13px;font-weight:600">หน้าอนุมัติ</span><span style="font-size:12px;color:var(--muted-foreground)">Sheet · อนุมัติ / ขอแก้ไข / ปฏิเสธ</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;position:relative;background:var(--background);font-family:var(--font-sans);color:var(--foreground);overflow:hidden">
+  <div style="padding:58px 20px 0;opacity:.4">
+    <div style="font-family:var(--font-display);font-size:18px;font-weight:600">รายการที่รออนุมัติ</div>
+    <div style="margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);height:140px"></div>
+    <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);height:140px"></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(23,23,23,0.34)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top-left-radius:var(--radius-sheet);border-top-right-radius:var(--radius-sheet);box-shadow:var(--shadow-elevated);padding:10px 20px 30px;display:flex;flex-direction:column;gap:14px">
+    <div style="align-self:center;width:40px;height:4px;border-radius:2px;background:var(--border)"></div>
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11.5px;color:var(--muted-foreground)">คำขอเบิกจ่าย · EXP-0248</div>
+        <div style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-top:3px;letter-spacing:-0.01em">ซื้ออุปกรณ์ห้องเยาวชน</div>
+      </div>
+      <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.StatusBadge" status="pending" hint-size="auto,22px"></x-import>
+    </div>
+    <div class="num-display" style="font-family:var(--font-display);font-size:32px;font-weight:700;line-height:1;color:var(--expense)">−฿8,500.00</div>
+    <div style="background:var(--background);border:1px solid var(--border);border-radius:var(--radius-lg);padding:4px 14px">
+      <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--muted-foreground)">กองทุน</span><span style="font-size:13.5px;font-weight:500">กองทุนเยาวชน</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--muted-foreground)">คงเหลือหลังอนุมัติ</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿3,510.00</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--muted-foreground)">ผู้ขอ</span><span style="font-size:13.5px;font-weight:500">นรินทร์ (ธุรการ)</span></div>
+      <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--muted-foreground)">เอกสาร</span><span style="font-size:13.5px;font-weight:500;color:var(--primary)">ใบเสร็จ 1 ไฟล์</span></div>
+    </div>
+    <div style="padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--background)">
+      <p class="kicker" style="margin:0 0 6px">เหตุผลจากผู้ขอ</p>
+      <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--muted-foreground)">เปลี่ยนโปรเจกเตอร์ห้องเยาวชนที่ใช้งานไม่ได้ ตามที่ประชุมเยาวชนอนุมัติเมื่อ 11 ส.ค.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="lg" dc-props="{{ fullBtn }}" hint-size="100%,48px">อนุมัติคำขอนี้</x-import>
+      <div style="display:flex;gap:8px">
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" dc-props="{{ flexBtn }}" hint-size="100%,44px">ขอแก้ไข</x-import>
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="ghost" dc-props="{{ rejectBtn }}" hint-size="100%,44px">ปฏิเสธ</x-import>
+      </div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">13</span><span style="font-size:13px;font-weight:600">ตรวจสอบย้อนหลัง</span><span style="font-size:12px;color:var(--muted-foreground)">Audit trail</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em">ตรวจสอบย้อนหลัง</div>
+    <div style="font-size:12px;color:var(--muted-foreground);margin-top:2px">ทุกการกระทำถูกบันทึกและแก้ไขย้อนหลังไม่ได้</div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:16px">
+    <div>
+      <div class="kicker" style="margin:0 0 8px">วันนี้ · 14 สิงหาคม</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:4px 16px">
+        <div style="display:flex;gap:12px;padding:13px 0">
+          <span class="num-display" style="width:44px;font-size:12px;color:var(--muted-foreground);padding-top:2px">09:42</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px"><span style="font-weight:600">สมชาย</span> อนุมัติคำขอเบิกจ่าย</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">EXP-0248 · ฿8,500.00 · กองทุนเยาวชน</div></div>
+          <span style="color:var(--income);flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;gap:12px;padding:13px 0">
+          <span class="num-display" style="width:44px;font-size:12px;color:var(--muted-foreground);padding-top:2px">09:31</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px"><span style="font-weight:600">นรินทร์</span> สร้างคำขอเบิกจ่าย</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">EXP-0248 · แนบใบเสร็จ 1 ไฟล์</div></div>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;gap:12px;padding:13px 0">
+          <span class="num-display" style="width:44px;font-size:12px;color:var(--muted-foreground);padding-top:2px">08:12</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px"><span style="font-weight:600">สมชาย</span> บันทึกเงินถวายวันอาทิตย์</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">฿18,450.00 · 5 หมวด · รอการนับเงิน</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="kicker" style="margin:0 0 8px">เมื่อวาน · 13 สิงหาคม</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:4px 16px">
+        <div style="display:flex;gap:12px;padding:13px 0">
+          <span class="num-display" style="width:44px;font-size:12px;color:var(--muted-foreground);padding-top:2px">18:22</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px">ยืนยันการนับเงินสด</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ผู้ยืนยัน: สมชาย, อรพิน · ผลต่าง ฿0.00</div></div>
+          <span style="color:var(--income);flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;gap:12px;padding:13px 0">
+          <span class="num-display" style="width:44px;font-size:12px;color:var(--muted-foreground);padding-top:2px">16:05</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px"><span style="font-weight:600">อรพิน</span> แก้ไขหมวดของรายการ</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">EXP-0244 · สาธารณูปโภค → ซ่อมบำรุง</div></div>
+          <span style="color:var(--warning);flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h4L20 8l-4-4L4 16z"/></svg></span>
+        </div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;gap:12px;padding:13px 0">
+          <span class="num-display" style="width:44px;font-size:12px;color:var(--muted-foreground);padding-top:2px">10:48</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13.5px"><span style="font-weight:600">สมชาย</span> ให้สิทธิ์ดูข้อมูลการถวาย</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">แก่ อรพิน · กรรมการการเงิน</div></div>
+          <span style="color:var(--muted-foreground);flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V8a4 4 0 0 1 8 0v2"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">14</span><span style="font-size:13px;font-weight:600">การแจ้งเตือน</span><span style="font-size:12px;color:var(--muted-foreground)">Notifications</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:flex-end;gap:12px">
+    <div style="flex:1"><div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em">การแจ้งเตือน</div><div style="font-size:12px;color:var(--muted-foreground);margin-top:2px">เฉพาะเรื่องที่ต้องทำหรือควรรู้</div></div>
+    <span style="font-size:12.5px;font-weight:600;color:var(--primary)">อ่านทั้งหมด</span>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+    <div style="background:var(--card);border:1px solid color-mix(in oklch, var(--primary) 45%, transparent);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;gap:12px">
+      <div style="width:34px;height:34px;border-radius:11px;background:var(--pending-muted);color:var(--warning);display:grid;place-items:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600">ต้องการการอนุมัติจากคุณ</div>
+        <div class="num-display" style="font-size:12.5px;color:var(--muted-foreground);margin-top:3px;line-height:1.55">คำขอเบิกจ่าย ฿15,000.00 สำหรับทริปมิชชั่น — ทีมต้องจ่ายก่อน 20 ส.ค.</div>
+        <div style="font-size:11.5px;color:var(--primary);font-weight:600;margin-top:8px">เปิดคำขอ</div>
+      </div>
+      <span style="width:7px;height:7px;border-radius:var(--radius-full);background:var(--primary);flex-shrink:0;margin-top:4px"></span>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;gap:12px">
+      <div style="width:34px;height:34px;border-radius:11px;background:var(--income-muted);color:var(--income);display:grid;place-items:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600">การนับเงินเสร็จสมบูรณ์</div>
+        <div class="num-display" style="font-size:12.5px;color:var(--muted-foreground);margin-top:3px;line-height:1.55">เงินถวาย 13 ส.ค. ฿17,900.00 · ผลต่าง ฿0.00 · ยืนยันโดย 2 คน</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;gap:12px">
+      <div style="width:34px;height:34px;border-radius:11px;background:var(--pending-muted);color:var(--warning);display:grid;place-items:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5l8 14H4z"/><path d="M12 10v4M12 17h.01"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600">งบหมวดอาคารใช้ไปเกิน 65%</div>
+        <div class="num-display" style="font-size:12.5px;color:var(--muted-foreground);margin-top:3px;line-height:1.55">เหลือ ฿49,800.00 สำหรับ 4 เดือนที่เหลือของปี</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;gap:12px">
+      <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);color:var(--info);display:grid;place-items:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 13h7M9 17h4"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600">รายงานเดือนกรกฎาคมพร้อมแล้ว</div>
+        <div style="font-size:12.5px;color:var(--muted-foreground);margin-top:3px;line-height:1.55">ตรวจทานและปิดงวดได้ · ยังไม่มีใครเปิดดู</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:16px 18px;display:flex;gap:12px">
+      <div style="width:34px;height:34px;border-radius:11px;background:var(--secondary);color:var(--muted-foreground);display:grid;place-items:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20h4L20 8l-4-4L4 16z"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600">มีการแก้ไขรายการย้อนหลัง</div>
+        <div class="num-display" style="font-size:12.5px;color:var(--muted-foreground);margin-top:3px;line-height:1.55">อรพินเปลี่ยนหมวดของ EXP-0244 · ดูในประวัติการตรวจสอบ</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+</section>
+
+<section style="padding:0 60px 70px;font-family:var(--font-sans);color:var(--foreground)">
+<div style="display:flex;align-items:baseline;gap:12px;margin:0 0 22px">
+<span style="font:600 11px var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:#171717;color:#fff;padding:4px 9px;border-radius:6px">ชุดที่ 5</span>
+<span style="font-family:var(--font-display);font-size:16px;font-weight:600">สมาชิก รายงาน และการตั้งค่า</span>
+<span style="font-size:13px;color:var(--muted-foreground)">การถวายของสมาชิก (ข้อมูลปกปิด) → รายงาน → โปรไฟล์และสิทธิ์</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">15</span><span style="font-size:13px;font-weight:600">การถวายของสมาชิก</span><span style="font-size:12px;color:var(--muted-foreground)">ค้นหา · เข้าถึงจำกัด</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em">การถวายของสมาชิก</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;height:44px;padding:0 14px;border:1px solid var(--input);border-radius:var(--radius-input);background:var(--background)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+      <span style="font-size:14px;color:var(--muted-foreground)">ค้นหาชื่อสมาชิกหรือครัวเรือน</span>
+    </div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V8a4 4 0 0 1 8 0v2"/></svg>
+      <span style="font-size:12.5px;line-height:1.6;color:var(--muted-foreground)">ข้อมูลการถวายเป็นความลับ · คุณเปิดดูได้ในฐานะเหรัญญิก และการเปิดดูทุกครั้งถูกบันทึกไว้</span>
+    </div>
+    <div>
+      <p class="kicker" style="margin:0 0 8px">ภาพรวมเดือนสิงหาคม</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">รวมการถวายที่ระบุชื่อ</div><div class="num-display" style="font-size:18px;font-weight:700;margin-top:4px">฿96,400.00</div></div>
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">สมาชิกที่ถวาย</div><div class="num-display" style="font-size:18px;font-weight:700;margin-top:4px">128 คน</div></div>
+      </div>
+    </div>
+    <div>
+      <p class="kicker" style="margin:0 0 8px">เปิดดูล่าสุด</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <span style="width:36px;height:36px;border-radius:var(--radius-full);background:var(--secondary);display:grid;place-items:center;font-size:12px;font-weight:600">ปณ</span>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">ปณิดา จันทร์เพ็ญ</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ครัวเรือนจันทร์เพ็ญ · สมาชิกตั้งแต่ 2019</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <span style="width:36px;height:36px;border-radius:var(--radius-full);background:var(--secondary);display:grid;place-items:center;font-size:12px;font-weight:600">วส</span>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">วสันต์ ศรีสุวรรณ</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ครัวเรือนศรีสุวรรณ · สมาชิกตั้งแต่ 2015</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:44px">
+          <span style="width:36px;height:36px;border-radius:var(--radius-full);background:var(--secondary);display:grid;place-items:center;font-size:12px;font-weight:600">กม</span>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">กมล เทพารักษ์</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ครัวเรือนเทพารักษ์ · สมาชิกตั้งแต่ 2021</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+      <p style="margin:10px 0 0;font-size:11.5px;color:var(--muted-foreground);line-height:1.6">ไม่มีการจัดอันดับหรือเปรียบเทียบระหว่างสมาชิก — ดูได้ทีละคนเท่านั้น</p>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">16</span><span style="font-size:13px;font-weight:600">ประวัติการถวายรายบุคคล</span><span style="font-size:12px;color:var(--muted-foreground)">Member detail</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:var(--radius-full);border:1px solid var(--border);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div>
+    <div style="flex:1;min-width:0"><div style="font-family:var(--font-display);font-size:16px;font-weight:600">ปณิดา จันทร์เพ็ญ</div><div style="font-size:11.5px;color:var(--muted-foreground)">ครัวเรือนจันทร์เพ็ญ · 4 คน</div></div>
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Badge" variant="outline" hint-size="auto,22px">ข้อมูลปกปิด</x-import>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">ถวายเดือนนี้</div><div class="num-display" style="font-size:19px;font-weight:700;margin-top:4px">฿4,500.00</div></div>
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">รวมทั้งปี 2026</div><div class="num-display" style="font-size:19px;font-weight:700;margin-top:4px">฿36,800.00</div></div>
+      </div>
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:12.5px;color:var(--muted-foreground)">รูปแบบการถวาย</span><span style="font-size:12.5px;font-weight:500">สม่ำเสมอทุกเดือน · โอนธนาคาร</span></div>
+    </div>
+    <div>
+      <p class="kicker" style="margin:0 0 8px">แยกตามประเภท · ปีนี้</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:4px 16px">
+        <div style="display:flex;justify-content:space-between;padding:12px 0"><span style="font-size:13.5px">สิบลด</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿28,000.00</span></div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;justify-content:space-between;padding:12px 0"><span style="font-size:13.5px">ถวายทรัพย์ทั่วไป</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿5,300.00</span></div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;justify-content:space-between;padding:12px 0"><span style="font-size:13.5px">พันธกิจมิชชั่น</span><span class="num-display" style="font-size:13.5px;font-weight:600">฿3,500.00</span></div>
+      </div>
+    </div>
+    <div>
+      <p class="kicker" style="margin:0 0 8px">รายการล่าสุด</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:4px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><div><div style="font-size:13.5px">สิบลด · โอนธนาคาร</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">3 ส.ค. 2026</div></div><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--income)">+฿3,500.00</span></div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><div><div style="font-size:13.5px">พันธกิจมิชชั่น · QR</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">3 ส.ค. 2026</div></div><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--income)">+฿1,000.00</span></div>
+        <div style="height:1px;background:color-mix(in oklch, var(--border) 60%, transparent)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0"><div><div style="font-size:13.5px">สิบลด · โอนธนาคาร</div><div class="num-display" style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">6 ก.ค. 2026</div></div><span class="num-display" style="font-size:13.5px;font-weight:600;color:var(--income)">+฿3,500.00</span></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--card)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>
+      <span style="font-size:12.5px;line-height:1.6;color:var(--muted-foreground)">ใช้สำหรับออกหนังสือรับรองการถวายและการดูแลสมาชิกเท่านั้น</span>
+    </div>
+  </div>
+  <div style="padding:12px 20px 30px;border-top:1px solid var(--border);background:var(--card)">
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" dc-props="{{ fullBtn }}" hint-size="100%,44px">ออกหนังสือรับรองการถวาย</x-import>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">17</span><span style="font-size:13px;font-weight:600">รายงาน</span><span style="font-size:12px;color:var(--muted-foreground)">Reports hub</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em">รายงาน</div>
+    <div style="font-size:12px;color:var(--muted-foreground);margin-top:2px">สรุปตัวเลขที่ใช้ประชุมและปิดงวดได้ทันที</div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid color-mix(in oklch, var(--primary) 45%, transparent);border-radius:var(--radius-card);box-shadow:var(--shadow-elevated);padding:18px 20px">
+      <div style="display:flex;align-items:center;gap:8px"><x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Badge" variant="warning" hint-size="auto,22px">รอตรวจทาน</x-import><span style="font-size:11.5px;color:var(--muted-foreground)">ปิดงวดภายใน 15 ส.ค.</span></div>
+      <div style="font-family:var(--font-display);font-size:17px;font-weight:600;margin-top:12px">สรุปการเงินเดือนกรกฎาคม 2026</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">รายรับ</div><div class="num-display" style="font-size:16px;font-weight:600;color:var(--income);margin-top:3px">+฿92,400.00</div></div>
+        <div><div style="font-size:11.5px;color:var(--muted-foreground)">รายจ่าย</div><div class="num-display" style="font-size:16px;font-weight:600;color:var(--expense);margin-top:3px">−฿71,180.00</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" size="sm" dc-props="{{ flexBtn }}" hint-size="100%,36px">ตรวจทานและปิดงวด</x-import>
+        <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="outline" size="sm" hint-size="auto,36px">แชร์</x-import>
+      </div>
+    </div>
+    <div>
+      <p class="kicker" style="margin:0 0 8px">รายงานอื่น</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px">
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">รายงานเงินถวาย</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">รายสัปดาห์ · แยกตามหมวดและช่องทาง</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px">
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">รายรับ–รายจ่าย</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">เลือกช่วงเวลาเองได้</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px">
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">รายงานกองทุน</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ยอดยกมา เข้า ออก คงเหลือ</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px">
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">รายงานงบประมาณ</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">งบ · ใช้จริง · ผลต่าง</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px">
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">การถวายของสมาชิก</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">ต้องมีสิทธิ์เข้าถึงข้อมูลปกปิด</div></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V8a4 4 0 0 1 8 0v2"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);padding:9px 6px 30px;border-top:1px solid var(--border);background:color-mix(in oklch, var(--card) 92%, transparent);backdrop-filter:blur(12px)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg><span style="font-size:10.5px">หน้าหลัก</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/></svg><span style="font-size:10.5px">การเงิน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/></svg><span style="font-size:10.5px">กองทุน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--primary);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span style="font-size:10.5px;font-weight:600">รายงาน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg><span style="font-size:10.5px">เพิ่มเติม</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;gap:8px"><span class="num-display" style="font:700 11px var(--font-display);color:var(--primary)">18</span><span style="font-size:13px;font-weight:600">โปรไฟล์และตั้งค่า</span><span style="font-size:12px;color:var(--muted-foreground)">เพิ่มเติม</span></div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="390px" height="844px" hint-size="390px,844px">
+<div style="height:100%;display:flex;flex-direction:column;background:var(--background);font-family:var(--font-sans);color:var(--foreground)">
+  <div style="padding:58px 20px 14px;background:var(--card);border-bottom:1px solid var(--border)">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em">เพิ่มเติม</div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);padding:18px;display:flex;align-items:center;gap:14px">
+      <span style="width:52px;height:52px;border-radius:var(--radius-full);background:var(--accent);color:var(--accent-foreground);display:grid;place-items:center;font-family:var(--font-display);font-size:17px;font-weight:600">สช</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:16px;font-weight:600">สมชาย วัฒนกุล</div>
+        <div style="font-size:12px;color:var(--muted-foreground);margin-top:2px">เหรัญญิก · คริสตจักรพระคุณกรุงเทพ</div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">งานการเงิน</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">รายการที่รออนุมัติ</span><span class="num-display" style="font-size:12.5px;font-weight:600;color:var(--warning)">3</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">การถวายของสมาชิก</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">กระทบยอดบัญชีธนาคาร</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">ตรวจสอบย้อนหลัง</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">โบสถ์และผู้ใช้</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">ข้อมูลคริสตจักร</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">บทบาทและสิทธิ์</div><div style="font-size:11.5px;color:var(--muted-foreground);margin-top:2px">8 ผู้ใช้ · 4 บทบาท</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">กองทุนและหมวดบัญชี</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="kicker" style="margin:0 0 8px">การแจ้งเตือนและความปลอดภัย</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);box-shadow:var(--shadow-sm-card);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">แจ้งเตือนเมื่อมีรายการรออนุมัติ</span><x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Switch" checked="{{ true }}" hint-size="44px,26px"></x-import></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">แจ้งเตือนเมื่อยอดนับไม่ตรง</span><x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Switch" checked="{{ true }}" hint-size="44px,26px"></x-import></div>
+        <div style="height:1px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:500">ล็อกอินด้วย Face ID</span><x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Switch" checked="{{ true }}" hint-size="44px,26px"></x-import></div>
+      </div>
+    </div>
+
+    <x-import component-from-global-scope="GraceLedgerDesignSystem_b2d940.Button" variant="ghost" dc-props="{{ rejectBtn }}" hint-size="100%,44px">ออกจากระบบ</x-import>
+    <p class="num-display" style="margin:0 0 4px;text-align:center;font-size:11px;color:var(--muted-foreground)">Grace Ledger 3.0 · อุปกรณ์นี้ยืนยันตัวตนแล้ว</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);padding:9px 6px 30px;border-top:1px solid var(--border);background:color-mix(in oklch, var(--card) 92%, transparent);backdrop-filter:blur(12px)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg><span style="font-size:10.5px">หน้าหลัก</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/></svg><span style="font-size:10.5px">การเงิน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/></svg><span style="font-size:10.5px">กองทุน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted-foreground);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span style="font-size:10.5px">รายงาน</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--primary);min-height:44px;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></svg><span style="font-size:10.5px;font-weight:600">เพิ่มเติม</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p style="margin:26px 0 0;font-size:12.5px;color:var(--muted-foreground)">ลองต่อ: “ทำ flow บันทึกรายจ่าย + แนบใบเสร็จ” · “เพิ่มหน้ากระทบยอดธนาคารและปิดงวด” · “ทำเวอร์ชันโหมดมืด”</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;showFlowArrows&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showNotes: this.props.showNotes ?? true,
+      showFlowArrows: this.props.showFlowArrows ?? true,
+      flexBtn: { style: { flex: 1, width: "100%" } },
+      fullBtn: { style: { width: "100%" } },
+      rejectBtn: { style: { flex: 1, width: "100%", color: "var(--destructive)" } }
+    };
+  }
+}
+</script>
+</body>
+</html>
