@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../lib/supabase/types";
 import { ApprovalsService } from "../lib/transactions/approvals-service";
+import { HistoricalService } from "../lib/reports/historical-service";
 import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
 
@@ -20,6 +21,17 @@ export interface RecentTransaction {
   status: "approved" | "pending" | "rejected";
 }
 
+export interface HistoricalTrendBar {
+  monthName: string;
+  income: string;
+  expense: string;
+  net: string;
+  isPositive: boolean;
+  incomeSatang: number;
+  expenseSatang: number;
+  isPartial?: boolean;
+}
+
 export interface DashboardData {
   pendingApprovalsCount: number;
   totalFundsBalance?: string;
@@ -28,6 +40,7 @@ export interface DashboardData {
   activeAccountsCount?: number;
   funds?: DashboardFund[];
   recentTransactions?: RecentTransaction[];
+  historicalTrend?: HistoricalTrendBar[];
   loadFailed?: boolean;
   errorMessage?: string;
 }
@@ -40,9 +53,11 @@ const ICON_TRANSFER = `<svg width="16" height="16" viewBox="0 0 24 24" fill="non
 
 export class DashboardPage {
   private approvalsService: ApprovalsService;
+  private historicalService: HistoricalService;
 
   constructor(private supabase: SupabaseClient<Database>) {
     this.approvalsService = new ApprovalsService(supabase);
+    this.historicalService = new HistoricalService(supabase);
   }
 
   public async loadData(churchId: string): Promise<DashboardData> {
@@ -149,6 +164,19 @@ export class DashboardPage {
         }
       }
 
+      // Query historical monthly summaries for dashboard trend preview
+      const histRes = await this.historicalService.getMonthlySummaries(churchId, 2569);
+      const historicalTrend: HistoricalTrendBar[] = (histRes.success && histRes.data ? histRes.data : []).map((m) => ({
+        monthName: m.monthName.slice(0, 4), // e.g. "ม.ค.", "ก.พ."
+        income: m.incomeTotal.format(),
+        expense: m.expenseTotal.format(),
+        net: m.net.format(),
+        isPositive: m.net.isPositive(),
+        incomeSatang: m.incomeTotal.toSatang(),
+        expenseSatang: m.expenseTotal.toSatang(),
+        isPartial: m.status === "historical_partial",
+      }));
+
       return {
         pendingApprovalsCount: pendingCount,
         totalFundsBalance: totalFunds.format(),
@@ -157,6 +185,7 @@ export class DashboardPage {
         activeAccountsCount: accountsCount || 0,
         funds,
         recentTransactions,
+        historicalTrend,
         loadFailed: false,
       };
     } catch {
@@ -455,6 +484,56 @@ export class DashboardPage {
         </div>
         ${fundsGridHtml}
       </section>
+
+      <!-- HISTORICAL PERFORMANCE PREVIEW (Jan–Jul 2569) -->
+      ${
+        data.historicalTrend && data.historicalTrend.length > 0
+          ? `
+      <section class="gl-section" style="margin-bottom: var(--space-6);">
+        <div class="gl-section__head">
+          <div>
+            <h2 style="display: inline-block; margin-right: 8px;">สถิติการเงินย้อนหลัง 2569</h2>
+            <span class="gl-badge gl-badge--pending" style="font-size: 10px;">ม.ค. – ก.ค. (ก่อนเริ่มระบบ)</span>
+          </div>
+          <a href="#/reports" style="font-size: var(--text-xs); color: var(--primary); font-weight: var(--weight-semibold); text-decoration: none;">ดูรายงานเต็ม</a>
+        </div>
+        <div class="gl-card" style="padding: var(--space-4);">
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; align-items: flex-end; min-height: 110px; padding-top: 10px;">
+            ${data.historicalTrend
+              .map((t) => {
+                const maxVal = 5000000; // 50,000 THB in satang max scale
+                const incHeight = Math.max(12, Math.min(80, Math.round((t.incomeSatang / maxVal) * 80)));
+                const expHeight = Math.max(12, Math.min(80, Math.round((t.expenseSatang / maxVal) * 80)));
+
+                return `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                  <div style="display: flex; align-items: flex-end; gap: 3px; height: 80px; width: 100%; justify-content: center;">
+                    <div title="รายรับ: ${t.income}" style="width: 10px; height: ${incHeight}px; background: var(--income); border-radius: 2px 2px 0 0;"></div>
+                    <div title="รายจ่าย: ${t.expense}" style="width: 10px; height: ${expHeight}px; background: var(--expense); border-radius: 2px 2px 0 0; opacity: 0.85;"></div>
+                  </div>
+                  <span style="font-size: 10px; font-weight: var(--weight-semibold); color: var(--foreground);">${t.monthName}</span>
+                  <span style="font-size: 9px; font-weight: var(--weight-bold); color: ${t.isPositive ? "var(--income)" : "var(--expense)"};">
+                    ${t.net}
+                  </span>
+                </div>`;
+              })
+              .join("")}
+          </div>
+          <div style="display: flex; justify-content: center; gap: var(--space-4); margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); font-size: 11px; color: var(--muted-foreground);">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: var(--income); border-radius: 2px;"></span>
+              <span>รายรับ</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: var(--expense); border-radius: 2px;"></span>
+              <span>รายจ่าย</span>
+            </div>
+            <span style="color: var(--muted-foreground);">· ข้อมูลสรุปย้อนหลัง</span>
+          </div>
+        </div>
+      </section>`
+          : ""
+      }
 
       <!-- RECENT ACTIVITY (Mockup 01: ความเคลื่อนไหวล่าสุด) -->
       <section class="gl-section" style="margin-bottom: var(--space-8);">

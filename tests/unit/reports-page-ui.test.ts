@@ -45,11 +45,12 @@ describe("ReportsPage UI — Unit Tests", () => {
     const html = page.renderHtml();
 
     expect(html).toContain("<h1>รายงานการเงิน</h1>");
-    expect(html).toContain("งบการเงินประจำเดือน รายรับ-รายจ่าย และรายงานสถานะกองทุน");
-    expect(html).toContain("สิงหาคม 2569 (งวดปัจจุบัน)");
-    expect(html).toContain("กรกฎาคม 2569");
-    expect(html).toContain("มิถุนายน 2569");
-    expect(html).toContain("ประจำปี 2569");
+    expect(html).toContain("งบการเงินประจำเดือน รายรับ-รายจ่าย");
+    expect(html).toContain("ส.ค. 2569 (Live)");
+    expect(html).toContain("ก.ค. 2569 (ย้อนหลัง)");
+    expect(html).toContain("มิ.ย. 2569");
+    expect(html).toContain("มี.ค. 2569 ⚠️");
+    expect(html).toContain("ภาพรวมทั้งปี 2569");
     expect(html).toContain("พิมพ์รายงาน");
   });
 

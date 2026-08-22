@@ -274,4 +274,115 @@ export class ReportsService {
       return { success: false, error: err.message || "เกิดข้อผิดพลาดในการดึงรายงานสรุปผู้บริหาร" };
     }
   }
+
+  /**
+   * Fetches full historical financial context (Jan-Jul 2569) without modifying live ledger
+   */
+  public async getHistoricalContext(
+    churchId: string,
+    fiscalYear: number = 2569
+  ): Promise<ServiceResult<{
+    monthly: Array<{
+      month: number;
+      month_name: string;
+      status: string;
+      data_through: string | null;
+      income_total: Money;
+      cash_income: Money;
+      online_income: Money;
+      expense_total: Money;
+      net: Money;
+      opening_balance_reported: Money | null;
+      closing_balance_reported: Money | null;
+      data_quality_flag: string;
+      data_quality_notes: string | null;
+    }>;
+    grand_totals: {
+      income: Money;
+      expense: Money;
+      net: Money;
+      cash_income: Money;
+      online_income: Money;
+      data_through: string;
+      has_review_flag: boolean;
+    };
+  }>> {
+    try {
+      this.checkRole("read");
+      const { data, error } = await (this.supabase
+        .from("historical_monthly_summaries") as any)
+        .select("*")
+        .eq("church_id", churchId)
+        .eq("fiscal_year", fiscalYear)
+        .order("month", { ascending: true });
+
+      if (error) {
+        return { success: false, error: error.message, code: error.code };
+      }
+
+      let grandIncome = Money.zero();
+      let grandExpense = Money.zero();
+      let grandNet = Money.zero();
+      let grandCash = Money.zero();
+      let grandOnline = Money.zero();
+      let hasReview = false;
+      let latestDate = "2026-07-19";
+
+      const monthly = (data || []).map((row: any) => {
+        const inc = Money.from(row.income_total);
+        const exp = Money.from(row.expense_total);
+        const net = Money.from(row.net);
+        const cash = Money.from(row.cash_income);
+        const online = Money.from(row.online_income);
+
+        grandIncome = grandIncome.add(inc);
+        grandExpense = grandExpense.add(exp);
+        grandNet = grandNet.add(net);
+        grandCash = grandCash.add(cash);
+        grandOnline = grandOnline.add(online);
+
+        if (row.data_quality_flag === "DATA_REVIEW_REQUIRED") {
+          hasReview = true;
+        }
+        if (row.data_through && row.data_through > latestDate) {
+          latestDate = row.data_through;
+        }
+
+        return {
+          month: row.month,
+          month_name: row.month_name,
+          status: row.status,
+          data_through: row.data_through,
+          income_total: inc,
+          cash_income: cash,
+          online_income: online,
+          expense_total: exp,
+          net,
+          opening_balance_reported: row.opening_balance_reported ? Money.from(row.opening_balance_reported) : null,
+          closing_balance_reported: row.closing_balance_reported ? Money.from(row.closing_balance_reported) : null,
+          data_quality_flag: row.data_quality_flag,
+          data_quality_notes: row.data_quality_notes,
+        };
+      });
+
+      return {
+        success: true,
+        data: {
+          monthly,
+          grand_totals: {
+            income: grandIncome,
+            expense: grandExpense,
+            net: grandNet,
+            cash_income: grandCash,
+            online_income: grandOnline,
+            data_through: latestDate,
+            has_review_flag: hasReview,
+          },
+        },
+      };
+    } catch (err: any) {
+      return { success: false, error: err.message || "เกิดข้อผิดพลาดในการดึงข้อมูลประวัติการเงินย้อนหลัง" };
+    }
+  }
 }
+

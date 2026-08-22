@@ -492,6 +492,138 @@ export interface Database {
           created_at?: string;
         };
       };
+
+      historical_monthly_summaries: {
+        Row: {
+          id: string;
+          church_id: string;
+          fiscal_year: number;
+          month: number;
+          month_name: string;
+          status: "historical" | "historical_partial";
+          data_through: string | null;
+          income_total: string | number;
+          cash_income: string | number;
+          online_income: string | number;
+          expense_total: string | number;
+          net: string | number;
+          opening_balance_reported: string | number | null;
+          closing_balance_reported: string | number | null;
+          data_quality_flag: "VERIFIED" | "DATA_REVIEW_REQUIRED" | "ESTIMATED";
+          data_quality_notes: string | null;
+          source: string;
+          source_document: string;
+          imported_at: string;
+          import_batch_id: string;
+          is_immutable: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          church_id: string;
+          fiscal_year: number;
+          month: number;
+          month_name: string;
+          status?: "historical" | "historical_partial";
+          data_through?: string | null;
+          income_total?: string | number;
+          cash_income?: string | number;
+          online_income?: string | number;
+          expense_total?: string | number;
+          net?: string | number;
+          opening_balance_reported?: string | number | null;
+          closing_balance_reported?: string | number | null;
+          data_quality_flag?: "VERIFIED" | "DATA_REVIEW_REQUIRED" | "ESTIMATED";
+          data_quality_notes?: string | null;
+          source?: string;
+          source_document?: string;
+          imported_at?: string;
+          import_batch_id?: string;
+          is_immutable?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          church_id?: string;
+          fiscal_year?: number;
+          month?: number;
+          month_name?: string;
+          status?: "historical" | "historical_partial";
+          data_through?: string | null;
+          income_total?: string | number;
+          cash_income?: string | number;
+          online_income?: string | number;
+          expense_total?: string | number;
+          net?: string | number;
+          opening_balance_reported?: string | number | null;
+          closing_balance_reported?: string | number | null;
+          data_quality_flag?: "VERIFIED" | "DATA_REVIEW_REQUIRED" | "ESTIMATED";
+          data_quality_notes?: string | null;
+          source?: string;
+          source_document?: string;
+          imported_at?: string;
+          import_batch_id?: string;
+          is_immutable?: boolean;
+          created_at?: string;
+        };
+      };
+
+      historical_weekly_summaries: {
+        Row: {
+          id: string;
+          church_id: string;
+          fiscal_year: number;
+          month: number;
+          week_date: string;
+          income_total: string | number;
+          cash_income: string | number;
+          online_income: string | number;
+          expense_total: string | number;
+          net: string | number;
+          source: string;
+          source_document: string;
+          imported_at: string;
+          import_batch_id: string;
+          is_immutable: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          church_id: string;
+          fiscal_year: number;
+          month: number;
+          week_date: string;
+          income_total?: string | number;
+          cash_income?: string | number;
+          online_income?: string | number;
+          expense_total?: string | number;
+          net?: string | number;
+          source?: string;
+          source_document?: string;
+          imported_at?: string;
+          import_batch_id?: string;
+          is_immutable?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          church_id?: string;
+          fiscal_year?: number;
+          month?: number;
+          week_date?: string;
+          income_total?: string | number;
+          cash_income?: string | number;
+          online_income?: string | number;
+          expense_total?: string | number;
+          net?: string | number;
+          source?: string;
+          source_document?: string;
+          imported_at?: string;
+          import_batch_id?: string;
+          is_immutable?: boolean;
+          created_at?: string;
+        };
+      };
     };
 
     Functions: {
