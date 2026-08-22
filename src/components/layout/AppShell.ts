@@ -22,8 +22,12 @@ interface NavDestination {
 }
 
 const ICON_DASHBOARD = `<path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/>`;
-const ICON_APPROVALS = `<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>`;
+const ICON_TRANSACTIONS = `<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/><path d="M3 10h18"/>`;
 const ICON_OFFERINGS = `<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 10h20"/>`;
+const ICON_FUNDS = `<path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/><path d="M4 17l8 4 8-4"/>`;
+const ICON_APPROVALS = `<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>`;
+const ICON_MEMBERS = `<circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/>`;
+const ICON_REPORTS = `<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/>`;
 
 function icon(paths: string, size: number): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false">${paths}</svg>`;
@@ -34,27 +38,59 @@ function buildDestinations(pendingCount: number): NavDestination[] {
     {
       href: "#/",
       label: "แดชบอร์ด",
-      shortLabel: "ภาพรวม",
+      shortLabel: "หน้าหลัก",
       group: "ภาพรวม",
       icon: ICON_DASHBOARD,
       isActive: (route) => route === "/" || route === "",
     },
     {
+      href: "#/transactions",
+      label: "รายการเงิน",
+      shortLabel: "การเงิน",
+      group: "ธุรกรรม",
+      icon: ICON_TRANSACTIONS,
+      isActive: (route) => route.startsWith("/transactions"),
+    },
+    {
+      href: "#/offerings",
+      label: "เงินถวายวันอาทิตย์",
+      shortLabel: "เงินถวาย",
+      group: "ธุรกรรม",
+      icon: ICON_OFFERINGS,
+      isActive: (route) => route.startsWith("/offerings"),
+    },
+    {
+      href: "#/funds",
+      label: "กองทุนและงบประมาณ",
+      shortLabel: "กองทุน",
+      group: "การเงิน",
+      icon: ICON_FUNDS,
+      isActive: (route) => route.startsWith("/funds"),
+    },
+    {
       href: "#/approvals",
       label: "คิวอนุมัติ",
-      shortLabel: "คิวอนุมัติ",
+      shortLabel: "อนุมัติ",
       group: "กำกับดูแล",
       icon: ICON_APPROVALS,
       isActive: (route) => route.startsWith("/approvals"),
       badge: pendingCount > 0 ? pendingCount : undefined,
     },
     {
-      href: "#/offerings",
-      label: "เงินถวายวันอาทิตย์",
-      shortLabel: "เงินถวาย",
-      group: "เงินถวาย",
-      icon: ICON_OFFERINGS,
-      isActive: (route) => route.startsWith("/offerings"),
+      href: "#/members",
+      label: "สมาชิกและการถวาย",
+      shortLabel: "สมาชิก",
+      group: "สมาชิก",
+      icon: ICON_MEMBERS,
+      isActive: (route) => route.startsWith("/members"),
+    },
+    {
+      href: "#/reports",
+      label: "รายงานการเงิน",
+      shortLabel: "รายงาน",
+      group: "รายงาน",
+      icon: ICON_REPORTS,
+      isActive: (route) => route.startsWith("/reports"),
     },
   ];
 }

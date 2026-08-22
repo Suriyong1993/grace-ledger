@@ -193,3 +193,11 @@ export function assertPermission(
     );
   }
 }
+
+/**
+ * Check if role is authorized to execute irreversible financial mutations
+ */
+export function canExecuteFinancialAction(role: UserRole): boolean {
+  return role === "super_admin" || role === "treasurer";
+}
+

@@ -1,4 +1,14 @@
-export type RoutePattern = "/" | "/approvals" | "/approvals/:id" | "/offerings" | "/offerings/new" | "/offerings/:id";
+export type RoutePattern =
+  | "/"
+  | "/transactions"
+  | "/funds"
+  | "/members"
+  | "/reports"
+  | "/approvals"
+  | "/approvals/:id"
+  | "/offerings"
+  | "/offerings/new"
+  | "/offerings/:id";
 
 export interface MatchedRoute {
   path: string;
@@ -35,6 +45,22 @@ class ClientRouter {
 
     if (cleanPath === "" || cleanPath === "/") {
       return { path: "/", pattern: "/", params: {} };
+    }
+
+    if (cleanPath === "/transactions") {
+      return { path: "/transactions", pattern: "/transactions", params: {} };
+    }
+
+    if (cleanPath === "/funds") {
+      return { path: "/funds", pattern: "/funds", params: {} };
+    }
+
+    if (cleanPath === "/members") {
+      return { path: "/members", pattern: "/members", params: {} };
+    }
+
+    if (cleanPath === "/reports") {
+      return { path: "/reports", pattern: "/reports", params: {} };
     }
 
     if (cleanPath === "/approvals") {

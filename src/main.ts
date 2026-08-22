@@ -4,7 +4,13 @@ import { renderAppShellHtml, AppShellUser } from "./components/layout/AppShell";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ApprovalsPage } from "./pages/ApprovalsPage";
 import { OfferingPage } from "./pages/OfferingPage";
+import { TransactionsPage } from "./pages/TransactionsPage";
+import { FundsPage } from "./pages/FundsPage";
+import { MembersPage } from "./pages/MembersPage";
+import { ReportsPage } from "./pages/ReportsPage";
 import { LoginPage } from "./pages/LoginPage";
+import { GraceAiDrawer } from "./components/ai/GraceAiDrawer";
+import { UserRole } from "./lib/rbac";
 
 interface ActiveSession {
   userId: string;
@@ -18,6 +24,11 @@ export class App {
   private dashboardPage: DashboardPage;
   private approvalsPage: ApprovalsPage | null = null;
   private offeringPage: OfferingPage | null = null;
+  private transactionsPage: TransactionsPage | null = null;
+  private fundsPage: FundsPage | null = null;
+  private membersPage: MembersPage | null = null;
+  private reportsPage: ReportsPage | null = null;
+  private aiDrawer: GraceAiDrawer | null = null;
   private currentRoute: MatchedRoute = { path: "/", pattern: "/", params: {} };
   private rootElement: HTMLElement | null = null;
   private pendingCount = 0;
@@ -36,6 +47,11 @@ export class App {
         this.session = null;
         this.approvalsPage = null;
         this.offeringPage = null;
+        this.transactionsPage = null;
+        this.fundsPage = null;
+        this.membersPage = null;
+        this.reportsPage = null;
+        this.aiDrawer = null;
         void this.render();
       }
     });
@@ -46,37 +62,24 @@ export class App {
     }
 
     router.subscribe(async (route) => {
-      const routeChanged = this.currentRoute.path !== route.path;
       this.currentRoute = route;
-
-      if (routeChanged && this.session) {
-        if (route.pattern === "/offerings") {
-          await this.offeringPage?.init("list");
-        } else if (route.pattern === "/offerings/new") {
-          await this.offeringPage?.init("new");
-        } else if (route.pattern === "/offerings/:id") {
-          await this.offeringPage?.init("detail", route.params.id);
-        } else if (route.pattern === "/approvals") {
-          this.approvalsPage?.setSelectedItem(null);
-          await this.approvalsPage?.loadQueue();
-        } else if (route.pattern === "/approvals/:id") {
-          this.approvalsPage?.setSelectedItem(route.params.id);
-          if (this.approvalsPage && this.approvalsPage.getItems().length === 0) {
-            await this.approvalsPage.loadQueue();
-          }
-        }
-      }
-
       await this.render();
     });
+
+    const initialRoute = router.matchRoute(window.location.hash || window.location.pathname);
+    this.currentRoute = initialRoute;
+    await this.render();
   }
 
   private async loadSession(userId: string): Promise<void> {
     const { data: profile, error } = (await this.supabase
       .from("profiles")
-      .select("id, church_id, full_name")
+      .select("full_name, church_id")
       .eq("id", userId)
-      .single()) as { data: { id: string; church_id: string; full_name: string } | null; error: unknown };
+      .single()) as {
+      data: { full_name: string | null; church_id: string } | null;
+      error: unknown;
+    };
 
     if (error || !profile) {
       console.error("Failed to load profile for authenticated user:", error);
@@ -99,6 +102,7 @@ export class App {
     ])) as [{ data: { role: string } | null }, { data: { name: string } | null }];
 
     const fullName: string = profile.full_name ?? "";
+    const userRole = (roleRow?.role as UserRole) || "member";
     const initials = fullName
       .split(" ")
       .map((part: string) => part.charAt(0))
@@ -119,6 +123,11 @@ export class App {
 
     this.approvalsPage = new ApprovalsPage(this.supabase, churchId, userId);
     this.offeringPage = new OfferingPage(this.supabase, churchId, userId, fullName);
+    this.transactionsPage = new TransactionsPage(this.supabase, churchId);
+    this.fundsPage = new FundsPage(this.supabase, churchId);
+    this.membersPage = new MembersPage(this.supabase, churchId);
+    this.reportsPage = new ReportsPage(this.supabase, churchId);
+    this.aiDrawer = new GraceAiDrawer(this.supabase, churchId, userRole, userId);
   }
 
   private async handleLoginSubmit(email: string, password: string): Promise<void> {
@@ -157,13 +166,33 @@ export class App {
       const data = await this.dashboardPage.loadData(this.session.churchId);
       this.pendingCount = data.pendingApprovalsCount;
       contentHtml = this.dashboardPage.renderHtml(data);
+    } else if (this.currentRoute.pattern === "/transactions") {
+      if (this.transactionsPage) {
+        await this.transactionsPage.loadData();
+        contentHtml = this.transactionsPage.renderHtml();
+      }
+    } else if (this.currentRoute.pattern === "/funds") {
+      if (this.fundsPage) {
+        await this.fundsPage.loadData();
+        contentHtml = this.fundsPage.renderHtml();
+      }
+    } else if (this.currentRoute.pattern === "/members") {
+      if (this.membersPage) {
+        await this.membersPage.loadData();
+        contentHtml = this.membersPage.renderHtml();
+      }
+    } else if (this.currentRoute.pattern === "/reports") {
+      if (this.reportsPage) {
+        await this.reportsPage.loadData();
+        contentHtml = this.reportsPage.renderHtml();
+      }
     } else if (this.currentRoute.pattern === "/approvals" || this.currentRoute.pattern === "/approvals/:id") {
       contentHtml = this.approvalsPage?.renderHtml() ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       contentHtml = this.offeringPage?.renderHtml() ?? "";
     }
 
-    this.rootElement.innerHTML = renderAppShellHtml(
+    const appShellHtml = renderAppShellHtml(
       {
         activeRoute: this.currentRoute.path,
         pendingCount: this.pendingCount,
@@ -172,10 +201,27 @@ export class App {
       contentHtml
     );
 
+    const aiDrawerHtml = this.aiDrawer?.renderHtml() ?? "";
+
+    this.rootElement.innerHTML = appShellHtml + aiDrawerHtml;
+
     if (this.currentRoute.pattern.startsWith("/approvals")) {
       this.approvalsPage?.attachEventListeners(this.rootElement, () => this.render());
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       this.offeringPage?.attachEventListeners(this.rootElement, () => this.render());
+    } else if (this.currentRoute.pattern === "/transactions") {
+      this.transactionsPage?.attachEventListeners(this.rootElement, () => this.render());
+    } else if (this.currentRoute.pattern === "/funds") {
+      this.fundsPage?.attachEventListeners(this.rootElement, () => this.render());
+    } else if (this.currentRoute.pattern === "/members") {
+      this.membersPage?.attachEventListeners(this.rootElement, () => this.render());
+    } else if (this.currentRoute.pattern === "/reports") {
+      this.reportsPage?.attachEventListeners(this.rootElement, () => this.render());
+    }
+
+    // Attach AI Drawer Event Listeners
+    if (this.aiDrawer) {
+      this.aiDrawer.attachEventListeners(this.rootElement, () => this.render());
     }
   }
 }
