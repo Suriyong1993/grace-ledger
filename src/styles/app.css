@@ -128,7 +128,12 @@ html, body {
 }
 
 .gl-card--elevated {
+  position: relative;
+  overflow: hidden;
   box-shadow: var(--shadow-card);
+  background:
+    radial-gradient(420px 220px at 88% -20%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+    var(--card);
 }
 
 .gl-card--attention {
@@ -137,6 +142,37 @@ html, body {
 
 .gl-card--danger {
   border-color: var(--expense);
+}
+
+/* Any card rendered as a link/button is a navigable row — give it the same
+   lift-on-hover language the dashboard and login screen already use. */
+a.gl-card,
+button.gl-card {
+  transition: transform var(--duration-micro) var(--ease-out), border-color var(--duration-micro) var(--ease-out), box-shadow var(--duration-micro) var(--ease-out);
+}
+a.gl-card:hover,
+button.gl-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-hover-card);
+}
+a.gl-card:active,
+button.gl-card:active {
+  transform: translateY(0);
+}
+
+/* Clickable inline rows (transaction list, recent activity) — background tint
+   on hover/focus, no layout shift so dense lists stay stable. */
+.gl-txn-row {
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+.gl-txn-row:hover {
+  background: var(--accent);
+}
+.gl-txn-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
 }
 
 /* A quiet grouping surface — used where a full card would over-separate. */
@@ -489,6 +525,14 @@ html, body {
 
 .gl-table tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.gl-table tbody tr {
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-table tbody tr:hover {
+  background: var(--accent);
 }
 
 .gl-table .is-right {

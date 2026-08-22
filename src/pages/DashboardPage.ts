@@ -280,13 +280,6 @@ export class DashboardPage {
 
     return `
     <style>
-      .gl-hero-card {
-        position: relative;
-        overflow: hidden;
-        background:
-          radial-gradient(420px 220px at 88% -20%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
-          var(--card);
-      }
       .gl-quick-action { transition: transform var(--duration-micro) var(--ease-out), box-shadow var(--duration-micro) var(--ease-out), background-color var(--duration-micro) var(--ease-out); }
       .gl-quick-action:hover { transform: translateY(-2px); }
       .gl-quick-action:active { transform: translateY(0) scale(0.98); }
@@ -302,7 +295,7 @@ export class DashboardPage {
 
       <!-- HERO BALANCE CARD (Mockup 01) -->
       <section class="gl-section" style="margin-bottom: var(--space-5);">
-        <div class="gl-card gl-card--elevated gl-hero-card" style="padding: var(--space-5);">
+        <div class="gl-card gl-card--elevated" style="padding: var(--space-5);">
           <div class="kicker" style="margin: 0;">ยอดเงินคงเหลือทั้งหมด</div>
           <div class="num-display" data-testid="total-balance" style="
             margin: var(--space-2) 0 0;
