@@ -221,7 +221,7 @@ export class DashboardPage {
           ${funds
             .map(
               (f) => `
-              <div class="gl-card gl-card--tight" style="transition: transform var(--duration-micro) var(--ease-out);">
+              <div class="gl-card gl-card--tight gl-fund-card">
                 <div style="font-size: var(--text-xs); color: var(--muted-foreground); font-weight: var(--weight-medium);">${f.name}</div>
                 <div class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold); margin-top: 4px; color: ${
                   f.balance.isNegative() ? "var(--expense)" : "var(--foreground)"
@@ -279,12 +279,30 @@ export class DashboardPage {
         </div>`;
 
     return `
+    <style>
+      .gl-hero-card {
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(420px 220px at 88% -20%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+          var(--card);
+      }
+      .gl-quick-action { transition: transform var(--duration-micro) var(--ease-out), box-shadow var(--duration-micro) var(--ease-out), background-color var(--duration-micro) var(--ease-out); }
+      .gl-quick-action:hover { transform: translateY(-2px); }
+      .gl-quick-action:active { transform: translateY(0) scale(0.98); }
+      .gl-quick-action--primary:hover { box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--primary) 55%, transparent); }
+      .gl-quick-action--muted:hover { background: var(--accent); border-color: var(--primary); }
+      .gl-fund-card { transition: transform var(--duration-micro) var(--ease-out), border-color var(--duration-micro) var(--ease-out); }
+      .gl-fund-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+      .gl-row-link { transition: background-color var(--duration-micro) var(--ease-out); }
+      .gl-row-link:hover { background: var(--accent); }
+    </style>
     <div class="gl-page gl-dashboard-container gl-fade-in">
       ${loadFailedHtml}
 
       <!-- HERO BALANCE CARD (Mockup 01) -->
       <section class="gl-section" style="margin-bottom: var(--space-5);">
-        <div class="gl-card gl-card--elevated" style="padding: var(--space-5);">
+        <div class="gl-card gl-card--elevated gl-hero-card" style="padding: var(--space-5);">
           <div class="kicker" style="margin: 0;">ยอดเงินคงเหลือทั้งหมด</div>
           <div class="num-display" data-testid="total-balance" style="
             margin: var(--space-2) 0 0;
@@ -324,7 +342,7 @@ export class DashboardPage {
       <!-- QUICK ACTION GRID (Mockup 01: 4 Quick Actions) -->
       <section class="gl-section" style="margin-bottom: var(--space-6);">
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2);">
-          <a href="#/offerings/new" style="
+          <a href="#/offerings/new" class="gl-quick-action gl-quick-action--primary" style="
             background: var(--primary);
             color: var(--primary-foreground);
             border-radius: var(--radius-lg);
@@ -337,13 +355,12 @@ export class DashboardPage {
             justify-content: center;
             text-decoration: none;
             box-shadow: var(--shadow-sm);
-            transition: opacity var(--duration-micro) var(--ease-out);
           ">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
             <span style="font-size: 11.5px; font-weight: 600; text-align: center; line-height: 1.2;">บันทึก<br>เงินถวาย</span>
           </a>
 
-          <a href="#/transactions" style="
+          <a href="#/transactions" class="gl-quick-action gl-quick-action--muted" style="
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--foreground);
@@ -356,13 +373,12 @@ export class DashboardPage {
             min-height: 76px;
             justify-content: center;
             text-decoration: none;
-            transition: background-color var(--duration-micro) var(--ease-out);
           ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>
             <span style="font-size: 11.5px; font-weight: 500; text-align: center; line-height: 1.2;">บันทึก<br>รายจ่าย</span>
           </a>
 
-          <a href="#/funds" style="
+          <a href="#/funds" class="gl-quick-action gl-quick-action--muted" style="
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--foreground);
@@ -375,13 +391,12 @@ export class DashboardPage {
             min-height: 76px;
             justify-content: center;
             text-decoration: none;
-            transition: background-color var(--duration-micro) var(--ease-out);
           ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>
             <span style="font-size: 11.5px; font-weight: 500; text-align: center; line-height: 1.2;">โอนเงิน<br>กองทุน</span>
           </a>
 
-          <a href="#/transactions" style="
+          <a href="#/transactions" class="gl-quick-action gl-quick-action--muted" style="
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--foreground);
@@ -394,7 +409,6 @@ export class DashboardPage {
             min-height: 76px;
             justify-content: center;
             text-decoration: none;
-            transition: background-color var(--duration-micro) var(--ease-out);
           ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
             <span style="font-size: 11.5px; font-weight: 500; text-align: center; line-height: 1.2;">รายการ<br>ทั้งหมด</span>
@@ -412,7 +426,7 @@ export class DashboardPage {
         </div>
 
         <div class="gl-card" style="padding: 0; overflow: hidden;">
-          <a href="#/approvals" style="
+          <a href="#/approvals" class="gl-row-link" style="
             display: flex;
             align-items: center;
             gap: var(--space-3);
@@ -420,7 +434,6 @@ export class DashboardPage {
             min-height: 48px;
             text-decoration: none;
             color: inherit;
-            transition: background-color var(--duration-micro) var(--ease-out);
           ">
             <div aria-hidden="true" style="
               width: 36px;
@@ -445,7 +458,7 @@ export class DashboardPage {
 
           <div style="height: 1px; background: var(--border);"></div>
 
-          <a href="#/offerings" style="
+          <a href="#/offerings" class="gl-row-link" style="
             display: flex;
             align-items: center;
             gap: var(--space-3);
@@ -453,7 +466,6 @@ export class DashboardPage {
             min-height: 48px;
             text-decoration: none;
             color: inherit;
-            transition: background-color var(--duration-micro) var(--ease-out);
           ">
             <div aria-hidden="true" style="
               width: 36px;

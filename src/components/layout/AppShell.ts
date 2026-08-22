@@ -109,20 +109,8 @@ function renderSidebarLink(dest: NavDestination, isActive: boolean): string {
     : "";
 
   return `
-    <a href="${dest.href}" class="gl-nav-item" ${isActive ? 'aria-current="page"' : ""} style="
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      min-height: var(--touch-target-min);
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-sm);
-      font-size: var(--text-sm);
-      font-weight: ${isActive ? "var(--weight-semibold)" : "var(--weight-medium)"};
-      text-decoration: none;
-      color: ${isActive ? "var(--primary)" : "var(--foreground)"};
-      background: ${isActive ? "var(--accent)" : "transparent"};
-    ">
-      ${icon(dest.icon, 18)}
+    <a href="${dest.href}" class="gl-nav-item${isActive ? " gl-nav-item--active" : ""}" ${isActive ? 'aria-current="page"' : ""}>
+      <span class="gl-nav-item__icon">${icon(dest.icon, 18)}</span>
       <span>${dest.label}</span>
       ${badge}
     </a>`;
@@ -165,6 +153,70 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
   if (lastGroup) groups.push(`</div>`);
 
   return `
+  <style>
+    .gl-nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: var(--touch-target-min);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: 2px;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-medium);
+      text-decoration: none;
+      color: var(--sidebar-foreground);
+      background: transparent;
+      transition: background var(--duration-micro) var(--ease-out), color var(--duration-micro) var(--ease-out);
+    }
+    .gl-nav-item__icon { display: flex; color: var(--sidebar-icon); transition: color var(--duration-micro) var(--ease-out); }
+    .gl-nav-item:hover { background: var(--sidebar-accent); color: var(--sidebar-accent-foreground); }
+    .gl-nav-item:hover .gl-nav-item__icon { color: var(--sidebar-accent-foreground); }
+    .gl-nav-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    .gl-nav-item--active {
+      background: var(--sidebar-accent);
+      color: var(--sidebar-primary);
+      font-weight: var(--weight-semibold);
+    }
+    .gl-nav-item--active .gl-nav-item__icon { color: var(--sidebar-primary); }
+    .gl-nav-item--active::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 18px;
+      border-radius: var(--radius-full);
+      background: var(--sidebar-primary);
+    }
+    .gl-shell-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
+      color: var(--primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px -4px oklch(0.65 0.19 45 / 55%);
+      flex-shrink: 0;
+    }
+    .gl-shell-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--weight-bold);
+      font-size: var(--text-xs);
+      flex-shrink: 0;
+    }
+  </style>
   <div class="gl-app-container" style="
     display: flex;
     min-height: 100vh;
@@ -186,18 +238,11 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         padding: var(--space-4) var(--space-5);
         border-bottom: 1px solid var(--sidebar-border);
       ">
-        <div aria-hidden="true" style="
-          width: 36px;
-          height: 36px;
-          border-radius: var(--radius-sm);
-          background: var(--primary);
-          color: var(--primary-foreground);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: var(--weight-bold);
-          font-size: var(--text-md);
-        ">GL</div>
+        <div class="gl-shell-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+            <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="currentColor"/>
+          </svg>
+        </div>
         <div style="min-width: 0;">
           <div style="font-weight: var(--weight-bold); font-size: var(--text-sm); letter-spacing: var(--tracking-heading);">
             Grace Ledger
@@ -208,7 +253,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         </div>
       </div>
 
-      <nav aria-label="เมนูหลัก" style="flex: 1; overflow-y: auto; padding: var(--space-3) var(--space-2);">
+      <nav aria-label="เมนูหลัก" style="flex: 1; overflow-y: auto; padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);">
         ${groups.join("")}
       </nav>
 
@@ -219,20 +264,9 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         align-items: center;
         gap: var(--space-3);
       ">
-        <div aria-hidden="true" style="
-          width: 32px;
-          height: 32px;
-          border-radius: var(--radius-full);
-          background: var(--sidebar-accent);
-          color: var(--sidebar-accent-foreground);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: var(--weight-bold);
-          font-size: var(--text-xs);
-        ">${initials}</div>
+        <div class="gl-shell-avatar" aria-hidden="true">${initials}</div>
         <div style="min-width: 0;">
-          <div style="font-size: var(--text-sm); font-weight: var(--weight-semibold);">${displayName}</div>
+          <div style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayName}</div>
           <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">${displayRole}</div>
         </div>
       </div>
@@ -242,8 +276,8 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       <header style="
         min-height: var(--gl-topbar-h);
         border-bottom: 1px solid var(--border);
-        background: color-mix(in srgb, var(--card) 92%, transparent);
-        backdrop-filter: blur(8px);
+        background: color-mix(in srgb, var(--card) 88%, transparent);
+        backdrop-filter: blur(10px);
         display: flex;
         align-items: center;
         justify-content: space-between;
