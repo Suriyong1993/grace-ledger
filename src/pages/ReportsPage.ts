@@ -364,10 +364,10 @@ export class ReportsPage {
             </div>
           </div>
           <div class="gl-stat ${m.net.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">รายรับสุทธิ (Net Movement)</div>
+            <div class="gl-stat__label">ผลสุทธิจากข้อมูลย้อนหลัง (Net Movement)</div>
             <div class="gl-stat__value num-display">${m.net.format()}</div>
             <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-              ${m.closingBalanceReported ? `ยกยอดไป: ${m.closingBalanceReported.format()}` : "บันทึกตามรายงาน"}
+              ${m.closingBalanceReported ? `ยกยอดปิดตามรายงาน: ${m.closingBalanceReported.format()}` : "บันทึกตามรายงาน (ไม่ใช่เงินในธนาคาร)"}
             </div>
           </div>
         </div>
@@ -457,10 +457,10 @@ export class ReportsPage {
             </div>
           </div>
           <div class="gl-stat ${combinedNet.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">ยอดคงเหลือสุทธิสะสม</div>
+            <div class="gl-stat__label">ผลสุทธิสะสมทั้งปี (Net Movement)</div>
             <div class="gl-stat__value num-display">${combinedNet.format()}</div>
             <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-              ม.ค.–ส.ค. 2569
+              ผลต่างรายรับ–รายจ่ายสะสม (ไม่ใช่ยอดเงินคงเหลือในบัญชีธนาคารจริง)
             </div>
           </div>
         </div>
