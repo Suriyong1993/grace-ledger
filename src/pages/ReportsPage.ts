@@ -173,7 +173,7 @@ export class ReportsPage {
           <button class="gl-tab ${this.selectedPeriod === "2026-06" ? "is-active" : ""}" data-period="2026-06">มิ.ย. 2569</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-05" ? "is-active" : ""}" data-period="2026-05">พ.ค. 2569</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-04" ? "is-active" : ""}" data-period="2026-04">เม.ย. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-03" ? "is-active" : ""}" data-period="2026-03">มี.ค. 2569 ⚠️</button>
+          <button class="gl-tab ${this.selectedPeriod === "2026-03" ? "is-active" : ""}" data-period="2026-03">มี.ค. 2569 (ตรวจทาน)</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-02" ? "is-active" : ""}" data-period="2026-02">ก.พ. 2569</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-01" ? "is-active" : ""}" data-period="2026-01">ม.ค. 2569</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-year" ? "is-active" : ""}" data-period="2026-year">ภาพรวมทั้งปี 2569</button>
@@ -340,7 +340,7 @@ export class ReportsPage {
           ? `
       <div class="gl-notice gl-notice--warning" style="margin-bottom: var(--space-4);">
         <div>
-          <strong>⚠️ DATA_REVIEW_REQUIRED:</strong> ${m.dataQualityNotes || "March 2569 opening/closing balance basis differs from February cumulative balance."}
+          <strong>ต้องตรวจทานยอด:</strong> ${m.dataQualityNotes || "ยอดเปิด/ปิดบัญชีเดือน มี.ค. 2569 ไม่ตรงกับยอดสะสมของเดือน ก.พ. กรุณาตรวจสอบก่อนใช้อ้างอิง"}
         </div>
       </div>`
           : ""
@@ -497,7 +497,7 @@ export class ReportsPage {
                     <td style="font-weight: var(--weight-semibold);">${m.monthName} 2569</td>
                     <td>
                       <span class="gl-badge ${isPartial ? "gl-badge--pending" : isWarn ? "gl-badge--rejected" : "gl-badge--pending"}" style="font-size: 10px;">
-                        ${isPartial ? "ย้อนหลัง (ไม่เต็มเดือน)" : isWarn ? "ย้อนหลัง (⚠️ Review)" : "ย้อนหลัง"}
+                        ${isPartial ? "ย้อนหลัง (ไม่เต็มเดือน)" : isWarn ? "ย้อนหลัง (ต้องตรวจทาน)" : "ย้อนหลัง"}
                       </span>
                     </td>
                     <td class="is-right num-display" style="color: var(--income);">${m.cashIncome.format()}</td>

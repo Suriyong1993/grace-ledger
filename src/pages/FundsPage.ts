@@ -261,17 +261,31 @@ export class FundsPage {
       onStateChange();
     });
 
-    const closeBtn = root.querySelector<HTMLButtonElement>("#close-transfer-btn");
-    closeBtn?.addEventListener("click", () => {
+    const closeTransferModal = () => {
       this.isTransferModalOpen = false;
       onStateChange();
-    });
+    };
+
+    const closeBtn = root.querySelector<HTMLButtonElement>("#close-transfer-btn");
+    closeBtn?.addEventListener("click", closeTransferModal);
 
     const cancelBtn = root.querySelector<HTMLButtonElement>("#cancel-transfer-btn");
-    cancelBtn?.addEventListener("click", () => {
-      this.isTransferModalOpen = false;
-      onStateChange();
+    cancelBtn?.addEventListener("click", closeTransferModal);
+
+    const backdrop = root.querySelector<HTMLElement>("#transfer-modal");
+    backdrop?.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeTransferModal();
     });
+
+    if (this.isTransferModalOpen) {
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          document.removeEventListener("keydown", onKeyDown);
+          closeTransferModal();
+        }
+      };
+      document.addEventListener("keydown", onKeyDown);
+    }
 
     const form = root.querySelector<HTMLFormElement>("#transfer-form");
     form?.addEventListener("submit", (e) => {

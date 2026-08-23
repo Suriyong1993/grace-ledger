@@ -184,7 +184,7 @@ export class TransactionsPage {
                 const borderBottom = idx < items.length - 1 ? `border-bottom: 1px solid var(--border);` : "";
 
                 return `
-                <div class="gl-txn-row" data-txn-id="${item.id}" style="
+                <div class="gl-txn-row" data-txn-id="${item.id}" role="button" tabindex="0" aria-label="ดูรายละเอียด ${item.description}" style="
                   display: flex;
                   align-items: center;
                   gap: var(--space-3);
@@ -403,31 +403,47 @@ export class TransactionsPage {
       });
     });
 
-    // Row click -> open modal
+    // Row click / keyboard activation -> open modal
     const rows = root.querySelectorAll<HTMLElement>(".gl-txn-row");
     rows.forEach((row) => {
-      row.addEventListener("click", () => {
+      const openRow = () => {
         const id = row.getAttribute("data-txn-id");
         if (id) {
           this.selectedTransactionId = id;
           onStateChange();
         }
+      };
+      row.addEventListener("click", openRow);
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openRow();
+        }
       });
     });
 
     // Close modal
-    const closeBtn = root.querySelector<HTMLButtonElement>("#close-modal-btn");
-    closeBtn?.addEventListener("click", () => {
+    const closeModal = () => {
       this.selectedTransactionId = null;
       onStateChange();
-    });
+    };
+
+    const closeBtn = root.querySelector<HTMLButtonElement>("#close-modal-btn");
+    closeBtn?.addEventListener("click", closeModal);
 
     const backdrop = root.querySelector<HTMLElement>("#txn-modal");
     backdrop?.addEventListener("click", (e) => {
-      if (e.target === backdrop) {
-        this.selectedTransactionId = null;
-        onStateChange();
-      }
+      if (e.target === backdrop) closeModal();
     });
+
+    if (this.selectedTransactionId) {
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          document.removeEventListener("keydown", onKeyDown);
+          closeModal();
+        }
+      };
+      document.addEventListener("keydown", onKeyDown);
+    }
   }
 }

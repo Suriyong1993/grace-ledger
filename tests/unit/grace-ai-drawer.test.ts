@@ -121,10 +121,10 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     const html = drawer.renderHtml();
     expect(html).toContain('id="gl-ai-drawer"');
     expect(html).toContain("Grace AI Copilot");
-    expect(html).toContain("📊 สรุปการเงิน");
-    expect(html).toContain("🏦 ยอดกองทุน");
-    expect(html).toContain("📝 ร่างโอนเงิน");
-    expect(html).toContain("⚠️ เสนอโอนเงิน");
+    expect(html).toContain("สรุปการเงิน");
+    expect(html).toContain("ยอดกองทุน");
+    expect(html).toContain("ร่างโอนเงิน");
+    expect(html).toContain("เสนอโอนเงิน");
     expect(html).toContain('id="gl-ai-prompt-input"');
   });
 
@@ -141,7 +141,7 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     expect(updated).toBe(true);
     const html = drawer.renderHtml();
 
-    expect(html).toContain("ข้อมูลข้อเท็จจริงทางบัญชี (FACTS)");
+    expect(html).toContain("ข้อมูลข้อเท็จจริงทางบัญชี");
     expect(html).toContain("150,000.00 บาท");
     expect(html).toContain("50,000.00 บาท");
     expect(html).toContain("100,000.00 บาท");
@@ -156,7 +156,7 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     await drawer.processPrompt("ร่างการโอนเงิน 5000", () => {});
     const html = drawer.renderHtml();
 
-    expect(html).toContain("แบบร่างการโอนเงิน (DRAFT)");
+    expect(html).toContain("แบบร่างการโอนเงิน");
     expect(html).toContain("ยังไม่กระทบยอดเงิน");
     expect(html).toContain("฿5,000.00");
     expect(html).toContain("รายการนี้เป็นเพียงแบบร่าง ยังไม่มีการตัดหรือเพิ่มยอดเงินในกองทุนจริง");
@@ -170,9 +170,9 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     await drawer.processPrompt("เสนอโอนเงิน 5000", () => {});
     const html = drawer.renderHtml();
 
-    expect(html).toContain("ข้อเสนอการดำเนินการ (ACTION PROPOSAL)");
+    expect(html).toContain("ข้อเสนอการดำเนินการ");
     expect(html).toContain("รอการยืนยัน");
-    expect(html).toContain("🔍 ตรวจสอบและยืนยันการดำเนินการ");
+    expect(html).toContain("ตรวจสอบและยืนยันการดำเนินการ");
     expect(html).toContain("gl-ai-review-proposal-btn");
 
     // CRITICAL SECURITY ASSERTION: No direct execution trigger exists on the card

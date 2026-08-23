@@ -49,7 +49,7 @@ describe("ReportsPage UI — Unit Tests", () => {
     expect(html).toContain("ส.ค. 2569 (Live)");
     expect(html).toContain("ก.ค. 2569 (ย้อนหลัง)");
     expect(html).toContain("มิ.ย. 2569");
-    expect(html).toContain("มี.ค. 2569 ⚠️");
+    expect(html).toContain("มี.ค. 2569 (ตรวจทาน)");
     expect(html).toContain("ภาพรวมทั้งปี 2569");
     expect(html).toContain("พิมพ์รายงาน");
   });

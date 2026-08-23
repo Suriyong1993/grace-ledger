@@ -259,8 +259,10 @@ export class GraceAiDrawer {
       bottom: 0;
       width: 100%;
       max-width: 460px;
-      background: var(--card);
-      border-left: 1px solid var(--border);
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-left: 1px solid color-mix(in srgb, var(--foreground) 10%, var(--border));
       box-shadow: var(--shadow-xl);
       z-index: 1001;
       display: flex;
@@ -308,10 +310,10 @@ export class GraceAiDrawer {
         white-space: nowrap;
         background: var(--surface-subtle, rgba(0,0,0,0.02));
       ">
-        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="สรุปการเงินเดือนนี้">📊 สรุปการเงิน</button>
-        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="ตรวจสอบยอดเงินกองทุน">🏦 ยอดกองทุน</button>
-        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="ร่างการโอนเงิน 5000">📝 ร่างโอนเงิน</button>
-        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="เสนอโอนเงิน 5000">⚠️ เสนอโอนเงิน</button>
+        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="สรุปการเงินเดือนนี้">สรุปการเงิน</button>
+        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="ตรวจสอบยอดเงินกองทุน">ยอดกองทุน</button>
+        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="ร่างการโอนเงิน 5000">ร่างโอนเงิน</button>
+        <button class="gl-ai-chip gl-btn gl-btn--xs gl-btn--secondary" data-prompt="เสนอโอนเงิน 5000">เสนอโอนเงิน</button>
       </div>
 
       <!-- Messages Stream -->
@@ -401,7 +403,7 @@ export class GraceAiDrawer {
         <!-- FACTS -->
         <div style="background: color-mix(in srgb, var(--primary) 5%, transparent); padding: var(--space-3); border-radius: var(--radius-sm); border-left: 3px solid var(--primary);">
           <div style="font-size: var(--text-2xs); font-weight: var(--weight-bold); color: var(--primary); margin-bottom: var(--space-1);">
-            📊 ข้อมูลข้อเท็จจริงทางบัญชี (FACTS)
+            ข้อมูลข้อเท็จจริงทางบัญชี
           </div>
           <div style="font-size: var(--text-xs); line-height: 1.5;">
             <div>• รายรับงวด: <strong>${facts.total_income} บาท</strong></div>
@@ -413,14 +415,14 @@ export class GraceAiDrawer {
 
         <!-- ANALYSIS -->
         <div style="font-size: var(--text-xs); color: var(--foreground); line-height: 1.4;">
-          <strong>📈 การวิเคราะห์:</strong> ${msg.readResponse.analysis || "สถานะกระแสเงินสดในงวดนี้มีรายรับสุทธิที่มั่นคง"}
+          <strong>การวิเคราะห์:</strong> ${msg.readResponse.analysis || "สถานะกระแสเงินสดในงวดนี้มีรายรับสุทธิที่มั่นคง"}
         </div>
 
         <!-- INTERPRETATION -->
         ${
           msg.readResponse.interpretation
             ? `<div style="font-size: var(--text-xs); color: var(--text-muted); font-style: italic; line-height: 1.4;">
-                💡 ${msg.readResponse.interpretation}
+                ${msg.readResponse.interpretation}
                </div>`
             : ""
         }
@@ -443,7 +445,7 @@ export class GraceAiDrawer {
       innerContent = `
       <div class="gl-card" style="padding: var(--space-3); border: 1px dashed var(--border); background: var(--surface-subtle, rgba(0,0,0,0.02));">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-          <span style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--primary);">📄 แบบร่างการโอนเงิน (DRAFT)</span>
+          <span style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--primary);">แบบร่างการโอนเงิน</span>
           <span class="gl-badge gl-badge--warning" style="font-size: 10px;">ยังไม่กระทบยอดเงิน</span>
         </div>
         <div style="font-size: var(--text-xs); line-height: 1.5; margin-bottom: var(--space-2);">
@@ -461,7 +463,7 @@ export class GraceAiDrawer {
       innerContent = `
       <div class="gl-card" style="padding: var(--space-3); border: 1px solid var(--primary); background: color-mix(in srgb, var(--primary) 4%, transparent);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-          <span style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--primary);">⚠️ ข้อเสนอการดำเนินการ (ACTION PROPOSAL)</span>
+          <span style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--primary);">ข้อเสนอการดำเนินการ</span>
           <span class="gl-badge gl-badge--info" style="font-size: 10px;">รอการยืนยัน</span>
         </div>
         <div style="font-size: var(--text-xs); line-height: 1.5; margin-bottom: var(--space-3);">
@@ -469,13 +471,13 @@ export class GraceAiDrawer {
           <div>• จำนวนเงิน: <strong>${prop.amount}</strong></div>
           <div>• รายละเอียด: ${prop.summary}</div>
           <div>• ผลกระทบทางการเงิน: ${prop.financial_effect}</div>
-          <div>• อายุคำขอ: 5 นาที (TTL)</div>
+          <div>• อายุคำขอ: 5 นาที</div>
         </div>
         <button
           class="gl-btn gl-btn--sm gl-btn--primary gl-ai-review-proposal-btn"
           style="width: 100%; justify-content: center;"
         >
-          🔍 ตรวจสอบและยืนยันการดำเนินการ
+          ตรวจสอบและยืนยันการดำเนินการ
         </button>
       </div>
       `;
@@ -616,7 +618,7 @@ export class GraceAiDrawer {
               id: "msg-" + Date.now(),
               sender: "grace_ai",
               type: "text",
-              text: `✅ ${res.message} (รหัสอ้างอิง: ${res.resource_id})`,
+              text: `${res.message} (รหัสอ้างอิง: ${res.resource_id})`,
               timestamp: new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" }),
             });
           } else {
