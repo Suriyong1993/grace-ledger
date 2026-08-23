@@ -70,7 +70,6 @@ export interface TransactionFilterOptions {
   startDate?: string;
   endDate?: string;
   fundId?: string;
-  categoryId?: string;
   limit?: number;
   offset?: number;
 }
@@ -129,13 +128,14 @@ export class TransactionsService {
       }
 
       // Insert transaction header
+      // NOTE: category_id lives on transaction_splits, not on transactions — the
+      // header row has no category_id column in the deployed schema.
       const { data: txn, error: txnError } = await (this.supabase
         .from("transactions") as any)
         .insert({
           church_id: parsed.church_id,
           description: parsed.description,
           transaction_date: parsed.transaction_date,
-          category_id: parsed.category_id,
           account_id: parsed.account_id,
           amount: totalAmount.toFixed(2),
           status: "draft",
@@ -147,10 +147,11 @@ export class TransactionsService {
         return { success: false, error: txnError.message, code: txnError.code };
       }
 
-      // Insert transaction splits
+      // Insert transaction splits — category_id applied per split, matching the real schema
       const splitsToInsert = parsed.splits.map((s) => ({
         transaction_id: txn.id,
         fund_id: s.fund_id,
+        category_id: parsed.category_id,
         amount: Money.from(s.amount).toFixed(2),
         notes: s.notes || null,
       }));
@@ -199,10 +200,11 @@ export class TransactionsService {
         };
       }
 
+      // category_id lives on transaction_splits, not on transactions — handled below,
+      // either by stamping it onto replacement splits or updating existing splits directly.
       const updatePayload: Record<string, any> = {};
       if (parsed.description) updatePayload.description = parsed.description;
       if (parsed.transaction_date) updatePayload.transaction_date = parsed.transaction_date;
-      if (parsed.category_id) updatePayload.category_id = parsed.category_id;
       if (parsed.account_id) updatePayload.account_id = parsed.account_id;
       if (parsed.amount) updatePayload.amount = Money.from(parsed.amount).toFixed(2);
 
@@ -233,6 +235,18 @@ export class TransactionsService {
           };
         }
 
+        // Preserve the existing category when splits are replaced without an explicit change
+        let categoryForSplits = parsed.category_id;
+        if (!categoryForSplits) {
+          const { data: currentSplit } = await (this.supabase
+            .from("transaction_splits") as any)
+            .select("category_id")
+            .eq("transaction_id", transactionId)
+            .limit(1)
+            .maybeSingle();
+          categoryForSplits = currentSplit?.category_id;
+        }
+
         // Delete old splits
         await (this.supabase.from("transaction_splits") as any).delete().eq("transaction_id", transactionId);
 
@@ -240,6 +254,7 @@ export class TransactionsService {
         const splitsToInsert = parsed.splits.map((s) => ({
           transaction_id: transactionId,
           fund_id: s.fund_id,
+          category_id: categoryForSplits || null,
           amount: Money.from(s.amount).toFixed(2),
           notes: s.notes || null,
         }));
@@ -250,6 +265,16 @@ export class TransactionsService {
 
         if (insertSplitsError) {
           return { success: false, error: insertSplitsError.message, code: insertSplitsError.code };
+        }
+      } else if (parsed.category_id) {
+        // Category changed but splits weren't replaced — update category on existing splits.
+        const { error: categoryUpdateError } = await (this.supabase
+          .from("transaction_splits") as any)
+          .update({ category_id: parsed.category_id })
+          .eq("transaction_id", transactionId);
+
+        if (categoryUpdateError) {
+          return { success: false, error: categoryUpdateError.message, code: categoryUpdateError.code };
         }
       }
 
@@ -418,11 +443,9 @@ export class TransactionsService {
           amount,
           reversal_of_id,
           created_at,
-          category_id,
           account_id,
-          categories(id, name),
           accounts(id, name),
-          transaction_splits(id, fund_id, amount, notes, funds(id, name))
+          transaction_splits(id, fund_id, amount, notes, category_id, categories(id, name), funds(id, name))
         `)
         .eq("church_id", churchId)
         .order("transaction_date", { ascending: false });
@@ -435,9 +458,6 @@ export class TransactionsService {
       }
       if (filters?.endDate) {
         query = query.lte("transaction_date", filters.endDate);
-      }
-      if (filters?.categoryId) {
-        query = query.eq("category_id", filters.categoryId);
       }
       if (filters?.limit) {
         query = query.limit(filters.limit);

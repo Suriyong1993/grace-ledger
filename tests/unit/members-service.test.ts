@@ -20,7 +20,7 @@ describe("MembersService — Comprehensive Unit Tests", () => {
                         church_id: dummyChurchId,
                         full_name: "สมชาย รักพระเจ้า",
                         email: "somchai@test.com",
-                        phone_number: "081-234-5678",
+                        phone: "081-234-5678",
                         is_active: true,
                         created_at: "2026-08-21T00:00:00Z",
                       },
@@ -39,6 +39,8 @@ describe("MembersService — Comprehensive Unit Tests", () => {
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(1);
       expect(result.data?.[0].full_name).toBe("สมชาย รักพระเจ้า");
+      // Regression: DB column is "phone", mapped to the public phone_number field.
+      expect(result.data?.[0].phone_number).toBe("081-234-5678");
     });
 
     it("creates a new member profile and validates email format", async () => {
@@ -67,6 +69,9 @@ describe("MembersService — Comprehensive Unit Tests", () => {
       expect(result.success).toBe(true);
       expect(result.data?.member_id).toBe("new-member-uuid");
       expect(insertedPayload.full_name).toBe("มานะ อดทน");
+      // Regression: insert must target the real "phone" column, not "phone_number".
+      expect(insertedPayload.phone).toBe("089-999-8888");
+      expect(insertedPayload).not.toHaveProperty("phone_number");
     });
 
     it("rejects member creation with invalid email syntax", async () => {
@@ -102,6 +107,9 @@ describe("MembersService — Comprehensive Unit Tests", () => {
 
       expect(result.success).toBe(true);
       expect(updatedPayload.full_name).toBe("สมชาย รักพระเจ้า (แก้ไข)");
+      // Regression: update must target the real "phone" column, not "phone_number".
+      expect(updatedPayload.phone).toBe("082-000-1111");
+      expect(updatedPayload).not.toHaveProperty("phone_number");
     });
   });
 

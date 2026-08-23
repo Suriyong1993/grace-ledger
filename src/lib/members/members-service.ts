@@ -103,9 +103,10 @@ export class MembersService {
   public async getMembers(churchId: string): Promise<ServiceResult<MemberModel[]>> {
     try {
       this.checkRole("read", "members");
+      // DB column is "phone" — mapped to the public "phone_number" field below.
       const { data, error } = await (this.supabase
         .from("members") as any)
-        .select("id, church_id, full_name, email, phone_number, is_active, created_at")
+        .select("id, church_id, full_name, email, phone, is_active, created_at")
         .eq("church_id", churchId)
         .eq("is_active", true)
         .order("full_name", { ascending: true });
@@ -114,7 +115,17 @@ export class MembersService {
         return { success: false, error: error.message, code: error.code };
       }
 
-      return { success: true, data: data || [] };
+      const members: MemberModel[] = (data || []).map((row: any) => ({
+        id: row.id,
+        church_id: row.church_id,
+        full_name: row.full_name,
+        email: row.email,
+        phone_number: row.phone,
+        is_active: row.is_active,
+        created_at: row.created_at,
+      }));
+
+      return { success: true, data: members };
     } catch (err: any) {
       return { success: false, error: err.message || "เกิดข้อผิดพลาดในการดึงข้อมูลสมาชิก" };
     }
@@ -134,7 +145,7 @@ export class MembersService {
           church_id: parsed.church_id,
           full_name: parsed.full_name,
           email: parsed.email || null,
-          phone_number: parsed.phone_number || null,
+          phone: parsed.phone_number || null,
           is_active: true,
         })
         .select("id")
@@ -164,7 +175,7 @@ export class MembersService {
       const payload: Record<string, any> = {};
       if (parsed.full_name) payload.full_name = parsed.full_name;
       if (parsed.email !== undefined) payload.email = parsed.email || null;
-      if (parsed.phone_number !== undefined) payload.phone_number = parsed.phone_number || null;
+      if (parsed.phone_number !== undefined) payload.phone = parsed.phone_number || null;
       if (parsed.is_active !== undefined) payload.is_active = parsed.is_active;
 
       const { error } = await (this.supabase

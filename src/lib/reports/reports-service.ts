@@ -86,7 +86,8 @@ export class ReportsService {
     try {
       this.checkRole("read");
 
-      // Query posted transactions and their splits
+      // Query posted transactions and their splits. Category lives on
+      // transaction_splits, not on the transactions header row.
       const { data, error } = await (this.supabase
         .from("transactions") as any)
         .select(`
@@ -96,9 +97,7 @@ export class ReportsService {
           description,
           transaction_date,
           status,
-          category_id,
-          categories(id, name),
-          transaction_splits(amount, fund_id, funds(id, name))
+          transaction_splits(amount, fund_id, category_id, funds(id, name), categories(id, name))
         `)
         .eq("church_id", churchId)
         .eq("status", "posted")
@@ -126,9 +125,14 @@ export class ReportsService {
           totalExpense = totalExpense.add(txnAmount);
         }
 
-        // Category breakdown
-        const catId = t.category_id || "uncategorized";
-        const catName = t.categories?.name || "หมวดหมู่ทั่วไป";
+        // Category breakdown — category_id lives on transaction_splits, so the
+        // transaction's category is represented by its first split's category
+        // (a transaction is entered against a single category at creation time).
+        const firstSplitWithCategory = Array.isArray(t.transaction_splits)
+          ? t.transaction_splits.find((sp: any) => sp.category_id)
+          : undefined;
+        const catId = firstSplitWithCategory?.category_id || "uncategorized";
+        const catName = firstSplitWithCategory?.categories?.name || "หมวดหมู่ทั่วไป";
         const existingCat = categoryMap.get(catId) || { name: catName, type: dir, amount: Money.zero(), count: 0 };
         existingCat.amount = existingCat.amount.add(txnAmount);
         existingCat.count++;

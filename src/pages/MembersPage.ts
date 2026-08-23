@@ -34,7 +34,7 @@ export class MembersPage {
     try {
       const { data, error } = await (this.supabase
         .from("members") as any)
-        .select("id, full_name, email, phone_number, is_active, created_at")
+        .select("id, full_name, email, phone, is_active, created_at")
         .eq("church_id", this.churchId)
         .eq("is_active", true)
         .order("full_name", { ascending: true });
@@ -51,7 +51,7 @@ export class MembersPage {
           code: `MEM-${String(idx + 101).padStart(4, "0")}`,
           name: m.full_name || "สมาชิก",
           email: m.email || "—",
-          phone: m.phone_number || "—",
+          phone: m.phone || "—",
           group: "กลุ่มสามัคคีธรรม",
           yearGivingTotal: Money.zero(),
           titheCount: 0,

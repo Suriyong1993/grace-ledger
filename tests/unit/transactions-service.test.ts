@@ -63,6 +63,53 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(insertedSplits[1].amount).toBe("500.00");
     });
 
+    it("stores category_id on transaction_splits, never on the transactions header row (regression)", async () => {
+      let insertedTxn: any = null;
+      let insertedSplits: any = null;
+
+      const mockSupabase = {
+        from: (table: string) => {
+          if (table === "transactions") {
+            return {
+              insert: (payload: any) => {
+                insertedTxn = payload;
+                return {
+                  select: () => ({
+                    single: () => Promise.resolve({ data: { id: "txn-created-456" }, error: null }),
+                  }),
+                };
+              },
+            };
+          }
+          if (table === "transaction_splits") {
+            return {
+              insert: (payload: any) => {
+                insertedSplits = payload;
+                return Promise.resolve({ error: null });
+              },
+            };
+          }
+          return {};
+        },
+      } as any;
+
+      const service = new TransactionsService(mockSupabase, "finance_staff");
+
+      const result = await service.createDraftTransaction({
+        church_id: dummyChurchId,
+        description: "เงินถวายทั่วไป",
+        transaction_date: "2026-08-23",
+        category_id: dummyCategoryId,
+        account_id: dummyAccountId,
+        amount: "1000.00",
+        splits: [{ fund_id: dummyFundId, amount: "1000.00" }],
+      });
+
+      expect(result.success).toBe(true);
+      expect(insertedTxn).not.toHaveProperty("category_id");
+      expect(insertedSplits[0].category_id).toBe(dummyCategoryId);
+    });
+
     it("rejects when split sum does not match total amount (Split Parity Invariant)", async () => {
       const mockSupabase = {} as any;
       const service = new TransactionsService(mockSupabase, "finance_staff");
@@ -172,6 +219,13 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
           }
           if (table === "transaction_splits") {
             return {
+              select: () => ({
+                eq: () => ({
+                  limit: () => ({
+                    maybeSingle: () => Promise.resolve({ data: null, error: null }),
+                  }),
+                }),
+              }),
               delete: () => ({
                 eq: (_col: string, val: string) => {
                   deletedSplitsTxnId = val;
@@ -197,6 +251,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       });
 
       expect(result.success).toBe(true);
+      expect(updatedPayload).not.toHaveProperty("category_id");
       expect(updatedPayload.description).toBe("แก้ไขรายละเอียดค่าเดินทาง");
       expect(updatedPayload.amount).toBe("1200.00");
       expect(deletedSplitsTxnId).toBe("txn-1");

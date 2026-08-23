@@ -8,36 +8,27 @@ describe("TransactionsPage UI — Unit Tests", () => {
       description: "เงินถวายวันอาทิตย์ (รอบเช้า)",
       transaction_date: "2026-08-21",
       status: "approved",
-      category_id: "cat-1",
       account_id: "acc-1",
-      categories: { name: "ถวายทรัพย์ทั่วไป" },
       accounts: { name: "เงินสดในมือ" },
-      funds: { name: "กองทุนทั่วไป" },
-      transaction_splits: [{ amount: "18450.00", fund_id: "fund-1", funds: { name: "กองทุนทั่วไป" } }],
+      transaction_splits: [{ amount: "18450.00", fund_id: "fund-1", category_id: "cat-1", funds: { name: "กองทุนทั่วไป" }, categories: { name: "ถวายทรัพย์ทั่วไป" } }],
     },
     {
       id: "txn-2",
       description: "ซื้ออุปกรณ์ระบบเสียงห้องเยาวชน",
       transaction_date: "2026-08-21",
       status: "pending",
-      category_id: "cat-2",
       account_id: "acc-2",
-      categories: { name: "พันธกิจเยาวชน" },
       accounts: { name: "ธ.กรุงไทย ···4821" },
-      funds: { name: "กองทุนเยาวชน" },
-      transaction_splits: [{ amount: "8500.00", fund_id: "fund-2", funds: { name: "กองทุนเยาวชน" } }],
+      transaction_splits: [{ amount: "8500.00", fund_id: "fund-2", category_id: "cat-2", funds: { name: "กองทุนเยาวชน" }, categories: { name: "พันธกิจเยาวชน" } }],
     },
     {
       id: "txn-3",
       description: "ค่าไฟฟ้าและสาธารณูปโภคประจำเดือน",
       transaction_date: "2026-08-20",
       status: "approved",
-      category_id: "cat-3",
       account_id: "acc-2",
-      categories: { name: "สาธารณูปโภค" },
       accounts: { name: "ธ.กรุงไทย ···4821" },
-      funds: { name: "กองทุนทั่วไป" },
-      transaction_splits: [{ amount: "4280.00", fund_id: "fund-1", funds: { name: "กองทุนทั่วไป" } }],
+      transaction_splits: [{ amount: "4280.00", fund_id: "fund-1", category_id: "cat-3", funds: { name: "กองทุนทั่วไป" }, categories: { name: "สาธารณูปโภค" } }],
     },
   ];
 
@@ -89,6 +80,16 @@ describe("TransactionsPage UI — Unit Tests", () => {
     expect(html).toContain("−฿8,500.00");
     expect(html).toContain("อนุมัติแล้ว");
     expect(html).toContain("รอตรวจสอบ");
+  });
+
+  it("resolves category name from transaction_splits, not a transactions.category_id column (regression)", async () => {
+    const page = new TransactionsPage(mockSupabase, "church-1");
+    await page.loadData();
+    const html = page.renderHtml();
+
+    expect(html).toContain("ถวายทรัพย์ทั่วไป");
+    expect(html).toContain("พันธกิจเยาวชน");
+    expect(html).toContain("สาธารณูปโภค");
   });
 
   it("renders detail modal with audit trail when a transaction is selected", async () => {

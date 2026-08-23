@@ -14,9 +14,7 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
           description: "เงินถวายทั่วไปวันอาทิตย์",
           transaction_date: "2026-08-01",
           status: "posted",
-          category_id: "cat-1",
-          categories: { id: "cat-1", name: "ถวายทั่วไป" },
-          transaction_splits: [{ amount: "50000.00", fund_id: "f-1", funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
+          transaction_splits: [{ amount: "50000.00", fund_id: "f-1", category_id: "cat-1", categories: { id: "cat-1", name: "ถวายทั่วไป" }, funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
         },
         {
           id: "tx-2",
@@ -25,9 +23,7 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
           description: "ค่าไฟฟ้าและน้ำประปา",
           transaction_date: "2026-08-05",
           status: "posted",
-          category_id: "cat-2",
-          categories: { id: "cat-2", name: "สาธารณูปโภค" },
-          transaction_splits: [{ amount: "12500.50", fund_id: "f-1", funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
+          transaction_splits: [{ amount: "12500.50", fund_id: "f-1", category_id: "cat-2", categories: { id: "cat-2", name: "สาธารณูปโภค" }, funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
         },
       ];
 
@@ -67,6 +63,10 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
       expect(result.data?.posted_transactions_count).toBe(2);
       expect(result.data?.categories_summary).toHaveLength(2);
       expect(result.data?.funds_allocation).toHaveLength(1);
+      // Regression: category resolved from transaction_splits.category_id, not transactions.category_id.
+      const catNames = result.data?.categories_summary.map((c) => c.category_name);
+      expect(catNames).toContain("ถวายทั่วไป");
+      expect(catNames).toContain("สาธารณูปโภค");
     });
 
     it("propagates database error cleanly when financial query fails", async () => {

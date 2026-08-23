@@ -53,11 +53,9 @@ export class TransactionsPage {
           transaction_date,
           status,
           created_at,
-          category_id,
           account_id,
-          categories(name),
           accounts(name),
-          transaction_splits(amount, fund_id, funds(name))
+          transaction_splits(amount, fund_id, category_id, funds(name), categories(name))
         `)
         .eq("church_id", this.churchId)
         .order("transaction_date", { ascending: false });
@@ -72,10 +70,12 @@ export class TransactionsPage {
         this.transactions = data.map((t, idx) => {
           let sum = Money.zero();
           let fundName = "กองทุนทั่วไป";
+          let categoryName: string | null = null;
           if (t.transaction_splits && Array.isArray(t.transaction_splits)) {
             for (const sp of t.transaction_splits) {
               if (sp.amount) sum = sum.add(Money.from(sp.amount));
               if (sp.funds?.name) fundName = sp.funds.name;
+              if (!categoryName && sp.categories?.name) categoryName = sp.categories.name;
             }
           }
 
@@ -86,7 +86,7 @@ export class TransactionsPage {
             id: t.id,
             code: `TXN-${String(idx + 1).padStart(4, "0")}`,
             description: t.description || "รายการทั่วไป",
-            categoryName: t.categories?.name || (direction === "income" ? "ถวายทรัพย์" : "พันธกิจและสาธารณูปโภค"),
+            categoryName: categoryName || (direction === "income" ? "ถวายทรัพย์" : "พันธกิจและสาธารณูปโภค"),
             fundName,
             accountName: t.accounts?.name || "บัญชีหลัก",
             amount: sum,
