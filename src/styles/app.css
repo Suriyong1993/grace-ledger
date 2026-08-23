@@ -274,10 +274,20 @@ button.gl-card:active {
   border-color: var(--destructive);
 }
 
+/* Compact button. The touch target stays at the documented minimum by default;
+   the shorter box is opt-in for precise pointers only. Height must not depend on
+   an ancestor selector — the AI drawer renders as a sibling of #main-content and
+   so never inherits that subtree's mobile touch-target patch. */
 .gl-btn--sm {
-  min-height: 34px;
+  min-height: var(--touch-target-min);
   padding: var(--space-1) var(--space-3);
   font-size: var(--text-xs);
+}
+
+@media (pointer: fine) {
+  .gl-btn--sm {
+    min-height: 34px;
+  }
 }
 
 .gl-btn--block {
