@@ -58,6 +58,8 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(result.data?.transaction_id).toBe("txn-created-123");
       expect(insertedTxn.status).toBe("draft");
       expect(insertedTxn.amount).toBe("1500.00");
+      // Regression: transaction_date is the effective financial date, stored on the header row.
+      expect(insertedTxn.transaction_date).toBe("2026-08-21");
       expect(insertedSplits).toHaveLength(2);
       expect(insertedSplits[0].amount).toBe("1000.00");
       expect(insertedSplits[1].amount).toBe("500.00");
@@ -256,6 +258,56 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(updatedPayload.amount).toBe("1200.00");
       expect(deletedSplitsTxnId).toBe("txn-1");
       expect(insertedNewSplits[0].amount).toBe("1200.00");
+    });
+
+    it("updates transaction_date when explicitly provided, and leaves it untouched when omitted (regression)", async () => {
+      let updatedPayloadWithDate: any = null;
+      const mockSupabaseWithDate = {
+        from: (table: string) => {
+          if (table === "transactions") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  single: () => Promise.resolve({ data: { id: "txn-2", status: "draft", amount: "1000.00" }, error: null }),
+                }),
+              }),
+              update: (payload: any) => {
+                updatedPayloadWithDate = payload;
+                return { eq: () => Promise.resolve({ error: null }) };
+              },
+            };
+          }
+          return {};
+        },
+      } as any;
+
+      const serviceWithDate = new TransactionsService(mockSupabaseWithDate, "finance_staff");
+      await serviceWithDate.updateDraftTransaction("txn-2", { transaction_date: "2026-07-31" });
+      expect(updatedPayloadWithDate.transaction_date).toBe("2026-07-31");
+
+      let updatedPayloadNoDate: any = null;
+      const mockSupabaseNoDate = {
+        from: (table: string) => {
+          if (table === "transactions") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  single: () => Promise.resolve({ data: { id: "txn-3", status: "draft", amount: "1000.00" }, error: null }),
+                }),
+              }),
+              update: (payload: any) => {
+                updatedPayloadNoDate = payload;
+                return { eq: () => Promise.resolve({ error: null }) };
+              },
+            };
+          }
+          return {};
+        },
+      } as any;
+
+      const serviceNoDate = new TransactionsService(mockSupabaseNoDate, "finance_staff");
+      await serviceNoDate.updateDraftTransaction("txn-3", { description: "แก้ไขคำอธิบายเท่านั้น" });
+      expect(updatedPayloadNoDate).not.toHaveProperty("transaction_date");
     });
 
     it("DENIES update if transaction is in posted status (Immutable Ledger Violation)", async () => {

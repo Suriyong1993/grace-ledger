@@ -69,6 +69,60 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
       expect(catNames).toContain("สาธารณูปโภค");
     });
 
+    it("reports a backdated transaction in its effective month (transaction_date), not the entry month (created_at) — regression", async () => {
+      // transaction_date = 2026-07-31 (when the money actually moved)
+      // created_at        = 2026-08-01 (when someone typed it into the system)
+      // posted_at         = 2026-08-01 (when it was posted to the GL)
+      const backdatedTxn = {
+        id: "tx-backdated",
+        amount: "9000.00",
+        direction: "income",
+        description: "เงินถวายสิ้นเดือนกรกฎาคม บันทึกย้อนหลัง",
+        transaction_date: "2026-07-31",
+        created_at: "2026-08-01T09:00:00Z",
+        posted_at: "2026-08-01T09:05:00Z",
+        status: "posted",
+        transaction_splits: [{ amount: "9000.00", fund_id: "f-1", funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
+      };
+
+      // Simulates real Postgres behavior: filters strictly by the queried column
+      // (transaction_date), never by created_at or posted_at.
+      const makeMockSupabase = (rows: any[]) => ({
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                gte: (col: string, val: string) => {
+                  expect(col).toBe("transaction_date");
+                  return {
+                    lte: (col2: string, val2: string) => {
+                      expect(col2).toBe("transaction_date");
+                      const filtered = rows.filter((r) => r.transaction_date >= val && r.transaction_date <= val2);
+                      return Promise.resolve({ data: filtered, error: null });
+                    },
+                  };
+                },
+              }),
+            }),
+          }),
+        }),
+      }) as any;
+
+      const service = new ReportsService(makeMockSupabase([backdatedTxn]), "treasurer");
+
+      // Queried as July → must be included (proves transaction_date drives the period, not created_at/posted_at)
+      const julyResult = await service.getStatementOfFinancialPosition(dummyChurchId, "2026-07-01", "2026-07-31");
+      expect(julyResult.success).toBe(true);
+      expect(julyResult.data?.posted_transactions_count).toBe(1);
+      expect(julyResult.data?.total_income.format()).toBe("฿9,000.00");
+
+      // Queried as August → must be excluded, even though created_at/posted_at fall in August
+      const augustResult = await service.getStatementOfFinancialPosition(dummyChurchId, "2026-08-01", "2026-08-31");
+      expect(augustResult.success).toBe(true);
+      expect(augustResult.data?.posted_transactions_count).toBe(0);
+      expect(augustResult.data?.total_income.format()).toBe("฿0.00");
+    });
+
     it("propagates database error cleanly when financial query fails", async () => {
       const mockSupabase = {
         from: () => ({
