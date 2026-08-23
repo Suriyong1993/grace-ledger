@@ -69,7 +69,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
   const isAllAllocMatched = isCashMatch && isTransferMatch && isQrMatch && !grandExpected.isZero();
 
   return `
-  <div class="gl-offering-entry-container gl-fade-in" style="padding: 28px 32px 64px; max-width: 960px; margin: 0 auto;">
+  <div class="gl-page gl-offering-entry-container gl-fade-in">
     <!-- Breadcrumb & Back -->
     <div style="margin-bottom: 20px;">
       <a href="#/offerings" style="
