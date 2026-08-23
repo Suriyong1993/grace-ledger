@@ -13,13 +13,13 @@ export class LoginPage {
 
   public renderHtml(): string {
     const errorHtml = this.errorMessage
-      ? `<div role="alert" aria-live="polite" class="gl-login-alert">
+      ? `<div role="alert" aria-live="polite" class="gl-notice gl-notice--error gl-login-alert">
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="gl-login-alert-icon">
             <circle cx="10" cy="10" r="8.25" stroke="currentColor" stroke-width="1.5"/>
             <path d="M10 6.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <circle cx="10" cy="13.25" r="0.9" fill="currentColor"/>
           </svg>
-          <span>${escapeHtml(this.errorMessage)}</span>
+          <span class="gl-notice__body">${escapeHtml(this.errorMessage)}</span>
         </div>`
       : "";
 
@@ -32,26 +32,13 @@ export class LoginPage {
         justify-content: center;
         padding: var(--space-6);
         font-family: var(--font-sans);
-        position: relative;
-        overflow: hidden;
-        background: oklch(0.155 0.012 45);
+        background: var(--background);
       }
-      .gl-login-glow {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background:
-          radial-gradient(560px 420px at 50% -8%, oklch(0.32 0.09 45 / 55%), transparent 65%),
-          radial-gradient(420px 320px at 88% 92%, oklch(0.24 0.05 45 / 45%), transparent 60%);
-      }
+      /* Panel takes .gl-card + .gl-card--elevated from the app stylesheet;
+         only the width, padding and entrance are login-specific. */
       .gl-login-panel {
-        position: relative;
         width: 100%;
         max-width: 388px;
-        background: oklch(0.19 0.012 45);
-        border: 1px solid oklch(1 0 0 / 10%);
-        border-radius: var(--radius-card);
-        box-shadow: var(--shadow-elevated), 0 30px 60px -20px rgb(0 0 0 / 0.45);
         padding: var(--space-8) var(--space-6);
         animation: gl-login-rise var(--duration-page) var(--ease-out);
       }
@@ -63,77 +50,47 @@ export class LoginPage {
         width: 44px;
         height: 44px;
         border-radius: var(--radius-md);
-        background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
+        background: linear-gradient(155deg, var(--primary), var(--primary-dark));
+        color: var(--primary-foreground);
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: var(--space-5);
-        box-shadow: 0 8px 20px -8px oklch(0.65 0.19 45 / 60%);
+        box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--primary) 55%, transparent);
       }
       .gl-login-title {
-        font-weight: 800;
-        font-size: 22px;
-        letter-spacing: -0.01em;
-        color: oklch(0.97 0.006 80);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-2xl);
+        letter-spacing: var(--tracking-heading);
+        color: var(--foreground);
         margin: 0 0 2px;
       }
       .gl-login-role {
-        font-size: 13px;
-        font-weight: 600;
-        color: oklch(0.8 0.05 55);
+        font-size: var(--text-sm);
+        font-weight: var(--weight-semibold);
+        color: var(--accent-foreground);
         margin: 0 0 var(--space-1);
       }
       .gl-login-subtitle {
-        font-size: 13px;
-        line-height: 1.5;
-        color: oklch(0.68 0.01 60);
+        font-size: var(--text-sm);
+        line-height: var(--leading-body);
+        color: var(--muted-foreground);
         margin: 0 0 var(--space-6);
       }
+      /* Colour, border and radius come from .gl-notice--error. */
       .gl-login-alert {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        background: oklch(0.24 0.06 25);
-        border: 1px solid oklch(0.4 0.1 25);
-        color: oklch(0.88 0.06 25);
-        font-size: 13px;
-        line-height: 1.4;
-        border-radius: var(--radius-sm);
-        padding: 10px 12px;
         margin-bottom: var(--space-5);
       }
       .gl-login-alert-icon { flex: none; width: 16px; height: 16px; margin-top: 1px; }
       .gl-login-field { margin-bottom: var(--space-4); }
       .gl-login-label {
         display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: oklch(0.85 0.01 60);
-        margin-bottom: 6px;
+        margin-bottom: var(--space-1);
       }
       .gl-login-input-wrap { position: relative; }
-      .gl-login-input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        background: oklch(0.155 0.012 45);
-        border: 1px solid oklch(1 0 0 / 12%);
-        border-radius: var(--radius-input);
-        color: oklch(0.96 0.006 80);
-        font-size: 14px;
-        font-family: inherit;
-        min-height: var(--touch-target-min);
-        transition: border-color var(--duration-micro) var(--ease-out), background var(--duration-micro) var(--ease-out);
-      }
-      .gl-login-input::placeholder { color: oklch(0.5 0.01 60); }
-      .gl-login-input:hover { border-color: oklch(1 0 0 / 20%); }
-      .gl-login-input:focus-visible {
-        outline: 2px solid var(--ring);
-        outline-offset: 1px;
-        border-color: transparent;
-      }
+      /* Field colour, border, radius and height come from .gl-input. */
       .gl-login-input[type="password"],
-      .gl-login-input.gl-login-input--pw { padding-right: 44px; }
+      .gl-login-input.gl-login-input--pw { padding-right: var(--touch-target-min); }
       .gl-login-toggle-pw {
         position: absolute;
         top: 0; bottom: 0; right: 4px;
@@ -143,47 +100,27 @@ export class LoginPage {
         justify-content: center;
         background: transparent;
         border: none;
-        color: oklch(0.6 0.01 60);
+        color: var(--muted-foreground);
         cursor: pointer;
         border-radius: var(--radius-sm);
+        transition: color var(--duration-micro) var(--ease-out);
       }
-      .gl-login-toggle-pw:hover { color: oklch(0.85 0.01 60); }
+      .gl-login-toggle-pw:hover { color: var(--foreground); }
       .gl-login-toggle-pw:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
-      .gl-login-submit {
-        width: 100%;
-        min-height: var(--touch-target-min);
-        padding: 12px;
-        margin-top: var(--space-2);
-        border: none;
-        border-radius: var(--radius-button);
-        background: var(--gl-orange-600);
-        color: #ffffff;
-        font-weight: 700;
-        font-size: 15px;
-        font-family: inherit;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: background var(--duration-micro) var(--ease-out), transform var(--duration-micro) var(--ease-out);
-      }
-      .gl-login-submit:hover:not(:disabled) { background: var(--gl-orange-700); }
-      .gl-login-submit:active:not(:disabled) { transform: scale(0.99); }
-      .gl-login-submit:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-      .gl-login-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+      /* Submit takes .gl-btn + .gl-btn--primary + .gl-btn--block. */
+      .gl-login-submit { margin-top: var(--space-2); }
       .gl-login-spinner {
         width: 16px; height: 16px;
-        border-radius: 50%;
-        border: 2px solid rgb(255 255 255 / 0.35);
-        border-top-color: #ffffff;
+        border-radius: var(--radius-full);
+        border: 2px solid color-mix(in srgb, var(--primary-foreground) 35%, transparent);
+        border-top-color: var(--primary-foreground);
         animation: gl-login-spin 0.7s linear infinite;
       }
       @keyframes gl-login-spin { to { transform: rotate(360deg); } }
       .gl-login-footer {
         margin-top: var(--space-6);
-        font-size: 12px;
-        color: oklch(0.5 0.01 60);
+        font-size: var(--text-xs);
+        color: var(--muted-foreground);
         text-align: center;
       }
       @media (max-width: 420px) {
@@ -191,11 +128,10 @@ export class LoginPage {
       }
     </style>
     <div class="gl-login-screen">
-      <div class="gl-login-glow" aria-hidden="true"></div>
-      <form id="login-form" class="gl-login-panel" novalidate>
+      <form id="login-form" class="gl-card gl-card--elevated gl-login-panel" novalidate>
         <div class="gl-login-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-            <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="#ffffff"/>
+            <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="currentColor"/>
           </svg>
         </div>
 
@@ -206,7 +142,7 @@ export class LoginPage {
         ${errorHtml}
 
         <div class="gl-login-field">
-          <label class="gl-login-label" for="login-email">อีเมล</label>
+          <label class="gl-label gl-login-label" for="login-email">อีเมล</label>
           <div class="gl-login-input-wrap">
             <input
               id="login-email"
@@ -217,14 +153,14 @@ export class LoginPage {
               autocomplete="username"
               autofocus
               placeholder="you@church.org"
-              class="gl-login-input"
+              class="gl-input gl-login-input"
               ${this.isSubmitting ? "disabled" : ""}
             />
           </div>
         </div>
 
         <div class="gl-login-field">
-          <label class="gl-login-label" for="login-password">รหัสผ่าน</label>
+          <label class="gl-label gl-login-label" for="login-password">รหัสผ่าน</label>
           <div class="gl-login-input-wrap">
             <input
               id="login-password"
@@ -233,7 +169,7 @@ export class LoginPage {
               required
               autocomplete="current-password"
               placeholder="••••••••"
-              class="gl-login-input gl-login-input--pw"
+              class="gl-input gl-login-input gl-login-input--pw"
               ${this.isSubmitting ? "disabled" : ""}
             />
             <button
@@ -252,7 +188,7 @@ export class LoginPage {
         <button
           id="login-submit"
           type="submit"
-          class="gl-login-submit"
+          class="gl-btn gl-btn--primary gl-btn--block gl-login-submit"
           ${this.isSubmitting ? "disabled aria-busy=\"true\"" : ""}
         >
           ${this.isSubmitting ? `<span class="gl-login-spinner" aria-hidden="true"></span><span>กำลังเข้าสู่ระบบ...</span>` : "เข้าสู่ระบบ"}
