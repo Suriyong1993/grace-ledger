@@ -10,6 +10,12 @@ import {
 } from "../lib/reports/historical-service";
 import { formatDateThai } from "../lib/format";
 
+interface ChurchLeadership {
+  pastor?: string;
+  auditor?: string;
+  cashCounters: string[];
+}
+
 export class ReportsPage {
   private selectedPeriod = "2026-08";
   private reportsService: ReportsService;
@@ -28,6 +34,7 @@ export class ReportsPage {
 
   private isLoading = true;
   private errorMessage: string | null = null;
+  private leadership: ChurchLeadership | null = null;
 
   constructor(
     public readonly supabase: SupabaseClient<Database>,
@@ -49,6 +56,8 @@ export class ReportsPage {
     this.historicalWeekly = [];
     this.historicalGrandTotals = null;
     this.historicalAllMonths = [];
+
+    await this.loadLeadership();
 
     try {
       if (this.selectedPeriod === "2026-year") {
@@ -103,6 +112,31 @@ export class ReportsPage {
       this.errorMessage = err.message || "เกิดข้อผิดพลาดในการโหลดรายงานการเงิน";
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  private async loadLeadership(): Promise<void> {
+    try {
+      const { data } = await (this.supabase
+        .from("churches") as any)
+        .select("settings")
+        .eq("id", this.churchId)
+        .single();
+
+      const raw = data?.settings?.leadership;
+      if (!raw) {
+        this.leadership = null;
+        return;
+      }
+
+      this.leadership = {
+        pastor: typeof raw.pastor === "string" ? raw.pastor : undefined,
+        auditor: typeof raw.auditor === "string" ? raw.auditor : undefined,
+        cashCounters: Array.isArray(raw.cash_counters) ? raw.cash_counters.filter((v: unknown) => typeof v === "string") : [],
+      };
+    } catch {
+      // Leadership info is supplementary — never let it block the financial report.
+      this.leadership = null;
     }
   }
 
@@ -181,8 +215,53 @@ export class ReportsPage {
       </section>
 
       ${isYearView ? this.renderYearView() : isHistorical ? this.renderHistoricalMonthView() : this.renderLiveMonthView()}
+
+      ${this.renderLeadershipBlock()}
     </div>
     `;
+  }
+
+  /**
+   * Governance / signing parties for the printed financial report — pastor,
+   * cash counters, auditor. Read-only display of churches.settings.leadership;
+   * these are personnel records, not application users.
+   */
+  private renderLeadershipBlock(): string {
+    const l = this.leadership;
+    if (!l || (!l.pastor && !l.auditor && l.cashCounters.length === 0)) return "";
+
+    const rows: string[] = [];
+    if (l.pastor) {
+      rows.push(`
+        <div style="display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border);">
+          <span style="color: var(--muted-foreground);">ศิษยาภิบาล</span>
+          <span style="font-weight: var(--weight-semibold); text-align: right;">${l.pastor}</span>
+        </div>`);
+    }
+    if (l.cashCounters.length > 0) {
+      rows.push(`
+        <div style="display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border);">
+          <span style="color: var(--muted-foreground);">ผู้นับเงิน</span>
+          <span style="font-weight: var(--weight-semibold); text-align: right;">${l.cashCounters.join(", ")}</span>
+        </div>`);
+    }
+    if (l.auditor) {
+      rows.push(`
+        <div style="display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0;">
+          <span style="color: var(--muted-foreground);">ผู้ตรวจสอบบัญชี</span>
+          <span style="font-weight: var(--weight-semibold); text-align: right;">${l.auditor}</span>
+        </div>`);
+    }
+
+    return `
+      <section class="gl-section" style="margin-top: var(--space-6);">
+        <div class="gl-section__head">
+          <h2>ผู้รับผิดชอบและผู้ตรวจสอบ</h2>
+        </div>
+        <div class="gl-card" style="padding: var(--space-4);">
+          ${rows.join("")}
+        </div>
+      </section>`;
   }
 
   /**
