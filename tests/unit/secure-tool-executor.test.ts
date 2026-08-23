@@ -20,9 +20,11 @@ describe("SecureAiToolExecutor — Comprehensive Security & Boundary Tests", () 
     customData?: Record<string, any>;
   }) {
     const auditLogs: any[] = [];
+    const insertedSplits: any[] = [];
 
     const client = {
       auditLogs,
+      insertedSplits,
       auth: {
         getUser: () =>
           options.authenticated !== false
@@ -101,7 +103,10 @@ describe("SecureAiToolExecutor — Comprehensive Security & Boundary Tests", () 
         }
         if (table === "transaction_splits") {
           return {
-            insert: () => Promise.resolve({ error: null }),
+            insert: (payload: any) => {
+              insertedSplits.push(...(Array.isArray(payload) ? payload : [payload]));
+              return Promise.resolve({ error: null });
+            },
           };
         }
         if (table === "members") {
@@ -210,6 +215,28 @@ describe("SecureAiToolExecutor — Comprehensive Security & Boundary Tests", () 
       expect(result.status).toBe("denied");
       expect(result.code).toBe("PERMISSION_DENIED");
       expect(result.error).toContain('บทบาท "member" ไม่มีสิทธิ์');
+    });
+
+    it("writes transaction_splits.note (singular), never .notes, for create_draft_transaction (regression)", async () => {
+      const mockSupabase = createMockSupabase({ role: "treasurer" });
+      const executor = new SecureAiToolExecutor(mockSupabase);
+
+      const result = await executor.executeTool({
+        toolName: "create_draft_transaction",
+        parameters: {
+          description: "ซื้ออุปกรณ์",
+          transaction_date: "2026-08-21",
+          category_id: dummyCategoryId,
+          account_id: dummyAccountId,
+          amount: "100.00",
+          splits: [{ fund_id: dummyFundId, amount: "100.00", notes: "หมายเหตุจาก AI" }],
+        },
+        context: { churchId: dummyChurchId },
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockSupabase.insertedSplits[0].note).toBe("หมายเหตุจาก AI");
+      expect(mockSupabase.insertedSplits[0]).not.toHaveProperty("notes");
     });
   });
 

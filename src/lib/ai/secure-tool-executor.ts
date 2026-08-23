@@ -521,7 +521,7 @@ export class SecureAiToolExecutor {
         transaction_id: txn.id,
         fund_id: s.fund_id,
         amount: Money.from(s.amount).toFixed(2),
-        notes: s.notes || null,
+        note: s.notes || null,
       }));
 
       const { error: splitsError } = await (this.supabase

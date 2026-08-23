@@ -153,7 +153,7 @@ export class TransactionsService {
         fund_id: s.fund_id,
         category_id: parsed.category_id,
         amount: Money.from(s.amount).toFixed(2),
-        notes: s.notes || null,
+        note: s.notes || null,
       }));
 
       const { error: splitsError } = await (this.supabase
@@ -256,7 +256,7 @@ export class TransactionsService {
           fund_id: s.fund_id,
           category_id: categoryForSplits || null,
           amount: Money.from(s.amount).toFixed(2),
-          notes: s.notes || null,
+          note: s.notes || null,
         }));
 
         const { error: insertSplitsError } = await (this.supabase
@@ -445,7 +445,7 @@ export class TransactionsService {
           created_at,
           account_id,
           accounts(id, name),
-          transaction_splits(id, fund_id, amount, notes, category_id, categories(id, name), funds(id, name))
+          transaction_splits(id, fund_id, amount, note, category_id, categories(id, name), funds(id, name))
         `)
         .eq("church_id", churchId)
         .order("transaction_date", { ascending: false });

@@ -104,12 +104,16 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
         amount: "1000.00",
-        splits: [{ fund_id: dummyFundId, amount: "1000.00" }],
+        splits: [{ fund_id: dummyFundId, amount: "1000.00", notes: "หมายเหตุทดสอบ" }],
       });
 
       expect(result.success).toBe(true);
       expect(insertedTxn).not.toHaveProperty("category_id");
       expect(insertedSplits[0].category_id).toBe(dummyCategoryId);
+      // Regression: DB column is "note" (singular) — the public split input field
+      // stays "notes" but must be written to the real column.
+      expect(insertedSplits[0].note).toBe("หมายเหตุทดสอบ");
+      expect(insertedSplits[0]).not.toHaveProperty("notes");
     });
 
     it("rejects when split sum does not match total amount (Split Parity Invariant)", async () => {
@@ -258,6 +262,9 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(updatedPayload.amount).toBe("1200.00");
       expect(deletedSplitsTxnId).toBe("txn-1");
       expect(insertedNewSplits[0].amount).toBe("1200.00");
+      // Regression: updateDraftTransaction must also write "note" (singular), not "notes".
+      expect(insertedNewSplits[0].note).toBe("แก้ไขยอด");
+      expect(insertedNewSplits[0]).not.toHaveProperty("notes");
     });
 
     it("updates transaction_date when explicitly provided, and leaves it untouched when omitted (regression)", async () => {
