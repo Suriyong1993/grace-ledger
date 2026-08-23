@@ -83,7 +83,7 @@ export function renderOfferingReviewSheetHtml(props: OfferingReviewSheetProps): 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
       <div>
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-          <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--income); color: #ffffff; font-size: 12px; font-weight: 700;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--income); color: var(--income-foreground); font-size: 12px; font-weight: 700;">
             ✓
           </span>
           <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--income);">ขั้นตอนที่ 2 / 2: ตรวจทานยอดและยืนยันบันทึกร่าง
@@ -286,7 +286,7 @@ export function renderOfferingReviewSheetHtml(props: OfferingReviewSheetProps): 
           border-radius: var(--radius-md, 10px);
           border: none;
           background: ${isSubmitting ? 'var(--muted-foreground)' : 'var(--primary)'};
-          color: #ffffff;
+          color: var(--primary-foreground);
           font-size: 14px;
           font-weight: 700;
           cursor: ${isSubmitting ? 'not-allowed' : 'pointer'};

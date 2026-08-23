@@ -393,7 +393,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
                   border-radius: var(--radius-md, 10px);
                   border: none;
                   background: ${!isExplanationValid || isSubmitting ? 'var(--muted-foreground)' : 'var(--info)'};
-                  color: #ffffff;
+                  color: var(--info-foreground);
                   font-size: 13px;
                   font-weight: 700;
                   cursor: ${!isExplanationValid || isSubmitting ? 'not-allowed' : 'pointer'};
@@ -465,7 +465,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
               border-radius: var(--radius-md, 10px);
               border: none;
               background: ${!canConfirm || isSubmitting ? 'var(--muted-foreground)' : 'var(--income)'};
-              color: #ffffff;
+              color: var(--income-foreground);
               font-size: 14px;
               font-weight: 800;
               cursor: ${!canConfirm || isSubmitting ? 'not-allowed' : 'pointer'};

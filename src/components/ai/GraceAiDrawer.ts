@@ -421,7 +421,7 @@ export class GraceAiDrawer {
         <!-- INTERPRETATION -->
         ${
           msg.readResponse.interpretation
-            ? `<div style="font-size: var(--text-xs); color: var(--text-muted); font-style: italic; line-height: 1.4;">
+            ? `<div style="font-size: var(--text-xs); color: var(--muted-foreground); font-style: italic; line-height: 1.4;">
                 ${msg.readResponse.interpretation}
                </div>`
             : ""

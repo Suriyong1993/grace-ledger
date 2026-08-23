@@ -262,11 +262,28 @@ export class MembersPage {
       });
     });
 
-    const closeBtn = root.querySelector<HTMLButtonElement>("#close-cert-btn");
-    closeBtn?.addEventListener("click", () => {
+    const closeCertModal = () => {
       this.selectedMemberId = null;
       onStateChange();
+    };
+
+    const closeBtn = root.querySelector<HTMLButtonElement>("#close-cert-btn");
+    closeBtn?.addEventListener("click", closeCertModal);
+
+    const certBackdrop = root.querySelector<HTMLElement>("#cert-modal");
+    certBackdrop?.addEventListener("click", (e) => {
+      if (e.target === certBackdrop) closeCertModal();
     });
+
+    if (this.selectedMemberId) {
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          document.removeEventListener("keydown", onKeyDown);
+          closeCertModal();
+        }
+      };
+      document.addEventListener("keydown", onKeyDown);
+    }
 
     const printBtn = root.querySelector<HTMLButtonElement>("#print-cert-btn");
     printBtn?.addEventListener("click", () => {
