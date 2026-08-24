@@ -59,7 +59,7 @@ export function renderOfferingReviewSheetHtml(props: OfferingReviewSheetProps): 
   const activeFundAllocations = Array.from(fundMap.values()).filter((f) => !f.total.isZero());
 
   return `
-  <div class="gl-offering-review-container gl-fade-in" style="padding: 28px 32px 64px; max-width: 960px; margin: 0 auto;">
+  <div class="gl-page gl-offering-review-container gl-fade-in">
     <!-- Breadcrumb & Step -->
     <div style="margin-bottom: 20px;">
       <button type="button" id="btn-back-to-entry" style="
