@@ -1,10 +1,42 @@
+import { renderLoginStylesHtml } from "../components/login/loginStyles";
+import { renderProfileSelectHtml } from "../components/login/ProfileSelectView";
+import {
+  renderPinEntryHtml,
+  renderDots,
+  renderCountText,
+  renderStatusText,
+  PinStatus,
+  PIN_LENGTH,
+} from "../components/login/PinEntryView";
+import { renderEmailFallbackHtml, eyeIcon, eyeOffIcon } from "../components/login/EmailFallbackView";
+import { LoginProfile, MOCK_LOGIN_PROFILES, findMockProfile } from "../components/login/mockProfiles";
+
+type LoginView = "profiles" | "pin" | "email";
+
+/** How long the selected profile stays visible before the PIN screen replaces it. */
+const SELECTION_HANDOFF_MS = 160;
+/** How long the PIN screen shows its loading state before reporting the result. */
+const PIN_CHECK_MS = 900;
+
+type LoginSubmitHandler = (email: string, password: string) => void;
+
 export class LoginPage {
+  private view: LoginView = "profiles";
+  private selectedProfile: LoginProfile | null = null;
+  private pin = "";
+  private pinStatus: PinStatus = "idle";
+
   private errorMessage: string | null = null;
   private isSubmitting = false;
   private isPasswordVisible = false;
 
+  private root: HTMLElement | null = null;
+  private onSubmit: LoginSubmitHandler | null = null;
+  private pinTimer: ReturnType<typeof setTimeout> | null = null;
+
   public setError(message: string | null): void {
     this.errorMessage = message;
+    if (message) this.view = "email";
   }
 
   public setSubmitting(value: boolean): void {
@@ -12,195 +44,198 @@ export class LoginPage {
   }
 
   public renderHtml(): string {
-    const errorHtml = this.errorMessage
-      ? `<div role="alert" aria-live="polite" class="gl-notice gl-notice--error gl-login-alert">
-          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="gl-login-alert-icon">
-            <circle cx="10" cy="10" r="8.25" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M10 6.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="10" cy="13.25" r="0.9" fill="currentColor"/>
-          </svg>
-          <span class="gl-notice__body">${escapeHtml(this.errorMessage)}</span>
-        </div>`
-      : "";
-
-    return `
-    <style>
-      .gl-login-screen {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: var(--space-6);
-        font-family: var(--font-sans);
-        background: var(--background);
-      }
-      /* Panel takes .gl-card + .gl-card--elevated from the app stylesheet;
-         only the width, padding and entrance are login-specific. */
-      .gl-login-panel {
-        width: 100%;
-        max-width: 388px;
-        padding: var(--space-8) var(--space-6);
-        animation: gl-login-rise var(--duration-page) var(--ease-out);
-      }
-      @keyframes gl-login-rise {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .gl-login-mark {
-        width: 44px;
-        height: 44px;
-        border-radius: var(--radius-md);
-        background: linear-gradient(155deg, var(--primary), var(--primary-dark));
-        color: var(--primary-foreground);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: var(--space-5);
-        box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--primary) 55%, transparent);
-      }
-      .gl-login-title {
-        font-weight: var(--weight-bold);
-        font-size: var(--text-2xl);
-        letter-spacing: var(--tracking-heading);
-        color: var(--foreground);
-        margin: 0 0 2px;
-      }
-      .gl-login-role {
-        font-size: var(--text-sm);
-        font-weight: var(--weight-semibold);
-        color: var(--accent-foreground);
-        margin: 0 0 var(--space-1);
-      }
-      .gl-login-subtitle {
-        font-size: var(--text-sm);
-        line-height: var(--leading-body);
-        color: var(--muted-foreground);
-        margin: 0 0 var(--space-6);
-      }
-      /* Colour, border and radius come from .gl-notice--error. */
-      .gl-login-alert {
-        margin-bottom: var(--space-5);
-      }
-      .gl-login-alert-icon { flex: none; width: 16px; height: 16px; margin-top: 1px; }
-      .gl-login-field { margin-bottom: var(--space-4); }
-      .gl-login-label {
-        display: block;
-        margin-bottom: var(--space-1);
-      }
-      .gl-login-input-wrap { position: relative; }
-      /* Field colour, border, radius and height come from .gl-input. */
-      .gl-login-input[type="password"],
-      .gl-login-input.gl-login-input--pw { padding-right: var(--touch-target-min); }
-      .gl-login-toggle-pw {
-        position: absolute;
-        top: 0; bottom: 0; right: 4px;
-        width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        border: none;
-        color: var(--muted-foreground);
-        cursor: pointer;
-        border-radius: var(--radius-sm);
-        transition: color var(--duration-micro) var(--ease-out);
-      }
-      .gl-login-toggle-pw:hover { color: var(--foreground); }
-      .gl-login-toggle-pw:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
-      /* Submit takes .gl-btn + .gl-btn--primary + .gl-btn--block. */
-      .gl-login-submit { margin-top: var(--space-2); }
-      .gl-login-spinner {
-        width: 16px; height: 16px;
-        border-radius: var(--radius-full);
-        border: 2px solid color-mix(in srgb, var(--primary-foreground) 35%, transparent);
-        border-top-color: var(--primary-foreground);
-        animation: gl-login-spin 0.7s linear infinite;
-      }
-      @keyframes gl-login-spin { to { transform: rotate(360deg); } }
-      .gl-login-footer {
-        margin-top: var(--space-6);
-        font-size: var(--text-xs);
-        color: var(--muted-foreground);
-        text-align: center;
-      }
-      @media (max-width: 420px) {
-        .gl-login-panel { max-width: 100%; padding: var(--space-6) var(--space-5); }
-      }
-    </style>
-    <div class="gl-login-screen">
-      <form id="login-form" class="gl-card gl-card--elevated gl-login-panel" novalidate>
-        <div class="gl-login-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-            <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="currentColor"/>
-          </svg>
-        </div>
-
-        <p class="gl-login-title">Grace Ledger</p>
-        <p class="gl-login-role">ระบบการเงินคริสตจักร</p>
-        <p class="gl-login-subtitle">จัดการการเงินอย่างโปร่งใส เป็นระบบ และตรวจสอบได้</p>
-
-        ${errorHtml}
-
-        <div class="gl-login-field">
-          <label class="gl-label gl-login-label" for="login-email">อีเมล</label>
-          <div class="gl-login-input-wrap">
-            <input
-              id="login-email"
-              name="email"
-              type="email"
-              inputmode="email"
-              required
-              autocomplete="username"
-              autofocus
-              placeholder="you@church.org"
-              class="gl-input gl-login-input"
-              ${this.isSubmitting ? "disabled" : ""}
-            />
-          </div>
-        </div>
-
-        <div class="gl-login-field">
-          <label class="gl-label gl-login-label" for="login-password">รหัสผ่าน</label>
-          <div class="gl-login-input-wrap">
-            <input
-              id="login-password"
-              name="password"
-              type="${this.isPasswordVisible ? "text" : "password"}"
-              required
-              autocomplete="current-password"
-              placeholder="••••••••"
-              class="gl-input gl-login-input gl-login-input--pw"
-              ${this.isSubmitting ? "disabled" : ""}
-            />
-            <button
-              type="button"
-              id="login-toggle-password"
-              class="gl-login-toggle-pw"
-              aria-label="${this.isPasswordVisible ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}"
-              aria-pressed="${this.isPasswordVisible ? "true" : "false"}"
-              tabindex="-1"
-            >
-              ${this.isPasswordVisible ? eyeOffIcon() : eyeIcon()}
-            </button>
-          </div>
-        </div>
-
-        <button
-          id="login-submit"
-          type="submit"
-          class="gl-btn gl-btn--primary gl-btn--block gl-login-submit"
-          ${this.isSubmitting ? "disabled aria-busy=\"true\"" : ""}
-        >
-          ${this.isSubmitting ? `<span class="gl-login-spinner" aria-hidden="true"></span><span>กำลังเข้าสู่ระบบ...</span>` : "เข้าสู่ระบบ"}
-        </button>
-
-        <p class="gl-login-footer">ตรวจสอบได้ทุกรายการ · ปลอดภัยตามมาตรฐานคริสตจักร</p>
-      </form>
-    </div>
-    `;
+    return `${renderLoginStylesHtml()}<div class="gl-login-screen">${this.renderViewHtml()}</div>`;
   }
 
-  public attachEventListeners(root: HTMLElement, onSubmit: (email: string, password: string) => void): void {
+  private renderViewHtml(): string {
+    if (this.view === "pin" && this.selectedProfile) {
+      return renderPinEntryHtml(this.selectedProfile, this.pin.length, this.pinStatus);
+    }
+    if (this.view === "email") {
+      return renderEmailFallbackHtml({
+        errorMessage: this.errorMessage,
+        isSubmitting: this.isSubmitting,
+        isPasswordVisible: this.isPasswordVisible,
+      });
+    }
+    return renderProfileSelectHtml(MOCK_LOGIN_PROFILES, this.selectedProfile?.id ?? null);
+  }
+
+  public attachEventListeners(root: HTMLElement, onSubmit: LoginSubmitHandler): void {
+    this.root = root;
+    this.onSubmit = onSubmit;
+
+    root.querySelector<HTMLButtonElement>("#login-use-email")?.addEventListener("click", () => {
+      this.goToEmail();
+    });
+    root.querySelector<HTMLButtonElement>("#login-back-to-profiles")?.addEventListener("click", () => {
+      this.goToProfiles();
+    });
+
+    if (this.view === "profiles") this.attachProfileListeners(root);
+    if (this.view === "pin") this.attachPinListeners(root);
+    if (this.view === "email") this.attachEmailListeners(root, onSubmit);
+  }
+
+  // ---------------------------------------------------------------- profiles
+
+  private attachProfileListeners(root: HTMLElement): void {
+    root.querySelectorAll<HTMLButtonElement>("[data-profile-id]").forEach((card) => {
+      card.addEventListener("click", () => {
+        const profile = findMockProfile(card.dataset.profileId ?? "");
+        if (!profile) return;
+
+        this.selectedProfile = profile;
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-profile-id]")
+          .forEach((other) => other.setAttribute("data-selected", String(other === card)));
+
+        window.setTimeout(() => this.goToPin(), prefersReducedMotion() ? 0 : SELECTION_HANDOFF_MS);
+      });
+    });
+  }
+
+  // --------------------------------------------------------------------- pin
+
+  private attachPinListeners(root: HTMLElement): void {
+    root.querySelector<HTMLButtonElement>("#login-pin-back")?.addEventListener("click", () => {
+      this.goToProfiles();
+    });
+
+    root.querySelectorAll<HTMLButtonElement>("[data-pin-key]").forEach((key) => {
+      key.addEventListener("click", (event) => {
+        this.pushDigit(key.dataset.pinKey ?? "");
+        this.restoreGroupFocusAfterPointer(event);
+      });
+    });
+
+    root.querySelector<HTMLButtonElement>('[data-pin-action="backspace"]')?.addEventListener("click", (event) => {
+      this.popDigit();
+      this.restoreGroupFocusAfterPointer(event);
+    });
+
+    root.addEventListener("keydown", this.handlePinKeydown);
+
+    root.querySelector<HTMLElement>("#login-pin-group")?.focus();
+  }
+
+  private handlePinKeydown = (event: KeyboardEvent): void => {
+    if (this.view !== "pin") return;
+
+    const target = event.target as HTMLElement | null;
+    const isOnControl = Boolean(target?.closest("button"));
+    if (isOnControl && (event.key === "Enter" || event.key === " ")) return;
+
+    if (event.key === "Escape") {
+      this.goToProfiles();
+      return;
+    }
+    if (this.pinStatus === "checking") return;
+
+    if (/^[0-9]$/.test(event.key)) {
+      event.preventDefault();
+      this.pushDigit(event.key);
+      return;
+    }
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      this.popDigit();
+      return;
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      this.submitPin();
+    }
+  };
+
+  private pushDigit(digit: string): void {
+    if (this.pinStatus === "checking") return;
+    if (!/^[0-9]$/.test(digit)) return;
+    if (this.pin.length >= PIN_LENGTH) return;
+
+    this.pin += digit;
+    if (this.pinStatus !== "idle") this.pinStatus = "idle";
+    this.syncPinDom();
+
+    if (this.pin.length === PIN_LENGTH) this.submitPin();
+  }
+
+  private popDigit(): void {
+    if (this.pinStatus === "checking") return;
+    if (this.pin.length === 0) return;
+
+    this.pin = this.pin.slice(0, -1);
+    if (this.pinStatus !== "idle") this.pinStatus = "idle";
+    this.syncPinDom();
+  }
+
+  private submitPin(): void {
+    if (this.pinStatus === "checking") return;
+
+    if (this.pin.length < PIN_LENGTH) {
+      this.pinStatus = "incomplete";
+      this.rerender();
+      this.shakePinGroup();
+      return;
+    }
+
+    this.pinStatus = "checking";
+    this.rerender();
+
+    this.clearPinTimer();
+    this.pinTimer = window.setTimeout(() => {
+      // UI-only phase: no credential leaves this screen and no session is
+      // created. The screen reports that PIN sign-in is not available yet.
+      this.pin = "";
+      this.pinStatus = "unavailable";
+      this.rerender();
+      this.shakePinGroup();
+    }, PIN_CHECK_MS) as unknown as ReturnType<typeof setTimeout>;
+  }
+
+  /** Digit changes update in place so keyboard focus and the keypad stay put. */
+  private syncPinDom(): void {
+    if (!this.root) return;
+
+    const group = this.root.querySelector<HTMLElement>("#login-pin-group");
+    if (group) group.innerHTML = renderDots(this.pin.length);
+
+    const count = this.root.querySelector<HTMLElement>("#login-pin-count");
+    if (count) count.textContent = renderCountText(this.pin.length);
+
+    const status = this.root.querySelector<HTMLElement>("#login-pin-status");
+    if (status) {
+      status.textContent = renderStatusText(this.pinStatus);
+      status.classList.remove("gl-pin-status--error");
+    }
+  }
+
+  /**
+   * A tap leaves focus on the key that was pressed, so a following Enter would
+   * re-fire that key instead of submitting. Hand focus back to the dots. Keyboard
+   * activation (detail === 0) keeps its own focus so Tab order stays predictable.
+   */
+  private restoreGroupFocusAfterPointer(event: MouseEvent): void {
+    if (event.detail === 0) return;
+    this.root?.querySelector<HTMLElement>("#login-pin-group")?.focus();
+  }
+
+  private shakePinGroup(): void {
+    const group = this.root?.querySelector<HTMLElement>("#login-pin-group");
+    if (!group) return;
+    group.setAttribute("data-shake", "true");
+    window.setTimeout(() => group.removeAttribute("data-shake"), 300);
+  }
+
+  private clearPinTimer(): void {
+    if (this.pinTimer === null) return;
+    clearTimeout(this.pinTimer);
+    this.pinTimer = null;
+  }
+
+  // ------------------------------------------------------------------- email
+
+  private attachEmailListeners(root: HTMLElement, onSubmit: LoginSubmitHandler): void {
     const form = root.querySelector<HTMLFormElement>("#login-form");
     if (!form) return;
 
@@ -209,26 +244,24 @@ export class LoginPage {
 
     toggleBtn?.addEventListener("click", () => {
       this.isPasswordVisible = !this.isPasswordVisible;
-      if (passwordInput) {
-        passwordInput.type = this.isPasswordVisible ? "text" : "password";
-        toggleBtn.setAttribute("aria-label", this.isPasswordVisible ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน");
-        toggleBtn.setAttribute("aria-pressed", this.isPasswordVisible ? "true" : "false");
-        toggleBtn.innerHTML = this.isPasswordVisible ? eyeOffIcon() : eyeIcon();
-        passwordInput.focus();
-      }
+      if (!passwordInput) return;
+      passwordInput.type = this.isPasswordVisible ? "text" : "password";
+      toggleBtn.setAttribute("aria-label", this.isPasswordVisible ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน");
+      toggleBtn.setAttribute("aria-pressed", this.isPasswordVisible ? "true" : "false");
+      toggleBtn.innerHTML = this.isPasswordVisible ? eyeOffIcon() : eyeIcon();
+      passwordInput.focus();
     });
 
     form.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        if (this.isPasswordVisible && passwordInput) {
-          this.isPasswordVisible = false;
-          passwordInput.type = "password";
-          toggleBtn?.setAttribute("aria-label", "แสดงรหัสผ่าน");
-          toggleBtn?.setAttribute("aria-pressed", "false");
-          if (toggleBtn) toggleBtn.innerHTML = eyeIcon();
-        }
-        (document.activeElement as HTMLElement | null)?.blur();
+      if (e.key !== "Escape") return;
+      if (this.isPasswordVisible && passwordInput) {
+        this.isPasswordVisible = false;
+        passwordInput.type = "password";
+        toggleBtn?.setAttribute("aria-label", "แสดงรหัสผ่าน");
+        toggleBtn?.setAttribute("aria-pressed", "false");
+        if (toggleBtn) toggleBtn.innerHTML = eyeIcon();
       }
+      (document.activeElement as HTMLElement | null)?.blur();
     });
 
     form.addEventListener("submit", (e) => {
@@ -240,28 +273,43 @@ export class LoginPage {
       onSubmit(email, password);
     });
   }
+
+  // ---------------------------------------------------------------- movement
+
+  private goToProfiles(): void {
+    this.clearPinTimer();
+    this.view = "profiles";
+    this.selectedProfile = null;
+    this.pin = "";
+    this.pinStatus = "idle";
+    this.errorMessage = null;
+    this.rerender();
+  }
+
+  private goToPin(): void {
+    if (!this.selectedProfile) return;
+    this.view = "pin";
+    this.pin = "";
+    this.pinStatus = "idle";
+    this.rerender();
+  }
+
+  private goToEmail(): void {
+    this.clearPinTimer();
+    this.view = "email";
+    this.pin = "";
+    this.pinStatus = "idle";
+    this.rerender();
+  }
+
+  private rerender(): void {
+    if (!this.root || !this.onSubmit) return;
+    this.root.removeEventListener("keydown", this.handlePinKeydown);
+    this.root.innerHTML = this.renderHtml();
+    this.attachEventListeners(this.root, this.onSubmit);
+  }
 }
 
-function eyeIcon(): string {
-  return `<svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
-    <path d="M1.5 10S4.5 4.5 10 4.5 18.5 10 18.5 10 15.5 15.5 10 15.5 1.5 10 1.5 10Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-  </svg>`;
-}
-
-function eyeOffIcon(): string {
-  return `<svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
-    <path d="M2.5 2.5L17.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M8.28 4.68A9.7 9.7 0 0 1 10 4.5C15.5 4.5 18.5 10 18.5 10a13.6 13.6 0 0 1-3.02 3.6M5.6 5.98C3.13 7.47 1.5 10 1.5 10S4.5 15.5 10 15.5c1.02 0 1.96-.19 2.8-.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M8.2 11.8a2.5 2.5 0 0 0 3.6-3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-  </svg>`;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 }
