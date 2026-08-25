@@ -114,7 +114,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   const { data: otpData, error: otpError } = await anonClient.auth.verifyOtp({
     token_hash: tokenHash,
-    type: "email",
+    type: "magiclink",
   });
 
   const session = otpData?.session;

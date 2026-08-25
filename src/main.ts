@@ -20,7 +20,7 @@ interface ActiveSession {
 
 export class App {
   private supabase = getSupabaseClient();
-  private loginPage = new LoginPage();
+  private loginPage = new LoginPage(this.supabase);
   private dashboardPage: DashboardPage;
   private approvalsPage: ApprovalsPage | null = null;
   private offeringPage: OfferingPage | null = null;
@@ -149,14 +149,32 @@ export class App {
     await this.render();
   }
 
+  private async handlePinAuthenticated(accessToken: string, refreshToken: string): Promise<void> {
+    const { data, error } = await this.supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (error || !data.session?.user) {
+      console.error("Failed to establish session from PIN sign-in:", error);
+      this.loginPage.setError("เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง");
+      await this.render();
+      return;
+    }
+
+    await this.loadSession(data.session.user.id);
+    await this.render();
+  }
+
   public async render(): Promise<void> {
     if (!this.rootElement) return;
 
     if (!this.session) {
       this.rootElement.innerHTML = this.loginPage.renderHtml();
-      this.loginPage.attachEventListeners(this.rootElement, (email, password) =>
-        this.handleLoginSubmit(email, password)
-      );
+      this.loginPage.attachEventListeners(this.rootElement, {
+        onEmailSubmit: (email, password) => this.handleLoginSubmit(email, password),
+        onPinAuthenticated: (accessToken, refreshToken) => void this.handlePinAuthenticated(accessToken, refreshToken),
+      });
       return;
     }
 

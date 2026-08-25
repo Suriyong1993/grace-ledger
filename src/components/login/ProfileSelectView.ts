@@ -1,31 +1,72 @@
-import { LoginProfile } from "./mockProfiles";
+import { LoginProfile } from "./types";
 import { escapeHtml } from "./html";
+
+export type ProfilesStatus = "loading" | "ready" | "empty" | "error";
 
 /**
  * Screen 1 — who is signing in. Selection is local UI state only.
  */
 export function renderProfileSelectHtml(
   profiles: readonly LoginProfile[],
-  selectedId: string | null
+  selectedId: string | null,
+  status: ProfilesStatus
 ): string {
-  const cards = profiles.map((profile) => renderProfileCard(profile, profile.id === selectedId)).join("");
-
   return `
     <div class="gl-login-stage">
       ${renderBrandHtml()}
 
       <h1 class="gl-login-heading">วันนี้ใครเข้าใช้งาน?</h1>
 
-      <ul class="gl-profile-grid" id="login-profile-grid">
-        ${cards}
-      </ul>
-
-      <p class="gl-login-hint">เลือกโปรไฟล์ →</p>
+      ${renderProfilesBodyHtml(profiles, selectedId, status)}
 
       <button type="button" id="login-use-email" class="gl-btn gl-btn--ghost gl-login-alt">
         เข้าสู่ระบบด้วยอีเมล
       </button>
     </div>
+  `;
+}
+
+function renderProfilesBodyHtml(
+  profiles: readonly LoginProfile[],
+  selectedId: string | null,
+  status: ProfilesStatus
+): string {
+  if (status === "loading") {
+    return `
+      <div class="gl-login-profiles-status" role="status" aria-live="polite">
+        <span class="gl-login-spinner gl-login-spinner--dark" aria-hidden="true"></span>
+        <p class="gl-login-hint">กำลังโหลดรายชื่อ...</p>
+      </div>
+    `;
+  }
+
+  if (status === "error") {
+    return `
+      <div class="gl-login-profiles-status" role="alert">
+        <p class="gl-login-hint">โหลดรายชื่อไม่สำเร็จ</p>
+        <button type="button" id="login-profiles-retry" class="gl-btn gl-btn--secondary">
+          ลองใหม่
+        </button>
+      </div>
+    `;
+  }
+
+  if (status === "empty") {
+    return `
+      <div class="gl-login-profiles-status" role="status">
+        <p class="gl-login-hint">ยังไม่มีผู้ใช้งาน</p>
+      </div>
+    `;
+  }
+
+  const cards = profiles.map((profile) => renderProfileCard(profile, profile.id === selectedId)).join("");
+
+  return `
+    <ul class="gl-profile-grid" id="login-profile-grid">
+      ${cards}
+    </ul>
+
+    <p class="gl-login-hint">เลือกโปรไฟล์ →</p>
   `;
 }
 

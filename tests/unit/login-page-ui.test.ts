@@ -1,49 +1,73 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { LoginPage } from "../../src/pages/LoginPage";
 import { renderProfileSelectHtml } from "../../src/components/login/ProfileSelectView";
 import { renderPinEntryHtml, renderDots, renderStatusText, PIN_LENGTH } from "../../src/components/login/PinEntryView";
-import { MOCK_LOGIN_PROFILES } from "../../src/components/login/mockProfiles";
+import { LoginProfile } from "../../src/components/login/types";
+
+const TEST_PROFILES: LoginProfile[] = [
+  { id: "11111111-1111-1111-1111-111111111111", name: "อาจารย์สรรเสริญ ดวงจิตร", role: "ศิษยาภิบาล", initials: "สด" },
+  { id: "22222222-2222-2222-2222-222222222222", name: "สุดารัตน์ จิณเซ่ง", role: "ผู้นับเงิน", initials: "สจ" },
+];
+
+/** LoginPage never calls a Supabase method in these tests (no DOM root is attached), so an unresolved stub is enough. */
+function stubSupabase(): SupabaseClient {
+  return { functions: { invoke: vi.fn() } } as unknown as SupabaseClient;
+}
 
 describe("LoginPage UI — profile selection + PIN entry", () => {
-  describe("profile selection (default view)", () => {
-    const html = new LoginPage().renderHtml();
-
-    it("leads with the brand and the profile question, not a credential form", () => {
+  describe("profile selection screen states", () => {
+    it("shows a loading state before the roster is fetched", () => {
+      const html = new LoginPage(stubSupabase()).renderHtml();
       expect(html).toContain("Grace Ledger");
-      expect(html).toContain("ระบบการเงินคริสตจักร");
       expect(html).toContain("วันนี้ใครเข้าใช้งาน?");
+      expect(html).toContain("กำลังโหลดรายชื่อ");
       expect(html).not.toContain('id="login-email"');
       expect(html).not.toContain('id="login-password"');
     });
 
-    it("renders every mock profile as one labelled button", () => {
-      for (const profile of MOCK_LOGIN_PROFILES) {
+    it("renders every profile as one labelled button once ready", () => {
+      const html = renderProfileSelectHtml(TEST_PROFILES, null, "ready");
+      for (const profile of TEST_PROFILES) {
         expect(html).toContain(`data-profile-id="${profile.id}"`);
         expect(html).toContain(profile.name);
         expect(html).toContain(profile.role);
       }
       const cardCount = html.match(/data-profile-id="/g)?.length ?? 0;
-      expect(cardCount).toBe(MOCK_LOGIN_PROFILES.length);
+      expect(cardCount).toBe(TEST_PROFILES.length);
     });
 
     it("keeps the email path reachable but quiet", () => {
+      const html = renderProfileSelectHtml(TEST_PROFILES, null, "ready");
       expect(html).toContain('id="login-use-email"');
       expect(html).toContain("gl-btn--ghost");
     });
 
     it("marks the selected profile so the state is visible and not only animated", () => {
-      const selected = renderProfileSelectHtml(MOCK_LOGIN_PROFILES, MOCK_LOGIN_PROFILES[1].id);
+      const selected = renderProfileSelectHtml(TEST_PROFILES, TEST_PROFILES[1].id, "ready");
       expect(selected).toMatch(
-        new RegExp(`data-profile-id="${MOCK_LOGIN_PROFILES[1].id}"\\s+data-selected="true"`)
+        new RegExp(`data-profile-id="${TEST_PROFILES[1].id}"\\s+data-selected="true"`)
       );
       expect(selected).toMatch(
-        new RegExp(`data-profile-id="${MOCK_LOGIN_PROFILES[0].id}"\\s+data-selected="false"`)
+        new RegExp(`data-profile-id="${TEST_PROFILES[0].id}"\\s+data-selected="false"`)
       );
+    });
+
+    it("offers a retry action when the roster fails to load", () => {
+      const html = renderProfileSelectHtml([], null, "error");
+      expect(html).toContain('id="login-profiles-retry"');
+      expect(html).toContain('role="alert"');
+    });
+
+    it("states plainly when no one is registered yet", () => {
+      const html = renderProfileSelectHtml([], null, "empty");
+      expect(html).toContain("ยังไม่มีผู้ใช้งาน");
+      expect(html).not.toContain('id="login-profile-grid"');
     });
   });
 
   describe("PIN entry", () => {
-    const profile = MOCK_LOGIN_PROFILES[0];
+    const profile = TEST_PROFILES[0];
 
     it("shows the chosen identity, the prompt and a full keypad", () => {
       const html = renderPinEntryHtml(profile, 0, "idle");
@@ -71,12 +95,19 @@ describe("LoginPage UI — profile selection + PIN entry", () => {
       expect(html).toMatch(/data-pin-key="1"\s+aria-label="เลข 1"\s+disabled/);
     });
 
-    it("states the incomplete and unavailable outcomes in plain Thai", () => {
+    it("states the incomplete, invalid, locked and unavailable outcomes in plain Thai", () => {
       expect(renderStatusText("idle")).toBe("");
       expect(renderStatusText("checking")).toBe("กำลังเข้าสู่ระบบ...");
       expect(renderStatusText("incomplete")).toBe("ใส่ให้ครบ 6 หลัก");
-      expect(renderStatusText("unavailable")).toContain("ใช้อีเมล");
+      expect(renderStatusText("invalid")).toContain("ไม่ถูกต้อง");
+      expect(renderStatusText("locked", null)).toContain("ล็อก");
+      expect(renderStatusText("unavailable")).toContain("ไม่สำเร็จ");
       expect(renderPinEntryHtml(profile, 2, "incomplete")).toContain("gl-pin-status--error");
+    });
+
+    it("disables the keypad while locked", () => {
+      const html = renderPinEntryHtml(profile, 0, "locked", null);
+      expect(html).toMatch(/data-pin-key="1"\s+aria-label="เลข 1"\s+disabled/);
     });
 
     it("announces progress for screen readers", () => {
@@ -89,7 +120,7 @@ describe("LoginPage UI — profile selection + PIN entry", () => {
 
   describe("email fallback", () => {
     it("renders the working email form when an authentication error is reported", () => {
-      const page = new LoginPage();
+      const page = new LoginPage(stubSupabase());
       page.setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
       const html = page.renderHtml();
 
@@ -102,7 +133,7 @@ describe("LoginPage UI — profile selection + PIN entry", () => {
     });
 
     it("disables the form and shows progress while submitting", () => {
-      const page = new LoginPage();
+      const page = new LoginPage(stubSupabase());
       page.setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
       page.setSubmitting(true);
       const html = page.renderHtml();

@@ -1,7 +1,8 @@
-import { LoginProfile } from "./mockProfiles";
+import { LoginProfile } from "./types";
 import { escapeHtml } from "./html";
+import { formatDateThai } from "../../lib/format";
 
-export type PinStatus = "idle" | "checking" | "incomplete" | "unavailable";
+export type PinStatus = "idle" | "checking" | "incomplete" | "invalid" | "locked" | "unavailable";
 
 export const PIN_LENGTH = 6;
 
@@ -11,8 +12,14 @@ const KEYPAD_DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
  * Screen 2 — PIN entry. The keypad drives local UI state only: no credential
  * is sent anywhere and no session is created.
  */
-export function renderPinEntryHtml(profile: LoginProfile, pinLength: number, status: PinStatus): string {
+export function renderPinEntryHtml(
+  profile: LoginProfile,
+  pinLength: number,
+  status: PinStatus,
+  lockedUntil: string | null = null
+): string {
   const isChecking = status === "checking";
+  const isLocked = status === "locked";
 
   return `
     <div class="gl-login-stage gl-login-stage--narrow">
@@ -47,21 +54,21 @@ export function renderPinEntryHtml(profile: LoginProfile, pinLength: number, sta
       </p>
 
       <p
-        class="gl-pin-status${status === "incomplete" || status === "unavailable" ? " gl-pin-status--error" : ""}"
+        class="gl-pin-status${isStatusTextAlert(status) ? " gl-pin-status--error" : ""}"
         id="login-pin-status"
         role="status"
         aria-live="polite"
-      >${isChecking ? '<span class="gl-pin-spinner" aria-hidden="true"></span>' : ""}${renderStatusText(status)}</p>
+      >${isChecking ? '<span class="gl-pin-spinner" aria-hidden="true"></span>' : ""}${renderStatusText(status, lockedUntil)}</p>
 
       <div class="gl-pin-keypad" id="login-pin-keypad">
-        ${KEYPAD_DIGITS.map((digit) => renderKey(digit, isChecking)).join("")}
-        ${renderKey("0", isChecking, "gl-pin-key--zero")}
+        ${KEYPAD_DIGITS.map((digit) => renderKey(digit, isChecking || isLocked)).join("")}
+        ${renderKey("0", isChecking || isLocked, "gl-pin-key--zero")}
         <button
           type="button"
           class="gl-pin-key gl-pin-key--action"
           data-pin-action="backspace"
           aria-label="ลบหนึ่งหลัก"
-          ${isChecking ? "disabled" : ""}
+          ${isChecking || isLocked ? "disabled" : ""}
         >
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
             <path d="M9 5.5H20V18.5H9L3.5 12L9 5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
@@ -88,11 +95,21 @@ export function renderCountText(pinLength: number): string {
   return `ใส่แล้ว ${pinLength} จาก ${PIN_LENGTH} หลัก`;
 }
 
-export function renderStatusText(status: PinStatus): string {
+export function renderStatusText(status: PinStatus, lockedUntil: string | null = null): string {
   if (status === "incomplete") return "ใส่ให้ครบ 6 หลัก";
-  if (status === "unavailable") return "ยังใช้รหัสส่วนตัวเข้าสู่ระบบไม่ได้ ใช้อีเมลไปก่อน";
+  if (status === "invalid") return "รหัสไม่ถูกต้อง";
+  if (status === "locked") {
+    return lockedUntil
+      ? `ล็อกชั่วคราว ลองใหม่หลัง ${formatDateThai(lockedUntil)}`
+      : "ล็อกชั่วคราว ลองใหม่ภายหลัง";
+  }
+  if (status === "unavailable") return "เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง";
   if (status === "checking") return "กำลังเข้าสู่ระบบ...";
   return "";
+}
+
+function isStatusTextAlert(status: PinStatus): boolean {
+  return status === "incomplete" || status === "invalid" || status === "locked" || status === "unavailable";
 }
 
 function renderKey(digit: string, isChecking: boolean, extraClass = ""): string {

@@ -1,5 +1,6 @@
+import { SupabaseClient } from "@supabase/supabase-js";
 import { renderLoginStylesHtml } from "../components/login/loginStyles";
-import { renderProfileSelectHtml } from "../components/login/ProfileSelectView";
+import { renderProfileSelectHtml, ProfilesStatus } from "../components/login/ProfileSelectView";
 import {
   renderPinEntryHtml,
   renderDots,
@@ -9,30 +10,41 @@ import {
   PIN_LENGTH,
 } from "../components/login/PinEntryView";
 import { renderEmailFallbackHtml, eyeIcon, eyeOffIcon } from "../components/login/EmailFallbackView";
-import { LoginProfile, MOCK_LOGIN_PROFILES, findMockProfile } from "../components/login/mockProfiles";
+import { LoginProfile } from "../components/login/types";
+import { fetchLoginProfiles, verifyPin } from "../lib/auth/login-service";
 
 type LoginView = "profiles" | "pin" | "email";
 
 /** How long the selected profile stays visible before the PIN screen replaces it. */
 const SELECTION_HANDOFF_MS = 160;
-/** How long the PIN screen shows its loading state before reporting the result. */
-const PIN_CHECK_MS = 900;
 
 type LoginSubmitHandler = (email: string, password: string) => void;
+type PinAuthHandler = (accessToken: string, refreshToken: string) => void;
+
+export interface LoginPageHandlers {
+  onEmailSubmit: LoginSubmitHandler;
+  onPinAuthenticated: PinAuthHandler;
+}
 
 export class LoginPage {
   private view: LoginView = "profiles";
   private selectedProfile: LoginProfile | null = null;
   private pin = "";
   private pinStatus: PinStatus = "idle";
+  private pinLockedUntil: string | null = null;
+
+  private profiles: LoginProfile[] = [];
+  private profilesStatus: ProfilesStatus = "loading";
+  private profilesLoadStarted = false;
 
   private errorMessage: string | null = null;
   private isSubmitting = false;
   private isPasswordVisible = false;
 
   private root: HTMLElement | null = null;
-  private onSubmit: LoginSubmitHandler | null = null;
-  private pinTimer: ReturnType<typeof setTimeout> | null = null;
+  private handlers: LoginPageHandlers | null = null;
+
+  constructor(private readonly supabase: SupabaseClient) {}
 
   public setError(message: string | null): void {
     this.errorMessage = message;
@@ -49,7 +61,7 @@ export class LoginPage {
 
   private renderViewHtml(): string {
     if (this.view === "pin" && this.selectedProfile) {
-      return renderPinEntryHtml(this.selectedProfile, this.pin.length, this.pinStatus);
+      return renderPinEntryHtml(this.selectedProfile, this.pin.length, this.pinStatus, this.pinLockedUntil);
     }
     if (this.view === "email") {
       return renderEmailFallbackHtml({
@@ -58,12 +70,12 @@ export class LoginPage {
         isPasswordVisible: this.isPasswordVisible,
       });
     }
-    return renderProfileSelectHtml(MOCK_LOGIN_PROFILES, this.selectedProfile?.id ?? null);
+    return renderProfileSelectHtml(this.profiles, this.selectedProfile?.id ?? null, this.profilesStatus);
   }
 
-  public attachEventListeners(root: HTMLElement, onSubmit: LoginSubmitHandler): void {
+  public attachEventListeners(root: HTMLElement, handlers: LoginPageHandlers): void {
     this.root = root;
-    this.onSubmit = onSubmit;
+    this.handlers = handlers;
 
     root.querySelector<HTMLButtonElement>("#login-use-email")?.addEventListener("click", () => {
       this.goToEmail();
@@ -74,15 +86,26 @@ export class LoginPage {
 
     if (this.view === "profiles") this.attachProfileListeners(root);
     if (this.view === "pin") this.attachPinListeners(root);
-    if (this.view === "email") this.attachEmailListeners(root, onSubmit);
+    if (this.view === "email") this.attachEmailListeners(root, handlers.onEmailSubmit);
   }
 
   // ---------------------------------------------------------------- profiles
 
   private attachProfileListeners(root: HTMLElement): void {
+    if (!this.profilesLoadStarted) {
+      this.profilesLoadStarted = true;
+      void this.loadProfiles();
+    }
+
+    root.querySelector<HTMLButtonElement>("#login-profiles-retry")?.addEventListener("click", () => {
+      this.profilesLoadStarted = false;
+      this.profilesStatus = "loading";
+      this.rerender();
+    });
+
     root.querySelectorAll<HTMLButtonElement>("[data-profile-id]").forEach((card) => {
       card.addEventListener("click", () => {
-        const profile = findMockProfile(card.dataset.profileId ?? "");
+        const profile = this.profiles.find((candidate) => candidate.id === card.dataset.profileId) ?? null;
         if (!profile) return;
 
         this.selectedProfile = profile;
@@ -93,6 +116,18 @@ export class LoginPage {
         window.setTimeout(() => this.goToPin(), prefersReducedMotion() ? 0 : SELECTION_HANDOFF_MS);
       });
     });
+  }
+
+  private async loadProfiles(): Promise<void> {
+    const result = await fetchLoginProfiles(this.supabase);
+    if (result.status === "ready") {
+      this.profiles = result.profiles;
+      this.profilesStatus = "ready";
+    } else {
+      this.profiles = [];
+      this.profilesStatus = result.status;
+    }
+    this.rerender();
   }
 
   // --------------------------------------------------------------------- pin
@@ -182,15 +217,27 @@ export class LoginPage {
     this.pinStatus = "checking";
     this.rerender();
 
-    this.clearPinTimer();
-    this.pinTimer = window.setTimeout(() => {
-      // UI-only phase: no credential leaves this screen and no session is
-      // created. The screen reports that PIN sign-in is not available yet.
-      this.pin = "";
-      this.pinStatus = "unavailable";
-      this.rerender();
-      this.shakePinGroup();
-    }, PIN_CHECK_MS) as unknown as ReturnType<typeof setTimeout>;
+    void this.checkPin();
+  }
+
+  private async checkPin(): Promise<void> {
+    const profile = this.selectedProfile;
+    const pin = this.pin;
+    if (!profile) return;
+
+    const outcome = await verifyPin(this.supabase, profile.id, pin);
+    this.pin = "";
+
+    if (outcome.status === "success") {
+      this.pinStatus = "idle";
+      this.handlers?.onPinAuthenticated(outcome.accessToken, outcome.refreshToken);
+      return;
+    }
+
+    this.pinLockedUntil = outcome.status === "locked" ? outcome.lockedUntil : null;
+    this.pinStatus = outcome.status;
+    this.rerender();
+    this.shakePinGroup();
   }
 
   /** Digit changes update in place so keyboard focus and the keypad stay put. */
@@ -205,7 +252,7 @@ export class LoginPage {
 
     const status = this.root.querySelector<HTMLElement>("#login-pin-status");
     if (status) {
-      status.textContent = renderStatusText(this.pinStatus);
+      status.textContent = renderStatusText(this.pinStatus, this.pinLockedUntil);
       status.classList.remove("gl-pin-status--error");
     }
   }
@@ -225,12 +272,6 @@ export class LoginPage {
     if (!group) return;
     group.setAttribute("data-shake", "true");
     window.setTimeout(() => group.removeAttribute("data-shake"), 300);
-  }
-
-  private clearPinTimer(): void {
-    if (this.pinTimer === null) return;
-    clearTimeout(this.pinTimer);
-    this.pinTimer = null;
   }
 
   // ------------------------------------------------------------------- email
@@ -277,11 +318,11 @@ export class LoginPage {
   // ---------------------------------------------------------------- movement
 
   private goToProfiles(): void {
-    this.clearPinTimer();
     this.view = "profiles";
     this.selectedProfile = null;
     this.pin = "";
     this.pinStatus = "idle";
+    this.pinLockedUntil = null;
     this.errorMessage = null;
     this.rerender();
   }
@@ -291,22 +332,23 @@ export class LoginPage {
     this.view = "pin";
     this.pin = "";
     this.pinStatus = "idle";
+    this.pinLockedUntil = null;
     this.rerender();
   }
 
   private goToEmail(): void {
-    this.clearPinTimer();
     this.view = "email";
     this.pin = "";
     this.pinStatus = "idle";
+    this.pinLockedUntil = null;
     this.rerender();
   }
 
   private rerender(): void {
-    if (!this.root || !this.onSubmit) return;
+    if (!this.root || !this.handlers) return;
     this.root.removeEventListener("keydown", this.handlePinKeydown);
     this.root.innerHTML = this.renderHtml();
-    this.attachEventListeners(this.root, this.onSubmit);
+    this.attachEventListeners(this.root, this.handlers);
   }
 }
 

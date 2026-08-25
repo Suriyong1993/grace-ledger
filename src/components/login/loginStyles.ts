@@ -156,6 +156,21 @@ export function renderLoginStylesHtml(): string {
       font-size: var(--text-xs);
       color: var(--muted-foreground);
     }
+    .gl-login-profiles-status {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-10) 0;
+    }
+    .gl-login-spinner--dark {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      animation: gl-login-spin 0.7s linear infinite;
+    }
     .gl-login-alt {
       margin-top: var(--space-3);
       font-size: var(--text-xs);
