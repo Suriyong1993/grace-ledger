@@ -9,6 +9,7 @@ import { FundsPage } from "./pages/FundsPage";
 import { MembersPage } from "./pages/MembersPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { LoginPage } from "./pages/LoginPage";
+import { PinSetupPage } from "./pages/PinSetupPage";
 import { GraceAiDrawer } from "./components/ai/GraceAiDrawer";
 import { UserRole } from "./lib/rbac";
 
@@ -21,6 +22,8 @@ interface ActiveSession {
 export class App {
   private supabase = getSupabaseClient();
   private loginPage = new LoginPage(this.supabase);
+  private pinSetupPage: PinSetupPage | null = null;
+  private isPinSetupMode = false;
   private dashboardPage: DashboardPage;
   private approvalsPage: ApprovalsPage | null = null;
   private offeringPage: OfferingPage | null = null;
@@ -42,9 +45,21 @@ export class App {
     this.rootElement = document.getElementById("app");
     if (!this.rootElement) return;
 
-    this.supabase.auth.onAuthStateChange((_event, authSession) => {
+    // Detect if landing from a Magic Link / Bootstrap URL
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    if (hash.includes("type=magiclink") || hash.includes("setup-pin") || search.includes("type=magiclink")) {
+      this.isPinSetupMode = true;
+    }
+
+    this.supabase.auth.onAuthStateChange(async (event, authSession) => {
+      if (event === "SIGNED_IN" && (this.isPinSetupMode || hash.includes("type=magiclink"))) {
+        this.isPinSetupMode = true;
+      }
+
       if (!authSession) {
         this.session = null;
+        this.pinSetupPage = null;
         this.approvalsPage = null;
         this.offeringPage = null;
         this.transactionsPage = null;
@@ -52,6 +67,9 @@ export class App {
         this.membersPage = null;
         this.reportsPage = null;
         this.aiDrawer = null;
+        void this.render();
+      } else if (authSession.user && !this.session) {
+        await this.loadSession(authSession.user.id);
         void this.render();
       }
     });
@@ -121,6 +139,14 @@ export class App {
       },
     };
 
+    if (this.isPinSetupMode) {
+      this.pinSetupPage = new PinSetupPage(this.supabase, {
+        name: fullName,
+        role: roleRow?.role,
+      });
+      return;
+    }
+
     this.approvalsPage = new ApprovalsPage(this.supabase, churchId, userId);
     this.offeringPage = new OfferingPage(this.supabase, churchId, userId, fullName);
     this.transactionsPage = new TransactionsPage(this.supabase, churchId);
@@ -169,6 +195,23 @@ export class App {
   public async render(): Promise<void> {
     if (!this.rootElement) return;
 
+    // 1. PIN Setup Mode (Bootstrap from Magic Link)
+    if (this.isPinSetupMode && this.pinSetupPage) {
+      this.rootElement.innerHTML = this.pinSetupPage.renderHtml();
+      this.pinSetupPage.attachEventListeners(this.rootElement, () => {
+        this.isPinSetupMode = false;
+        this.pinSetupPage = null;
+        this.session = null;
+        // Clean URL hash
+        if (window.location.hash.includes("type=magiclink") || window.location.hash.includes("setup-pin")) {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+        void this.render();
+      });
+      return;
+    }
+
+    // 2. Unauthenticated Login Page (Profile + PIN Keypad)
     if (!this.session) {
       this.rootElement.innerHTML = this.loginPage.renderHtml();
       this.loginPage.attachEventListeners(this.rootElement, {
@@ -178,6 +221,7 @@ export class App {
       return;
     }
 
+    // 3. Authenticated App Shell & Dashboard
     let contentHtml = "";
 
     if (this.currentRoute.pattern === "/" || this.currentRoute.pattern === "not_found") {

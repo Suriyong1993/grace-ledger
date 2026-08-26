@@ -3,14 +3,31 @@ import { escapeHtml } from "./html";
 
 export type ProfilesStatus = "loading" | "ready" | "empty" | "error";
 
+export interface BootstrapModalState {
+  isOpen: boolean;
+  selectedProfileId: string | null;
+  status: "idle" | "sending" | "sent" | "error";
+  errorMessage?: string | null;
+}
+
 /**
  * Screen 1 — who is signing in. Selection is local UI state only.
  */
 export function renderProfileSelectHtml(
   profiles: readonly LoginProfile[],
   selectedId: string | null,
-  status: ProfilesStatus
+  status: ProfilesStatus,
+  bootstrapState: BootstrapModalState = { isOpen: false, selectedProfileId: null, status: "idle" }
 ): string {
+  if (bootstrapState.isOpen) {
+    return `
+      <div class="gl-login-stage gl-login-stage--narrow">
+        ${renderBrandHtml()}
+        ${renderBootstrapModalHtml(profiles, bootstrapState)}
+      </div>
+    `;
+  }
+
   return `
     <div class="gl-login-stage">
       ${renderBrandHtml()}
@@ -18,10 +35,6 @@ export function renderProfileSelectHtml(
       <h1 class="gl-login-heading">วันนี้ใครเข้าใช้งาน?</h1>
 
       ${renderProfilesBodyHtml(profiles, selectedId, status)}
-
-      <button type="button" id="login-use-email" class="gl-btn gl-btn--ghost gl-login-alt">
-        เข้าสู่ระบบด้วยอีเมล
-      </button>
     </div>
   `;
 }
@@ -66,7 +79,68 @@ function renderProfilesBodyHtml(
       ${cards}
     </ul>
 
-    <p class="gl-login-hint">เลือกโปรไฟล์ →</p>
+    <div class="gl-bootstrap-trigger-wrap">
+      <button type="button" id="login-trigger-bootstrap" class="gl-bootstrap-trigger-btn">
+        ต้องการตั้งค่าการเข้าใช้งานครั้งแรกหรือไม่
+      </button>
+    </div>
+  `;
+}
+
+function renderBootstrapModalHtml(
+  profiles: readonly LoginProfile[],
+  state: BootstrapModalState
+): string {
+  const isSending = state.status === "sending";
+  const isSent = state.status === "sent";
+
+  if (isSent) {
+    return `
+      <div class="gl-bootstrap-dialog" role="dialog" aria-labelledby="bootstrap-sent-title">
+        <h2 id="bootstrap-sent-title" class="gl-bootstrap-title">ส่งลิงก์ตั้งค่า PIN แล้ว</h2>
+        <p class="gl-bootstrap-desc">
+          ระบบได้ส่ง One-Time Magic Link ไปยังอีเมลที่ลงทะเบียนไว้ของท่านเรียบร้อยแล้ว<br/>
+          กรุณาเปิดลิงก์จากอีเมลเพื่อกำหนดรหัส PIN 6 หลักของท่าน
+        </p>
+        <button type="button" id="login-cancel-bootstrap" class="gl-btn gl-btn--primary" style="width:100%;">
+          กลับไปหน้าเลือกโปรไฟล์
+        </button>
+      </div>
+    `;
+  }
+
+  const options = profiles.map((p) => {
+    const selected = p.id === state.selectedProfileId ? "selected" : "";
+    return `<option value="${escapeHtml(p.id)}" ${selected}>${escapeHtml(p.name)} (${escapeHtml(p.role)})</option>`;
+  }).join("");
+
+  return `
+    <div class="gl-bootstrap-dialog" role="dialog" aria-labelledby="bootstrap-dialog-title">
+      <h2 id="bootstrap-dialog-title" class="gl-bootstrap-title">ตั้งค่าการเข้าใช้งานครั้งแรก</h2>
+      <p class="gl-bootstrap-desc">
+        เลือกโปรไฟล์ของท่านเพื่อรับลิงก์ One-Time Magic Link ทางอีเมลสำหรับกำหนดรหัส PIN
+      </p>
+
+      ${state.errorMessage ? `<p class="gl-pin-status gl-pin-status--error" role="alert">${escapeHtml(state.errorMessage)}</p>` : ""}
+
+      <div style="margin-bottom: var(--space-4);">
+        <label for="bootstrap-profile-select" style="display:block; font-size:var(--text-xs); margin-bottom:var(--space-1); color:var(--muted-foreground);">
+          เลือกโปรไฟล์ของท่าน
+        </label>
+        <select id="bootstrap-profile-select" class="gl-input" style="width:100%; height:44px; border-radius:var(--radius-md); border:1px solid var(--border); background:var(--card); color:var(--foreground); padding:0 var(--space-3);" ${isSending ? "disabled" : ""}>
+          ${options}
+        </select>
+      </div>
+
+      <div style="display:flex; gap:var(--space-2); margin-top:var(--space-4);">
+        <button type="button" id="login-cancel-bootstrap" class="gl-btn gl-btn--secondary" style="flex:1;" ${isSending ? "disabled" : ""}>
+          ยกเลิก
+        </button>
+        <button type="button" id="login-send-bootstrap" class="gl-btn gl-btn--primary" style="flex:1;" ${isSending ? "disabled" : ""}>
+          ${isSending ? '<span class="gl-pin-spinner" aria-hidden="true"></span> กำลังส่ง...' : "ส่งลิงก์ตั้งค่า PIN"}
+        </button>
+      </div>
+    </div>
   `;
 }
 

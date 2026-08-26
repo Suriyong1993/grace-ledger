@@ -99,3 +99,23 @@ export async function verifyPin(
 
   return { status: "unavailable" };
 }
+
+export type RequestPinBootstrapResult =
+  | { status: "sent" }
+  | { status: "rate_limited" }
+  | { status: "unavailable" };
+
+export async function requestPinBootstrap(
+  supabase: SupabaseClient,
+  profileId: string,
+  redirectTo?: string
+): Promise<RequestPinBootstrapResult> {
+  const result = await callFunction(supabase, "request-pin-bootstrap", {
+    profile_id: profileId,
+    redirect_to: redirectTo,
+  });
+
+  if (result.ok) return { status: "sent" };
+  if (result.status === 429) return { status: "rate_limited" };
+  return { status: "unavailable" };
+}

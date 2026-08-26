@@ -2,7 +2,7 @@ import { LoginProfile } from "./types";
 import { escapeHtml } from "./html";
 import { formatDateThai } from "../../lib/format";
 
-export type PinStatus = "idle" | "checking" | "incomplete" | "invalid" | "locked" | "unavailable";
+export type PinStatus = "idle" | "checking" | "incomplete" | "invalid" | "locked" | "unavailable" | "requires_reset";
 
 export const PIN_LENGTH = 6;
 
@@ -27,7 +27,7 @@ export function renderPinEntryHtml(
         <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
           <path d="M12 4.5L6.5 10L12 15.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        กลับ
+        ย้อนกลับ
       </button>
 
       <div class="gl-pin-identity">
@@ -36,7 +36,7 @@ export function renderPinEntryHtml(
         <p class="gl-pin-role">${escapeHtml(profile.role)}</p>
       </div>
 
-      <p class="gl-pin-prompt" id="login-pin-prompt">ใส่รหัสของคุณ</p>
+      <p class="gl-pin-prompt" id="login-pin-prompt">ระบุรหัส PIN 6 หลัก</p>
 
       <div
         class="gl-pin-group"
@@ -62,6 +62,15 @@ export function renderPinEntryHtml(
 
       <div class="gl-pin-keypad" id="login-pin-keypad">
         ${KEYPAD_DIGITS.map((digit) => renderKey(digit, isChecking || isLocked)).join("")}
+        <button
+          type="button"
+          class="gl-pin-key gl-pin-key--action gl-pin-key--clear"
+          data-pin-action="clear"
+          aria-label="ล้างรหัส PIN ทั้งหมด"
+          ${isChecking || isLocked ? "disabled" : ""}
+        >
+          <span class="gl-pin-clear-text">ล้าง</span>
+        </button>
         ${renderKey("0", isChecking || isLocked, "gl-pin-key--zero")}
         <button
           type="button"
@@ -76,10 +85,6 @@ export function renderPinEntryHtml(
           </svg>
         </button>
       </div>
-
-      <button type="button" id="login-use-email" class="gl-btn gl-btn--ghost gl-login-alt">
-        เข้าสู่ระบบด้วยอีเมล
-      </button>
     </div>
   `;
 }
@@ -92,24 +97,31 @@ export function renderDots(pinLength: number): string {
 }
 
 export function renderCountText(pinLength: number): string {
-  return `ใส่แล้ว ${pinLength} จาก ${PIN_LENGTH} หลัก`;
+  return `ระบุแล้ว ${pinLength} จาก ${PIN_LENGTH} หลัก`;
 }
 
 export function renderStatusText(status: PinStatus, lockedUntil: string | null = null): string {
-  if (status === "incomplete") return "ใส่ให้ครบ 6 หลัก";
-  if (status === "invalid") return "รหัสไม่ถูกต้อง";
+  if (status === "incomplete") return "กรุณาระบุ PIN ให้ครบ 6 หลัก";
+  if (status === "invalid") return "รหัส PIN ไม่ถูกต้อง";
   if (status === "locked") {
     return lockedUntil
-      ? `ล็อกชั่วคราว ลองใหม่หลัง ${formatDateThai(lockedUntil)}`
-      : "ล็อกชั่วคราว ลองใหม่ภายหลัง";
+      ? `ระบบถูกล็อกชั่วคราว ลองใหม่หลัง ${formatDateThai(lockedUntil)}`
+      : "ระบบถูกล็อกชั่วคราว ลองใหม่ภายหลัง";
   }
-  if (status === "unavailable") return "เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง";
-  if (status === "checking") return "กำลังเข้าสู่ระบบ...";
+  if (status === "requires_reset") return "ต้องตั้งรหัส PIN ใหม่ก่อนเข้าใช้งาน";
+  if (status === "unavailable") return "ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง";
+  if (status === "checking") return "กำลังตรวจสอบรหัส PIN...";
   return "";
 }
 
 function isStatusTextAlert(status: PinStatus): boolean {
-  return status === "incomplete" || status === "invalid" || status === "locked" || status === "unavailable";
+  return (
+    status === "incomplete" ||
+    status === "invalid" ||
+    status === "locked" ||
+    status === "requires_reset" ||
+    status === "unavailable"
+  );
 }
 
 function renderKey(digit: string, isChecking: boolean, extraClass = ""): string {

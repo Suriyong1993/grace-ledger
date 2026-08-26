@@ -1,6 +1,10 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderLoginStylesHtml } from "../components/login/loginStyles";
-import { renderProfileSelectHtml, ProfilesStatus } from "../components/login/ProfileSelectView";
+import {
+  renderProfileSelectHtml,
+  ProfilesStatus,
+  BootstrapModalState,
+} from "../components/login/ProfileSelectView";
 import {
   renderPinEntryHtml,
   renderDots,
@@ -9,21 +13,24 @@ import {
   PinStatus,
   PIN_LENGTH,
 } from "../components/login/PinEntryView";
-import { renderEmailFallbackHtml, eyeIcon, eyeOffIcon } from "../components/login/EmailFallbackView";
 import { LoginProfile } from "../components/login/types";
-import { fetchLoginProfiles, verifyPin } from "../lib/auth/login-service";
+import {
+  fetchLoginProfiles,
+  verifyPin,
+  requestPinBootstrap,
+} from "../lib/auth/login-service";
 
-type LoginView = "profiles" | "pin" | "email";
+type LoginView = "profiles" | "pin";
 
 /** How long the selected profile stays visible before the PIN screen replaces it. */
-const SELECTION_HANDOFF_MS = 160;
+const SELECTION_HANDOFF_MS = 140;
 
-type LoginSubmitHandler = (email: string, password: string) => void;
 type PinAuthHandler = (accessToken: string, refreshToken: string) => void;
+type EmailSubmitHandler = (email: string, password: string) => void;
 
 export interface LoginPageHandlers {
-  onEmailSubmit: LoginSubmitHandler;
   onPinAuthenticated: PinAuthHandler;
+  onEmailSubmit?: EmailSubmitHandler;
 }
 
 export class LoginPage {
@@ -37,9 +44,11 @@ export class LoginPage {
   private profilesStatus: ProfilesStatus = "loading";
   private profilesLoadStarted = false;
 
-  private errorMessage: string | null = null;
-  private isSubmitting = false;
-  private isPasswordVisible = false;
+  private bootstrapState: BootstrapModalState = {
+    isOpen: false,
+    selectedProfileId: null,
+    status: "idle",
+  };
 
   private root: HTMLElement | null = null;
   private handlers: LoginPageHandlers | null = null;
@@ -47,12 +56,15 @@ export class LoginPage {
   constructor(private readonly supabase: SupabaseClient) {}
 
   public setError(message: string | null): void {
-    this.errorMessage = message;
-    if (message) this.view = "email";
+    if (message) {
+      this.pinStatus = "unavailable";
+      this.rerender();
+    }
   }
 
   public setSubmitting(value: boolean): void {
-    this.isSubmitting = value;
+    this.pinStatus = value ? "checking" : "idle";
+    this.rerender();
   }
 
   public renderHtml(): string {
@@ -63,30 +75,24 @@ export class LoginPage {
     if (this.view === "pin" && this.selectedProfile) {
       return renderPinEntryHtml(this.selectedProfile, this.pin.length, this.pinStatus, this.pinLockedUntil);
     }
-    if (this.view === "email") {
-      return renderEmailFallbackHtml({
-        errorMessage: this.errorMessage,
-        isSubmitting: this.isSubmitting,
-        isPasswordVisible: this.isPasswordVisible,
-      });
-    }
-    return renderProfileSelectHtml(this.profiles, this.selectedProfile?.id ?? null, this.profilesStatus);
+    return renderProfileSelectHtml(
+      this.profiles,
+      this.selectedProfile?.id ?? null,
+      this.profilesStatus,
+      this.bootstrapState
+    );
   }
 
   public attachEventListeners(root: HTMLElement, handlers: LoginPageHandlers): void {
     this.root = root;
     this.handlers = handlers;
 
-    root.querySelector<HTMLButtonElement>("#login-use-email")?.addEventListener("click", () => {
-      this.goToEmail();
-    });
     root.querySelector<HTMLButtonElement>("#login-back-to-profiles")?.addEventListener("click", () => {
       this.goToProfiles();
     });
 
     if (this.view === "profiles") this.attachProfileListeners(root);
     if (this.view === "pin") this.attachPinListeners(root);
-    if (this.view === "email") this.attachEmailListeners(root, handlers.onEmailSubmit);
   }
 
   // ---------------------------------------------------------------- profiles
@@ -103,6 +109,7 @@ export class LoginPage {
       this.rerender();
     });
 
+    // Profile card selection
     root.querySelectorAll<HTMLButtonElement>("[data-profile-id]").forEach((card) => {
       card.addEventListener("click", () => {
         const profile = this.profiles.find((candidate) => candidate.id === card.dataset.profileId) ?? null;
@@ -115,6 +122,55 @@ export class LoginPage {
 
         window.setTimeout(() => this.goToPin(), prefersReducedMotion() ? 0 : SELECTION_HANDOFF_MS);
       });
+    });
+
+    // Bootstrap trigger
+    root.querySelector<HTMLButtonElement>("#login-trigger-bootstrap")?.addEventListener("click", () => {
+      this.bootstrapState = {
+        isOpen: true,
+        selectedProfileId: this.profiles[0]?.id ?? null,
+        status: "idle",
+      };
+      this.rerender();
+    });
+
+    root.querySelector<HTMLButtonElement>("#login-cancel-bootstrap")?.addEventListener("click", () => {
+      this.bootstrapState = {
+        isOpen: false,
+        selectedProfileId: null,
+        status: "idle",
+      };
+      this.rerender();
+    });
+
+    const selectEl = root.querySelector<HTMLSelectElement>("#bootstrap-profile-select");
+    if (selectEl) {
+      selectEl.addEventListener("change", () => {
+        this.bootstrapState.selectedProfileId = selectEl.value;
+      });
+    }
+
+    root.querySelector<HTMLButtonElement>("#login-send-bootstrap")?.addEventListener("click", async () => {
+      const profileId = selectEl?.value || this.bootstrapState.selectedProfileId || this.profiles[0]?.id;
+      if (!profileId) return;
+
+      this.bootstrapState.status = "sending";
+      this.bootstrapState.errorMessage = null;
+      this.rerender();
+
+      const origin = typeof window !== "undefined" ? window.location.origin : undefined;
+      const res = await requestPinBootstrap(this.supabase, profileId, origin);
+
+      if (res.status === "sent") {
+        this.bootstrapState.status = "sent";
+      } else if (res.status === "rate_limited") {
+        this.bootstrapState.status = "error";
+        this.bootstrapState.errorMessage = "คุณขอรหัสบ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่";
+      } else {
+        this.bootstrapState.status = "error";
+        this.bootstrapState.errorMessage = "ไม่สามารถส่งคำขอได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง";
+      }
+      this.rerender();
     });
   }
 
@@ -149,6 +205,11 @@ export class LoginPage {
       this.restoreGroupFocusAfterPointer(event);
     });
 
+    root.querySelector<HTMLButtonElement>('[data-pin-action="clear"]')?.addEventListener("click", (event) => {
+      this.clearPin();
+      this.restoreGroupFocusAfterPointer(event);
+    });
+
     root.addEventListener("keydown", this.handlePinKeydown);
 
     root.querySelector<HTMLElement>("#login-pin-group")?.focus();
@@ -177,6 +238,11 @@ export class LoginPage {
       this.popDigit();
       return;
     }
+    if (event.key === "Delete") {
+      event.preventDefault();
+      this.clearPin();
+      return;
+    }
     if (event.key === "Enter") {
       event.preventDefault();
       this.submitPin();
@@ -200,6 +266,15 @@ export class LoginPage {
     if (this.pin.length === 0) return;
 
     this.pin = this.pin.slice(0, -1);
+    if (this.pinStatus !== "idle") this.pinStatus = "idle";
+    this.syncPinDom();
+  }
+
+  private clearPin(): void {
+    if (this.pinStatus === "checking") return;
+    if (this.pin.length === 0) return;
+
+    this.pin = "";
     if (this.pinStatus !== "idle") this.pinStatus = "idle";
     this.syncPinDom();
   }
@@ -253,7 +328,11 @@ export class LoginPage {
     const status = this.root.querySelector<HTMLElement>("#login-pin-status");
     if (status) {
       status.textContent = renderStatusText(this.pinStatus, this.pinLockedUntil);
-      status.classList.remove("gl-pin-status--error");
+      if (this.pinStatus !== "idle" && this.pinStatus !== "checking") {
+        status.classList.add("gl-pin-status--error");
+      } else {
+        status.classList.remove("gl-pin-status--error");
+      }
     }
   }
 
@@ -271,48 +350,7 @@ export class LoginPage {
     const group = this.root?.querySelector<HTMLElement>("#login-pin-group");
     if (!group) return;
     group.setAttribute("data-shake", "true");
-    window.setTimeout(() => group.removeAttribute("data-shake"), 300);
-  }
-
-  // ------------------------------------------------------------------- email
-
-  private attachEmailListeners(root: HTMLElement, onSubmit: LoginSubmitHandler): void {
-    const form = root.querySelector<HTMLFormElement>("#login-form");
-    if (!form) return;
-
-    const passwordInput = root.querySelector<HTMLInputElement>("#login-password");
-    const toggleBtn = root.querySelector<HTMLButtonElement>("#login-toggle-password");
-
-    toggleBtn?.addEventListener("click", () => {
-      this.isPasswordVisible = !this.isPasswordVisible;
-      if (!passwordInput) return;
-      passwordInput.type = this.isPasswordVisible ? "text" : "password";
-      toggleBtn.setAttribute("aria-label", this.isPasswordVisible ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน");
-      toggleBtn.setAttribute("aria-pressed", this.isPasswordVisible ? "true" : "false");
-      toggleBtn.innerHTML = this.isPasswordVisible ? eyeOffIcon() : eyeIcon();
-      passwordInput.focus();
-    });
-
-    form.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
-      if (this.isPasswordVisible && passwordInput) {
-        this.isPasswordVisible = false;
-        passwordInput.type = "password";
-        toggleBtn?.setAttribute("aria-label", "แสดงรหัสผ่าน");
-        toggleBtn?.setAttribute("aria-pressed", "false");
-        if (toggleBtn) toggleBtn.innerHTML = eyeIcon();
-      }
-      (document.activeElement as HTMLElement | null)?.blur();
-    });
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (this.isSubmitting) return;
-      const email = (root.querySelector<HTMLInputElement>("#login-email")?.value ?? "").trim();
-      const password = root.querySelector<HTMLInputElement>("#login-password")?.value ?? "";
-      if (!email || !password) return;
-      onSubmit(email, password);
-    });
+    window.setTimeout(() => group.removeAttribute("data-shake"), 350);
   }
 
   // ---------------------------------------------------------------- movement
@@ -323,21 +361,17 @@ export class LoginPage {
     this.pin = "";
     this.pinStatus = "idle";
     this.pinLockedUntil = null;
-    this.errorMessage = null;
+    this.bootstrapState = {
+      isOpen: false,
+      selectedProfileId: null,
+      status: "idle",
+    };
     this.rerender();
   }
 
   private goToPin(): void {
     if (!this.selectedProfile) return;
     this.view = "pin";
-    this.pin = "";
-    this.pinStatus = "idle";
-    this.pinLockedUntil = null;
-    this.rerender();
-  }
-
-  private goToEmail(): void {
-    this.view = "email";
     this.pin = "";
     this.pinStatus = "idle";
     this.pinLockedUntil = null;
