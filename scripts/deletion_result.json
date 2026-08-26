@@ -1,0 +1,618 @@
+{
+  "allPassed": true,
+  "preSnapshot": {
+    "all_auth_users": [
+      {
+        "created_at": null,
+        "email": "member_a@grace.org",
+        "id": "aaaaaaaa-4444-4444-4444-444444444444",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-25T17:28:08.636223+00:00",
+        "email": "p21_approver2@test.com",
+        "id": "66666666-aaaa-3333-3333-333333333333",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-25T17:28:08.636223+00:00",
+        "email": "p21_treasurer@test.com",
+        "id": "66666666-aaaa-4444-4444-444444444444",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "p22_approver1@test.com",
+        "id": "77777777-aaaa-2222-2222-222222222222",
+        "role": null
+      },
+      {
+        "created_at": null,
+        "email": "p22_approver2@test.com",
+        "id": "77777777-aaaa-3333-3333-333333333333",
+        "role": null
+      },
+      {
+        "created_at": null,
+        "email": "p22_creator@test.com",
+        "id": "77777777-aaaa-1111-1111-111111111111",
+        "role": null
+      },
+      {
+        "created_at": null,
+        "email": "p22_member@test.com",
+        "id": "77777777-aaaa-4444-4444-444444444444",
+        "role": null
+      },
+      {
+        "created_at": "2026-08-25T17:28:08.636223+00:00",
+        "email": "p23_approver@test.com",
+        "id": "66666666-aaaa-2222-2222-222222222222",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-25T05:21:02.454594+00:00",
+        "email": "p23_creator@test.com",
+        "id": "66666666-aaaa-1111-1111-111111111111",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "pastor_a@grace.org",
+        "id": "aaaaaaaa-1111-1111-1111-111111111111",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "pastor_b@grace.org",
+        "id": "bbbbbbbb-1111-1111-1111-111111111111",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-25T16:27:32.560145+00:00",
+        "email": "somchai_pastor@grace.org",
+        "id": "52f40eb3-8e4d-42ef-b41c-7a40b5c2ef93",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "staff_a@grace.org",
+        "id": "aaaaaaaa-3333-3333-3333-333333333333",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-24T16:42:12.306439+00:00",
+        "email": "suriyongbralpret7@gmail.com",
+        "id": "f0fc6cdd-07ad-4d76-8fe6-80427525d340",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "treasurer_a@grace.org",
+        "id": "aaaaaaaa-2222-2222-2222-222222222222",
+        "role": "authenticated"
+      }
+    ],
+    "auth_pins": null,
+    "churches": [
+      {
+        "id": "11111111-1111-1111-1111-111111111111",
+        "name": "Church A - Grace Alpha"
+      },
+      {
+        "id": "22222222-2222-2222-2222-222222222222",
+        "name": "Church B - Grace Beta"
+      },
+      {
+        "id": "66666666-6666-6666-6666-111111111111",
+        "name": "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์"
+      },
+      {
+        "id": "77777777-7777-7777-7777-111111111111",
+        "name": "P22_TEST_Grace_Church"
+      }
+    ],
+    "counts": {
+      "audit_logs": 313,
+      "auth_pins": 0,
+      "auth_users": 15,
+      "churches": 4,
+      "member_giving_records": 1,
+      "offering_sessions": 19,
+      "profiles": 12,
+      "transaction_splits": 23,
+      "transactions": 15,
+      "user_roles": 12
+    },
+    "profiles": [
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "email": "somchai_pastor@grace.org",
+        "full_name": "ศจ.สมชาย มีสุข (Pastor)",
+        "id": "3aeb81bd-0ae5-49a4-95b1-c7a877e447fc"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "email": "p23_creator@test.com",
+        "full_name": "มนัส สุขใจ (Staff)",
+        "id": "66666666-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_creator@test.com",
+        "full_name": "P22 Creator Staff",
+        "id": "77777777-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_approver1@test.com",
+        "full_name": "P22 Pastor Somchai",
+        "id": "77777777-aaaa-2222-2222-222222222222"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_approver2@test.com",
+        "full_name": "P22 Elder Orapin",
+        "id": "77777777-aaaa-3333-3333-333333333333"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_member@test.com",
+        "full_name": "P22 Member",
+        "id": "77777777-aaaa-4444-4444-444444444444"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "pastor_a@grace.org",
+        "full_name": "Pastor A",
+        "id": "aaaaaaaa-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "treasurer_a@grace.org",
+        "full_name": "Treasurer A",
+        "id": "aaaaaaaa-2222-2222-2222-222222222222"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "staff_a@grace.org",
+        "full_name": "Staff A",
+        "id": "aaaaaaaa-3333-3333-3333-333333333333"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "member_a@grace.org",
+        "full_name": "Member A",
+        "id": "aaaaaaaa-4444-4444-4444-444444444444"
+      },
+      {
+        "church_id": "22222222-2222-2222-2222-222222222222",
+        "email": "pastor_b@grace.org",
+        "full_name": "Pastor B",
+        "id": "bbbbbbbb-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "email": "suriyongbralpret7@gmail.com",
+        "full_name": "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร",
+        "id": "f0fc6cdd-07ad-4d76-8fe6-80427525d340"
+      }
+    ],
+    "user_roles": [
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "01c109ae-3433-44b6-90a8-566daeacfa52",
+        "role": "treasurer",
+        "user_id": "aaaaaaaa-2222-2222-2222-222222222222"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "049cfc67-3d5d-4216-8a73-807e095e386a",
+        "role": "pastor",
+        "user_id": "77777777-aaaa-2222-2222-222222222222"
+      },
+      {
+        "church_id": "22222222-2222-2222-2222-222222222222",
+        "id": "11f6c110-9cfc-4575-bf33-887d8f2d648e",
+        "role": "pastor",
+        "user_id": "bbbbbbbb-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "id": "3aeaf1b0-be05-4827-9fe4-382645aa99d6",
+        "role": "finance_staff",
+        "user_id": "66666666-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "430cdff1-ba60-4976-8e3c-af3503eb076f",
+        "role": "finance_staff",
+        "user_id": "77777777-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "id": "5eff5be1-7eee-473f-afc6-4b6361ba57fc",
+        "role": "pastor",
+        "user_id": "3aeb81bd-0ae5-49a4-95b1-c7a877e447fc"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "6817a80e-be61-42d2-814a-4d608a2753bd",
+        "role": "approver",
+        "user_id": "77777777-aaaa-3333-3333-333333333333"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "6e405e80-dd17-4086-83bd-215044a39840",
+        "role": "member",
+        "user_id": "aaaaaaaa-4444-4444-4444-444444444444"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "8f03364b-f1cb-4ebc-88aa-3262ed661c59",
+        "role": "pastor",
+        "user_id": "aaaaaaaa-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "id": "a7b3a4fa-18b3-42a0-9b91-1b00a84c51b7",
+        "role": "super_admin",
+        "user_id": "f0fc6cdd-07ad-4d76-8fe6-80427525d340"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "e561df85-3b20-4885-ab29-e9e445bdbe90",
+        "role": "member",
+        "user_id": "77777777-aaaa-4444-4444-444444444444"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "f6c15afe-cbce-4b73-b6cb-d2579799437e",
+        "role": "finance_staff",
+        "user_id": "aaaaaaaa-3333-3333-3333-333333333333"
+      }
+    ]
+  },
+  "postSnapshot": {
+    "all_auth_users": [
+      {
+        "created_at": null,
+        "email": "member_a@grace.org",
+        "id": "aaaaaaaa-4444-4444-4444-444444444444",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "p22_approver1@test.com",
+        "id": "77777777-aaaa-2222-2222-222222222222",
+        "role": null
+      },
+      {
+        "created_at": null,
+        "email": "p22_approver2@test.com",
+        "id": "77777777-aaaa-3333-3333-333333333333",
+        "role": null
+      },
+      {
+        "created_at": null,
+        "email": "p22_creator@test.com",
+        "id": "77777777-aaaa-1111-1111-111111111111",
+        "role": null
+      },
+      {
+        "created_at": null,
+        "email": "p22_member@test.com",
+        "id": "77777777-aaaa-4444-4444-444444444444",
+        "role": null
+      },
+      {
+        "created_at": "2026-08-25T05:21:02.454594+00:00",
+        "email": "p23_creator@test.com",
+        "id": "66666666-aaaa-1111-1111-111111111111",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "pastor_a@grace.org",
+        "id": "aaaaaaaa-1111-1111-1111-111111111111",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "pastor_b@grace.org",
+        "id": "bbbbbbbb-1111-1111-1111-111111111111",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-25T16:27:32.560145+00:00",
+        "email": "somchai_pastor@grace.org",
+        "id": "52f40eb3-8e4d-42ef-b41c-7a40b5c2ef93",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "staff_a@grace.org",
+        "id": "aaaaaaaa-3333-3333-3333-333333333333",
+        "role": "authenticated"
+      },
+      {
+        "created_at": "2026-08-24T16:42:12.306439+00:00",
+        "email": "suriyongbralpret7@gmail.com",
+        "id": "f0fc6cdd-07ad-4d76-8fe6-80427525d340",
+        "role": "authenticated"
+      },
+      {
+        "created_at": null,
+        "email": "treasurer_a@grace.org",
+        "id": "aaaaaaaa-2222-2222-2222-222222222222",
+        "role": "authenticated"
+      }
+    ],
+    "auth_pins": null,
+    "churches": [
+      {
+        "id": "11111111-1111-1111-1111-111111111111",
+        "name": "Church A - Grace Alpha"
+      },
+      {
+        "id": "22222222-2222-2222-2222-222222222222",
+        "name": "Church B - Grace Beta"
+      },
+      {
+        "id": "66666666-6666-6666-6666-111111111111",
+        "name": "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์"
+      },
+      {
+        "id": "77777777-7777-7777-7777-111111111111",
+        "name": "P22_TEST_Grace_Church"
+      }
+    ],
+    "counts": {
+      "audit_logs": 313,
+      "auth_pins": 0,
+      "auth_users": 12,
+      "churches": 4,
+      "member_giving_records": 1,
+      "offering_sessions": 19,
+      "profiles": 12,
+      "transaction_splits": 23,
+      "transactions": 15,
+      "user_roles": 12
+    },
+    "profiles": [
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "email": "somchai_pastor@grace.org",
+        "full_name": "ศจ.สมชาย มีสุข (Pastor)",
+        "id": "3aeb81bd-0ae5-49a4-95b1-c7a877e447fc"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "email": "p23_creator@test.com",
+        "full_name": "มนัส สุขใจ (Staff)",
+        "id": "66666666-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_creator@test.com",
+        "full_name": "P22 Creator Staff",
+        "id": "77777777-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_approver1@test.com",
+        "full_name": "P22 Pastor Somchai",
+        "id": "77777777-aaaa-2222-2222-222222222222"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_approver2@test.com",
+        "full_name": "P22 Elder Orapin",
+        "id": "77777777-aaaa-3333-3333-333333333333"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "email": "p22_member@test.com",
+        "full_name": "P22 Member",
+        "id": "77777777-aaaa-4444-4444-444444444444"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "pastor_a@grace.org",
+        "full_name": "Pastor A",
+        "id": "aaaaaaaa-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "treasurer_a@grace.org",
+        "full_name": "Treasurer A",
+        "id": "aaaaaaaa-2222-2222-2222-222222222222"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "staff_a@grace.org",
+        "full_name": "Staff A",
+        "id": "aaaaaaaa-3333-3333-3333-333333333333"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "email": "member_a@grace.org",
+        "full_name": "Member A",
+        "id": "aaaaaaaa-4444-4444-4444-444444444444"
+      },
+      {
+        "church_id": "22222222-2222-2222-2222-222222222222",
+        "email": "pastor_b@grace.org",
+        "full_name": "Pastor B",
+        "id": "bbbbbbbb-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "email": "suriyongbralpret7@gmail.com",
+        "full_name": "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร",
+        "id": "f0fc6cdd-07ad-4d76-8fe6-80427525d340"
+      }
+    ],
+    "user_roles": [
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "01c109ae-3433-44b6-90a8-566daeacfa52",
+        "role": "treasurer",
+        "user_id": "aaaaaaaa-2222-2222-2222-222222222222"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "049cfc67-3d5d-4216-8a73-807e095e386a",
+        "role": "pastor",
+        "user_id": "77777777-aaaa-2222-2222-222222222222"
+      },
+      {
+        "church_id": "22222222-2222-2222-2222-222222222222",
+        "id": "11f6c110-9cfc-4575-bf33-887d8f2d648e",
+        "role": "pastor",
+        "user_id": "bbbbbbbb-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "id": "3aeaf1b0-be05-4827-9fe4-382645aa99d6",
+        "role": "finance_staff",
+        "user_id": "66666666-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "430cdff1-ba60-4976-8e3c-af3503eb076f",
+        "role": "finance_staff",
+        "user_id": "77777777-aaaa-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "id": "5eff5be1-7eee-473f-afc6-4b6361ba57fc",
+        "role": "pastor",
+        "user_id": "3aeb81bd-0ae5-49a4-95b1-c7a877e447fc"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "6817a80e-be61-42d2-814a-4d608a2753bd",
+        "role": "approver",
+        "user_id": "77777777-aaaa-3333-3333-333333333333"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "6e405e80-dd17-4086-83bd-215044a39840",
+        "role": "member",
+        "user_id": "aaaaaaaa-4444-4444-4444-444444444444"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "8f03364b-f1cb-4ebc-88aa-3262ed661c59",
+        "role": "pastor",
+        "user_id": "aaaaaaaa-1111-1111-1111-111111111111"
+      },
+      {
+        "church_id": "66666666-6666-6666-6666-111111111111",
+        "id": "a7b3a4fa-18b3-42a0-9b91-1b00a84c51b7",
+        "role": "super_admin",
+        "user_id": "f0fc6cdd-07ad-4d76-8fe6-80427525d340"
+      },
+      {
+        "church_id": "77777777-7777-7777-7777-111111111111",
+        "id": "e561df85-3b20-4885-ab29-e9e445bdbe90",
+        "role": "member",
+        "user_id": "77777777-aaaa-4444-4444-444444444444"
+      },
+      {
+        "church_id": "11111111-1111-1111-1111-111111111111",
+        "id": "f6c15afe-cbce-4b73-b6cb-d2579799437e",
+        "role": "finance_staff",
+        "user_id": "aaaaaaaa-3333-3333-3333-333333333333"
+      }
+    ]
+  },
+  "deletionResults": [
+    {
+      "uid": "66666666-aaaa-2222-2222-222222222222",
+      "email": "p23_approver@test.com",
+      "success": true,
+      "user": {}
+    },
+    {
+      "uid": "66666666-aaaa-3333-3333-333333333333",
+      "email": "p21_approver2@test.com",
+      "success": true,
+      "user": {}
+    },
+    {
+      "uid": "66666666-aaaa-4444-4444-444444444444",
+      "email": "p21_treasurer@test.com",
+      "success": true,
+      "user": {}
+    }
+  ],
+  "checks": [
+    {
+      "name": "Target User 66666666-aaaa-2222-2222-222222222222 (p23_approver@test.com) removed from auth.users",
+      "passed": true,
+      "detail": "Auth Admin API Status: 404, DB Auth Users Count: 0"
+    },
+    {
+      "name": "Target User 66666666-aaaa-3333-3333-333333333333 (p21_approver2@test.com) removed from auth.users",
+      "passed": true,
+      "detail": "Auth Admin API Status: 404, DB Auth Users Count: 0"
+    },
+    {
+      "name": "Target User 66666666-aaaa-4444-4444-444444444444 (p21_treasurer@test.com) removed from auth.users",
+      "passed": true,
+      "detail": "Auth Admin API Status: 404, DB Auth Users Count: 0"
+    },
+    {
+      "name": "profiles table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 12, Count after: 12"
+    },
+    {
+      "name": "user_roles table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 12, Count after: 12"
+    },
+    {
+      "name": "transactions table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 15, Count after: 15"
+    },
+    {
+      "name": "transaction_splits table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 23, Count after: 23"
+    },
+    {
+      "name": "offering_sessions table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 19, Count after: 19"
+    },
+    {
+      "name": "member_giving_records table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 1, Count after: 1"
+    },
+    {
+      "name": "audit_logs table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 313, Count after: 313"
+    },
+    {
+      "name": "churches table intact & unchanged",
+      "passed": true,
+      "detail": "Count before: 4, Count after: 4"
+    },
+    {
+      "name": "auth_pins count is 0",
+      "passed": true,
+      "detail": "auth_pins count: 0"
+    },
+    {
+      "name": "Somchai (3aeb81bd / ศจ.สมชาย มีสุข) profile & role & auth completely untouched",
+      "passed": true,
+      "detail": "Profile: ศจ.สมชาย มีสุข (Pastor), Role: pastor, Auth: somchai_pastor@grace.org"
+    }
+  ]
+}
