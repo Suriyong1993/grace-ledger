@@ -20,6 +20,7 @@ export function renderPinEntryHtml(
 ): string {
   const isChecking = status === "checking";
   const isLocked = status === "locked";
+  const isHardBlocked = isChecking || isLocked || status === "requires_reset";
 
   return `
     <div class="gl-login-stage gl-login-stage--narrow">
@@ -32,11 +33,19 @@ export function renderPinEntryHtml(
 
       <div class="gl-pin-identity">
         <span class="gl-pin-avatar" aria-hidden="true">${escapeHtml(profile.initials)}</span>
+        <span class="gl-pin-identity-pill">PIN 6 หลัก</span>
         <h1 class="gl-pin-name">${escapeHtml(profile.name)}</h1>
         <p class="gl-pin-role">${escapeHtml(profile.role)}</p>
       </div>
 
       <p class="gl-pin-prompt" id="login-pin-prompt">ระบุรหัส PIN 6 หลัก</p>
+      <p class="gl-pin-hint">รองรับ number pad บนมือถือ และพิมพ์ตัวเลขจากคีย์บอร์ดได้</p>
+
+      ${status === "requires_reset" ? `
+        <div class="gl-pin-banner gl-pin-banner--warning" role="alert">
+          ต้องตั้งรหัส PIN ใหม่ก่อนเข้าใช้งาน โปรดทำรายการรีเซ็ตให้เรียบร้อย
+        </div>
+      ` : ""}
 
       <div
         class="gl-pin-group"
@@ -61,23 +70,23 @@ export function renderPinEntryHtml(
       >${isChecking ? '<span class="gl-pin-spinner" aria-hidden="true"></span>' : ""}${renderStatusText(status, lockedUntil)}</p>
 
       <div class="gl-pin-keypad" id="login-pin-keypad">
-        ${KEYPAD_DIGITS.map((digit) => renderKey(digit, isChecking || isLocked)).join("")}
+        ${KEYPAD_DIGITS.map((digit) => renderKey(digit, isHardBlocked)).join("")}
         <button
           type="button"
           class="gl-pin-key gl-pin-key--action gl-pin-key--clear"
           data-pin-action="clear"
           aria-label="ล้างรหัส PIN ทั้งหมด"
-          ${isChecking || isLocked ? "disabled" : ""}
+          ${isHardBlocked ? "disabled" : ""}
         >
           <span class="gl-pin-clear-text">ล้าง</span>
         </button>
-        ${renderKey("0", isChecking || isLocked, "gl-pin-key--zero")}
+        ${renderKey("0", isHardBlocked, "gl-pin-key--zero")}
         <button
           type="button"
           class="gl-pin-key gl-pin-key--action"
           data-pin-action="backspace"
           aria-label="ลบหนึ่งหลัก"
-          ${isChecking || isLocked ? "disabled" : ""}
+          ${isHardBlocked ? "disabled" : ""}
         >
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
             <path d="M9 5.5H20V18.5H9L3.5 12L9 5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>

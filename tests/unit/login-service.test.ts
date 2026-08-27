@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { fetchLoginProfiles, verifyPin } from "../../src/lib/auth/login-service";
+import { fetchLoginProfiles, verifyPin } from "../../src/services/authPinService";
 
 class FakeFunctionsHttpError extends Error {
   constructor(public readonly context: Response) {
@@ -9,7 +9,7 @@ class FakeFunctionsHttpError extends Error {
 }
 
 function stubSupabase(invoke: ReturnType<typeof vi.fn>): SupabaseClient {
-  return { functions: { invoke } } as unknown as SupabaseClient;
+  return { functions: { invoke }, auth: { setSession: vi.fn() } } as unknown as SupabaseClient;
 }
 
 describe("fetchLoginProfiles", () => {
@@ -57,16 +57,35 @@ describe("verifyPin", () => {
       },
       error: null,
     });
+    const setSession = vi.fn().mockResolvedValue({ data: { session: { user: { id: "user-1" } } }, error: null });
+    const supabase = { functions: { invoke }, auth: { setSession } } as unknown as SupabaseClient;
 
-    const result = await verifyPin(stubSupabase(invoke), "profile-id", "123456");
+    const result = await verifyPin(supabase, "profile-id", "123456");
 
     expect(result).toEqual({
       status: "success",
-      accessToken: "at",
-      refreshToken: "rt",
-      requiresReset: false,
+      userId: "user-1",
     });
     expect(invoke).toHaveBeenCalledWith("verify-pin", { body: { profile_id: "profile-id", pin: "123456" } });
+    expect(setSession).toHaveBeenCalledWith({ access_token: "at", refresh_token: "rt" });
+  });
+
+  it("returns requires_reset without bridging a session", async () => {
+    const invoke = vi.fn().mockResolvedValue({
+      data: {
+        access_token: "at",
+        refresh_token: "rt",
+        requires_reset: true,
+      },
+      error: null,
+    });
+    const setSession = vi.fn();
+    const supabase = { functions: { invoke }, auth: { setSession } } as unknown as SupabaseClient;
+
+    const result = await verifyPin(supabase, "profile-id", "123456");
+
+    expect(result).toEqual({ status: "requires_reset" });
+    expect(setSession).not.toHaveBeenCalled();
   });
 
   it("returns invalid on a 401", async () => {

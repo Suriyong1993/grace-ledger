@@ -10,7 +10,8 @@ import { MembersPage } from "./pages/MembersPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PinSetupPage } from "./pages/PinSetupPage";
-import { GraceAiDrawer } from "./components/ai/GraceAiDrawer";
+import { GraceAiDrawer } from "./components/ai-drawer/GraceAiDrawer";
+import type { AiDrawerCallbacks } from "./components/ai-drawer/types";
 import { UserRole } from "./lib/rbac";
 
 interface ActiveSession {
@@ -24,6 +25,7 @@ export class App {
   private loginPage = new LoginPage(this.supabase);
   private pinSetupPage: PinSetupPage | null = null;
   private isPinSetupMode = false;
+  private isBootstrappingSession = false;
   private dashboardPage: DashboardPage;
   private approvalsPage: ApprovalsPage | null = null;
   private offeringPage: OfferingPage | null = null;
@@ -32,6 +34,13 @@ export class App {
   private membersPage: MembersPage | null = null;
   private reportsPage: ReportsPage | null = null;
   private aiDrawer: GraceAiDrawer | null = null;
+  /** Drawer hooks: draft cards hand the user over to the Transactions page. */
+  private readonly aiDrawerCallbacks: AiDrawerCallbacks = {
+    onDraftReview: () => {
+      this.aiDrawer?.close();
+      router.navigate("/transactions");
+    },
+  };
   private currentRoute: MatchedRoute = { path: "/", pattern: "/", params: {} };
   private rootElement: HTMLElement | null = null;
   private pendingCount = 0;
@@ -68,7 +77,7 @@ export class App {
         this.reportsPage = null;
         this.aiDrawer = null;
         void this.render();
-      } else if (authSession.user && !this.session) {
+      } else if (authSession.user && !this.session && !this.isBootstrappingSession) {
         await this.loadSession(authSession.user.id);
         void this.render();
       }
@@ -153,43 +162,17 @@ export class App {
     this.fundsPage = new FundsPage(this.supabase, churchId);
     this.membersPage = new MembersPage(this.supabase, churchId);
     this.reportsPage = new ReportsPage(this.supabase, churchId);
-    this.aiDrawer = new GraceAiDrawer(this.supabase, churchId, userRole, userId);
+    this.aiDrawer = new GraceAiDrawer(this.supabase, churchId, userRole, userId, this.aiDrawerCallbacks);
   }
 
-  private async handleLoginSubmit(email: string, password: string): Promise<void> {
-    this.loginPage.setError(null);
-    this.loginPage.setSubmitting(true);
-    await this.render();
-
-    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
-
-    if (error || !data.user) {
-      this.loginPage.setSubmitting(false);
-      this.loginPage.setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+  private async handlePinAuthenticated(userId: string): Promise<void> {
+    this.isBootstrappingSession = true;
+    try {
+      await this.loadSession(userId);
       await this.render();
-      return;
+    } finally {
+      this.isBootstrappingSession = false;
     }
-
-    await this.loadSession(data.user.id);
-    this.loginPage.setSubmitting(false);
-    await this.render();
-  }
-
-  private async handlePinAuthenticated(accessToken: string, refreshToken: string): Promise<void> {
-    const { data, error } = await this.supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-
-    if (error || !data.session?.user) {
-      console.error("Failed to establish session from PIN sign-in:", error);
-      this.loginPage.setError("เข้าสู่ระบบไม่สำเร็จ ลองใหม่อีกครั้ง");
-      await this.render();
-      return;
-    }
-
-    await this.loadSession(data.session.user.id);
-    await this.render();
   }
 
   public async render(): Promise<void> {
@@ -215,8 +198,7 @@ export class App {
     if (!this.session) {
       this.rootElement.innerHTML = this.loginPage.renderHtml();
       this.loginPage.attachEventListeners(this.rootElement, {
-        onEmailSubmit: (email, password) => this.handleLoginSubmit(email, password),
-        onPinAuthenticated: (accessToken, refreshToken) => void this.handlePinAuthenticated(accessToken, refreshToken),
+        onPinAuthenticated: (userId) => void this.handlePinAuthenticated(userId),
       });
       return;
     }
@@ -283,7 +265,7 @@ export class App {
 
     // Attach AI Drawer Event Listeners
     if (this.aiDrawer) {
-      this.aiDrawer.attachEventListeners(this.rootElement, () => this.render());
+      this.aiDrawer.attachEventListeners(this.rootElement, this.aiDrawerCallbacks, () => this.render());
     }
   }
 }

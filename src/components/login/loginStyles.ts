@@ -22,6 +22,7 @@ export function renderLoginStylesHtml(): string {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: var(--space-4);
       animation: gl-login-rise var(--duration-page) var(--ease-out);
     }
     .gl-login-stage--narrow { max-width: 380px; }
@@ -36,7 +37,7 @@ export function renderLoginStylesHtml(): string {
       flex-direction: column;
       align-items: center;
       gap: var(--space-2);
-      margin-bottom: var(--space-8);
+      margin-bottom: var(--space-2);
     }
     .gl-login-mark {
       width: 40px;
@@ -47,7 +48,6 @@ export function renderLoginStylesHtml(): string {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 25%, transparent);
     }
     .gl-login-wordmark {
       font-family: var(--font-display);
@@ -62,6 +62,45 @@ export function renderLoginStylesHtml(): string {
       font-size: var(--text-xs);
       color: var(--muted-foreground);
       margin: 0;
+    }
+
+    .gl-login-hero {
+      width: 100%;
+      text-align: center;
+      margin-bottom: var(--space-2);
+    }
+    .gl-login-hero--compact {
+      margin-bottom: 0;
+    }
+    .gl-login-subheading {
+      max-width: 52ch;
+      margin: 0 auto;
+      font-size: var(--text-sm);
+      color: var(--muted-foreground);
+      line-height: var(--leading-body);
+    }
+    .gl-login-identity-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+    .gl-login-identity-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--card) 82%, transparent);
+      color: var(--foreground);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-medium);
+      letter-spacing: 0.02em;
+    }
+    .gl-login-identity-chip--muted {
+      color: var(--muted-foreground);
     }
 
     /* --- heading ---------------------------------------------------------- */
@@ -102,7 +141,9 @@ export function renderLoginStylesHtml(): string {
       cursor: pointer;
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
-      background: var(--card);
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, var(--primary)), var(--card));
+      box-shadow: var(--shadow-card);
       transition: transform var(--duration-micro) var(--ease-spring),
                   border-color var(--duration-micro) var(--ease-out),
                   box-shadow var(--duration-micro) var(--ease-out);
@@ -125,13 +166,11 @@ export function renderLoginStylesHtml(): string {
       justify-content: flex-start;
       text-align: left;
       gap: var(--space-4);
-      min-height: 72px;
+      min-height: max(72px, var(--touch-target-min));
       padding: var(--space-3) var(--space-4);
     }
     .gl-profile-item:hover {
-      transform: translateY(-2px);
       border-color: var(--primary);
-      box-shadow: 0 8px 24px color-mix(in srgb, var(--primary) 10%, transparent);
     }
     .gl-profile-item:active {
       transform: scale(0.98);
@@ -142,15 +181,15 @@ export function renderLoginStylesHtml(): string {
     }
     .gl-profile-item[data-selected="true"] {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--accent);
+      background: color-mix(in srgb, var(--primary) 4%, var(--card));
     }
     .gl-profile-avatar {
       width: 68px;
       height: 68px;
       flex: none;
       border-radius: var(--radius-full);
-      border: 1.5px solid var(--border);
-      background: var(--secondary);
+      border: 1.5px solid color-mix(in srgb, var(--primary) 24%, var(--border));
+      background: color-mix(in srgb, var(--secondary) 88%, var(--card));
       color: var(--secondary-foreground);
       display: flex;
       align-items: center;
@@ -166,7 +205,6 @@ export function renderLoginStylesHtml(): string {
       background: var(--primary);
       border-color: var(--primary);
       color: var(--primary-foreground);
-      transform: scale(1.06);
     }
     .gl-profile-text {
       display: flex;
@@ -273,13 +311,28 @@ export function renderLoginStylesHtml(): string {
       text-align: center;
       margin-bottom: var(--space-6);
     }
+    .gl-pin-identity-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-full);
+      background: color-mix(in srgb, var(--primary) 12%, transparent);
+      color: var(--primary);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
     .gl-pin-avatar {
       width: 76px;
       height: 76px;
       border-radius: var(--radius-full);
-      background: var(--accent);
+      background:
+        radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 55%),
+        var(--accent);
       color: var(--accent-foreground);
-      border: 2px solid color-mix(in srgb, var(--primary) 30%, transparent);
+      border: 2px solid color-mix(in srgb, var(--primary) 28%, transparent);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -304,9 +357,30 @@ export function renderLoginStylesHtml(): string {
     }
     .gl-pin-prompt {
       font-size: var(--text-sm);
-      font-weight: var(--weight-medium);
+      font-weight: var(--weight-semibold);
+      color: var(--foreground);
+      margin: 0;
+    }
+    .gl-pin-hint {
+      font-size: var(--text-xs);
       color: var(--muted-foreground);
-      margin: 0 0 var(--space-4);
+      margin: 0 0 var(--space-3);
+      text-align: center;
+    }
+    .gl-pin-banner {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-3);
+      border: 1px solid var(--border);
+      background: var(--secondary);
+      color: var(--foreground);
+      font-size: var(--text-xs);
+      line-height: var(--leading-body);
+    }
+    .gl-pin-banner--warning {
+      border-color: color-mix(in srgb, var(--warning) 40%, var(--border));
+      background: color-mix(in srgb, var(--warning) 10%, var(--card));
     }
     .gl-pin-group {
       display: flex;
@@ -320,7 +394,7 @@ export function renderLoginStylesHtml(): string {
       outline-offset: 8px;
       border-radius: var(--radius-full);
     }
-    .gl-pin-group[data-shake="true"] { animation: gl-pin-shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+    .gl-pin-group[data-shake="true"] { animation: gl-pin-shake 320ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
     @keyframes gl-pin-shake {
       10%, 90% { transform: translate3d(-1px, 0, 0); }
       20%, 80% { transform: translate3d(2px, 0, 0); }
@@ -331,8 +405,8 @@ export function renderLoginStylesHtml(): string {
       width: 14px;
       height: 14px;
       border-radius: var(--radius-full);
-      border: 2px solid var(--border);
-      background: transparent;
+      border: 2px solid color-mix(in srgb, var(--border) 82%, var(--foreground));
+      background: color-mix(in srgb, var(--card) 92%, var(--muted));
       transition: background-color var(--duration-micro) var(--ease-out),
                   border-color var(--duration-micro) var(--ease-out),
                   transform var(--duration-micro) var(--ease-spring);
@@ -340,7 +414,7 @@ export function renderLoginStylesHtml(): string {
     .gl-pin-dot.is-filled {
       background: var(--primary);
       border-color: var(--primary);
-      transform: scale(1.18);
+      transform: scale(1.12);
       box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 35%, transparent);
     }
     .gl-pin-status {
@@ -386,7 +460,8 @@ export function renderLoginStylesHtml(): string {
       min-width: 56px;
       border-radius: var(--radius-full);
       border: 1px solid var(--border);
-      background: var(--card);
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, var(--accent)), var(--card));
       color: var(--foreground);
       font-family: var(--font-display);
       font-size: var(--text-2xl);
@@ -395,7 +470,8 @@ export function renderLoginStylesHtml(): string {
       touch-action: manipulation;
       transition: background-color var(--duration-micro) var(--ease-out),
                   border-color var(--duration-micro) var(--ease-out),
-                  transform var(--duration-micro) var(--ease-out);
+                  transform var(--duration-micro) var(--ease-out),
+                  box-shadow var(--duration-micro) var(--ease-out);
     }
     .gl-pin-key:hover:not(:disabled) {
       background: var(--secondary);
@@ -403,6 +479,7 @@ export function renderLoginStylesHtml(): string {
     }
     .gl-pin-key:active:not(:disabled) {
       transform: scale(0.98);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
     }
     .gl-pin-key:disabled {
       cursor: not-allowed;
@@ -416,6 +493,7 @@ export function renderLoginStylesHtml(): string {
       color: var(--muted-foreground);
       font-size: var(--text-sm);
       font-family: var(--font-sans);
+      letter-spacing: 0.02em;
     }
     .gl-pin-key--clear {
       grid-column: 1;
@@ -484,47 +562,6 @@ export function renderLoginStylesHtml(): string {
       line-height: var(--leading-body);
     }
 
-    .gl-bootstrap-field {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-      margin-bottom: var(--space-5);
-    }
-    .gl-bootstrap-actions {
-      display: flex;
-      gap: var(--space-3);
-    }
-    .gl-bootstrap-actions .gl-btn {
-      flex: 1;
-    }
-    .gl-bootstrap-status-icon {
-      font-size: var(--text-2xl);
-      font-weight: var(--weight-bold);
-      color: var(--success);
-      margin: 0 0 var(--space-4);
-    }
-
-    .gl-bootstrap-dialog {
-      width: 100%;
-      max-width: 420px;
-      padding: var(--space-6);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--border);
-      background: var(--card);
-      box-shadow: 0 16px 40px color-mix(in srgb, var(--foreground) 10%, transparent);
-    }
-    .gl-bootstrap-title {
-      font-size: var(--text-lg);
-      font-weight: var(--weight-bold);
-      margin: 0 0 var(--space-2);
-    }
-    .gl-bootstrap-desc {
-      font-size: var(--text-xs);
-      color: var(--muted-foreground);
-      margin: 0 0 var(--space-5);
-      line-height: var(--leading-body);
-    }
-
     /* --- responsive ------------------------------------------------------- */
     @media (max-width: 640px) {
       .gl-login-screen {
@@ -533,19 +570,23 @@ export function renderLoginStylesHtml(): string {
       }
       .gl-login-brand { margin-bottom: var(--space-6); }
       .gl-login-heading { font-size: var(--text-2xl); margin-bottom: var(--space-6); }
+      .gl-login-subheading { font-size: var(--text-xs); }
       .gl-login-profiles {
         grid-template-columns: minmax(0, 1fr);
         gap: var(--space-3);
+      }
+      .gl-profile-item {
+        width: 100%;
       }
       .gl-profile-item--card {
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
         text-align: left;
-        min-height: 72px;
+        min-height: max(72px, var(--touch-target-min));
         padding: var(--space-3) var(--space-4);
       }
-      .gl-profile-avatar { width: 50px; height: 50px; font-size: var(--text-base); }
+      .gl-profile-avatar { width: 52px; height: 52px; font-size: var(--text-base); }
       .gl-profile-text { flex: 1; align-items: flex-start; }
       .gl-profile-role { align-self: flex-start; }
       .gl-profile-chevron { display: block; }
