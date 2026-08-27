@@ -26,7 +26,7 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
       const html = new LoginPage(stubSupabase()).renderHtml();
       expect(html).toContain("Grace Ledger");
       expect(html).toContain("วันนี้ใครเข้าใช้งาน?");
-      expect(html).toContain("กำลังโหลดรายชื่อ");
+      expect(html).toContain("กำลังโหลด");
       expect(html).not.toContain('id="login-email"');
       expect(html).not.toContain('id="login-password"');
       expect(html).not.toContain('id="login-use-email"');
@@ -64,8 +64,8 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
 
     it("states plainly when no one is registered yet", () => {
       const html = renderProfileSelectHtml([], null, "empty");
-      expect(html).toContain("ยังไม่มีผู้ใช้งาน");
-      expect(html).not.toContain('id="login-profile-grid"');
+      expect(html).toContain("ยังไม่มีผู้ใช้งานในระบบ");
+      expect(html).not.toContain('id="login-profile-list"');
     });
   });
 
