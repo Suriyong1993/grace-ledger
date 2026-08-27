@@ -74,6 +74,29 @@ No fake data, no placeholder identity in a production path, no hardcoded financi
 
 ## Workflow
 
+### วิธีทำงานที่แนะนำ (ใช้ commands ที่สร้างไว้)
+
+สำหรับ feature ให่ม ใช้ workflow นี้:
+
+```
+1. /gl-spec     → ถามว่าจะสร้างอะไร → เขียน spec
+2. /gl-plan     → แบ่งเป็น tasks (P0-P3)
+3. /gl-build    → เขียนโค้ดทีละ task พร้อม test
+4. /gl-test     → รัน npm test + build + ตรวจ financial/UI
+5. /gl-review   → ตรวจ 5 Quality Gates
+6. /gl-ship     → commit + push + PR
+```
+
+### Agents ที่ใช้ร่วม
+
+| Agent | เมื่อไหร่ |
+|---|---|
+| `financial-reviewer` | หลังเขียน RPC/transaction logic ที่มีการเงิน |
+| `ui-reviewer` | หลังเขียน component ใหม่ |
+| `thai-writer` | หลังเขียน UI copy ภาษาไทย |
+
+### กฎทั่วไป
+
 1. Read the existing implementation before changing it. Reuse before adding.
 2. Smallest safe change per step.
 3. `npm test` + `npm run build` after each step.
