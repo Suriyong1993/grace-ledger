@@ -250,7 +250,7 @@ export class DashboardPage {
                 <div aria-hidden="true" style="
                   width: 36px;
                   height: 36px;
-                  border-radius: 11px;
+                  border-radius: var(--radius-md);
                   background: ${bgVar};
                   color: ${colorVar};
                   display: grid;
@@ -269,7 +269,7 @@ export class DashboardPage {
                   <div class="num-display" style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: ${
                     isIncome ? "var(--income)" : isExpense ? "var(--expense)" : "var(--foreground)"
                   };">${amountPrefix}${item.amount.format()}</div>
-                  <span class="gl-badge gl-badge--${item.status}" style="font-size: 10px; padding: 0 6px; margin-top: 2px;">
+                  <span class="gl-badge gl-badge--${item.status}" style="font-size: var(--text-2xs); padding: 0 var(--space-2); margin-top: 2px;">
                     ${item.status === "approved" ? "อนุมัติแล้ว" : item.status === "rejected" ? "ไม่อนุมัติ" : "รอตรวจสอบ"}
                   </span>
                 </div>
@@ -347,10 +347,10 @@ export class DashboardPage {
             min-height: 76px;
             justify-content: center;
             text-decoration: none;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-sm-card);
           ">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-            <span style="font-size: 11.5px; font-weight: 600; text-align: center; line-height: 1.2;">บันทึก<br>เงินถวาย</span>
+            <span style="font-size: var(--text-2xs); font-weight: var(--weight-semibold); text-align: center; line-height: 1.2;">บันทึก<br>เงินถวาย</span>
           </a>
 
           <a href="#/transactions" class="gl-quick-action gl-quick-action--muted" style="
@@ -368,7 +368,7 @@ export class DashboardPage {
             text-decoration: none;
           ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>
-            <span style="font-size: 11.5px; font-weight: 500; text-align: center; line-height: 1.2;">บันทึก<br>รายจ่าย</span>
+            <span style="font-size: var(--text-2xs); font-weight: var(--weight-medium); text-align: center; line-height: 1.2;">บันทึก<br>รายจ่าย</span>
           </a>
 
           <a href="#/funds" class="gl-quick-action gl-quick-action--muted" style="
@@ -386,7 +386,7 @@ export class DashboardPage {
             text-decoration: none;
           ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>
-            <span style="font-size: 11.5px; font-weight: 500; text-align: center; line-height: 1.2;">โอนเงิน<br>กองทุน</span>
+            <span style="font-size: var(--text-2xs); font-weight: var(--weight-medium); text-align: center; line-height: 1.2;">โอนเงิน<br>กองทุน</span>
           </a>
 
           <a href="#/transactions" class="gl-quick-action gl-quick-action--muted" style="
@@ -404,7 +404,7 @@ export class DashboardPage {
             text-decoration: none;
           ">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-            <span style="font-size: 11.5px; font-weight: 500; text-align: center; line-height: 1.2;">รายการ<br>ทั้งหมด</span>
+            <span style="font-size: var(--text-2xs); font-weight: var(--weight-medium); text-align: center; line-height: 1.2;">รายการ<br>ทั้งหมด</span>
           </a>
         </div>
       </section>
@@ -431,7 +431,7 @@ export class DashboardPage {
             <div aria-hidden="true" style="
               width: 36px;
               height: 36px;
-              border-radius: 11px;
+              border-radius: var(--radius-md);
               background: ${hasPending ? "var(--pending-muted)" : "var(--secondary)"};
               color: ${hasPending ? "var(--on-pending-muted)" : "var(--muted-foreground)"};
               display: grid;
@@ -463,7 +463,7 @@ export class DashboardPage {
             <div aria-hidden="true" style="
               width: 36px;
               height: 36px;
-              border-radius: 11px;
+              border-radius: var(--radius-md);
               background: var(--income-muted);
               color: var(--income);
               display: grid;
@@ -498,7 +498,7 @@ export class DashboardPage {
         <div class="gl-section__head">
           <div>
             <h2 style="display: inline-block; margin-right: 8px;">สถิติการเงินย้อนหลัง 2569</h2>
-            <span class="gl-badge gl-badge--pending" style="font-size: 10px;">ม.ค. – ก.ค. (ก่อนเริ่มระบบ)</span>
+            <span class="gl-badge gl-badge--pending" style="font-size: var(--text-2xs);">ม.ค. – ก.ค.</span>
           </div>
           <a href="#/reports" style="font-size: var(--text-xs); color: var(--primary); font-weight: var(--weight-semibold); text-decoration: none;">ดูรายงานเต็ม</a>
         </div>
@@ -511,29 +511,28 @@ export class DashboardPage {
                 const expHeight = Math.max(12, Math.min(80, Math.round((t.expenseSatang / maxVal) * 80)));
 
                 return `
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1);">
                   <div style="display: flex; align-items: flex-end; gap: 3px; height: 80px; width: 100%; justify-content: center;">
                     <div title="รายรับ: ${t.income}" style="width: 10px; height: ${incHeight}px; background: var(--income); border-radius: 2px 2px 0 0;"></div>
-                    <div title="รายจ่าย: ${t.expense}" style="width: 10px; height: ${expHeight}px; background: var(--expense); border-radius: 2px 2px 0 0; opacity: 0.85;"></div>
+                    <div title="รายจ่าย: ${t.expense}" style="width: 10px; height: ${expHeight}px; background: repeating-linear-gradient(135deg, var(--expense), var(--expense) 2px, color-mix(in srgb, var(--expense) 60%, transparent) 2px, color-mix(in srgb, var(--expense) 60%, transparent) 4px); border-radius: 2px 2px 0 0;"></div>
                   </div>
-                  <span style="font-size: 10px; font-weight: var(--weight-semibold); color: var(--foreground);">${t.monthName}</span>
-                  <span style="font-size: 9px; font-weight: var(--weight-bold); color: ${t.isPositive ? "var(--income)" : "var(--expense)"};">
+                  <span style="font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--foreground);">${t.monthName}</span>
+                  <span style="font-size: var(--text-2xs); font-weight: var(--weight-bold); color: ${t.isPositive ? "var(--income)" : "var(--expense)"};">
                     ${t.net}
                   </span>
                 </div>`;
               })
               .join("")}
           </div>
-          <div style="display: flex; justify-content: center; gap: var(--space-4); margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); font-size: 11px; color: var(--muted-foreground);">
-            <div style="display: flex; align-items: center; gap: 4px;">
+          <div style="display: flex; justify-content: center; gap: var(--space-4); margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); font-size: var(--text-2xs); color: var(--muted-foreground);">
+            <div style="display: flex; align-items: center; gap: var(--space-1);">
               <span style="display: inline-block; width: 8px; height: 8px; background: var(--income); border-radius: 2px;"></span>
               <span>รายรับ</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="display: inline-block; width: 8px; height: 8px; background: var(--expense); border-radius: 2px;"></span>
+            <div style="display: flex; align-items: center; gap: var(--space-1);">
+              <span style="display: inline-block; width: 8px; height: 8px; background: repeating-linear-gradient(135deg, var(--expense), var(--expense) 2px, color-mix(in srgb, var(--expense) 60%, transparent) 2px, color-mix(in srgb, var(--expense) 60%, transparent) 4px); border-radius: 2px;"></span>
               <span>รายจ่าย</span>
             </div>
-            <span style="color: var(--muted-foreground);">· ข้อมูลสรุปย้อนหลัง</span>
           </div>
         </div>
       </section>`
