@@ -78,8 +78,8 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
         gap: 6px;
         color: var(--muted-foreground);
         text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
+        font-size: var(--text-sm);
+        font-weight: var(--weight-medium);
       ">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         <span>กลับไปหน้ารายการ</span>
@@ -90,13 +90,13 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
       <div>
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-          <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); font-size: 12px; font-weight: 700;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); font-size: var(--text-xs); font-weight: var(--weight-bold);">
             1
           </span>
-          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary);">ขั้นตอนที่ 1 / 2: บันทึกข้อมูลและจัดสรรยอด
+          <span style="font-size: var(--text-xs); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary);">ขั้นตอนที่ 1 / 2: บันทึกข้อมูลและจัดสรรยอด
           </span>
         </div>
-        <h1 style="font-size: 24px; font-weight: 800; color: var(--foreground); margin: 0; letter-spacing: -0.02em;">บันทึกยอดเงินถวายวันอาทิตย์
+        <h1 style="font-size: 24px; font-weight: var(--weight-bold); color: var(--foreground); margin: 0; letter-spacing: -0.02em;">บันทึกยอดเงินถวายวันอาทิตย์
         </h1>
       </div>
 
@@ -105,11 +105,11 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
     <!-- Validation Errors Banner if any -->
     ${validationErrors.length > 0 ? `
       <div style="background: var(--expense-muted); border: 1px solid var(--expense); border-radius: var(--radius-md, 10px); padding: 14px 18px; margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 8px; color: var(--expense); font-weight: 700; font-size: 13.5px; margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--expense); font-weight: var(--weight-bold); font-size: 13.5px; margin-bottom: 6px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <span>กรุณาตรวจสอบข้อมูลก่อนดำเนินการ</span>
         </div>
-        <ul style="margin: 0; padding-left: 20px; color: var(--on-expense-muted); font-size: 13px; line-height: 1.5;">
+        <ul style="margin: 0; padding-left: 20px; color: var(--on-expense-muted); font-size: var(--text-sm); line-height: 1.5;">
           ${validationErrors.map((err) => `<li>${err}</li>`).join("")}
         </ul>
       </div>
@@ -119,14 +119,14 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
     <form id="offering-entry-form" onsubmit="return false;">
       <!-- Card 1: Service Details -->
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg, 12px); padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-        <h3 style="font-size: 15px; font-weight: 700; color: var(--foreground); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+        <h3 style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--foreground); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>ข้อมูลรอบนมัสการ</span>
         </h3>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
           <div>
-            <label for="input-service-date" style="display: block; font-size: 13px; font-weight: 600; color: var(--foreground); margin-bottom: 6px;">วันที่นมัสการ <span style="color: var(--destructive);">*</span>
+            <label for="input-service-date" style="display: block; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--foreground); margin-bottom: 6px;">วันที่นมัสการ <span style="color: var(--destructive);">*</span>
             </label>
             <input
               type="date"
@@ -147,7 +147,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
           </div>
 
           <div>
-            <label for="input-service-name" style="display: block; font-size: 13px; font-weight: 600; color: var(--foreground); margin-bottom: 6px;">ชื่อรอบการนมัสการ <span style="color: var(--destructive);">*</span>
+            <label for="input-service-name" style="display: block; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--foreground); margin-bottom: 6px;">ชื่อรอบการนมัสการ <span style="color: var(--destructive);">*</span>
             </label>
             <select
               id="input-service-name"
@@ -176,7 +176,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg, 12px); padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
         <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
           <div>
-            <h3 style="font-size: 15px; font-weight: 700; color: var(--foreground); margin: 0 0 2px 0; display: flex; align-items: center; gap: 8px;">
+            <h3 style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--foreground); margin: 0 0 2px 0; display: flex; align-items: center; gap: 8px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
               <span>1. ยอดรวมตามช่องทาง</span>
             </h3>
@@ -185,8 +185,8 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
           </div>
 
           <div style="text-align: right;">
-            <span style="font-size: 12px; color: var(--muted-foreground);">ยอดรวมที่คาดหวังทั้งหมด: </span>
-            <span class="num-display" style="font-size: 16px; font-weight: 800; color: var(--primary); margin-left: 4px;">
+            <span style="font-size: var(--text-xs); color: var(--muted-foreground);">ยอดรวมที่คาดหวังทั้งหมด: </span>
+            <span class="num-display" style="font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--primary); margin-left: 4px;">
               ${grandExpected.format()}
             </span>
           </div>
@@ -196,14 +196,14 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
           <!-- Cash Expected -->
           <div style="background: var(--gl-stone-50); border: 1px solid var(--border); border-radius: var(--radius-md, 10px); padding: 16px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-              <span style="font-size: 13px; font-weight: 700; color: var(--foreground); display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--foreground); display: flex; align-items: center; gap: 6px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--income);"></span>เงินสด
               </span>
-              <span style="font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: var(--income-muted); color: var(--on-income-muted);">ส่งตรวจนับ
+              <span style="font-size: var(--text-2xs); font-weight: var(--weight-semibold); padding: 1px 6px; border-radius: 4px; background: var(--income-muted); color: var(--on-income-muted);">ส่งตรวจนับ
               </span>
             </div>
             <div style="position: relative;">
-              <span style="position: absolute; left: 12px; top: 10px; font-weight: 700; color: var(--muted-foreground); font-size: 14px;">฿</span>
+              <span style="position: absolute; left: 12px; top: 10px; font-weight: var(--weight-bold); color: var(--muted-foreground); font-size: 14px;">฿</span>
               <input
                 type="number"
                 step="0.01"
@@ -219,8 +219,8 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                   border: 1px solid var(--border);
                   border-radius: var(--radius-sm, 8px);
                   background: var(--gl-white);
-                  font-size: 15px;
-                  font-weight: 700;
+                  font-size: var(--text-base);
+                  font-weight: var(--weight-bold);
                   color: var(--foreground);
                   text-align: right;
                 "
@@ -228,7 +228,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
             </div>
             <div style="font-size: 11.5px; color: var(--muted-foreground); margin-top: 6px; display: flex; justify-content: space-between;">
               <span>จัดสรรแล้ว:</span>
-              <span class="num-display" style="font-weight: 600; color: ${allocCash.isZero() ? 'var(--muted-foreground)' : isCashMatch ? 'var(--income)' : 'var(--pending)'};">
+              <span class="num-display" style="font-weight: var(--weight-semibold); color: ${allocCash.isZero() ? 'var(--muted-foreground)' : isCashMatch ? 'var(--income)' : 'var(--pending)'};">
                 ${allocCash.format()}${allocCash.isZero() ? '' : !isCashMatch ? ` · ต่าง ${diffCash.format()}` : ''}
               </span>
             </div>
@@ -237,14 +237,14 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
           <!-- Transfer Expected -->
           <div style="background: var(--gl-stone-50); border: 1px solid var(--border); border-radius: var(--radius-md, 10px); padding: 16px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-              <span style="font-size: 13px; font-weight: 700; color: var(--foreground); display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--foreground); display: flex; align-items: center; gap: 6px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--info);"></span>เงินโอน
               </span>
-              <span style="font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: var(--secondary); color: var(--on-info-muted);">เข้าธนาคาร
+              <span style="font-size: var(--text-2xs); font-weight: var(--weight-semibold); padding: 1px 6px; border-radius: 4px; background: var(--secondary); color: var(--on-info-muted);">เข้าธนาคาร
               </span>
             </div>
             <div style="position: relative;">
-              <span style="position: absolute; left: 12px; top: 10px; font-weight: 700; color: var(--muted-foreground); font-size: 14px;">฿</span>
+              <span style="position: absolute; left: 12px; top: 10px; font-weight: var(--weight-bold); color: var(--muted-foreground); font-size: 14px;">฿</span>
               <input
                 type="number"
                 step="0.01"
@@ -260,8 +260,8 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                   border: 1px solid var(--border);
                   border-radius: var(--radius-sm, 8px);
                   background: var(--gl-white);
-                  font-size: 15px;
-                  font-weight: 700;
+                  font-size: var(--text-base);
+                  font-weight: var(--weight-bold);
                   color: var(--foreground);
                   text-align: right;
                 "
@@ -269,7 +269,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
             </div>
             <div style="font-size: 11.5px; color: var(--muted-foreground); margin-top: 6px; display: flex; justify-content: space-between;">
               <span>จัดสรรแล้ว:</span>
-              <span class="num-display" style="font-weight: 600; color: ${allocTransfer.isZero() ? 'var(--muted-foreground)' : isTransferMatch ? 'var(--income)' : 'var(--pending)'};">
+              <span class="num-display" style="font-weight: var(--weight-semibold); color: ${allocTransfer.isZero() ? 'var(--muted-foreground)' : isTransferMatch ? 'var(--income)' : 'var(--pending)'};">
                 ${allocTransfer.format()}${allocTransfer.isZero() ? '' : !isTransferMatch ? ` · ต่าง ${diffTransfer.format()}` : ''}
               </span>
             </div>
@@ -278,14 +278,14 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
           <!-- QR Expected -->
           <div style="background: var(--gl-stone-50); border: 1px solid var(--border); border-radius: var(--radius-md, 10px); padding: 16px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-              <span style="font-size: 13px; font-weight: 700; color: var(--foreground); display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--foreground); display: flex; align-items: center; gap: 6px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--pending);"></span>พร้อมเพย์ / QR Code
               </span>
-              <span style="font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; background: var(--pending-muted); color: var(--on-pending-muted);">เข้าธนาคาร
+              <span style="font-size: var(--text-2xs); font-weight: var(--weight-semibold); padding: 1px 6px; border-radius: 4px; background: var(--pending-muted); color: var(--on-pending-muted);">เข้าธนาคาร
               </span>
             </div>
             <div style="position: relative;">
-              <span style="position: absolute; left: 12px; top: 10px; font-weight: 700; color: var(--muted-foreground); font-size: 14px;">฿</span>
+              <span style="position: absolute; left: 12px; top: 10px; font-weight: var(--weight-bold); color: var(--muted-foreground); font-size: 14px;">฿</span>
               <input
                 type="number"
                 step="0.01"
@@ -301,8 +301,8 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                   border: 1px solid var(--border);
                   border-radius: var(--radius-sm, 8px);
                   background: var(--gl-white);
-                  font-size: 15px;
-                  font-weight: 700;
+                  font-size: var(--text-base);
+                  font-weight: var(--weight-bold);
                   color: var(--foreground);
                   text-align: right;
                 "
@@ -310,7 +310,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
             </div>
             <div style="font-size: 11.5px; color: var(--muted-foreground); margin-top: 6px; display: flex; justify-content: space-between;">
               <span>จัดสรรแล้ว:</span>
-              <span class="num-display" style="font-weight: 600; color: ${allocQr.isZero() ? 'var(--muted-foreground)' : isQrMatch ? 'var(--income)' : 'var(--pending)'};">
+              <span class="num-display" style="font-weight: var(--weight-semibold); color: ${allocQr.isZero() ? 'var(--muted-foreground)' : isQrMatch ? 'var(--income)' : 'var(--pending)'};">
                 ${allocQr.format()}${allocQr.isZero() ? '' : !isQrMatch ? ` · ต่าง ${diffQr.format()}` : ''}
               </span>
             </div>
@@ -322,7 +322,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg, 12px); padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
           <div>
-            <h3 style="font-size: 15px; font-weight: 700; color: var(--foreground); margin: 0 0 2px 0; display: flex; align-items: center; gap: 8px;">
+            <h3 style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--foreground); margin: 0 0 2px 0; display: flex; align-items: center; gap: 8px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
               <span>2. จัดสรรเข้ากองทุน</span>
             </h3>
@@ -342,8 +342,8 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
               border: 1px solid var(--border);
               background: var(--gl-white);
               color: var(--foreground);
-              font-size: 13px;
-              font-weight: 600;
+              font-size: var(--text-sm);
+              font-weight: var(--weight-semibold);
               cursor: pointer;
               transition: all 150ms ease;
             "
@@ -369,7 +369,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
             ">
               <!-- Fund Selector -->
               <div>
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 3px;">กองทุน
+                <label style="display: block; font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--muted-foreground); margin-bottom: 3px;">กองทุน
                 </label>
                 <select
                   class="select-row-fund"
@@ -380,7 +380,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                     border: 1px solid var(--border);
                     border-radius: 6px;
                     background: var(--card);
-                    font-size: 13px;
+                    font-size: var(--text-sm);
                     color: var(--foreground);
                   "
                 >
@@ -394,7 +394,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
 
               <!-- Channel Selector -->
               <div>
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 3px;">ช่องทาง
+                <label style="display: block; font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--muted-foreground); margin-bottom: 3px;">ช่องทาง
                 </label>
                 <select
                   class="select-row-channel"
@@ -405,7 +405,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                     border: 1px solid var(--border);
                     border-radius: 6px;
                     background: var(--card);
-                    font-size: 13px;
+                    font-size: var(--text-sm);
                     color: var(--foreground);
                   "
                 >
@@ -417,7 +417,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
 
               <!-- Amount Input -->
               <div>
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 3px;">จำนวนเงิน (บาท)
+                <label style="display: block; font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--muted-foreground); margin-bottom: 3px;">จำนวนเงิน (บาท)
                 </label>
                 <input
                   type="number"
@@ -434,7 +434,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                     border-radius: 6px;
                     background: var(--card);
                     font-size: 13.5px;
-                    font-weight: 700;
+                    font-weight: var(--weight-bold);
                     text-align: right;
                     color: var(--foreground);
                   "
@@ -443,7 +443,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
 
               <!-- Notes / Donor Name -->
               <div>
-                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 3px;">ผู้ถวาย / หมายเหตุ
+                <label style="display: block; font-size: var(--text-2xs); font-weight: var(--weight-semibold); color: var(--muted-foreground); margin-bottom: 3px;">ผู้ถวาย / หมายเหตุ
                 </label>
                 <input
                   type="text"
@@ -512,7 +512,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
 
       <!-- Card 4: Session Notes (Optional) -->
       <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg, 12px); padding: 20px 24px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-        <label for="input-session-notes" style="display: block; font-size: 13px; font-weight: 600; color: var(--foreground); margin-bottom: 6px;">หมายเหตุเพิ่มเติม
+        <label for="input-session-notes" style="display: block; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--foreground); margin-bottom: 6px;">หมายเหตุเพิ่มเติม
         </label>
         <textarea
           id="input-session-notes"
@@ -525,7 +525,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
             border: 1px solid var(--border);
             border-radius: var(--radius-sm, 8px);
             background: var(--gl-white);
-            font-size: 13px;
+            font-size: var(--text-sm);
             color: var(--foreground);
             font-family: inherit;
             resize: vertical;
@@ -542,7 +542,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
           background: var(--card);
           color: var(--foreground);
           font-size: 14px;
-          font-weight: 600;
+          font-weight: var(--weight-semibold);
           text-decoration: none;
         ">ยกเลิก
         </a>
@@ -560,7 +560,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
             background: var(--primary);
             color: var(--primary-foreground);
             font-size: 14px;
-            font-weight: 700;
+            font-weight: var(--weight-bold);
             cursor: pointer;
             box-shadow: 0 1px 3px rgba(249, 115, 22, 0.3);
             transition: opacity 150ms ease;

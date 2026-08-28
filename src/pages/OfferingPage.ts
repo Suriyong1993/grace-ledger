@@ -282,7 +282,7 @@ export class OfferingPage {
     if (this.isLoading && this.funds.length === 0) {
       return `
       <div class="gl-fade-in" style="padding: 48px; text-align: center; color: var(--muted-foreground);">
-        <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px;">กำลังโหลดระบบเงินถวาย...</div>
+        <div style="font-size: var(--text-base); font-weight: var(--weight-semibold); margin-bottom: 6px;">กำลังโหลดระบบเงินถวาย...</div>
         
       </div>
       `;
@@ -291,11 +291,11 @@ export class OfferingPage {
     // Success Notification Banner
     const successBannerHtml = this.successMessage ? `
       <div style="background: var(--income-muted); border: 1px solid var(--approved); border-radius: 10px; padding: 14px 20px; margin: 20px auto 0; max-width: 960px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px; color: var(--on-income-muted); font-weight: 600; font-size: 13.5px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--on-income-muted); font-weight: var(--weight-semibold); font-size: 13.5px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           <span>${this.successMessage}</span>
         </div>
-        <button id="btn-dismiss-toast" style="background: none; border: none; color: var(--on-income-muted); cursor: pointer; font-size: 16px; padding: 2px;">✕</button>
+        <button id="btn-dismiss-toast" style="background: none; border: none; color: var(--on-income-muted); cursor: pointer; font-size: var(--text-md); padding: 2px;">✕</button>
       </div>
     ` : "";
 

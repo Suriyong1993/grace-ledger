@@ -140,18 +140,18 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
   <div class="gl-fade-in" style="max-width: 960px; margin: 0 auto; padding: 24px 16px;">
     <!-- Breadcrumb & Back -->
     <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-      <a href="#/offerings" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--muted-foreground); text-decoration: none;">
+      <a href="#/offerings" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: var(--weight-semibold); color: var(--muted-foreground); text-decoration: none;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
         <span>กลับหน้ารายการเงินถวาย</span>
       </a>
 
       <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 12px; color: var(--muted-foreground);">สถานะปัจจุบัน:</span>
+        <span style="font-size: var(--text-xs); color: var(--muted-foreground);">สถานะปัจจุบัน:</span>
         <span style="
           padding: 4px 10px;
           border-radius: 9999px;
-          font-size: 12px;
-          font-weight: 700;
+          font-size: var(--text-xs);
+          font-weight: var(--weight-bold);
           ${
             isPosted ? 'background: var(--secondary); color: var(--on-info-muted); border: 1px solid var(--border);' :
             isConfirmed ? 'background: var(--income-muted); color: var(--on-income-muted); border: 1px solid var(--approved);' :
@@ -183,10 +183,10 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
         <div>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px;">
+            <span style="background: var(--primary-light); color: var(--primary); font-size: var(--text-xs); font-weight: var(--weight-bold); padding: 2px 8px; border-radius: 6px;">
               ${isPosted ? 'ลงบัญชีแล้ว' : isConfirmed ? 'พร้อมลงบัญชี' : 'ผลต่างเงินสด'}
             </span>
-            <h1 style="font-size: 20px; font-weight: 800; color: var(--foreground); margin: 0;">
+            <h1 style="font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--foreground); margin: 0;">
               ${isPosted ? 'บันทึกเข้าสมุดบัญชีแยกประเภทสมบูรณ์แล้ว' : isConfirmed ? 'บันทึกเข้าสมุดบัญชีแยกประเภท' : 'จัดการและรับทราบผลต่างเงินสด'}
             </h1>
           </div>
@@ -204,8 +204,8 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
           border: 1px solid var(--border);
           background: var(--card);
           color: var(--foreground);
-          font-size: 13px;
-          font-weight: 600;
+          font-size: var(--text-sm);
+          font-weight: var(--weight-semibold);
           text-decoration: none;
         ">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
@@ -218,7 +218,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
     ${errorMessage ? `
       <div style="background: var(--expense-muted); border: 1px solid var(--expense); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--on-expense-muted); font-size: 13.5px;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span style="font-weight: 600;">${errorMessage}</span>
+        <span style="font-weight: var(--weight-semibold);">${errorMessage}</span>
       </div>
     ` : ""}
 
@@ -249,12 +249,12 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
         padding: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       ">
-        <div style="font-size: 12px; font-weight: 700; color: var(--muted-foreground); text-transform: uppercase; margin-bottom: 6px;">ยอดเงินสดคาดหวัง
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--muted-foreground); text-transform: uppercase; margin-bottom: 6px;">ยอดเงินสดคาดหวัง
         </div>
-        <div class="num-display" style="font-size: 26px; font-weight: 800; color: var(--foreground);">
+        <div class="num-display" style="font-size: var(--text-3xl); font-weight: var(--weight-bold); color: var(--foreground);">
           ${expectedCash.format()}
         </div>
-        <div style="font-size: 12px; color: var(--muted-foreground); margin-top: 4px;">ยอดรวมจากซองถวายและตู้บริจาค
+        <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 4px;">ยอดรวมจากซองถวายและตู้บริจาค
         </div>
       </div>
 
@@ -266,12 +266,12 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
         padding: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       ">
-        <div style="font-size: 12px; font-weight: 700; color: var(--muted-foreground); text-transform: uppercase; margin-bottom: 6px;">ยอดเงินสดนับได้จริง
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); color: var(--muted-foreground); text-transform: uppercase; margin-bottom: 6px;">ยอดเงินสดนับได้จริง
         </div>
-        <div class="num-display" style="font-size: 26px; font-weight: 800; color: ${hasCount ? "var(--info)" : "var(--muted-foreground)"};">
+        <div class="num-display" style="font-size: var(--text-3xl); font-weight: var(--weight-bold); color: ${hasCount ? "var(--info)" : "var(--muted-foreground)"};">
           ${hasCount ? countedCash.format() : "—"}
         </div>
-        <div style="font-size: 12px; color: var(--muted-foreground); margin-top: 4px;">
+        <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 4px;">
           ${hasCount ? "ยอดรวมธนบัตร + เหรียญที่ตรวจนับจริง" : "ยังไม่มีผลการตรวจนับเงินสด"}
         </div>
       </div>
@@ -280,8 +280,8 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
       ${varianceAmount === null ? `
       <div class="gl-card">
         <div class="kicker" style="margin-bottom: 6px;">ผลต่างเงินสด</div>
-        <div class="num-display" style="font-size: 26px; font-weight: var(--weight-bold); color: var(--muted-foreground);">—</div>
-        <div style="font-size: 12px; color: var(--muted-foreground); margin-top: 4px;">
+        <div class="num-display" style="font-size: var(--text-3xl); font-weight: var(--weight-bold); color: var(--muted-foreground);">—</div>
+        <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 4px;">
           ยังไม่มีผลการตรวจนับเงินสด
         </div>
       </div>
@@ -293,17 +293,17 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
         padding: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       ">
-        <div style="font-size: 12px; font-weight: 700; color: ${isMatch ? 'var(--on-income-muted)' : isShortage ? 'var(--on-expense-muted)' : 'var(--on-pending-muted)'}; text-transform: uppercase; margin-bottom: 6px;">
+        <div style="font-size: var(--text-xs); font-weight: var(--weight-bold); color: ${isMatch ? 'var(--on-income-muted)' : isShortage ? 'var(--on-expense-muted)' : 'var(--on-pending-muted)'}; text-transform: uppercase; margin-bottom: 6px;">
           ${isMatch ? 'ผลต่างเงินสด' : isShortage ? 'ผลต่างเงินสดขาด' : 'ผลต่างเงินสดเกิน'}
         </div>
         <div class="num-display" style="
-          font-size: 26px;
-          font-weight: 900;
+          font-size: var(--text-3xl);
+          font-weight: var(--weight-bold);
           color: ${isMatch ? 'var(--on-income-muted)' : isShortage ? 'var(--expense)' : 'var(--on-pending-muted)'};
         ">
           ${varianceAmount.format({ showSign: true })}
         </div>
-        <div style="font-size: 12px; color: ${isMatch ? 'var(--on-income-muted)' : isShortage ? 'var(--on-expense-muted)' : 'var(--on-pending-muted)'}; margin-top: 4px; font-weight: 600;">
+        <div style="font-size: var(--text-xs); color: ${isMatch ? 'var(--on-income-muted)' : isShortage ? 'var(--on-expense-muted)' : 'var(--on-pending-muted)'}; margin-top: 4px; font-weight: var(--weight-semibold);">
           ${isMatch ? '✓ ยอดตรวจนับตรงกันสมบูรณ์' : isShortage ? ' เงินสดขาดจากยอดบันทึก' : ' เงินสดเกินจากยอดบันทึก'}
         </div>
       </div>
@@ -322,9 +322,9 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
       ">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
           <div>
-            <h2 style="font-size: 16px; font-weight: 800; color: var(--foreground); margin: 0 0 4px 0;">ระบุคำชี้แจงผลต่าง หรือสั่งตรวจนับใหม่
+            <h2 style="font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--foreground); margin: 0 0 4px 0;">ระบุคำชี้แจงผลต่าง หรือสั่งตรวจนับใหม่
             </h2>
-            <p style="font-size: 13px; color: var(--muted-foreground); margin: 0;">ตามระเบียบการเงิน หากยอดตรวจนับไม่ตรง ต้องระบุคำชี้แจง (≥ 5 ตัวอักษร) หรือทำการนับใหม่เพื่อความโปร่งใส
+            <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0;">ตามระเบียบการเงิน หากยอดตรวจนับไม่ตรง ต้องระบุคำชี้แจง (≥ 5 ตัวอักษร) หรือทำการนับใหม่เพื่อความโปร่งใส
             </p>
           </div>
 
@@ -341,8 +341,8 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
                 border: 1px solid var(--primary);
                 background: var(--accent);
                 color: var(--accent-foreground);
-                font-size: 13px;
-                font-weight: 700;
+                font-size: var(--text-sm);
+                font-weight: var(--weight-bold);
                 cursor: ${isSubmitting ? 'not-allowed' : 'pointer'};
               "
               ${isSubmitting ? "disabled" : ""}
@@ -355,7 +355,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
 
         <!-- Explanation Form -->
         <div style="margin-top: 16px;">
-          <label style="display: block; font-size: 13.5px; font-weight: 700; color: var(--foreground); margin-bottom: 6px;">คำอธิบายสาเหตุผลต่าง <span style="color: var(--expense);">*</span>
+          <label style="display: block; font-size: 13.5px; font-weight: var(--weight-bold); color: var(--foreground); margin-bottom: 6px;">คำอธิบายสาเหตุผลต่าง <span style="color: var(--expense);">*</span>
           </label>
           <textarea
             id="input-variance-explanation"
@@ -376,8 +376,8 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
             ${isLocked ? "disabled" : ""}
           >${explanation || session.varianceReason || ""}</textarea>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px;">
-            <div id="label-char-counter" style="color: ${explanationLength < 5 ? 'var(--expense)' : 'var(--income)'}; font-weight: 600;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: var(--text-xs);">
+            <div id="label-char-counter" style="color: ${explanationLength < 5 ? 'var(--expense)' : 'var(--income)'}; font-weight: var(--weight-semibold);">
               ${explanationLength < 5 ? ` กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${explanationLength}/5)` : `✓ ความยาวคำชี้แจงถูกต้อง (${explanationLength} ตัวอักษร)`}
             </div>
 
@@ -394,8 +394,8 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
                   border: none;
                   background: ${!isExplanationValid || isSubmitting ? 'var(--muted-foreground)' : 'var(--info)'};
                   color: var(--info-foreground);
-                  font-size: 13px;
-                  font-weight: 700;
+                  font-size: var(--text-sm);
+                  font-weight: var(--weight-bold);
                   cursor: ${!isExplanationValid || isSubmitting ? 'not-allowed' : 'pointer'};
                 "
                 ${!isExplanationValid || isSubmitting ? "disabled" : ""}
@@ -424,13 +424,13 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
         align-items: center;
         gap: 14px;
       ">
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--income); color: var(--income-foreground); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--income); color: var(--income-foreground); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg); font-weight: var(--weight-bold); flex-shrink: 0;">
           ✓
         </div>
         <div>
-          <div style="font-size: 15px; font-weight: 800; color: var(--on-income-muted);">ยอดตรวจนับเงินสดตรงกับยอดบันทึกสมบูรณ์
+          <div style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--on-income-muted);">ยอดตรวจนับเงินสดตรงกับยอดบันทึกสมบูรณ์
           </div>
-          <div style="font-size: 13px; color: var(--on-income-muted); margin-top: 2px;">ไม่มีผลต่างเงินสด สามารถดำเนินการยืนยันความถูกต้องรอบเงินถวาย ได้ทันที
+          <div style="font-size: var(--text-sm); color: var(--on-income-muted); margin-top: 2px;">ไม่มีผลต่างเงินสด สามารถดำเนินการยืนยันความถูกต้องรอบเงินถวาย ได้ทันที
           </div>
         </div>
       </div>
@@ -448,9 +448,9 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
       ">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div>
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--foreground); margin: 0 0 4px 0;">การยืนยันรอบเงินถวาย
+            <h3 style="font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--foreground); margin: 0 0 4px 0;">การยืนยันรอบเงินถวาย
             </h3>
-            <p style="font-size: 13px; color: var(--muted-foreground); margin: 0;">เมื่อตรวจสอบผลต่างและบันทึกคำชี้แจงครบถ้วน ให้กดยืนยันรอบเงินถวายเพื่อล็อกข้อมูล
+            <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0;">เมื่อตรวจสอบผลต่างและบันทึกคำชี้แจงครบถ้วน ให้กดยืนยันรอบเงินถวายเพื่อล็อกข้อมูล
             </p>
           </div>
 
@@ -467,7 +467,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
               background: ${!canConfirm || isSubmitting ? 'var(--muted-foreground)' : 'var(--income)'};
               color: var(--income-foreground);
               font-size: 14px;
-              font-weight: 800;
+              font-weight: var(--weight-bold);
               cursor: ${!canConfirm || isSubmitting ? 'not-allowed' : 'pointer'};
               box-shadow: ${canConfirm ? '0 2px 6px rgba(22, 163, 74, 0.3)' : 'none'};
             "
@@ -484,7 +484,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
         </div>
 
         ${!canConfirm ? `
-          <div style="margin-top: 12px; font-size: 12.5px; color: var(--expense); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+          <div style="margin-top: 12px; font-size: 12.5px; color: var(--expense); font-weight: var(--weight-semibold); display: flex; align-items: center; gap: 6px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span>${confirmBlockedReason || "ปุ่มยืนยันจะเปิดให้ใช้งานเมื่อผลต่างเป็น 0 หรือบันทึกคำชี้แจงผลต่างเรียบร้อยแล้วเท่านั้น"}</span>
           </div>
