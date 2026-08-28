@@ -26,3 +26,7 @@ The Members route loaded with the refreshed page header, search field, and clean
 The Reports route loaded correctly after waiting for data, with month/year tab controls, print action, income/expense/net summary cards, a clear no-posted-data state, and responsible-person rows. The updated spacing and surfaces remain consistent with the rest of the application.
 
 Source checked: https://grace-ledger-git-main-tlcs-projects-ab505ecc.vercel.app/#/reports
+
+During the offering-form QA, the branch alias retained the list view when addressed directly as `#/offerings/new`. Source inspection found OfferingPage maintains internal mode separately from the router, so a route synchronization fix was added in commit `89450ea`. The immutable deployment URL correctly served the latest build but, as a separate Vercel hostname, was unauthenticated and its profile bootstrap request failed because the Supabase origin allowlist is scoped to the branch alias. Final verification must use the authenticated branch alias after Vercel cache propagation.
+
+After a hard reload on the authenticated production branch alias, `#/offerings/new` now renders the real two-step offering entry form instead of the list view. The form exposes service date, service name, channel totals, fund allocation, notes, cancel, and review actions. This confirms the route-state fix is live.
