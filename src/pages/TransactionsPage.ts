@@ -196,7 +196,7 @@ export class TransactionsPage {
                   <div aria-hidden="true" style="
                     width: 36px;
                     height: 36px;
-                    border-radius: 11px;
+                    border-radius: var(--radius-md);
                     background: ${bgVar};
                     color: ${colorVar};
                     display: grid;
@@ -215,7 +215,7 @@ export class TransactionsPage {
                     <div class="num-display" style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: ${
                       isIncome ? "var(--income)" : isExpense ? "var(--expense)" : "var(--foreground)"
                     };">${amountPrefix}${item.amount.format()}</div>
-                    <span class="gl-badge gl-badge--${item.status}" style="font-size: 10px; padding: 0 6px; margin-top: 2px;">
+                    <span class="gl-badge gl-badge--${item.status}" style="font-size: var(--text-2xs); padding: 0 var(--space-2); margin-top: 2px;">
                       ${item.status === "approved" ? "อนุมัติแล้ว" : item.status === "rejected" ? "ไม่อนุมัติ" : "รอตรวจสอบ"}
                     </span>
                   </div>
