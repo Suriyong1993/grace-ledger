@@ -233,7 +233,23 @@ export class App {
     } else if (this.currentRoute.pattern === "/approvals" || this.currentRoute.pattern === "/approvals/:id") {
       contentHtml = this.approvalsPage?.renderHtml() ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
-      contentHtml = this.offeringPage?.renderHtml() ?? "";
+      if (this.offeringPage) {
+        const offeringMode = this.currentRoute.pattern === "/offerings/new"
+          ? "new"
+          : this.currentRoute.pattern === "/offerings/:id"
+            ? "detail"
+            : "list";
+        const shouldLoadOfferingData = this.offeringPage.syncRoute(
+          offeringMode,
+          this.currentRoute.pattern === "/offerings/:id" ? this.currentRoute.params.id : undefined
+        );
+        if (shouldLoadOfferingData) {
+          await this.offeringPage.loadInitialData(
+            this.currentRoute.pattern === "/offerings/:id" ? this.currentRoute.params.id : undefined
+          );
+        }
+        contentHtml = this.offeringPage.renderHtml();
+      }
     }
 
     const appShellHtml = renderAppShellHtml(

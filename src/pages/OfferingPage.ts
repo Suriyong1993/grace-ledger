@@ -35,6 +35,8 @@ export class OfferingPage {
   private selectedBankAccountId: string = "";
   private sessions: OfferingSession[] = [];
   private selectedSession: OfferingSession | null = null;
+  private activeSessionId: string | null = null;
+  private initialDataLoaded = false;
 
   // View state
   private mode: OfferingPageMode = "list";
@@ -104,6 +106,7 @@ export class OfferingPage {
 
   public setMode(mode: OfferingPageMode, sessionId?: string): void {
     this.mode = mode;
+    this.activeSessionId = mode === "detail" ? sessionId ?? null : null;
     this.errorMessage = null;
     this.validationErrors = [];
     if (mode === "new") {
@@ -112,6 +115,17 @@ export class OfferingPage {
     } else if (mode === "detail" && sessionId) {
       // session will be loaded in loadInitialData
     }
+  }
+
+  /**
+   * Synchronise URL routing with the stateful offering renderer.
+   * Returns true when the route changed or the first data load is still needed.
+   */
+  public syncRoute(mode: OfferingPageMode, sessionId?: string): boolean {
+    const nextSessionId = mode === "detail" ? sessionId ?? null : null;
+    const routeChanged = this.mode !== mode || this.activeSessionId !== nextSessionId;
+    if (routeChanged) this.setMode(mode, sessionId);
+    return routeChanged || !this.initialDataLoaded;
   }
 
   private resetFormState(): void {
@@ -227,6 +241,7 @@ export class OfferingPage {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการโหลดข้อมูล");
     } finally {
       this.isLoading = false;
+      this.initialDataLoaded = true;
     }
   }
 
