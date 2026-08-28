@@ -14,7 +14,10 @@ import { resolve } from "node:path";
  */
 
 const MIGRATION = resolve(__dirname, "../../supabase/migrations/20260824000020_auth_pins.sql");
-const sql = readFileSync(MIGRATION, "utf8");
+// Normalize CRLF: git on Windows may check this file out with \r\n, which
+// would otherwise break the exact-substring decoy-hash match below without
+// changing anything about the migration's actual (line-ending-agnostic) SQL.
+const sql = readFileSync(MIGRATION, "utf8").replace(/\r\n/g, "\n");
 
 /** The body of one `CREATE OR REPLACE FUNCTION name(...)` block. */
 function functionBody(name: string): string {
