@@ -10,6 +10,9 @@ import {
 } from "../lib/reports/historical-service";
 import { formatDateThai } from "../lib/format";
 
+const ICON_NO_DATA = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 19h16M7 15v-4M12 15V7M17 15v-7"/><path d="M4 4l16 16" stroke-width="1.2" opacity="0.5"/></svg>`;
+const ICON_NO_ARCHIVE = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><path d="M10 13h4"/></svg>`;
+
 interface ChurchLeadership {
   pastor?: string;
   auditor?: string;
@@ -185,10 +188,10 @@ export class ReportsPage {
             <h1>รายงานการเงิน</h1>
             ${
               isHistorical
-                ? `<span class="gl-badge gl-badge--pending" style="font-size: 11px;">ข้อมูลย้อนหลัง (Historical)</span>`
+                ? `<span class="gl-badge gl-badge--pending" style="font-size: var(--text-2xs);">ข้อมูลย้อนหลัง</span>`
                 : isYearView
-                ? `<span class="gl-badge gl-badge--approved" style="font-size: 11px;">ประจำปี 2569</span>`
-                : `<span class="gl-badge gl-badge--approved" style="font-size: 11px;">ระบบบัญชีจริง (Live)</span>`
+                ? `<span class="gl-badge gl-badge--approved" style="font-size: var(--text-2xs);">ประจำปี 2569</span>`
+                : `<span class="gl-badge gl-badge--approved" style="font-size: var(--text-2xs);">ระบบบัญชีจริง</span>`
             }
           </div>
           <p style="margin-top: 4px;">งบการเงินประจำเดือน รายรับ-รายจ่าย และข้อมูลเปรียบเทียบย้อนหลัง</p>
@@ -281,15 +284,15 @@ export class ReportsPage {
       <section class="gl-section" style="margin-bottom: var(--space-5);">
         <div class="gl-statgrid">
           <div class="gl-stat gl-stat--success">
-            <div class="gl-stat__label">รายรับรวมทั้งหมด (Live)</div>
+            <div class="gl-stat__label">รายรับรวมทั้งหมด</div>
             <div class="gl-stat__value num-display">+${totalIncome.format()}</div>
           </div>
           <div class="gl-stat gl-stat--danger">
-            <div class="gl-stat__label">รายจ่ายรวมทั้งหมด (Live)</div>
+            <div class="gl-stat__label">รายจ่ายรวมทั้งหมด</div>
             <div class="gl-stat__value num-display">−${totalExpense.format()}</div>
           </div>
           <div class="gl-stat ${netSurplus.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">รายรับสุทธิ (Net Surplus)</div>
+            <div class="gl-stat__label">รายรับสุทธิ</div>
             <div class="gl-stat__value num-display">${netSurplus.format()}</div>
           </div>
         </div>
@@ -299,7 +302,7 @@ export class ReportsPage {
         !hasData
           ? `
       <div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8) var(--space-4);">
-        <div style="font-size: 3rem; margin-bottom: var(--space-3);">📊</div>
+        <div style="color: var(--muted-foreground); margin-bottom: var(--space-3);">${ICON_NO_DATA}</div>
         <h3>ไม่มีข้อมูลธุรกรรมที่ลงบัญชีแล้วในงวดนี้</h3>
         <p style="color: var(--muted-foreground); max-width: 420px; margin: 0 auto var(--space-4);">
           รายงานการเงินจะประมวลผลเฉพาะรายการที่ผ่านการอนุมัติและลงบัญชี (Posted) ในช่วงเวลาที่เลือกเท่านั้น
@@ -328,10 +331,10 @@ export class ReportsPage {
                       <td style="width: 65%;">
                         <div style="font-weight: var(--weight-medium);">${item.category_name} (${item.transaction_count} รายการ)</div>
                         <div style="display: flex; align-items: center; gap: var(--space-2); margin-top: 4px;">
-                          <div style="flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                          <div style="flex: 1; height: var(--space-1); background: var(--border); border-radius: 3px; overflow: hidden;">
                             <div style="height: 100%; width: ${pct}%; background: var(--income); border-radius: 3px;"></div>
                           </div>
-                          <span style="font-size: 11px; color: var(--muted-foreground); width: 32px; text-align: right;">${pct}%</span>
+                          <span style="font-size: var(--text-2xs); color: var(--muted-foreground); width: 32px; text-align: right;">${pct}%</span>
                         </div>
                       </td>
                       <td class="is-right num-display" style="font-weight: var(--weight-semibold); color: var(--income); vertical-align: top;">+${item.total_amount.format()}</td>
@@ -363,10 +366,10 @@ export class ReportsPage {
                       <td style="width: 65%;">
                         <div style="font-weight: var(--weight-medium);">${item.category_name} (${item.transaction_count} รายการ)</div>
                         <div style="display: flex; align-items: center; gap: var(--space-2); margin-top: 4px;">
-                          <div style="flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                          <div style="flex: 1; height: var(--space-1); background: var(--border); border-radius: 3px; overflow: hidden;">
                             <div style="height: 100%; width: ${pct}%; background: var(--expense); border-radius: 3px;"></div>
                           </div>
-                          <span style="font-size: 11px; color: var(--muted-foreground); width: 32px; text-align: right;">${pct}%</span>
+                          <span style="font-size: var(--text-2xs); color: var(--muted-foreground); width: 32px; text-align: right;">${pct}%</span>
                         </div>
                       </td>
                       <td class="is-right num-display" style="font-weight: var(--weight-semibold); color: var(--expense); vertical-align: top;">−${item.total_amount.format()}</td>
@@ -391,7 +394,7 @@ export class ReportsPage {
     if (!m) {
       return `
       <div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8) var(--space-4);">
-        <div style="font-size: 3rem; margin-bottom: var(--space-3);">📁</div>
+        <div style="color: var(--muted-foreground); margin-bottom: var(--space-3);">${ICON_NO_ARCHIVE}</div>
         <h3>ไม่พบข้อมูลย้อนหลังสำหรับงวดนี้</h3>
         <p style="color: var(--muted-foreground); max-width: 420px; margin: 0 auto var(--space-4);">
           ไม่พบข้อมูลสรุปการเงินย้อนหลังในฐานข้อมูล
@@ -410,7 +413,7 @@ export class ReportsPage {
             <strong>ข้อมูลย้อนหลัง · ${m.monthName} 2569:</strong> 
             ${isPartial ? `ข้อมูลถึง ${formatDateThai(m.dataThrough || "2026-07-19")} (ไม่เต็มเดือน)` : "ข้อมูลนำเข้าสำหรับดูสถิติย้อนหลัง ไม่กระทบบัญชีจริง"}
           </div>
-          <span class="gl-badge gl-badge--pending" style="font-size: 10px;">Source: ${m.sourceDocument}</span>
+          <span class="gl-badge gl-badge--pending" style="font-size: var(--text-2xs);">ที่มา: ${m.sourceDocument}</span>
         </div>
       </div>
 
@@ -431,21 +434,21 @@ export class ReportsPage {
           <div class="gl-stat gl-stat--success">
             <div class="gl-stat__label">รายรับรวม (${m.monthName})</div>
             <div class="gl-stat__value num-display">+${m.incomeTotal.format()}</div>
-            <div style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">
+            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
               เงินสด: ${m.cashIncome.format()} · โอน: ${m.onlineIncome.format()}
             </div>
           </div>
           <div class="gl-stat gl-stat--danger">
             <div class="gl-stat__label">รายจ่ายรวม (${m.monthName})</div>
             <div class="gl-stat__value num-display">−${m.expenseTotal.format()}</div>
-            <div style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">
+            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
               ยอดรายจ่ายตามสรุปรายงาน
             </div>
           </div>
           <div class="gl-stat ${m.net.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">ผลสุทธิจากข้อมูลย้อนหลัง (Net Movement)</div>
+            <div class="gl-stat__label">ผลสุทธิจากข้อมูลย้อนหลัง</div>
             <div class="gl-stat__value num-display">${m.net.format()}</div>
-            <div style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">
+            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
               ${m.closingBalanceReported ? `ยกยอดปิดตามรายงาน: ${m.closingBalanceReported.format()}` : "บันทึกตามรายงาน (ไม่ใช่เงินในธนาคาร)"}
             </div>
           </div>
@@ -456,7 +459,7 @@ export class ReportsPage {
       <section class="gl-section">
         <div class="gl-card" style="padding: 0; overflow: hidden;">
           <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: var(--weight-bold); font-size: var(--text-sm);">รายละเอียดรายสัปดาห์ (Weekly Breakdown — ${m.monthName} 2569)</span>
+            <span style="font-weight: var(--weight-bold); font-size: var(--text-sm);">รายละเอียดรายสัปดาห์ ${m.monthName} 2569</span>
             <span style="font-size: 12px; color: var(--muted-foreground);">${this.historicalWeekly.length} สัปดาห์</span>
           </div>
           <div style="overflow-x: auto;">
@@ -524,21 +527,21 @@ export class ReportsPage {
           <div class="gl-stat gl-stat--success">
             <div class="gl-stat__label">รายรับสะสมทั้งปี 2569</div>
             <div class="gl-stat__value num-display">+${combinedIncome.format()}</div>
-            <div style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">
-              ย้อนหลัง (ม.ค.-ก.ค.): +${histIncome.format()} · ส.ค. (Live): +${liveIncome.format()}
+            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
+              ย้อนหลัง (ม.ค.-ก.ค.): +${histIncome.format()} · ส.ค.: +${liveIncome.format()}
             </div>
           </div>
           <div class="gl-stat gl-stat--danger">
             <div class="gl-stat__label">รายจ่ายสะสมทั้งปี 2569</div>
             <div class="gl-stat__value num-display">−${combinedExpense.format()}</div>
-            <div style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">
-              ย้อนหลัง (ม.ค.-ก.ค.): −${histExpense.format()} · ส.ค. (Live): −${liveExpense.format()}
+            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
+              ย้อนหลัง (ม.ค.-ก.ค.): −${histExpense.format()} · ส.ค.: −${liveExpense.format()}
             </div>
           </div>
           <div class="gl-stat ${combinedNet.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">ผลสุทธิสะสมทั้งปี (Net Movement)</div>
+            <div class="gl-stat__label">ผลสุทธิสะสมทั้งปี</div>
             <div class="gl-stat__value num-display">${combinedNet.format()}</div>
-            <div style="font-size: 11px; color: var(--muted-foreground); margin-top: 4px;">
+            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
               ผลต่างรายรับ–รายจ่ายสะสม (ไม่ใช่ยอดเงินคงเหลือในบัญชีธนาคารจริง)
             </div>
           </div>
@@ -549,7 +552,7 @@ export class ReportsPage {
       <section class="gl-section">
         <div class="gl-card" style="padding: 0; overflow: hidden;">
           <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: var(--weight-bold); font-size: var(--text-sm);">ตารางสรุปรายเดือน ประจำปี 2569 (Historical Jan–Jul + Live Aug)</span>
+            <span style="font-weight: var(--weight-bold); font-size: var(--text-sm);">ตารางสรุปรายเดือน ประจำปี 2569</span>
             <span style="font-size: 12px; color: var(--muted-foreground);">ข้อมูล 8 เดือน</span>
           </div>
           <div style="overflow-x: auto;">
@@ -575,7 +578,7 @@ export class ReportsPage {
                   <tr>
                     <td style="font-weight: var(--weight-semibold);">${m.monthName} 2569</td>
                     <td>
-                      <span class="gl-badge ${isPartial ? "gl-badge--pending" : isWarn ? "gl-badge--rejected" : "gl-badge--pending"}" style="font-size: 10px;">
+                      <span class="gl-badge ${isPartial ? "gl-badge--pending" : isWarn ? "gl-badge--rejected" : "gl-badge--pending"}" style="font-size: var(--text-2xs);">
                         ${isPartial ? "ย้อนหลัง (ไม่เต็มเดือน)" : isWarn ? "ย้อนหลัง (ต้องตรวจทาน)" : "ย้อนหลัง"}
                       </span>
                     </td>
@@ -597,7 +600,7 @@ export class ReportsPage {
                 <tr style="background: var(--primary-muted);">
                   <td style="font-weight: var(--weight-bold);">สิงหาคม 2569</td>
                   <td>
-                    <span class="gl-badge gl-badge--approved" style="font-size: 10px;">Live Accounting</span>
+                    <span class="gl-badge gl-badge--approved" style="font-size: var(--text-2xs);">บัญชีปัจจุบัน</span>
                   </td>
                   <td class="is-right num-display" style="color: var(--income);">—</td>
                   <td class="is-right num-display" style="color: var(--income);">—</td>
@@ -606,7 +609,7 @@ export class ReportsPage {
                   <td class="is-right num-display" style="font-weight: var(--weight-bold); color: ${liveNet.isPositive() ? "var(--income)" : "var(--expense)"};">
                     ${liveNet.format()}
                   </td>
-                  <td class="is-right num-display" style="color: var(--muted-foreground);">Live GL</td>
+                  <td class="is-right num-display" style="color: var(--muted-foreground);">ปัจจุบัน</td>
                 </tr>
               </tbody>
             </table>
