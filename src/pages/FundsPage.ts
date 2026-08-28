@@ -167,7 +167,7 @@ export class FundsPage {
               (fund) => `
             <div class="gl-card" style="display: flex; flex-direction: column; gap: var(--space-3);">
               <div style="display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2);">
-                <div style="font-size: var(--text-base); font-weight: var(--weight-bold handwriting);">${fund.name}</div>
+                <div style="font-size: var(--text-base); font-weight: var(--weight-bold);">${fund.name}</div>
                 <div class="num-display" style="font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--primary);">${fund.balance.format()}</div>
               </div>
 
@@ -179,7 +179,7 @@ export class FundsPage {
                   <span>เป้าหมายงบประมาณ: ${fund.targetBudget.format()}</span>
                   <span class="num-display">${fund.percentageUsed}%</span>
                 </div>
-                <div style="height: 6px; background: var(--secondary); border-radius: var(--radius-full); overflow: hidden;">
+                <div style="height: var(--space-1); background: var(--secondary); border-radius: var(--radius-full); overflow: hidden;">
                   <div style="height: 100%; width: ${fund.percentageUsed}%; background: var(--primary); border-radius: var(--radius-full);"></div>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export class FundsPage {
               ${fund.recentActivity && fund.recentActivity.length > 0 ? `
               <!-- Mini Recent Activity -->
               <div style="border-top: 1px solid var(--border); padding-top: var(--space-2); margin-top: var(--space-1);">
-                <div class="kicker" style="margin: 0 0 6px; font-size: 10px;">ความเคลื่อนไหวล่าสุด</div>
+                <div class="kicker" style="margin: 0 0 var(--space-1); font-size: var(--text-2xs);">ความเคลื่อนไหวล่าสุด</div>
                 ${fund.recentActivity
                   .map(
                     (act) => `
