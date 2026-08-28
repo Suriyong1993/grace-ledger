@@ -154,8 +154,8 @@ export class MembersPage {
             <div class="gl-card gl-member-card" style="display: flex; flex-direction: column; gap: var(--space-3);">
               <div style="display: flex; align-items: center; gap: var(--space-3);">
                 <div aria-hidden="true" style="
-                  width: 44px;
-                  height: 44px;
+                  width: var(--touch-target-min);
+                  height: var(--touch-target-min);
                   border-radius: var(--radius-full);
                   background: var(--accent);
                   color: var(--accent-foreground);
