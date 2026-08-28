@@ -94,6 +94,13 @@ export function renderPinEntryHtml(
           </svg>
         </button>
       </div>
+
+      <div class="gl-pin-bootstrap">
+        <p class="gl-pin-bootstrap-text">ยังไม่มี PIN หรือเพิ่งเริ่มใช้งานครั้งแรก?</p>
+        <button type="button" id="login-pin-bootstrap" class="gl-login-text-btn" ${isHardBlocked ? "disabled" : ""}>
+          ขออีเมลสำหรับตั้ง PIN
+        </button>
+      </div>
     </div>
   `;
 }
