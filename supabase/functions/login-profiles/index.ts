@@ -11,13 +11,13 @@
  */
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import {
-  CORS_HEADERS,
   clientAddress,
+  corsHeadersFor,
   createRateLimiter,
   deploymentChurchId,
   deploymentConfigFault,
   hasProjectKey,
-  json,
+  json as jsonBase,
 } from "../_shared/deployment.ts";
 
 const ROLE_LABELS_TH: Record<string, string> = {
@@ -40,6 +40,14 @@ const ROLE_ORDER = [
   "counter",
   "member",
 ];
+
+/**
+ * Per-profile display-title override. DB role/RLS stay on the enum value
+ * (`super_admin`) — this only changes the text shown on the profile card.
+ */
+const ROLE_TITLE_OVERRIDES: Record<string, string> = {
+  "f0fc6cdd-07ad-4d76-8fe6-80427525d340": "Super Admin / ผู้ตรวจสอบบัญชี",
+};
 
 const takeRequest = createRateLimiter(60, 60_000);
 
@@ -74,7 +82,10 @@ function highestRole(roles: readonly string[]): string | null {
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS_HEADERS });
+  const corsHeaders = corsHeadersFor(req);
+  const json = (body: unknown, status: number) => jsonBase(body, status, corsHeaders);
+
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "GET" && req.method !== "POST") {
     return json({ error: "method_not_allowed" }, 405);
   }
@@ -132,10 +143,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
   const payload = rows.map((row) => {
     const name = (row.display_name ?? row.full_name ?? "").trim();
     const role = highestRole(rolesByUser.get(row.id) ?? []);
+    const roleLabel = ROLE_TITLE_OVERRIDES[row.id] ?? (role ? ROLE_LABELS_TH[role] ?? "" : "");
     return {
       id: row.id,
       name,
-      role: role ? ROLE_LABELS_TH[role] ?? "" : "",
+      role: roleLabel,
       initials: initialsOf(name),
     };
   });

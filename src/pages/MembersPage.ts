@@ -10,10 +10,14 @@ export interface MemberRecord {
   email: string;
   phone: string;
   group: string;
-  yearGivingTotal: Money;
-  titheCount: number;
-  lastGivenDate: string;
 }
+
+type GivingState = {
+  status: "loading" | "loaded" | "denied" | "none";
+  total: Money;
+  titheCount: number;
+  lastGivenDate: string | null;
+};
 
 const ICON_SEARCH = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>`;
 const ICON_CERT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>`;
@@ -25,6 +29,9 @@ export class MembersPage {
   private members: MemberRecord[] = [];
   private errorMessage: string | null = null;
   private isLoading = false;
+  // Per-member confidential giving history, loaded only on explicit detail view
+  // (single-member lookup — never bulk-fetched, per the privacy design).
+  private givingById: Record<string, GivingState> = {};
 
   constructor(private supabase: SupabaseClient<Database>, private churchId: string) {}
 
@@ -34,7 +41,7 @@ export class MembersPage {
     try {
       const { data, error } = await (this.supabase
         .from("members") as any)
-        .select("id, full_name, email, phone, is_active, created_at")
+        .select("id, full_name, email, phone, is_active, created_at, member_code")
         .eq("church_id", this.churchId)
         .eq("is_active", true)
         .order("full_name", { ascending: true });
@@ -46,16 +53,15 @@ export class MembersPage {
       }
 
       if (data && Array.isArray(data)) {
-        this.members = data.map((m, idx) => ({
+        this.members = data.map((m: any) => ({
           id: m.id,
-          code: `MEM-${String(idx + 101).padStart(4, "0")}`,
+          // Real member code from the database; "—" when not yet assigned.
+          code: m.member_code || "—",
           name: m.full_name || "สมาชิก",
           email: m.email || "—",
           phone: m.phone || "—",
-          group: "กลุ่มสามัคคีธรรม",
-          yearGivingTotal: Money.zero(),
-          titheCount: 0,
-          lastGivenDate: m.created_at ? formatDateThai(m.created_at) : "—",
+          // Care group is not stored on members; shown as unavailable.
+          group: "—",
         }));
       } else {
         this.members = [];
@@ -66,6 +72,83 @@ export class MembersPage {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  /**
+   * Loads the confidential giving history for a single member via the
+   * privacy-gated RPC. This is the only sanctioned path for giving data and
+   * must never be called in bulk. Results are cached per member id.
+   */
+  public async loadGivingForMember(memberId: string, onStateChange: () => void): Promise<void> {
+    const existing = this.givingById[memberId];
+    if (existing && existing.status !== "none") return;
+
+    this.givingById[memberId] = { status: "loading", total: Money.zero(), titheCount: 0, lastGivenDate: null };
+    onStateChange();
+
+    try {
+      const { data, error } = await this.supabase.rpc("get_member_giving_history", {
+        p_member_id: memberId,
+        p_reason: "ออกหนังสือรับรองการถวายทรัพย์",
+      } as any);
+
+      if (error) throw new Error(error.message);
+
+      const records = (data as any[]) || [];
+      const currentYear = new Date().getFullYear();
+      const thisYear = records.filter((r) => {
+        const d = r.given_at ? new Date(r.given_at) : null;
+        return d && d.getFullYear() === currentYear;
+      });
+
+      if (thisYear.length === 0) {
+        this.givingById[memberId] = { status: "none", total: Money.zero(), titheCount: 0, lastGivenDate: null };
+      } else {
+        const total = thisYear.reduce((acc, r) => acc.add(Money.from(r.amount || "0.00")), Money.zero());
+        const titheCount = thisYear.filter((r) => r.giving_type === "tithe").length;
+        const last = thisYear
+          .map((r) => (r.given_at ? new Date(r.given_at) : null))
+          .filter((d): d is Date => d !== null)
+          .sort((a, b) => b.getTime() - a.getTime())[0];
+        this.givingById[memberId] = {
+          status: "loaded",
+          total,
+          titheCount,
+          lastGivenDate: last ? formatDateThai(last.toISOString()) : null,
+        };
+      }
+    } catch (err: any) {
+      // Access Denied (role-gated) or other failure -> never surface raw error.
+      this.givingById[memberId] = {
+        status: "denied",
+        total: Money.zero(),
+        titheCount: 0,
+        lastGivenDate: null,
+      };
+    } finally {
+      onStateChange();
+    }
+  }
+
+  private givingBlockHtml(member: MemberRecord | null): string {
+    if (!member) return "";
+    const g = this.givingById[member.id];
+    let body: string;
+    if (!g || g.status === "loading") {
+      body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground);">กำลังโหลดประวัติการถวาย...</div>`;
+    } else if (g.status === "denied") {
+      body = `<div style="font-size: var(--text-xs); color: var(--expense);">ไม่มีสิทธิ์ดูข้อมูลการถวาย</div>`;
+    } else if (g.status === "none") {
+      body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground);">ไม่มีข้อมูลการถวายในปีนี้</div>`;
+    } else {
+      body = `
+        <div><strong>ชื่อผู้ถวาย:</strong> ${member.name} (รหัส: ${member.code})</div>
+        <div><strong>สถิติการถวายสิบลด:</strong> ${g.titheCount} ครั้ง</div>
+        <div><strong>ยอดถวายสะสมรวม:</strong> <span class="num-display" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--primary);">${g.total.format()}</span></div>
+        <div><strong>ถวายล่าสุด:</strong> ${g.lastGivenDate ?? "—"}</div>
+        <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: var(--space-2);">ประวัติการเข้าดูถูกบันทึกในบันทึกการตรวจสอบ (audit log)</div>`;
+    }
+    return body;
   }
 
   public renderHtml(): string {
@@ -117,18 +200,15 @@ export class MembersPage {
             </button>
           </div>
 
-          <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: var(--space-5); text-align: center; margin-bottom: var(--space-4);">
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: var(--space-5); margin-bottom: var(--space-4);">
             <div style="font-size: var(--text-sm); color: var(--muted-foreground);">คริสตจักรเกรซแบ๊บติสต์</div>
             <div style="font-size: var(--text-lg); font-weight: var(--weight-bold); margin: var(--space-1) 0;">หนังสือรับรองการบริจาค/การถวายทรัพย์</div>
-            <div style="font-size: var(--text-xs); color: var(--muted-foreground);">ประจำปีภาษี 2569 / 2026</div>
+            <div style="font-size: var(--text-xs); color: var(--muted-foreground);">ประจำปีภาษี ${new Date().getFullYear() + 543} / ${new Date().getFullYear()}</div>
 
             <div style="height: 1px; background: var(--border); margin: var(--space-4) 0;"></div>
 
             <div style="text-align: left; font-size: var(--text-xs); line-height: 1.8; color: var(--foreground);">
-              <div><strong>ชื่อผู้ถวาย:</strong> ${selectedMember.name} (รหัส: ${selectedMember.code})</div>
-              <div><strong>สถิติการถวายสิบลด:</strong> ${selectedMember.titheCount} ครั้ง</div>
-              <div><strong>ยอดถวายสะสมรวมทั้งสิ้น:</strong> <span class="num-display" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--primary);">${selectedMember.yearGivingTotal.format()}</span></div>
-              <div><strong>สถานะ:</strong> ได้รับการตรวจสอบและบันทึกลงในระบบบัญชีคริสตจักรแล้ว</div>
+              ${this.givingBlockHtml(selectedMember)}
             </div>
           </div>
 
@@ -170,21 +250,13 @@ export class MembersPage {
                 </div>
               </div>
 
-              <div style="background: var(--secondary); border-radius: var(--radius-md); padding: var(--space-3); display: flex; justify-content: space-between; align-items: baseline;">
-                <div>
-                  <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">ยอดถวายสะสมปี 2026</div>
-                  <div class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--primary); margin-top: 2px;">
-                    ${m.yearGivingTotal.format()}
-                  </div>
-                </div>
-                <div style="text-align: right;">
-                  <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">ถวายสิบลด</div>
-                  <div class="num-display" style="font-size: var(--text-sm); font-weight: var(--weight-semibold);">${m.titheCount} ครั้ง</div>
-                </div>
+              <div style="background: var(--secondary); border-radius: var(--radius-md); padding: var(--space-3);">
+                <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">ประวัติการถวายเป็นข้อมูลส่วนตัว</div>
+                <div style="font-size: var(--text-xs); font-weight: var(--weight-medium); margin-top: 2px;">ดูรายละเอียดในหนังสือรับรอง</div>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: var(--space-2);">
-                <span style="font-size: var(--text-2xs); color: var(--muted-foreground);">ถวายล่าสุด: ${m.lastGivenDate}</span>
+                <span style="font-size: var(--text-2xs); color: var(--muted-foreground);">อีเมล: ${m.email}</span>
                 <button class="gl-btn gl-btn--secondary gl-btn--sm view-cert-btn" data-member-id="${m.id}">
                   ${ICON_CERT}
                   <span>หนังสือรับรอง</span>
@@ -257,6 +329,8 @@ export class MembersPage {
         const id = btn.getAttribute("data-member-id");
         if (id) {
           this.selectedMemberId = id;
+          // Trigger the privacy-gated single-member giving lookup.
+          void this.loadGivingForMember(id, onStateChange);
           onStateChange();
         }
       });

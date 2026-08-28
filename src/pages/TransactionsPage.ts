@@ -12,10 +12,10 @@ export interface TransactionItem {
   accountName: string;
   amount: Money;
   direction: "income" | "expense" | "transfer";
-  date: string;
-  dateGroup: "today" | "yesterday" | "earlier";
+  date: string | null;
+  dateGroup: "today" | "yesterday" | "earlier" | "undated";
   recordedBy: string;
-  status: "approved" | "pending" | "rejected";
+  status: "draft" | "pending_approval" | "approved" | "posted" | "rejected" | "voided";
   attachmentName?: string;
   attachmentSize?: string;
   timeline: {
@@ -30,6 +30,31 @@ const ICON_INCOME = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 const ICON_EXPENSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
 const ICON_TRANSFER = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>`;
 const ICON_CLOSE = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+
+// Real transaction lifecycle status -> Thai label + badge class. No guessing.
+const TXN_STATUS: Record<
+  TransactionItem["status"],
+  { label: string; badge: "neutral" | "pending" | "approved" | "rejected" | "info" }
+> = {
+  draft: { label: "ร่าง", badge: "neutral" },
+  pending_approval: { label: "รออนุมัติ", badge: "pending" },
+  approved: { label: "อนุมัติแล้ว", badge: "approved" },
+  posted: { label: "ลงบัญชีแล้ว", badge: "approved" },
+  rejected: { label: "ไม่อนุมัติ", badge: "rejected" },
+  voided: { label: "ยกเลิก", badge: "rejected" },
+};
+
+function dateGroupFor(dateStr: string | null): TransactionItem["dateGroup"] {
+  if (!dateStr) return "undated";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "undated";
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startOfYesterday = new Date(startOfToday.getTime() - 24 * 60 * 60 * 1000);
+  if (d >= startOfToday) return "today";
+  if (d >= startOfYesterday) return "yesterday";
+  return "earlier";
+}
 
 export class TransactionsPage {
   private activeFilter: "all" | "income" | "expense" | "transfer" | "pending" = "all";
@@ -50,8 +75,11 @@ export class TransactionsPage {
         .select(`
           id,
           description,
+          direction,
           transaction_date,
+          reference_number,
           status,
+          created_by,
           created_at,
           account_id,
           accounts(name),
@@ -67,7 +95,10 @@ export class TransactionsPage {
       }
 
       if (data && Array.isArray(data)) {
-        this.transactions = data.map((t, idx) => {
+        // First pass: build items with real direction/status/date; collect
+        // creator ids for a single profiles lookup (honest recorder name).
+        const creatorIds = new Set<string>();
+        const items = data.map((t: any) => {
           let sum = Money.zero();
           let fundName = "กองทุนทั่วไป";
           let categoryName: string | null = null;
@@ -79,27 +110,57 @@ export class TransactionsPage {
             }
           }
 
-          const isExp = t.description?.includes("จ่าย") || t.description?.includes("ซื้อ") || t.description?.includes("ค่า");
-          const direction: "income" | "expense" | "transfer" = isExp ? "expense" : "income";
+          // Use the real direction column — never guess from keywords.
+          const direction = (t.direction === "expense" || t.direction === "transfer" ? t.direction : "income") as
+            | "income"
+            | "expense"
+            | "transfer";
+
+          const txnDate: string | null = t.transaction_date ?? null;
+          if (t.created_by) creatorIds.add(t.created_by);
 
           return {
             id: t.id,
-            code: `TXN-${String(idx + 1).padStart(4, "0")}`,
+            // Real reference number when present; never a fabricated TXN-XXXX.
+            code: t.reference_number || "—",
             description: t.description || "รายการทั่วไป",
             categoryName: categoryName || (direction === "income" ? "ถวายทรัพย์" : "พันธกิจและสาธารณูปโภค"),
             fundName,
             accountName: t.accounts?.name || "บัญชีหลัก",
             amount: sum,
             direction,
-            date: t.transaction_date || "2026-08-21",
-            dateGroup: idx === 0 ? "today" : idx < 3 ? "yesterday" : "earlier",
-            recordedBy: "เจ้าหน้าที่การเงิน",
-            status: t.status === "approved" ? "approved" : t.status === "rejected" ? "rejected" : "pending",
+            date: txnDate,
+            dateGroup: dateGroupFor(txnDate),
+            // Recorder resolved below; default until lookup completes.
+            recordedBy: "",
+            // Real status, mapped honestly (no collapsing of posted/voided).
+            status: (t.status || "draft") as TransactionItem["status"],
             timeline: [
-              { title: "สร้างรายการ", detail: `บันทึกเมื่อ ${formatDateThai(t.transaction_date || "2026-08-21")}`, status: "done" },
+              {
+                title: "สร้างรายการ",
+                detail: `บันทึกเมื่อ ${txnDate ? formatDateThai(txnDate) : "ไม่ระบุวันที่"}`,
+                status: "done" as const,
+              },
             ],
+            _createdBy: t.created_by as string | null,
           };
         });
+
+        // Resolve recorder names from profiles (single query, never a fake name).
+        const idList = Array.from(creatorIds);
+        const recorderById: Record<string, string> = {};
+        if (idList.length > 0) {
+          const { data: profiles } = await (this.supabase
+            .from("profiles") as any)
+            .select("id, full_name")
+            .in("id", idList);
+          for (const p of profiles || []) recorderById[p.id] = p.full_name || "ไม่ระบุผู้บันทึก";
+        }
+
+        this.transactions = items.map((it: any) => ({
+          ...it,
+          recordedBy: it._createdBy ? recorderById[it._createdBy] || "ไม่ระบุผู้บันทึก" : "ไม่ระบุผู้บันทึก",
+        }));
       } else {
         this.transactions = [];
       }
@@ -138,13 +199,12 @@ export class TransactionsPage {
       if (this.activeFilter === "income" && item.direction !== "income") return false;
       if (this.activeFilter === "expense" && item.direction !== "expense") return false;
       if (this.activeFilter === "transfer" && item.direction !== "transfer") return false;
-      if (this.activeFilter === "pending" && item.status !== "pending") return false;
+      if (this.activeFilter === "pending" && item.status !== "pending_approval" && item.status !== "draft") return false;
 
       if (this.searchQuery) {
         const q = this.searchQuery.toLowerCase();
         const match =
           item.description.toLowerCase().includes(q) ||
-          item.code.toLowerCase().includes(q) ||
           item.fundName.toLowerCase().includes(q) ||
           item.categoryName.toLowerCase().includes(q);
         if (!match) return false;
@@ -166,6 +226,7 @@ export class TransactionsPage {
     const todayItems = filtered.filter((t) => t.dateGroup === "today");
     const yesterdayItems = filtered.filter((t) => t.dateGroup === "yesterday");
     const earlierItems = filtered.filter((t) => t.dateGroup === "earlier");
+    const undatedItems = filtered.filter((t) => t.dateGroup === "undated");
 
     const renderGroup = (title: string, items: TransactionItem[]) => {
       if (items.length === 0) return "";
@@ -215,8 +276,8 @@ export class TransactionsPage {
                     <div class="num-display" style="font-size: var(--text-sm); font-weight: var(--weight-bold); color: ${
                       isIncome ? "var(--income)" : isExpense ? "var(--expense)" : "var(--foreground)"
                     };">${amountPrefix}${item.amount.format()}</div>
-                    <span class="gl-badge gl-badge--${item.status}" style="font-size: var(--text-2xs); padding: 0 var(--space-2); margin-top: 2px;">
-                      ${item.status === "approved" ? "อนุมัติแล้ว" : item.status === "rejected" ? "ไม่อนุมัติ" : "รอตรวจสอบ"}
+                    <span class="gl-badge gl-badge--${TXN_STATUS[item.status].badge}" style="font-size: var(--text-2xs); padding: 0 var(--space-2); margin-top: 2px;">
+                      ${TXN_STATUS[item.status].label}
                     </span>
                   </div>
                 </div>`;
@@ -248,8 +309,8 @@ export class TransactionsPage {
               margin: var(--space-2) 0;
               color: ${selectedTxn.direction === "income" ? "var(--income)" : selectedTxn.direction === "expense" ? "var(--expense)" : "var(--foreground)"};
             ">${selectedTxn.direction === "income" ? "+" : selectedTxn.direction === "expense" ? "−" : ""}${selectedTxn.amount.format()}</div>
-            <span class="gl-badge gl-badge--${selectedTxn.status}">
-              ${selectedTxn.status === "approved" ? "อนุมัติเรียบร้อย" : selectedTxn.status === "rejected" ? "ปฏิเสธ" : "รอการอนุมัติ"}
+            <span class="gl-badge gl-badge--${TXN_STATUS[selectedTxn.status].badge}">
+              ${TXN_STATUS[selectedTxn.status].label}
             </span>
           </div>
 
@@ -361,6 +422,7 @@ export class TransactionsPage {
         ${renderGroup("วันนี้", todayItems)}
         ${renderGroup("เมื่อวาน", yesterdayItems)}
         ${renderGroup("รายการก่อนหน้า", earlierItems)}
+        ${renderGroup("ไม่ระบุวันที่", undatedItems)}
         ${
           filtered.length === 0 && !this.errorMessage
             ? `<div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">

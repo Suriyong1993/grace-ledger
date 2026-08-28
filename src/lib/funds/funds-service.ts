@@ -8,7 +8,7 @@ export const CreateFundSchema = z.object({
   church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
   name: z.string().trim().min(1, "ชื่อกองทุนต้องไม่เป็นค่าว่าง"),
   description: z.string().optional(),
-  target_budget: z
+  target_amount: z
     .union([z.string(), z.number()])
     .optional()
     .refine(
@@ -28,7 +28,7 @@ export const CreateFundSchema = z.object({
 export const UpdateFundSchema = z.object({
   name: z.string().trim().min(1).optional(),
   description: z.string().optional(),
-  target_budget: z
+  target_amount: z
     .union([z.string(), z.number()])
     .optional()
     .refine(
@@ -80,7 +80,7 @@ export interface FundModel {
   name: string;
   description: string | null;
   current_balance: Money;
-  target_budget: Money;
+  target_amount: Money;
   is_active: boolean;
   created_at: string;
 }
@@ -112,7 +112,7 @@ export class FundsService {
       this.checkRole("read");
       const { data, error } = await (this.supabase
         .from("funds") as any)
-        .select("id, church_id, name, description, current_balance, target_budget, is_active, created_at")
+        .select("id, church_id, name, description, current_balance, target_amount, is_active, created_at")
         .eq("church_id", churchId)
         .eq("is_active", true)
         .order("name", { ascending: true });
@@ -127,7 +127,7 @@ export class FundsService {
         name: f.name,
         description: f.description,
         current_balance: f.current_balance ? Money.from(f.current_balance) : Money.zero(),
-        target_budget: f.target_budget ? Money.from(f.target_budget) : Money.zero(),
+        target_amount: f.target_amount ? Money.from(f.target_amount) : Money.zero(),
         is_active: f.is_active,
         created_at: f.created_at,
       }));
@@ -146,8 +146,8 @@ export class FundsService {
       this.checkRole("create");
       const parsed = CreateFundSchema.parse(input);
 
-      const targetPlain = parsed.target_budget
-        ? Money.from(parsed.target_budget).toFixed(2)
+      const targetPlain = parsed.target_amount
+        ? Money.from(parsed.target_amount).toFixed(2)
         : "0.00";
 
       const { data, error } = await (this.supabase
@@ -157,7 +157,7 @@ export class FundsService {
           name: parsed.name,
           description: parsed.description || null,
           current_balance: "0.00",
-          target_budget: targetPlain,
+          target_amount: targetPlain,
           is_active: true,
         })
         .select("id")
@@ -187,8 +187,8 @@ export class FundsService {
       const payload: Record<string, any> = {};
       if (parsed.name) payload.name = parsed.name;
       if (parsed.description !== undefined) payload.description = parsed.description;
-      if (parsed.target_budget !== undefined) {
-        payload.target_budget = Money.from(parsed.target_budget).toFixed(2);
+      if (parsed.target_amount !== undefined) {
+        payload.target_amount = Money.from(parsed.target_amount).toFixed(2);
       }
       if (parsed.is_active !== undefined) payload.is_active = parsed.is_active;
 

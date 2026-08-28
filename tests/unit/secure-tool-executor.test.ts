@@ -68,7 +68,7 @@ describe("SecureAiToolExecutor — Comprehensive Security & Boundary Tests", () 
                 eq: () =>
                   Promise.resolve({
                     data: options.customData?.funds || [
-                      { id: dummyFundId, name: "กองทุนทั่วไป", current_balance: "100000.00", target_budget: "150000.00" },
+                      { id: dummyFundId, name: "กองทุนทั่วไป", current_balance: "100000.00", target_amount: "150000.00" },
                     ],
                     error: null,
                   }),

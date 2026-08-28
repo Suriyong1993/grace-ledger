@@ -74,12 +74,12 @@ export async function verifyPin(
       requires_reset?: boolean;
     } | null;
 
-    if (!body?.access_token || !body.refresh_token) {
-      return { status: "unavailable" };
+    if (body?.requires_reset === true) {
+      return { status: "requires_reset" };
     }
 
-    if (body.requires_reset === true) {
-      return { status: "requires_reset" };
+    if (!body?.access_token || !body.refresh_token) {
+      return { status: "unavailable" };
     }
 
     const { data, error } = await supabase.auth.setSession({

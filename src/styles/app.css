@@ -809,6 +809,73 @@ button.gl-card:active {
 }
 
 /* --------------------------------------------------------------------------
+   Inline utilities — extracted from page inline styles
+   -------------------------------------------------------------------------- */
+.gl-loading-center {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+.gl-loading-center__msg {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  margin-bottom: 6px;
+}
+
+/* Success toast banner */
+.gl-toast {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--space-5) auto 0;
+  max-width: 960px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--approved);
+  background: var(--income-muted);
+}
+
+.gl-toast__body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--on-income-muted);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.gl-toast__close {
+  background: none;
+  border: none;
+  color: var(--on-income-muted);
+  cursor: pointer;
+  font-size: var(--text-md);
+  padding: var(--space-1);
+}
+
+/* Page modifier: remove bottom padding (used for tab headers) */
+.gl-page--flush-bottom {
+  padding-bottom: 0;
+}
+
+/* Badge inline spacing (in tab headers etc.) */
+.gl-badge--inline {
+  margin-left: var(--space-2);
+}
+
+/* Empty state: centered page with heading */
+.gl-empty-center {
+  text-align: center;
+}
+
+.gl-empty-center__msg {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  margin: 0 0 var(--space-2);
+}
+
+/* --------------------------------------------------------------------------
    App shell
    -------------------------------------------------------------------------- */
 .gl-mobilenav {

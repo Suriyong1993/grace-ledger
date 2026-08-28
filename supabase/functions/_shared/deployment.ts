@@ -59,11 +59,34 @@ export function isPinShaped(value: unknown): value is string {
   return typeof value === "string" && PIN_PATTERN.test(value);
 }
 
-export const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
+/**
+ * Origins allowed to call the pre-auth Edge Functions from a browser. Only the
+ * deployed frontend needs this — everything else (curl, server-to-server) is
+ * unaffected by CORS, so this is a browser-only restriction, not the real
+ * security boundary (that's the anon-key check, rate limit, and DB lockout).
+ */
+const ALLOWED_ORIGINS = new Set([
+  "https://grace-ledger-mu.vercel.app",
+  "http://localhost:5500",
+]);
+
+const BASE_CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  Vary: "Origin",
 };
+
+/** Static fallback for callers that need a headers object before a request exists. */
+export const CORS_HEADERS: Record<string, string> = BASE_CORS_HEADERS;
+
+/** Per-request CORS headers: reflects the caller's origin only if it's allowlisted. */
+export function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin");
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    return { ...BASE_CORS_HEADERS, "Access-Control-Allow-Origin": origin };
+  }
+  return BASE_CORS_HEADERS;
+}
 
 /**
  * Both endpoints run with `verify_jwt = false` because they are what a person

@@ -7,8 +7,8 @@ export interface FundDetail {
   name: string;
   description: string;
   balance: Money;
-  targetBudget: Money;
-  percentageUsed: number;
+  targetAmount: Money | null;
+  percentageUsed: number | null;
   recentActivity: {
     description: string;
     amount: string;
@@ -35,7 +35,7 @@ export class FundsPage {
     try {
       const { data, error } = await (this.supabase
         .from("funds") as any)
-        .select("id, name, current_balance, is_active")
+        .select("id, name, current_balance, target_amount, is_active")
         .eq("church_id", this.churchId)
         .eq("is_active", true)
         .order("name", { ascending: true });
@@ -47,18 +47,19 @@ export class FundsPage {
       }
 
       if (data && Array.isArray(data)) {
-        this.funds = data.map((f, idx) => {
+        this.funds = data.map((f) => {
           const balance = f.current_balance ? Money.from(f.current_balance) : Money.zero();
-          const target = Money.from(String((idx + 1) * 100000));
+          const hasTarget = f.target_amount !== null && f.target_amount !== undefined && Money.from(f.target_amount).isPositive();
+          const target = hasTarget ? Money.from(f.target_amount) : null;
           return {
             id: f.id,
             name: f.name || "กองทุน",
             description: "กองทุนเพื่อวัตถุประสงค์เฉพาะของคริสตจักร",
             balance,
-            targetBudget: target,
-            percentageUsed: target.isPositive() && !target.isZero()
+            targetAmount: target,
+            percentageUsed: target
               ? Math.min(100, Math.round((balance.toNumber() / target.toNumber()) * 100))
-              : 0,
+              : null,
             recentActivity: [],
           };
         });
@@ -176,12 +177,16 @@ export class FundsPage {
               <!-- Budget Progress Bar -->
               <div>
                 <div style="display: flex; justify-content: space-between; font-size: var(--text-2xs); color: var(--muted-foreground); margin-bottom: 4px;">
-                  <span>เป้าหมายงบประมาณ: ${fund.targetBudget.format()}</span>
-                  <span class="num-display">${fund.percentageUsed}%</span>
+                  <span>เป้าหมายงบประมาณ: ${fund.targetAmount ? fund.targetAmount.format() : "ไม่ระบุ"}</span>
+                  <span class="num-display">${fund.percentageUsed !== null ? fund.percentageUsed + "%" : "—"}</span>
                 </div>
-                <div style="height: var(--space-1); background: var(--secondary); border-radius: var(--radius-full); overflow: hidden;">
+                ${
+                  fund.targetAmount
+                    ? `<div style="height: var(--space-1); background: var(--secondary); border-radius: var(--radius-full); overflow: hidden;">
                   <div style="height: 100%; width: ${fund.percentageUsed}%; background: var(--primary); border-radius: var(--radius-full);"></div>
-                </div>
+                </div>`
+                    : ""
+                }
               </div>
 
               ${fund.recentActivity && fund.recentActivity.length > 0 ? `

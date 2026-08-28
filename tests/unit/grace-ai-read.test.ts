@@ -64,7 +64,7 @@ describe("Grace AI READ Capabilities & Data Provenance Tests", () => {
                 eq: () =>
                   Promise.resolve({
                     data: options.customData?.funds || [
-                      { id: "f-1", name: "กองทุนทั่วไป", current_balance: "150000.00", target_budget: "200000.00" },
+                      { id: "f-1", name: "กองทุนทั่วไป", current_balance: "150000.00", target_amount: "200000.00" },
                     ],
                     error: options.customError?.funds || null,
                   }),

@@ -22,7 +22,7 @@ describe("FundsService — Comprehensive Unit Tests", () => {
                         name: "กองทุนทั่วไป",
                         description: "พันธกิจทั่วไป",
                         current_balance: "250000.75",
-                        target_budget: "300000.00",
+                        target_amount: "300000.00",
                         is_active: true,
                         created_at: "2026-08-21T00:00:00Z",
                       },
@@ -41,7 +41,7 @@ describe("FundsService — Comprehensive Unit Tests", () => {
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(1);
       expect(result.data?.[0].current_balance.format()).toBe("฿250,000.75");
-      expect(result.data?.[0].target_budget.format()).toBe("฿300,000.00");
+      expect(result.data?.[0].target_amount.format()).toBe("฿300,000.00");
     });
 
     it("propagates database error cleanly when getFunds query fails", async () => {
@@ -86,13 +86,13 @@ describe("FundsService — Comprehensive Unit Tests", () => {
         church_id: dummyChurchId,
         name: "กองทุนเพื่อการศึกษา",
         description: "ทุนการศึกษาบุตรหลาน",
-        target_budget: "50000.00",
+        target_amount: "50000.00",
       });
 
       expect(result.success).toBe(true);
       expect(result.data?.fund_id).toBe("fund-new-123");
       expect(insertedPayload.name).toBe("กองทุนเพื่อการศึกษา");
-      expect(insertedPayload.target_budget).toBe("50000.00");
+      expect(insertedPayload.target_amount).toBe("50000.00");
       expect(insertedPayload.current_balance).toBe("0.00");
     });
 
@@ -108,7 +108,7 @@ describe("FundsService — Comprehensive Unit Tests", () => {
       const resNeg = await service.createFund({
         church_id: dummyChurchId,
         name: "กองทุนติดลบ",
-        target_budget: "-1000.00",
+        target_amount: "-1000.00",
       });
 
       expect(resEmpty.success).toBe(false);
@@ -130,13 +130,13 @@ describe("FundsService — Comprehensive Unit Tests", () => {
       const service = new FundsService(mockSupabase, "treasurer");
       const result = await service.updateFund(fromFundId, {
         name: "กองทุนทั่วไป (ปรับปรุง)",
-        target_budget: "400000.00",
+        target_amount: "400000.00",
         is_active: true,
       });
 
       expect(result.success).toBe(true);
       expect(updatedPayload.name).toBe("กองทุนทั่วไป (ปรับปรุง)");
-      expect(updatedPayload.target_budget).toBe("400000.00");
+      expect(updatedPayload.target_amount).toBe("400000.00");
     });
   });
 

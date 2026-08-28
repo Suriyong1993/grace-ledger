@@ -35,7 +35,7 @@ export interface FundBalanceReportItem {
   fund_id: string;
   fund_name: string;
   current_balance: Money;
-  target_budget: Money;
+  target_amount: Money;
   budget_variance_percentage: number;
   is_active: boolean;
 }
@@ -195,7 +195,7 @@ export class ReportsService {
       this.checkRole("read");
       const { data, error } = await (this.supabase
         .from("funds") as any)
-        .select("id, name, current_balance, target_budget, is_active")
+        .select("id, name, current_balance, target_amount, is_active")
         .eq("church_id", churchId)
         .order("name", { ascending: true });
 
@@ -205,7 +205,7 @@ export class ReportsService {
 
       const items: FundBalanceReportItem[] = (data || []).map((f: any) => {
         const balance = f.current_balance ? Money.from(f.current_balance) : Money.zero();
-        const target = f.target_budget ? Money.from(f.target_budget) : Money.zero();
+        const target = f.target_amount ? Money.from(f.target_amount) : Money.zero();
         const variancePct = target.isPositive() && !target.isZero()
           ? Math.round((balance.toNumber() / target.toNumber()) * 100)
           : 0;
@@ -214,7 +214,7 @@ export class ReportsService {
           fund_id: f.id,
           fund_name: f.name,
           current_balance: balance,
-          target_budget: target,
+          target_amount: target,
           budget_variance_percentage: variancePct,
           is_active: f.is_active,
         };

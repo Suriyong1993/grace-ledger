@@ -16,15 +16,15 @@
  */
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import {
-  CORS_HEADERS,
   clientAddress,
+  corsHeadersFor,
   createRateLimiter,
   deploymentChurchId,
   deploymentConfigFault,
   hasProjectKey,
   isPinShaped,
   isUuid,
-  json,
+  json as jsonBase,
 } from "../_shared/deployment.ts";
 
 /** Instance-local throttle. The durable control is the lockout in `auth_pins`. */
@@ -39,7 +39,10 @@ interface VerifyResult {
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS_HEADERS });
+  const corsHeaders = corsHeadersFor(req);
+  const json = (body: unknown, status: number) => jsonBase(body, status, corsHeaders);
+
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   if (!hasProjectKey(req)) return json({ error: "unauthorized" }, 401);
   if (!takeRequest(clientAddress(req))) return json({ error: "rate_limited" }, 429);
@@ -92,6 +95,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   if (result?.status !== "success" || !result.email || !result.user_id) {
     return json({ error: "invalid" }, 401);
+  }
+
+  // A PIN awaiting reset is proven but must not yield a usable session: the
+  // holder still needs to go through PIN setup before touching real data.
+  if (result.requires_reset === true) {
+    return json({ requires_reset: true }, 200);
   }
 
   // The PIN is now spent and proven. Turn that proof into a real session by

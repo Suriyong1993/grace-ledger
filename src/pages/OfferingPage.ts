@@ -281,21 +281,20 @@ export class OfferingPage {
   public renderHtml(): string {
     if (this.isLoading && this.funds.length === 0) {
       return `
-      <div class="gl-fade-in" style="padding: 48px; text-align: center; color: var(--muted-foreground);">
-        <div style="font-size: var(--text-base); font-weight: var(--weight-semibold); margin-bottom: 6px;">กำลังโหลดระบบเงินถวาย...</div>
-        
+      <div class="gl-fade-in gl-loading-center">
+        <div class="gl-loading-center__msg">กำลังโหลดระบบเงินถวาย...</div>
       </div>
       `;
     }
 
     // Success Notification Banner
     const successBannerHtml = this.successMessage ? `
-      <div style="background: var(--income-muted); border: 1px solid var(--approved); border-radius: 10px; padding: 14px 20px; margin: 20px auto 0; max-width: 960px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px; color: var(--on-income-muted); font-weight: var(--weight-semibold); font-size: 13.5px;">
+      <div class="gl-toast">
+        <div class="gl-toast__body">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           <span>${this.successMessage}</span>
         </div>
-        <button id="btn-dismiss-toast" style="background: none; border: none; color: var(--on-income-muted); cursor: pointer; font-size: var(--text-md); padding: 2px;">✕</button>
+        <button id="btn-dismiss-toast" class="gl-toast__close">✕</button>
       </div>
     ` : "";
 
@@ -326,8 +325,8 @@ export class OfferingPage {
     } else if (this.mode === "detail") {
       if (!this.selectedSession) {
         contentHtml = `
-        <div class="gl-page gl-fade-in" style="text-align: center;">
-          <p style="font-size: var(--text-base); font-weight: var(--weight-semibold); margin: 0 0 var(--space-2);">ไม่พบข้อมูลรอบเงินถวาย</p>
+        <div class="gl-page gl-fade-in gl-empty-center">
+          <p class="gl-empty-center__msg">ไม่พบข้อมูลรอบเงินถวาย</p>
           <a href="#/offerings" class="gl-btn gl-btn--secondary">กลับไปหน้ารายการ</a>
         </div>
         `;
@@ -355,7 +354,7 @@ export class OfferingPage {
         };
 
         const tabHeaderHtml = `
-        <div class="gl-page" style="padding-bottom: 0;">
+        <div class="gl-page gl-page--flush-bottom">
           <div class="gl-tablist" role="tablist" aria-label="รายละเอียดรอบเงินถวาย">
             ${tab("btn-tab-overview", "overview", "ภาพรวม")}
             ${tab("btn-tab-count", "count", "ตรวจนับเงินสด")}
@@ -363,7 +362,7 @@ export class OfferingPage {
               "btn-tab-resolution",
               "resolution",
               "ผลต่างและการยืนยัน",
-              needsVariance ? '<span class="gl-badge gl-badge--rejected" style="margin-left: var(--space-2);" aria-label="มีผลต่างรอจัดการ">1</span>' : ""
+              needsVariance ? '<span class="gl-badge gl-badge--rejected gl-badge--inline" aria-label="มีผลต่างรอจัดการ">1</span>' : ""
             )}
           </div>
         </div>

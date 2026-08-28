@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GraceAiDrawer } from "../../src/components/ai/GraceAiDrawer";
+import { GraceAiDrawer } from "../../src/components/ai-drawer/GraceAiDrawer";
 
 describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
   const dummyChurchId = "00000000-0000-0000-0000-000000000001";
@@ -33,7 +33,7 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
             }
             if (table === "funds") {
               return Promise.resolve({
-                data: { id: "00000000-0000-0000-0000-000000000010", name: "กองทุนทั่วไป", current_balance: 200000, target_budget: 300000, is_active: true },
+                data: { id: "00000000-0000-0000-0000-000000000010", name: "กองทุนทั่วไป", current_balance: 200000, target_amount: 300000, is_active: true },
                 error: null,
               });
             }
@@ -76,8 +76,8 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
             if (table === "funds") {
               return resolve({
                 data: [
-                  { id: "00000000-0000-0000-0000-000000000010", name: "กองทุนทั่วไป", current_balance: 200000, target_budget: 300000, is_active: true },
-                  { id: "00000000-0000-0000-0000-000000000011", name: "กองทุนพันธกิจ", current_balance: 80000, target_budget: 100000, is_active: true },
+                  { id: "00000000-0000-0000-0000-000000000010", name: "กองทุนทั่วไป", current_balance: 200000, target_amount: 300000, is_active: true },
+                  { id: "00000000-0000-0000-0000-000000000011", name: "กองทุนพันธกิจ", current_balance: 80000, target_amount: 100000, is_active: true },
                 ],
                 error: null,
               });
@@ -108,8 +108,8 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     expect(drawer.getIsOpen()).toBe(false);
 
     const html = drawer.renderHtml();
-    expect(html).toContain('id="gl-ai-drawer-toggle"');
-    expect(html).not.toContain('id="gl-ai-drawer"');
+    expect(html).toContain('id="gl-aid-toggle"');
+    expect(html).not.toContain('id="gl-aid-drawer"');
   });
 
   it("renders full drawer container with header and quick chips when open", () => {
@@ -119,13 +119,12 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     expect(drawer.getIsOpen()).toBe(true);
 
     const html = drawer.renderHtml();
-    expect(html).toContain('id="gl-ai-drawer"');
+    expect(html).toContain('id="gl-aid-drawer"');
     expect(html).toContain("Grace AI Copilot");
     expect(html).toContain("สรุปการเงิน");
-    expect(html).toContain("ยอดกองทุน");
     expect(html).toContain("ร่างโอนเงิน");
     expect(html).toContain("เสนอโอนเงิน");
-    expect(html).toContain('id="gl-ai-prompt-input"');
+    expect(html).toContain('id="gl-aid-input"');
   });
 
   it("processes READ prompt and renders segregated Facts, Analysis, and Provenance metadata", async () => {
@@ -141,11 +140,11 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     expect(updated).toBe(true);
     const html = drawer.renderHtml();
 
-    expect(html).toContain("ข้อมูลข้อเท็จจริงทางบัญชี");
-    expect(html).toContain("150,000.00 บาท");
-    expect(html).toContain("50,000.00 บาท");
-    expect(html).toContain("100,000.00 บาท");
-    expect(html).toContain("การวิเคราะห์");
+    expect(html).toContain("สรุปการเงินเดือน");
+    expect(html).toContain("฿150,000.00");
+    expect(html).toContain("฿50,000.00");
+    expect(html).toContain("฿100,000.00");
+    expect(html).toContain("การตีความของ AI:");
   });
 
   it("processes DRAFT transfer prompt and renders uncommitted draft card with non-impact warning", async () => {
@@ -156,10 +155,10 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     await drawer.processPrompt("ร่างการโอนเงิน 5000", () => {});
     const html = drawer.renderHtml();
 
-    expect(html).toContain("แบบร่างการโอนเงิน");
-    expect(html).toContain("ยังไม่กระทบยอดเงิน");
+    expect(html).toContain("ร่างรายการ");
+    expect(html).toContain("ยังไม่มีผลทางบัญชี");
     expect(html).toContain("฿5,000.00");
-    expect(html).toContain("รายการนี้เป็นเพียงแบบร่าง ยังไม่มีการตัดหรือเพิ่มยอดเงินในกองทุนจริง");
+    expect(html).toContain("ร่างนี้ยังไม่มีการตัดหรือเพิ่มยอดเงินในกองทุนจริง");
   });
 
   it("processes ACTION PROPOSAL prompt and renders review button without direct execute bypass", async () => {
@@ -170,10 +169,10 @@ describe("GraceAiDrawer Copilot UI — Unit & Security Tests", () => {
     await drawer.processPrompt("เสนอโอนเงิน 5000", () => {});
     const html = drawer.renderHtml();
 
-    expect(html).toContain("ข้อเสนอการดำเนินการ");
+    expect(html).toContain("ข้อเสนอโอนเงินระหว่างกองทุน");
     expect(html).toContain("รอการยืนยัน");
     expect(html).toContain("ตรวจสอบและยืนยันการดำเนินการ");
-    expect(html).toContain("gl-ai-review-proposal-btn");
+    expect(html).toContain("data-aid-proposal-review");
 
     // CRITICAL SECURITY ASSERTION: No direct execution trigger exists on the card
     expect(html).not.toContain("ยืนยันและโอนเงินทันที");

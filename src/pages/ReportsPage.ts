@@ -97,7 +97,9 @@ export class ReportsPage {
       } else {
         // Live Accounting month (2026-08+)
         const periodStart = `${this.selectedPeriod}-01`;
-        const periodEnd = `${this.selectedPeriod}-31`;
+        const [periodYear, periodMonth] = this.selectedPeriod.split("-").map(Number);
+        const lastDay = new Date(periodYear, periodMonth, 0).getDate();
+        const periodEnd = `${this.selectedPeriod}-${String(lastDay).padStart(2, "0")}`;
 
         const res = await this.reportsService.getStatementOfFinancialPosition(
           this.churchId,

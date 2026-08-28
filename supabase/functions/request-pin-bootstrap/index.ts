@@ -14,21 +14,24 @@
  */
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import {
-  CORS_HEADERS,
   clientAddress,
+  corsHeadersFor,
   createRateLimiter,
   deploymentChurchId,
   deploymentConfigFault,
   hasProjectKey,
   isUuid,
-  json,
+  json as jsonBase,
 } from "../_shared/deployment.ts";
 
 /** Instance-local throttle: 10 requests per minute per IP. */
 const takeRequest = createRateLimiter(10, 60_000);
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS_HEADERS });
+  const corsHeaders = corsHeadersFor(req);
+  const json = (body: unknown, status: number) => jsonBase(body, status, corsHeaders);
+
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   if (!hasProjectKey(req)) return json({ error: "unauthorized" }, 401);
   if (!takeRequest(clientAddress(req))) return json({ error: "rate_limited" }, 429);

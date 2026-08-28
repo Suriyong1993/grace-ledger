@@ -82,7 +82,7 @@ const GetFundBalanceTool: AiToolDefinition = {
         fund_id: z.string(),
         name: z.string(),
         balance: z.string(),
-        target_budget: z.string(),
+        target_amount: z.string(),
       })
     ),
   }),

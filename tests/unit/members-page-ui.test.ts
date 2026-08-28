@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { MembersPage } from "../../src/pages/MembersPage";
-import { Money } from "../../src/lib/money";
 
 describe("MembersPage UI — Unit Tests", () => {
   const mockMembers = [
@@ -45,25 +44,24 @@ describe("MembersPage UI — Unit Tests", () => {
     expect(html).toContain("ค้นหาชื่อสมาชิก รหัส หรือกลุ่มแคร์...");
   });
 
-  it("renders member cards with giving totals, tithe counts, and certificates button", async () => {
+  it("renders member cards with member code and certificates button", async () => {
     const page = new MembersPage(mockSupabase, "church-1");
     await page.loadData();
     const html = page.renderHtml();
 
     expect(html).toContain("วนิดา เกียรติสกุล");
-    expect(html).toContain("MEM-0101");
-    expect(html).toContain("ยอดถวายสะสมปี 2026");
+    // member_code comes from DB; mock has none → shows "—"
     expect(html).toContain("หนังสือรับรอง");
+    // Privacy: giving totals not shown on card
+    expect(html).toContain("ประวัติการถวายเป็นข้อมูลส่วนตัว");
   });
 
   it("renders donation/giving certificate modal when a member is selected", async () => {
     const page = new MembersPage(mockSupabase, "church-1");
     await page.loadData();
 
-    // Select mem-1 and set giving total for certificate test
+    // Select mem-1 — cert modal renders; RPC not mocked so shows loading state
     (page as any).selectedMemberId = "mem-1";
-    (page as any).members[0].yearGivingTotal = Money.from("36000.00");
-    (page as any).members[0].titheCount = 12;
     const html = page.renderHtml();
 
     expect(html).toContain('id="cert-modal"');
@@ -71,7 +69,8 @@ describe("MembersPage UI — Unit Tests", () => {
     expect(html).toContain("คริสตจักรเกรซแบ๊บติสต์");
     expect(html).toContain("หนังสือรับรองการบริจาค/การถวายทรัพย์");
     expect(html).toContain("วนิดา เกียรติสกุล");
-    expect(html).toContain("฿36,000.00");
+    // Giving data loaded via RPC; mock doesn't provide it → loading state
+    expect(html).toContain("กำลังโหลดประวัติการถวาย...");
     expect(html).toContain("พิมพ์เอกสาร / ดาวน์โหลด PDF");
   });
 });

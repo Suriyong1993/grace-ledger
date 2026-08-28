@@ -31,8 +31,8 @@ describe("Grace AI DRAFT Capabilities — Security & Zero Financial Impact Tests
     ];
 
     const fundsTable: any[] = [
-      { id: dummyFundA, church_id: dummyChurchId, name: "กองทุนทั่วไป", current_balance: "100000.00", target_budget: "150000.00", is_active: true },
-      { id: dummyFundB, church_id: dummyChurchId, name: "กองทุนพันธกิจ", current_balance: "50000.00", target_budget: "80000.00", is_active: true },
+      { id: dummyFundA, church_id: dummyChurchId, name: "กองทุนทั่วไป", current_balance: "100000.00", target_amount: "150000.00", is_active: true },
+      { id: dummyFundB, church_id: dummyChurchId, name: "กองทุนพันธกิจ", current_balance: "50000.00", target_amount: "80000.00", is_active: true },
     ];
 
     const client = {

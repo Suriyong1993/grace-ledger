@@ -149,8 +149,8 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
   describe("2. Fund Balances Summary & Budget Variance", () => {
     it("computes fund balance variances against target budget without division-by-zero", async () => {
       const mockFunds = [
-        { id: "f-1", name: "กองทุนทั่วไป", current_balance: "150000.00", target_budget: "200000.00", is_active: true },
-        { id: "f-2", name: "กองทุนไร้งบ", current_balance: "25000.00", target_budget: "0.00", is_active: true }, // Target 0
+        { id: "f-1", name: "กองทุนทั่วไป", current_balance: "150000.00", target_amount: "200000.00", is_active: true },
+        { id: "f-2", name: "กองทุนไร้งบ", current_balance: "25000.00", target_amount: "0.00", is_active: true }, // Target 0
       ];
 
       const mockSupabase = {
@@ -176,8 +176,8 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
   describe("3. Executive Financial Summary & Data Provenance", () => {
     it("generates executive summary with strict provenance metadata and zero mock data", async () => {
       const mockFunds = [
-        { id: "f-1", name: "กองทุนทั่วไป", current_balance: "100000.00", target_budget: "150000.00", is_active: true },
-        { id: "f-2", name: "กองทุนพันธกิจ", current_balance: "50000.00", target_budget: "80000.00", is_active: true },
+        { id: "f-1", name: "กองทุนทั่วไป", current_balance: "100000.00", target_amount: "150000.00", is_active: true },
+        { id: "f-2", name: "กองทุนพันธกิจ", current_balance: "50000.00", target_amount: "80000.00", is_active: true },
       ];
 
       const mockSupabase = {

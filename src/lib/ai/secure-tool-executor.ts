@@ -416,7 +416,7 @@ export class SecureAiToolExecutor {
     if (toolName === "get_fund_balance") {
       let q = (this.supabase
         .from("funds") as any)
-        .select("id, name, current_balance, target_budget")
+        .select("id, name, current_balance, target_amount")
         .eq("church_id", input.church_id)
         .eq("is_active", true);
 
@@ -430,7 +430,7 @@ export class SecureAiToolExecutor {
           fund_id: f.id,
           name: f.name,
           balance: Money.from(f.current_balance || "0.00").toFixed(2),
-          target_budget: Money.from(f.target_budget || "0.00").toFixed(2),
+          target_amount: Money.from(f.target_amount || "0.00").toFixed(2),
         })),
       };
     }

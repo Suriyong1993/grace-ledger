@@ -2,44 +2,71 @@ import { describe, it, expect } from "vitest";
 import { TransactionsPage } from "../../src/pages/TransactionsPage";
 
 describe("TransactionsPage UI — Unit Tests", () => {
+  // Dynamic dates: today, yesterday, and an earlier date for date grouping
+  const today = new Date();
+  const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+  const earlier = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5);
+  const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
   const mockTransactions = [
     {
       id: "txn-1",
       description: "เงินถวายวันอาทิตย์ (รอบเช้า)",
-      transaction_date: "2026-08-21",
-      status: "approved",
+      transaction_date: fmt(today),
+      direction: "income",
+      reference_number: "RCV-2026-001",
+      status: "posted",
       account_id: "acc-1",
+      created_by: "user-1",
       accounts: { name: "เงินสดในมือ" },
       transaction_splits: [{ amount: "18450.00", fund_id: "fund-1", category_id: "cat-1", funds: { name: "กองทุนทั่วไป" }, categories: { name: "ถวายทรัพย์ทั่วไป" } }],
     },
     {
       id: "txn-2",
       description: "ซื้ออุปกรณ์ระบบเสียงห้องเยาวชน",
-      transaction_date: "2026-08-21",
-      status: "pending",
+      transaction_date: fmt(yesterday),
+      direction: "expense",
+      reference_number: "EXP-2026-002",
+      status: "pending_approval",
       account_id: "acc-2",
+      created_by: "user-1",
       accounts: { name: "ธ.กรุงไทย ···4821" },
       transaction_splits: [{ amount: "8500.00", fund_id: "fund-2", category_id: "cat-2", funds: { name: "กองทุนเยาวชน" }, categories: { name: "พันธกิจเยาวชน" } }],
     },
     {
       id: "txn-3",
       description: "ค่าไฟฟ้าและสาธารณูปโภคประจำเดือน",
-      transaction_date: "2026-08-20",
-      status: "approved",
+      transaction_date: fmt(earlier),
+      direction: "expense",
+      reference_number: null,
+      status: "posted",
       account_id: "acc-2",
+      created_by: "user-1",
       accounts: { name: "ธ.กรุงไทย ···4821" },
       transaction_splits: [{ amount: "4280.00", fund_id: "fund-1", category_id: "cat-3", funds: { name: "กองทุนทั่วไป" }, categories: { name: "สาธารณูปโภค" } }],
     },
   ];
 
+  const mockProfiles = [
+    { id: "user-1", full_name: "สมชาย ใจดี" },
+  ];
+
   const mockSupabase = {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          order: () => Promise.resolve({ data: mockTransactions, error: null }),
-        }),
-      }),
-    }),
+    from: (table: string) => {
+      const result = table === "profiles"
+        ? { data: mockProfiles, error: null }
+        : { data: mockTransactions, error: null };
+      const base: any = {
+        in: () => Promise.resolve(result),
+      };
+      base.eq = () => ({
+        order: () => Promise.resolve(result),
+        in: () => Promise.resolve(result),
+      });
+      return {
+        select: () => base,
+      };
+    },
   } as any;
 
   it("renders transactions page with header, income/expense overview, and search bar", async () => {
@@ -78,8 +105,8 @@ describe("TransactionsPage UI — Unit Tests", () => {
     expect(html).toContain("ซื้ออุปกรณ์ระบบเสียงห้องเยาวชน");
     expect(html).toContain("+฿18,450.00");
     expect(html).toContain("−฿8,500.00");
-    expect(html).toContain("อนุมัติแล้ว");
-    expect(html).toContain("รอตรวจสอบ");
+    expect(html).toContain("ลงบัญชีแล้ว");
+    expect(html).toContain("รออนุมัติ");
   });
 
   it("resolves category name from transaction_splits, not a transactions.category_id column (regression)", async () => {
@@ -102,7 +129,7 @@ describe("TransactionsPage UI — Unit Tests", () => {
 
     expect(html).toContain('id="txn-modal"');
     expect(html).toContain("รายละเอียดรายการ");
-    expect(html).toContain("TXN-0001");
+    expect(html).toContain("RCV-2026-001");
     expect(html).toContain("ประวัติการตรวจสอบ");
   });
 });
