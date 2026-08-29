@@ -70,14 +70,16 @@ export class DashboardPage {
     this.reportsService = new ReportsService(supabase);
   }
 
-
   public async loadData(churchId: string): Promise<DashboardData> {
     try {
-      const pendingRes = await this.approvalsService.getPendingApprovals(churchId);
-      const pendingCount = pendingRes.success && pendingRes.data ? pendingRes.data.length : 0;
+      const pendingRes =
+        await this.approvalsService.getPendingApprovals(churchId);
+      const pendingCount =
+        pendingRes.success && pendingRes.data ? pendingRes.data.length : 0;
 
-      const { data: fundsData, error: fundsError } = await (this.supabase
-        .from("funds") as any)
+      const { data: fundsData, error: fundsError } = await (
+        this.supabase.from("funds") as any
+      )
         .select("id, name, current_balance, target_amount")
         .eq("church_id", churchId)
         .eq("is_active", true)
@@ -101,7 +103,9 @@ export class DashboardPage {
       const funds: DashboardFund[] = [];
       if (fundsData && Array.isArray(fundsData)) {
         for (const f of fundsData) {
-          const balance = f.current_balance ? Money.from(f.current_balance as string) : Money.zero();
+          const balance = f.current_balance
+            ? Money.from(f.current_balance as string)
+            : Money.zero();
           totalFunds = totalFunds.add(balance);
           const target =
             f.target_amount !== null && f.target_amount !== undefined
@@ -123,9 +127,11 @@ export class DashboardPage {
         .eq("is_active", true);
 
       // Query recent transactions from Supabase
-      const { data: txnsData, error: txnsError } = await (this.supabase
-        .from("transactions") as any)
-        .select(`
+      const { data: txnsData, error: txnsError } = await (
+        this.supabase.from("transactions") as any
+      )
+        .select(
+          `
           id,
           description,
           amount,
@@ -133,7 +139,8 @@ export class DashboardPage {
           transaction_date,
           status,
           created_at
-        `)
+        `,
+        )
         .eq("church_id", churchId)
         .order("transaction_date", { ascending: false })
         .limit(5);
@@ -162,10 +169,16 @@ export class DashboardPage {
       const stmtRes = await this.reportsService.getStatementOfFinancialPosition(
         churchId,
         bounds.start,
-        bounds.end
+        bounds.end,
       );
-      const monthlyIncome = stmtRes.success && stmtRes.data ? stmtRes.data.total_income : Money.zero();
-      const monthlyExpense = stmtRes.success && stmtRes.data ? stmtRes.data.total_expense : Money.zero();
+      const monthlyIncome =
+        stmtRes.success && stmtRes.data
+          ? stmtRes.data.total_income
+          : Money.zero();
+      const monthlyExpense =
+        stmtRes.success && stmtRes.data
+          ? stmtRes.data.total_expense
+          : Money.zero();
 
       const recentTransactions: RecentTransaction[] = [];
 
@@ -180,18 +193,24 @@ export class DashboardPage {
           // The two can legitimately differ: this feed shows drafts as well as
           // posted rows, and parity is only enforced on submit and on post, so a
           // half-allocated draft would have displayed less than it is worth.
-          const amount = t.amount ? Money.from(t.amount as string) : Money.zero();
+          const amount = t.amount
+            ? Money.from(t.amount as string)
+            : Money.zero();
 
           // Ledger column, not a reading of the Thai description. `direction` is
           // NOT NULL in the schema; the fallback only fires if that contract is
           // broken, and it picks the neutral presentation rather than guessing a
           // sign onto an amount.
           const direction: "income" | "expense" | "transfer" =
-            t.direction === "income" || t.direction === "expense" || t.direction === "transfer"
+            t.direction === "income" ||
+            t.direction === "expense" ||
+            t.direction === "transfer"
               ? t.direction
               : "transfer";
 
-          const formattedDate = t.transaction_date ? formatDateThai(t.transaction_date) : "วันนี้";
+          const formattedDate = t.transaction_date
+            ? formatDateThai(t.transaction_date)
+            : "วันนี้";
 
           recentTransactions.push({
             id: t.id,
@@ -202,14 +221,24 @@ export class DashboardPage {
             amount,
             direction,
             date: formattedDate,
-            status: t.status === "approved" ? "approved" : t.status === "rejected" ? "rejected" : "pending",
+            status:
+              t.status === "approved"
+                ? "approved"
+                : t.status === "rejected"
+                  ? "rejected"
+                  : "pending",
           });
         }
       }
 
       // Query historical monthly summaries for dashboard trend preview
-      const histRes = await this.historicalService.getMonthlySummaries(churchId, 2569);
-      const historicalTrend: HistoricalTrendBar[] = (histRes.success && histRes.data ? histRes.data : []).map((m) => ({
+      const histRes = await this.historicalService.getMonthlySummaries(
+        churchId,
+        2569,
+      );
+      const historicalTrend: HistoricalTrendBar[] = (
+        histRes.success && histRes.data ? histRes.data : []
+      ).map((m) => ({
         monthName: m.monthName.slice(0, 4), // e.g. "ม.ค.", "ก.พ."
         income: m.incomeTotal.format(),
         expense: m.expenseTotal.format(),
@@ -241,7 +270,8 @@ export class DashboardPage {
         funds: [],
         recentTransactions: [],
         loadFailed: true,
-        errorMessage: "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง",
+        errorMessage:
+          "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง",
       };
     }
   }
@@ -252,7 +282,11 @@ export class DashboardPage {
    * month is never clipped into looking average. The 3px floor keeps a real but
    * small month visible instead of rendering nothing.
    */
-  private static trendBarHeight(satang: number, maxSatang: number, trackPx: number): number {
+  private static trendBarHeight(
+    satang: number,
+    maxSatang: number,
+    trackPx: number,
+  ): number {
     if (maxSatang <= 0 || satang <= 0) return 0;
     return Math.max(3, Math.round((satang / maxSatang) * trackPx));
   }
@@ -265,7 +299,10 @@ export class DashboardPage {
 
     // Period the figures below describe. Same locale and month style as
     // formatDateThai, so the app keeps one date language.
-    const period = new Date().toLocaleDateString("th-TH", { month: "short", year: "numeric" });
+    const period = new Date().toLocaleDateString("th-TH", {
+      month: "short",
+      year: "numeric",
+    });
 
     const loadFailedHtml = data.loadFailed
       ? `<div class="gl-notice gl-notice--error" role="alert" style="margin-bottom: var(--space-5);">
@@ -286,9 +323,19 @@ export class DashboardPage {
                 const target = f.targetAmount || null;
                 const hasTarget = target !== null && target.isPositive();
                 const pct = hasTarget
-                  ? Math.min(100, Math.max(0, Math.round((f.balance.toNumber() / target.toNumber()) * 100)))
+                  ? Math.min(
+                      100,
+                      Math.max(
+                        0,
+                        Math.round(
+                          (f.balance.toNumber() / target.toNumber()) * 100,
+                        ),
+                      ),
+                    )
                   : null;
-                const balanceColor = f.balance.isNegative() ? "var(--expense)" : "var(--foreground)";
+                const balanceColor = f.balance.isNegative()
+                  ? "var(--expense)"
+                  : "var(--foreground)";
 
                 return `
                 <div>
@@ -322,25 +369,33 @@ export class DashboardPage {
               .map((item) => {
                 const isIncome = item.direction === "income";
                 const isExpense = item.direction === "expense";
-                const iconSvg = isIncome ? ICON_INCOME : isExpense ? ICON_EXPENSE : ICON_TRANSFER;
+                const iconSvg = isIncome
+                  ? ICON_INCOME
+                  : isExpense
+                    ? ICON_EXPENSE
+                    : ICON_TRANSFER;
                 const iconBg = isIncome
                   ? "var(--income-muted)"
                   : isExpense
-                  ? "var(--expense-muted)"
-                  : "var(--secondary)";
+                    ? "var(--expense-muted)"
+                    : "var(--secondary)";
                 const iconColor = isIncome
                   ? "var(--on-income-muted)"
                   : isExpense
-                  ? "var(--on-expense-muted)"
-                  : "var(--muted-foreground)";
-                const amountColor = isIncome ? "var(--income)" : isExpense ? "var(--expense)" : "var(--foreground)";
+                    ? "var(--on-expense-muted)"
+                    : "var(--muted-foreground)";
+                const amountColor = isIncome
+                  ? "var(--income)"
+                  : isExpense
+                    ? "var(--expense)"
+                    : "var(--foreground)";
                 const sign = isIncome ? "+" : isExpense ? "−" : "";
                 const statusLabel =
                   item.status === "approved"
                     ? "อนุมัติแล้ว"
                     : item.status === "rejected"
-                    ? "ไม่อนุมัติ"
-                    : "รอตรวจสอบ";
+                      ? "ไม่อนุมัติ"
+                      : "รอตรวจสอบ";
 
                 return `
                 <div class="gl-row">
@@ -358,7 +413,10 @@ export class DashboardPage {
               .join("")}
           </div>`;
 
-    const trendMaxSatang = trend.reduce((max, t) => Math.max(max, t.incomeSatang, t.expenseSatang), 0);
+    const trendMaxSatang = trend.reduce(
+      (max, t) => Math.max(max, t.incomeSatang, t.expenseSatang),
+      0,
+    );
 
     const trendHtml =
       trend.length === 0
@@ -376,8 +434,16 @@ export class DashboardPage {
           <div class="gl-trend">
             ${trend
               .map((t, i) => {
-                const incH = DashboardPage.trendBarHeight(t.incomeSatang, trendMaxSatang, 96);
-                const expH = DashboardPage.trendBarHeight(t.expenseSatang, trendMaxSatang, 96);
+                const incH = DashboardPage.trendBarHeight(
+                  t.incomeSatang,
+                  trendMaxSatang,
+                  96,
+                );
+                const expH = DashboardPage.trendBarHeight(
+                  t.expenseSatang,
+                  trendMaxSatang,
+                  96,
+                );
                 // Columns reveal left to right, so the eye reads the year in the
                 // order the months happened. Capped at twelve steps: a longer
                 // series must still finish inside one page transition.
@@ -472,7 +538,7 @@ export class DashboardPage {
         <div class="gl-section__head">
           <h2>ต้องการให้คุณตรวจสอบ</h2>
           <span class="num-display" style="font-size: var(--text-xs); font-weight: var(--weight-semibold); color: ${
-            hasPending ? "var(--primary)" : "var(--muted-foreground)"
+            hasPending ? "var(--pending)" : "var(--muted-foreground)"
           };">${data.pendingApprovalsCount} เรื่อง</span>
         </div>
 
@@ -494,7 +560,7 @@ export class DashboardPage {
           </a>
 
           <a href="#/offerings" class="gl-row">
-            <span class="gl-row__icon" aria-hidden="true" style="background: var(--income-muted); color: var(--on-income-muted);">${ICON_OFFERING}</span>
+            <span class="gl-row__icon" aria-hidden="true" style="background: var(--pending-muted); color: var(--on-pending-muted);">${ICON_OFFERING}</span>
             <span class="gl-row__body">
               <span class="gl-row__title" style="display: block;">เงินถวายวันอาทิตย์</span>
               <span class="gl-row__meta" style="display: block;">เปิดรอบนับเงินและตรวจยอด</span>
