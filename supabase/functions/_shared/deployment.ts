@@ -67,7 +67,12 @@ export function isPinShaped(value: unknown): value is string {
  */
 const ALLOWED_ORIGINS = new Set([
   "https://grace-ledger-mu.vercel.app",
+  "https://grace-ledger-tlcs-projects-ab505ecc.vercel.app",
+  "https://grace-ledger-git-main-tlcs-projects-ab505ecc.vercel.app",
+  "https://grace-ledger-5r3y2kz3h-tlcs-projects-ab505ecc.vercel.app",
   "http://localhost:5500",
+  "http://localhost:5173",
+  "http://localhost:4173",
 ]);
 
 const BASE_CORS_HEADERS: Record<string, string> = {

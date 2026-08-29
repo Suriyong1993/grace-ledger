@@ -273,7 +273,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     </aside>
 
     <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
-      <header style="
+      <header class="gl-shell-topbar" style="
         min-height: var(--gl-topbar-h);
         border-bottom: 1px solid var(--border);
         background: color-mix(in srgb, var(--card) 88%, transparent);
@@ -287,18 +287,19 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         top: 0;
         z-index: 100;
       ">
-        <div style="display: flex; align-items: center; gap: var(--space-2); min-width: 0;">
+        <div class="gl-shell-topbar__title" style="display: flex; align-items: center; gap: var(--space-2); min-width: 0;">
           <span aria-hidden="true" class="gl-topbar-brand" style="
             display: none;
             font-weight: var(--weight-bold);
             font-size: var(--text-sm);
           ">Grace Ledger</span>
-          <span style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span class="gl-shell-topbar__page" style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
             ${active ? active.label : ""}
           </span>
         </div>
-        <div style="font-size: var(--text-xs); color: var(--muted-foreground); white-space: nowrap;">
-          ${churchName}
+        <div class="gl-shell-topbar__context" style="font-size: var(--text-xs); color: var(--muted-foreground); white-space: nowrap;">
+          <span class="gl-shell-status-dot" aria-hidden="true"></span>
+          <span>${churchName}</span>
         </div>
       </header>
 

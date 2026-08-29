@@ -29,7 +29,6 @@ export class App {
   private dashboardPage: DashboardPage;
   private approvalsPage: ApprovalsPage | null = null;
   private offeringPage: OfferingPage | null = null;
-  private offeringRouteKey: string | null = null;
   private transactionsPage: TransactionsPage | null = null;
   private fundsPage: FundsPage | null = null;
   private membersPage: MembersPage | null = null;
@@ -79,7 +78,6 @@ export class App {
         this.pinSetupPage = null;
         this.approvalsPage = null;
         this.offeringPage = null;
-        this.offeringRouteKey = null;
         this.transactionsPage = null;
         this.fundsPage = null;
         this.membersPage = null;
@@ -273,16 +271,22 @@ export class App {
       contentHtml = this.approvalsPage?.renderHtml() ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       if (this.offeringPage) {
-        const routeKey = `${this.currentRoute.pattern}:${this.currentRoute.params.id ?? ""}`;
-        if (this.offeringRouteKey !== routeKey) {
-          this.offeringRouteKey = routeKey;
-          const mode: OfferingPageMode =
-            this.currentRoute.pattern === "/offerings/new"
-              ? "new"
-              : this.currentRoute.pattern === "/offerings/:id"
-                ? "detail"
-                : "list";
-          await this.offeringPage.init(mode, this.currentRoute.params.id);
+        const offeringMode: OfferingPageMode =
+          this.currentRoute.pattern === "/offerings/new"
+            ? "new"
+            : this.currentRoute.pattern === "/offerings/:id"
+              ? "detail"
+              : "list";
+        const offeringSessionId =
+          this.currentRoute.pattern === "/offerings/:id"
+            ? this.currentRoute.params.id
+            : undefined;
+        const shouldLoadOfferingData = this.offeringPage.syncRoute(
+          offeringMode,
+          offeringSessionId,
+        );
+        if (shouldLoadOfferingData) {
+          await this.offeringPage.loadInitialData(offeringSessionId);
         }
         contentHtml = this.offeringPage.renderHtml();
       }

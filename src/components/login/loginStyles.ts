@@ -563,6 +563,83 @@ export function renderLoginStylesHtml(): string {
     }
 
     /* --- responsive ------------------------------------------------------- */
+    /* --- modern login polish ---------------------------------------------- */
+    .gl-login-screen {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(900px 500px at 50% -18%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 68%),
+        var(--background);
+    }
+    .gl-login-screen::before,
+    .gl-login-screen::after {
+      content: "";
+      position: fixed;
+      width: 240px;
+      height: 240px;
+      border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .gl-login-screen::before { top: -150px; left: -130px; }
+    .gl-login-screen::after { right: -130px; bottom: -150px; }
+    .gl-login-stage { gap: var(--space-5); }
+    .gl-login-brand { margin-bottom: var(--space-3); }
+    .gl-login-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+    .gl-login-heading { letter-spacing: -0.03em; }
+    .gl-login-profiles {
+      gap: var(--space-3);
+      max-width: 920px;
+    }
+    .gl-profile-item {
+      border-radius: 18px;
+      box-shadow: 0 8px 22px rgb(23 23 23 / 0.05);
+    }
+    .gl-profile-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px color-mix(in srgb, var(--primary) 14%, transparent);
+    }
+    .gl-pin-keypad { gap: var(--space-3); max-width: 282px; }
+    .gl-pin-key {
+      border-width: 1px;
+      box-shadow: 0 4px 12px rgb(23 23 23 / 0.04);
+    }
+    .gl-pin-key:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+    .gl-pin-bootstrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-1);
+      padding-top: var(--space-4);
+      border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    }
+    .gl-pin-bootstrap-text {
+      margin: 0;
+      color: var(--muted-foreground);
+      font-size: var(--text-xs);
+    }
+    .gl-login-text-btn {
+      color: var(--primary);
+      font-weight: var(--weight-semibold);
+    }
+    .gl-login-text-btn:hover:not(:disabled) {
+      color: var(--primary-dark);
+      background: var(--primary-light);
+    }
+    .gl-login-text-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
     @media (max-width: 640px) {
       .gl-login-screen {
         padding: var(--space-6) var(--space-4);

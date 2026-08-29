@@ -68,6 +68,25 @@ GOOD: ยังไม่มีรายการ
 
 - Dates: one format across the whole app. Today the app mixes `23 ส.ค. 2569` and `2026-08-23` — pick one and use it everywhere.
 
+## Single source of truth — mandatory
+
+Every fact that must change together has exactly one authoritative home. This includes brand colors, semantic colors, typography tokens, spacing, URLs, contact details, shipping/pricing rules, feature flags, permission rules, and shared business calculations. Do not copy the same literal, default, or rule into multiple screens or services.
+
+Before creating or changing a value or behavior, search the entire repository first. Search by the literal value, the relevant symbol, and the concept name. Inspect all matches, including CSS, TypeScript, HTML, SQL, tests, fixtures, and configuration. If an existing source of truth exists, reuse it and report its file path. If none exists, create one deliberately in the appropriate config/token/domain module and document why.
+
+When duplicate truth is found, do not patch matches one at a time and stop. First classify the matches: authoritative definition, consumer, intentional exception, test fixture, or stale duplicate. Move the authoritative value to one named export/token/configuration/RPC, replace every consumer with a reference to it, and leave intentional exceptions explicitly documented. A similar-looking component is not automatically the same behavior; consolidate only when it must change together.
+
+A task is not complete until a repository-wide search proves the migration is complete. The completion report must state: the old literal or rule searched for, the number and paths of matches before and after, the new source-of-truth file, every intentional remaining match, and the tests/build/browser checks performed. Never say “แก้ครบแล้ว” based only on one screen or one file.
+
+For visual changes, verify every route and shared component at desktop and 390px. For a brand color change, search all color literals and token references, inspect generated CSS, and open each affected route. Prefer semantic tokens such as `--primary`, `--income`, or a named TypeScript constant over raw hex values. Example:
+
+```ts
+// src/config/theme.ts
+export const BRAND = "#16a34a";
+```
+
+Every consumer imports `BRAND`; no consumer retypes `#16a34a`. Do not add a second theme/config file without first proving the existing one cannot own the value.
+
 ## No lazy shortcuts
 
 No fake data, no placeholder identity in a production path, no hardcoded financial numbers, no duplicate components, no skipped loading/error states, no `TODO` shipped as behavior, no disabling functionality to make a test pass.
@@ -98,10 +117,12 @@ No fake data, no placeholder identity in a production path, no hardcoded financi
 ### กฎทั่วไป
 
 1. Read the existing implementation before changing it. Reuse before adding.
-2. Smallest safe change per step.
-3. `npm test` + `npm run build` after each step.
-4. UI component tests assert on rendered HTML strings — markup refactors break them. Update tests deliberately, never by loosening the assertion to nothing.
-5. Verify in a browser at desktop and 390px. Compare before/after.
-6. Document what changed.
+2. Search the whole repository for existing values, symbols, and behaviors before writing anything new.
+3. Smallest safe change per step.
+4. After each change, search again and verify every intended consumer now references the single source of truth.
+5. `npm test` + `npm run build` after each step.
+6. UI component tests assert on rendered HTML strings — markup refactors break them. Update tests deliberately, never by loosening the assertion to nothing.
+7. Verify in a browser at desktop and 390px. Compare before/after across every affected route.
+8. Document changed files, search evidence, remaining intentional duplicates, and verification results before claiming completion.
 
 Do not redesign the whole app at once. Do not start new milestone features inside a polish task.

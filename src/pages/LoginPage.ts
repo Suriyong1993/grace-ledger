@@ -10,7 +10,7 @@ import {
   PIN_LENGTH,
 } from "../components/login/PinEntryView";
 import { LoginProfile } from "../components/login/types";
-import { fetchLoginProfiles, verifyPin } from "../services/authPinService";
+import { fetchLoginProfiles, requestPinBootstrap, verifyPin } from "../services/authPinService";
 
 type LoginView = "profiles" | "pin";
 type PinAuthHandler = (userId: string) => void;
@@ -115,6 +115,11 @@ export class LoginPage {
       this.restoreGroupFocusAfterPointer(event);
     });
 
+    root.querySelector<HTMLButtonElement>("#login-pin-bootstrap")?.addEventListener("click", (event) => {
+      const button = event.currentTarget as HTMLButtonElement;
+      void this.requestPinBootstrap(button);
+    });
+
     root.addEventListener("keydown", this.handlePinKeydown);
     root.querySelector<HTMLElement>("#login-pin-group")?.focus();
   }
@@ -181,6 +186,29 @@ export class LoginPage {
     this.pin = "";
     if (this.pinStatus !== "idle") this.pinStatus = "idle";
     this.syncPinDom();
+  }
+
+  private async requestPinBootstrap(button: HTMLButtonElement): Promise<void> {
+    const profile = this.selectedProfile;
+    if (!profile || button.disabled) return;
+
+    button.disabled = true;
+    button.textContent = "กำลังส่งอีเมล...";
+
+    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const result = await requestPinBootstrap(this.supabase, profile.id, redirectTo);
+
+    if (result.status === "sent") {
+      button.textContent = "ส่งลิงก์ไปที่อีเมลแล้ว";
+      const status = this.root?.querySelector<HTMLElement>("#login-pin-status");
+      if (status) status.textContent = "กรุณาเปิดลิงก์ในอีเมล แล้วทำตามขั้นตอนตั้ง PIN";
+      return;
+    }
+
+    button.disabled = false;
+    button.textContent = result.status === "rate_limited"
+      ? "ส่งไปแล้ว กรุณาตรวจอีเมลหรือลองใหม่ภายหลัง"
+      : "ส่งไม่สำเร็จ ลองอีกครั้ง";
   }
 
   private submitPin(): void {
