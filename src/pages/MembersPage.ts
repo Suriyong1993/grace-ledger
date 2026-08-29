@@ -3,6 +3,7 @@ import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
+import { MembersService } from "../lib/members/members-service";
 
 export interface MemberRecord {
   id: string;
@@ -21,28 +22,40 @@ type GivingState = {
 };
 
 const ICON_SEARCH = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>`;
+const ICON_PLUS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
 const ICON_CERT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>`;
 const ICON_CLOSE = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
 export class MembersPage {
   private searchQuery = "";
   private selectedMemberId: string | null = null;
+  private isAddMemberModalOpen = false;
   private members: MemberRecord[] = [];
+  private membersService: MembersService;
   private errorMessage: string | null = null;
+  private successMessage: string | null = null;
+  private formErrorMessage: string | null = null;
   private isLoading = false;
+  private isSubmitting = false;
   // Per-member confidential giving history, loaded only on explicit detail view
   // (single-member lookup — never bulk-fetched, per the privacy design).
   private givingById: Record<string, GivingState> = {};
 
-  constructor(private supabase: SupabaseClient<Database>, private churchId: string) {}
+  constructor(
+    private supabase: SupabaseClient<Database>,
+    private churchId: string,
+  ) {
+    this.membersService = new MembersService(supabase);
+  }
 
   public async loadData(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
     try {
-      const { data, error } = await (this.supabase
-        .from("members") as any)
-        .select("id, full_name, email, phone, is_active, created_at, member_code")
+      const { data, error } = await (this.supabase.from("members") as any)
+        .select(
+          "id, full_name, email, phone, is_active, created_at, member_code",
+        )
         .eq("church_id", this.churchId)
         .eq("is_active", true)
         .order("full_name", { ascending: true });
@@ -56,19 +69,18 @@ export class MembersPage {
       if (data && Array.isArray(data)) {
         this.members = data.map((m: any) => ({
           id: m.id,
-          // Real member code from the database; "—" when not yet assigned.
           code: m.member_code || "—",
           name: m.full_name || "สมาชิก",
           email: m.email || "—",
           phone: m.phone || "—",
-          // Care group is not stored on members; shown as unavailable.
           group: "—",
         }));
       } else {
         this.members = [];
       }
     } catch {
-      this.errorMessage = "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง";
+      this.errorMessage =
+        "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง";
       this.members = [];
     } finally {
       this.isLoading = false;
@@ -80,18 +92,29 @@ export class MembersPage {
    * privacy-gated RPC. This is the only sanctioned path for giving data and
    * must never be called in bulk. Results are cached per member id.
    */
-  public async loadGivingForMember(memberId: string, onStateChange: () => void): Promise<void> {
+  public async loadGivingForMember(
+    memberId: string,
+    onStateChange: () => void,
+  ): Promise<void> {
     const existing = this.givingById[memberId];
     if (existing && existing.status !== "none") return;
 
-    this.givingById[memberId] = { status: "loading", total: Money.zero(), titheCount: 0, lastGivenDate: null };
+    this.givingById[memberId] = {
+      status: "loading",
+      total: Money.zero(),
+      titheCount: 0,
+      lastGivenDate: null,
+    };
     onStateChange();
 
     try {
-      const { data, error } = await this.supabase.rpc("get_member_giving_history", {
-        p_member_id: memberId,
-        p_reason: "ออกหนังสือรับรองการถวายทรัพย์",
-      } as any);
+      const { data, error } = await this.supabase.rpc(
+        "get_member_giving_history",
+        {
+          p_member_id: memberId,
+          p_reason: "ออกหนังสือรับรองการถวายทรัพย์",
+        } as any,
+      );
 
       if (error) throw new Error(error.message);
 
@@ -103,10 +126,20 @@ export class MembersPage {
       });
 
       if (thisYear.length === 0) {
-        this.givingById[memberId] = { status: "none", total: Money.zero(), titheCount: 0, lastGivenDate: null };
+        this.givingById[memberId] = {
+          status: "none",
+          total: Money.zero(),
+          titheCount: 0,
+          lastGivenDate: null,
+        };
       } else {
-        const total = thisYear.reduce((acc, r) => acc.add(Money.from(r.amount || "0.00")), Money.zero());
-        const titheCount = thisYear.filter((r) => r.giving_type === "tithe").length;
+        const total = thisYear.reduce(
+          (acc, r) => acc.add(Money.from(r.amount || "0.00")),
+          Money.zero(),
+        );
+        const titheCount = thisYear.filter(
+          (r) => r.giving_type === "tithe",
+        ).length;
         const last = thisYear
           .map((r) => (r.given_at ? new Date(r.given_at) : null))
           .filter((d): d is Date => d !== null)
@@ -118,7 +151,7 @@ export class MembersPage {
           lastGivenDate: last ? formatDateThai(last.toISOString()) : null,
         };
       }
-    } catch (err: any) {
+    } catch {
       // Access Denied (role-gated) or other failure -> never surface raw error.
       this.givingById[memberId] = {
         status: "denied",
@@ -143,11 +176,11 @@ export class MembersPage {
       body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground);">ไม่มีข้อมูลการถวายในปีนี้</div>`;
     } else {
       body = `
-        <div><strong>ชื่อผู้ถวาย:</strong> ${escapeHtml(member.name)} (รหัส: ${escapeHtml(member.code)})</div>
-        <div><strong>สถิติการถวายสิบลด:</strong> ${g.titheCount} ครั้ง</div>
-        <div><strong>ยอดถวายสะสมรวม:</strong> <span class="num-display" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--primary);">${g.total.format()}</span></div>
-        <div><strong>ถวายล่าสุด:</strong> ${g.lastGivenDate ?? "—"}</div>
-        <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: var(--space-2);">ประวัติการเข้าดูถูกบันทึกในบันทึกการตรวจสอบ (audit log)</div>`;
+        <div style="margin-bottom: var(--space-2);"><strong>ชื่อผู้ถวาย:</strong> ${escapeHtml(member.name)} (รหัส: ${escapeHtml(member.code)})</div>
+        <div style="margin-bottom: var(--space-2);"><strong>สถิติการถวายสิบลด:</strong> ${g.titheCount} ครั้ง</div>
+        <div style="margin-bottom: var(--space-2);"><strong>ยอดถวายสะสมรวม:</strong> <span class="num-display" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--primary);">${g.total.format()}</span></div>
+        <div style="margin-bottom: var(--space-2);"><strong>ถวายล่าสุด:</strong> ${g.lastGivenDate ?? "—"}</div>
+        <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: var(--space-3);">ประวัติการเข้าดูถูกบันทึกในบันทึกการตรวจสอบ (audit log)</div>`;
     }
     return body;
   }
@@ -156,9 +189,15 @@ export class MembersPage {
     const errorNoticeHtml = this.errorMessage
       ? `<div class="gl-notice gl-notice--error" role="alert" style="margin-bottom: var(--space-4);">
           <div class="gl-notice__body" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>${this.errorMessage}</span>
+            <span>${escapeHtml(this.errorMessage)}</span>
             <button id="retry-members-btn" class="gl-btn gl-btn--secondary gl-btn--sm">ลองใหม่</button>
           </div>
+        </div>`
+      : "";
+
+    const successNoticeHtml = this.successMessage
+      ? `<div class="gl-notice gl-notice--success" role="status" style="margin-bottom: var(--space-4);">
+          <div class="gl-notice__body">${escapeHtml(this.successMessage)}</div>
         </div>`
       : "";
 
@@ -190,32 +229,92 @@ export class MembersPage {
       ? this.members.find((m) => m.id === this.selectedMemberId)
       : null;
 
+    // Certificate Modal
     const certModalHtml = selectedMember
       ? `
       <div id="cert-modal" class="gl-modal-backdrop gl-fade-in">
-        <div class="gl-modal-content" style="max-width: 480px; padding: var(--space-5);">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+        <div class="gl-modal-content gl-rise" style="max-width: 520px; padding: var(--space-5);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);" class="no-print">
             <div style="font-size: var(--text-base); font-weight: var(--weight-bold);">หนังสือรับรองการถวายทรัพย์</div>
-            <button id="close-cert-btn" class="gl-btn gl-btn--ghost gl-btn--sm" style="width: 36px; height: 36px; padding: 0; border-radius: var(--radius-full);">
+            <button id="close-cert-btn" class="gl-btn gl-btn--ghost gl-btn--sm" style="padding: 0; border-radius: var(--radius-full);">
               ${ICON_CLOSE}
             </button>
           </div>
 
-          <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: var(--space-5); margin-bottom: var(--space-4);">
-            <div style="font-size: var(--text-sm); color: var(--muted-foreground);">คริสตจักรเกรซแบ๊บติสต์</div>
-            <div style="font-size: var(--text-lg); font-weight: var(--weight-bold); margin: var(--space-1) 0;">หนังสือรับรองการบริจาค/การถวายทรัพย์</div>
-            <div style="font-size: var(--text-xs); color: var(--muted-foreground);">ประจำปีภาษี ${new Date().getFullYear() + 543} / ${new Date().getFullYear()}</div>
+          <div id="printable-certificate" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: var(--space-6); margin-bottom: var(--space-4);">
+            <div style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: var(--space-3); margin-bottom: var(--space-4);">
+              <div style="font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--primary);">คริสตจักรเกรซแบ๊บติสต์</div>
+              <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 2px;">Grace Baptist Church Thailand</div>
+              <div style="font-size: var(--text-base); font-weight: var(--weight-semibold); margin-top: var(--space-2);">หนังสือรับรองการบริจาค/การถวายทรัพย์</div>
+              <div style="font-size: var(--text-xs); color: var(--muted-foreground);">ประจำปีภาษี ${new Date().getFullYear() + 543} / ${new Date().getFullYear()}</div>
+            </div>
 
-            <div style="height: 1px; background: var(--border); margin: var(--space-4) 0;"></div>
-
-            <div style="text-align: left; font-size: var(--text-xs); line-height: 1.8; color: var(--foreground);">
+            <div style="text-align: left; font-size: var(--text-sm); line-height: 1.8; color: var(--foreground);">
               ${this.givingBlockHtml(selectedMember)}
+            </div>
+
+            <div style="margin-top: var(--space-6); display: flex; justify-content: space-between; text-align: center; font-size: var(--text-xs); color: var(--muted-foreground); padding-top: var(--space-4); border-top: 1px dashed var(--border);">
+              <div>
+                <div style="margin-bottom: 30px;">( ............................................................ )</div>
+                <div>เหรัญญิกคริสตจักร</div>
+              </div>
+              <div>
+                <div style="margin-bottom: 30px;">( ............................................................ )</div>
+                <div>ศิษยาภิบาล / ประธานคริสตจักร</div>
+              </div>
             </div>
           </div>
 
-          <div style="display: flex; gap: var(--space-2);">
+          <div style="display: flex; gap: var(--space-2);" class="no-print">
             <button id="print-cert-btn" class="gl-btn gl-btn--primary" style="flex: 1;">พิมพ์เอกสาร / ดาวน์โหลด PDF</button>
           </div>
+        </div>
+      </div>`
+      : "";
+
+    // Add Member Modal
+    const addMemberModalHtml = this.isAddMemberModalOpen
+      ? `
+      <div id="add-member-modal" class="gl-modal-backdrop gl-fade-in">
+        <div class="gl-modal-content gl-rise" style="max-width: 440px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+            <div style="font-size: var(--text-base); font-weight: var(--weight-bold);">เพิ่มสมาชิกใหม่</div>
+            <button id="close-add-member-btn" class="gl-btn gl-btn--ghost gl-btn--sm" style="padding: 0; border-radius: var(--radius-full);">
+              ${ICON_CLOSE}
+            </button>
+          </div>
+
+          ${
+            this.formErrorMessage
+              ? `<div class="gl-notice gl-notice--error" style="margin-bottom: var(--space-3); font-size: var(--text-xs);">
+                  <div class="gl-notice__body">${escapeHtml(this.formErrorMessage)}</div>
+                </div>`
+              : ""
+          }
+
+          <form id="add-member-form" style="display: flex; flex-direction: column; gap: var(--space-3);">
+            <div class="gl-field">
+              <label class="gl-label" for="member-name-input">ชื่อ-นามสกุล *</label>
+              <input type="text" class="gl-input" id="member-name-input" required placeholder="เช่น สมเกียรติ วงศ์สว่าง" />
+            </div>
+
+            <div class="gl-field">
+              <label class="gl-label" for="member-phone-input">เบอร์โทรศัพท์</label>
+              <input type="tel" class="gl-input" id="member-phone-input" placeholder="เช่น 081-234-5678" />
+            </div>
+
+            <div class="gl-field">
+              <label class="gl-label" for="member-email-input">อีเมล</label>
+              <input type="email" class="gl-input" id="member-email-input" placeholder="เช่น somkiat@example.com" />
+            </div>
+
+            <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">
+              <button type="button" id="cancel-add-member-btn" class="gl-btn gl-btn--secondary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
+              <button type="submit" class="gl-btn gl-btn--primary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>
+                ${this.isSubmitting ? "กำลังบันทึก..." : "บันทึกสมาชิก"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>`
       : "";
@@ -223,11 +322,12 @@ export class MembersPage {
     const membersGridHtml = this.errorMessage
       ? ""
       : filtered.length === 0
-      ? `<div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
+        ? `<div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
           <div style="font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--foreground); margin-bottom: 4px;">ยังไม่มีรายชื่อสมาชิก</div>
-          <p style="margin: 0; font-size: var(--text-sm);">เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี</p>
+          <p style="margin: 0 0 var(--space-3); font-size: var(--text-sm);">เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี</p>
+          <button id="empty-add-member-btn" class="gl-btn gl-btn--primary gl-btn--sm">+ เพิ่มสมาชิกคนแรก</button>
         </div>`
-      : `
+        : `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-3);">
           ${filtered
             .map(
@@ -263,19 +363,26 @@ export class MembersPage {
                   <span>หนังสือรับรอง</span>
                 </button>
               </div>
-            </div>`
+            </div>`,
             )
             .join("")}
         </div>`;
 
     return `
     <div class="gl-page gl-fade-in">
-      <div class="gl-page-header">
-        <h1>สมาชิกและการถวาย</h1>
-        <p>ทะเบียนสมาชิก ประวัติการถวายสิบลด และการออกหนังสือรับรองภาษี</p>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
+        <div class="gl-page-header" style="margin-bottom: 0;">
+          <h1>สมาชิกและการถวาย</h1>
+          <p>ทะเบียนสมาชิก ประวัติการถวายสิบลด และการออกหนังสือรับรองภาษี</p>
+        </div>
+        <button id="open-add-member-btn" class="gl-btn gl-btn--primary">
+          ${ICON_PLUS}
+          <span>เพิ่มสมาชิกใหม่</span>
+        </button>
       </div>
 
       ${errorNoticeHtml}
+      ${successNoticeHtml}
 
       <!-- Search Bar -->
       <section class="gl-section" style="margin-bottom: var(--space-4);">
@@ -307,21 +414,116 @@ export class MembersPage {
       </section>
 
       ${certModalHtml}
+      ${addMemberModalHtml}
     </div>
     `;
   }
 
-  public attachEventListeners(root: HTMLElement, onStateChange: () => void): void {
-    const retryBtn = root.querySelector<HTMLButtonElement>("#retry-members-btn");
+  public attachEventListeners(
+    root: HTMLElement,
+    onStateChange: () => void,
+  ): void {
+    const retryBtn =
+      root.querySelector<HTMLButtonElement>("#retry-members-btn");
     retryBtn?.addEventListener("click", async () => {
       await this.loadData();
       onStateChange();
     });
 
-    const searchInput = root.querySelector<HTMLInputElement>("#member-search-input");
+    const searchInput = root.querySelector<HTMLInputElement>(
+      "#member-search-input",
+    );
     searchInput?.addEventListener("input", (e) => {
       this.searchQuery = (e.target as HTMLInputElement).value;
       onStateChange();
+    });
+
+    // Add Member Modal toggle
+    const openAddMember = () => {
+      this.isAddMemberModalOpen = true;
+      this.formErrorMessage = null;
+      this.successMessage = null;
+      onStateChange();
+    };
+
+    root
+      .querySelector<HTMLButtonElement>("#open-add-member-btn")
+      ?.addEventListener("click", openAddMember);
+    root
+      .querySelector<HTMLButtonElement>("#empty-add-member-btn")
+      ?.addEventListener("click", openAddMember);
+
+    const closeAddMemberModal = () => {
+      this.isAddMemberModalOpen = false;
+      this.formErrorMessage = null;
+      onStateChange();
+    };
+
+    root
+      .querySelector<HTMLButtonElement>("#close-add-member-btn")
+      ?.addEventListener("click", closeAddMemberModal);
+    root
+      .querySelector<HTMLButtonElement>("#cancel-add-member-btn")
+      ?.addEventListener("click", closeAddMemberModal);
+    const addMemberBackdrop =
+      root.querySelector<HTMLElement>("#add-member-modal");
+    addMemberBackdrop?.addEventListener("click", (e) => {
+      if (e.target === addMemberBackdrop) closeAddMemberModal();
+    });
+
+    // Add Member Form submission
+    const addMemberForm =
+      root.querySelector<HTMLFormElement>("#add-member-form");
+    addMemberForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nameInput =
+        root.querySelector<HTMLInputElement>("#member-name-input");
+      const phoneInput = root.querySelector<HTMLInputElement>(
+        "#member-phone-input",
+      );
+      const emailInput = root.querySelector<HTMLInputElement>(
+        "#member-email-input",
+      );
+
+      const nameVal = nameInput?.value?.trim() || "";
+      const phoneVal = phoneInput?.value?.trim() || undefined;
+      const emailVal = emailInput?.value?.trim() || undefined;
+
+      if (!nameVal) {
+        this.formErrorMessage = "กรุณาระบุชื่อ-นามสกุลสมาชิก";
+        onStateChange();
+        return;
+      }
+
+      this.isSubmitting = true;
+      this.formErrorMessage = null;
+      onStateChange();
+
+      try {
+        const res = await this.membersService.createMember({
+          church_id: this.churchId,
+          full_name: nameVal,
+          phone_number: phoneVal,
+          email: emailVal,
+        });
+
+        if (!res.success) {
+          this.formErrorMessage = res.error || "ไม่สามารถเพิ่มสมาชิกได้";
+          this.isSubmitting = false;
+          onStateChange();
+          return;
+        }
+
+        this.isAddMemberModalOpen = false;
+        this.successMessage = `เพิ่มสมาชิก "${nameVal}" เรียบร้อยแล้ว`;
+        this.isSubmitting = false;
+        await this.loadData();
+        onStateChange();
+      } catch (err: any) {
+        this.formErrorMessage = err.message || "เกิดข้อผิดพลาด";
+        this.isSubmitting = false;
+        onStateChange();
+      }
     });
 
     const certBtns = root.querySelectorAll<HTMLButtonElement>(".view-cert-btn");
@@ -349,16 +551,6 @@ export class MembersPage {
     certBackdrop?.addEventListener("click", (e) => {
       if (e.target === certBackdrop) closeCertModal();
     });
-
-    if (this.selectedMemberId) {
-      const onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape") {
-          document.removeEventListener("keydown", onKeyDown);
-          closeCertModal();
-        }
-      };
-      document.addEventListener("keydown", onKeyDown);
-    }
 
     const printBtn = root.querySelector<HTMLButtonElement>("#print-cert-btn");
     printBtn?.addEventListener("click", () => {
