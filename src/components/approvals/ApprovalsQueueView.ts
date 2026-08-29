@@ -1,4 +1,5 @@
 import { PendingApprovalItem } from "../../lib/transactions/types";
+import { escapeHtml } from "../../lib/format";
 import { Money } from "../../lib/money";
 import { renderStatusBadgeHtml } from "./StatusBadge";
 
@@ -107,10 +108,10 @@ export function renderApprovalsQueueViewHtml(props: ApprovalsQueueViewProps): st
             </span>
           </div>
           <div style="font-size: var(--text-base); font-weight: var(--weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            ${item.description}
+            ${escapeHtml(item.description)}
           </div>
           <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 2px;">
-            ${fundName} · ${item.creatorName}
+            ${escapeHtml(fundName)} · ${escapeHtml(item.creatorName ?? "")}
           </div>
         </div>
 

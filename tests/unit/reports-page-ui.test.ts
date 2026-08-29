@@ -42,7 +42,9 @@ describe("ReportsPage UI — Unit Tests", () => {
 
     expect(html).toContain("<h1>รายงานการเงิน</h1>");
     expect(html).toContain("งบการเงินประจำเดือน รายรับ-รายจ่าย");
-    expect(html).toContain("ส.ค. 2569 (Live)");
+    expect(html).toContain("ส.ค. 2569");
+    expect(html).not.toContain("(Live)");
+    expect(html).not.toContain("(Posted)");
     expect(html).toContain("ก.ค. 2569 (ย้อนหลัง)");
     expect(html).toContain("มิ.ย. 2569");
     expect(html).toContain("มี.ค. 2569 (ตรวจทาน)");

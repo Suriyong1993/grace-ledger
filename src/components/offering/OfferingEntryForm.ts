@@ -1,4 +1,5 @@
 import { Money } from "../../lib/money";
+import { escapeHtml } from "../../lib/format";
 import { OfferingPaymentChannel, OfferingSourceType } from "../../lib/offering/types";
 
 export interface FundOption {
@@ -386,7 +387,7 @@ export function renderOfferingEntryFormHtml(props: OfferingEntryFormProps): stri
                 >
                   ${funds.map((f) => `
                     <option value="${f.id}" ${f.id === item.fundId ? "selected" : ""}>
-                      ${f.name}
+                      ${escapeHtml(f.name)}
                     </option>
                   `).join("")}
                 </select>

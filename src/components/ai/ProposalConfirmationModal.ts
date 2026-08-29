@@ -40,13 +40,19 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
     ? "ข้อเสนอหมดอายุแล้ว"
     : `หมดอายุใน ${mins}:${secs.toString().padStart(2, "0")} นาที`;
 
+  // One Thai mapping drives both the confirm button and the action badge, so
+  // the badge can never fall back to the raw database enum.
   let actionTitle = "ยืนยันการทำรายการ";
+  let actionLabel = "ทำรายการ";
   if (proposal.action === "fund_transfer") {
     actionTitle = `ยืนยันการโอนเงิน ${proposal.amount}`;
+    actionLabel = "โอนเงิน";
   } else if (proposal.action === "post_transaction") {
-    actionTitle = `ยืนยันโพสต์รายการ ${proposal.amount}`;
+    actionTitle = `ยืนยันลงบัญชีรายการ ${proposal.amount}`;
+    actionLabel = "ลงบัญชี";
   } else if (proposal.action === "void_transaction") {
-    actionTitle = `ยืนยันยกเลิกรายการ (Void) ${proposal.amount}`;
+    actionTitle = `ยืนยันยกเลิกรายการ ${proposal.amount}`;
+    actionLabel = "ยกเลิกรายการ";
   }
 
   return `
@@ -62,9 +68,6 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
             <h2 id="gl-proposal-modal-title" style="font-size: var(--text-base); font-weight: var(--weight-bold); margin: 0; color: var(--foreground);">
               การตรวจสอบและยืนยันโดยมนุษย์
             </h2>
-            <p style="font-size: var(--text-xs); color: var(--muted-foreground); margin: 0;">
-              Grace AI Action Proposal & Confirmation Gate
-            </p>
           </div>
         </div>
         <button type="button" class="gl-modal-close gl-btn gl-btn--ghost gl-btn--sm" aria-label="ปิด" ${isLoading ? "disabled" : ""}>
@@ -75,7 +78,7 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
       <!-- TTL Timer Banner -->
       <div class="gl-proposal-timer" style="display: flex; justify-content: space-between; align-items: center; background: var(--muted); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); font-size: var(--text-xs); margin-bottom: var(--space-4);">
         <span style="color: var(--muted-foreground);">ความถูกต้องของข้อเสนอ:</span>
-        <span class="gl-countdown-badge ${isExpired ? "gl-badge--expired" : "gl-badge--active"}" style="font-family: var(--font-mono); font-weight: var(--weight-bold); color: ${isExpired ? "var(--destructive)" : "var(--warning)"};">
+        <span class="gl-countdown-badge ${isExpired ? "gl-badge--expired" : "gl-badge--active"}" style="font-weight: var(--weight-bold); color: ${isExpired ? "var(--destructive)" : "var(--warning)"};">
           ${countdownText}
         </span>
       </div>
@@ -83,10 +86,10 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
       <!-- Action Card -->
       <div class="gl-proposal-card" style="border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); background: var(--card); margin-bottom: var(--space-4);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-          <span class="gl-badge gl-badge--action" style="font-size: var(--text-xs); text-transform: uppercase; font-weight: var(--weight-bold);">
-            ${proposal.action.replace("_", " ")}
+          <span class="gl-badge gl-badge--action" style="font-size: var(--text-xs); font-weight: var(--weight-bold);">
+            ${actionLabel}
           </span>
-          <span class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold); font-family: var(--font-mono);">
+          <span class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold);">
             ${proposal.amount}
           </span>
         </div>
@@ -144,7 +147,7 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
             ${ICON_SHIELD} <span>คำเตือนการยกเลิกรายการถาวร:</span>
           </div>
           <div style="padding-left: var(--space-4); line-height: 1.5;">
-            รายการนี้จะถูกทำเครื่องหมายเป็น Voided ในบัญชี และระบบจะสร้าง Reversal Mirror Entry โดยอัตโนมัติ ไม่สามารถย้อนกลับได้
+            รายการนี้จะถูกทำเครื่องหมายว่ายกเลิกในบัญชี และระบบจะบันทึกรายการกลับบัญชีอัตโนมัติ ไม่สามารถย้อนกลับได้
           </div>
         </div>
         `
@@ -156,12 +159,6 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
             ? `<div style="font-size: var(--text-xs); color: var(--muted-foreground);"><strong style="color: var(--foreground);">เหตุผลประกอบ:</strong> ${proposal.reason}</div>`
             : ""
         }
-      </div>
-
-      <!-- Security Hash Context -->
-      <div style="background: var(--muted); border-radius: var(--radius-sm); padding: var(--space-2); font-family: var(--font-mono); font-size: 10px; color: var(--muted-foreground); word-break: break-all; margin-bottom: var(--space-4);">
-        <div>CONFIRMATION_ID: ${proposal.confirmation_id}</div>
-        <div>PAYLOAD_HASH: ${proposal.payload_hash.substring(0, 24)}...</div>
       </div>
 
       <!-- Error State -->
@@ -180,7 +177,7 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
         isUnauthorized
           ? `
       <div class="gl-unauthorized-banner" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--destructive); border-radius: var(--radius-md); padding: var(--space-3); font-size: var(--text-xs); color: var(--destructive); margin-bottom: var(--space-4);" role="alert">
-        <strong>ไม่มีสิทธิ์ยืนยันการดำเนินการ:</strong> เฉพาะเหรัญญิก (Treasurer) หรือผู้ดูแลระบบเท่านั้นที่สามารถยืนยันการเงินนี้ได้
+        <strong>ไม่มีสิทธิ์ยืนยันการดำเนินการ:</strong> เฉพาะเหรัญญิกหรือผู้ดูแลระบบเท่านั้นที่สามารถยืนยันการเงินนี้ได้
       </div>
       `
           : ""

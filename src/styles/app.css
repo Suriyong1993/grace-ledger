@@ -998,7 +998,7 @@ button.gl-card:active {
   }
 
   /* Inline text links that act as the screen's back affordance. */
-  #main-content a:not(.gl-btn):not(.gl-mobilenav__item) {
+  #main-content a:not(.gl-btn):not(.gl-mobilenav__item):not(.gl-row):not(.gl-quick-action) {
     display: inline-flex;
     align-items: center;
     min-height: var(--touch-target-min);
@@ -1027,5 +1027,439 @@ button.gl-card:active {
   .gl-denom-row > div:last-child {
     grid-column: 1 / -1;
     text-align: right !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Progress meter
+   Three screens hand-rolled this shape before it had an owner (FundsPage
+   budget bar, ReportsPage income and expense tables). Colour is passed in
+   through --gl-progress-fill so income / expense / primary keep their meaning.
+   Width transition is covered by the design system's global reduced-motion
+   guard in tokens/motion.css.
+   -------------------------------------------------------------------------- */
+.gl-progress {
+  height: var(--space-1);
+  background: var(--secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.gl-progress__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--gl-progress-fill, var(--primary));
+  transition: width var(--duration-page) var(--ease-out);
+  /* The page re-renders whole, so a width transition has no previous value to
+     move from. Scaling the painted bar shows the fill arriving at the width
+     the markup already states — the number is never animated, only its bar. */
+  transform-origin: left center;
+  animation: glFillGrow var(--duration-page) var(--ease-out) both;
+}
+
+@keyframes glFillGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* --------------------------------------------------------------------------
+   Dashboard composition
+   The dashboard is a reading surface first: section rhythm, typography and
+   dividers do the grouping. A card appears only where a real container is
+   needed, never to decorate a section.
+   -------------------------------------------------------------------------- */
+
+/* Summary rail. The balance keeps the weight of the screen; the month's income
+   and expense are separate cards so each figure has one owner and one heading
+   rather than sharing a divided card with the balance. */
+.gl-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.gl-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gl-stat--hero {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+}
+
+/* A seven-figure baht amount is ~155px at --text-xl; two cards across a 390px
+   phone give the value 123px. Money is never clipped or shrunk to fit, so the
+   two figures take a full row each on the narrowest screens instead. */
+@media (max-width: 479px) {
+  .gl-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .gl-stats {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .gl-stat--hero {
+    grid-column: 1;
+    grid-row: span 2;
+  }
+}
+
+.gl-stat__label {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-stat__value {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: 1.15;
+}
+
+.gl-stat__value--hero {
+  margin-top: var(--space-2);
+  font-size: var(--text-5xl);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.1;
+}
+
+.gl-stat__foot {
+  margin-top: 6px;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+/* Entrance for the summary rail. Short, one direction, and staggered only far
+   enough to read as one group arriving rather than three separate events. */
+.gl-rise {
+  animation: glRiseIn var(--duration-component) var(--ease-out) both;
+  animation-delay: var(--gl-rise-delay, 0ms);
+}
+
+@keyframes glRiseIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* tokens/motion.css collapses durations under reduced motion but not delays,
+   and these animations hold their start frame during the delay. Zero the
+   delays too, or a reduced-motion reader waits on an invisible card. */
+@media (prefers-reduced-motion: reduce) {
+  .gl-rise,
+  .gl-trend__bar,
+  .gl-progress__fill {
+    animation-delay: 0ms !important;
+  }
+}
+
+/* Destinations row. Four across on a desk, two on a phone — never eight
+   thumbnails competing with the balance above them. */
+.gl-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.gl-quick-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1.3;
+  text-decoration: none;
+  transition: background-color var(--duration-micro) var(--ease-out),
+              border-color var(--duration-micro) var(--ease-out),
+              transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-quick-action:hover {
+  background: var(--accent);
+  border-color: var(--primary);
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.gl-quick-action:active {
+  background: var(--secondary);
+  transform: scale(0.98);
+}
+
+.gl-quick-action__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: color var(--duration-micro) var(--ease-out);
+}
+
+.gl-quick-action:hover .gl-quick-action__icon {
+  color: var(--primary);
+}
+
+.gl-quick-action--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-semibold);
+}
+
+.gl-quick-action--primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--primary-foreground);
+}
+
+.gl-quick-action--primary .gl-quick-action__icon,
+.gl-quick-action--primary:hover .gl-quick-action__icon {
+  color: var(--primary-foreground);
+}
+
+/* Navigable list row — guided actions and recent activity share one shape. */
+.gl-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  color: inherit;
+  text-decoration: none;
+}
+
+.gl-row + .gl-row {
+  border-top: 1px solid var(--border);
+}
+
+a.gl-row {
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+a.gl-row:hover {
+  background: var(--accent);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.gl-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-row__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.gl-row__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gl-row__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-row__meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-row__end {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.gl-row__chevron {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+
+/* Fund progress list — a target turns a balance into progress. */
+.gl-fundlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.gl-fundrow__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.gl-fundrow__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-fundrow__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+/* Month trend. Bars are scaled against the largest value actually present,
+   so a tall month is never silently clipped to look like an average one. */
+.gl-trend {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-2);
+  align-items: end;
+}
+
+.gl-trend__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-trend__col:hover {
+  background: var(--accent);
+}
+
+.gl-trend__bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 96px;
+  width: 100%;
+}
+
+.gl-trend__bar {
+  width: 9px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  /* Height stays in the markup; only the paint is animated, so a bar whose
+     animation never runs is still drawn at its correct value. */
+  transform-origin: bottom;
+  animation: glBarGrow var(--duration-page) var(--ease-out) both;
+  animation-delay: var(--gl-bar-delay, 0ms);
+}
+
+@keyframes glBarGrow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+.gl-trend__bar--income {
+  background: var(--income);
+}
+
+.gl-trend__bar--expense {
+  background: var(--expense);
+}
+
+.gl-trend__label {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+}
+
+.gl-trend__net {
+  white-space: nowrap;
+}
+
+.gl-legend {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gl-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* The reading column splits exactly once, and only when there is room. */
+.gl-dash-split {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .gl-dash-split {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .gl-quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+
+  .gl-quick-action {
+    padding: var(--space-3);
+  }
+
+  .gl-row {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .gl-trend__bars {
+    height: 72px;
+  }
+
+  .gl-trend__bar {
+    width: 7px;
+  }
+
+  /* A formatted baht amount needs ~60px; the column is 44px at 390px, so the
+     figures collide with their neighbours. The bars and the month label carry
+     the shape here, the exact numbers live one tap away in the full report.
+     Screen readers still get every figure from .gl-visually-hidden. */
+  .gl-trend__net {
+    display: none;
   }
 }

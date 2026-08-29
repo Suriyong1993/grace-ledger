@@ -207,7 +207,7 @@ export class ReportsPage {
       <!-- Month Selector Tabs -->
       <section class="gl-section" style="margin-bottom: var(--space-4);">
         <div class="gl-tablist" style="overflow-x: auto; white-space: nowrap; padding-bottom: 4px;">
-          <button class="gl-tab ${this.selectedPeriod === "2026-08" ? "is-active" : ""}" data-period="2026-08">ส.ค. 2569 (Live)</button>
+          <button class="gl-tab ${this.selectedPeriod === "2026-08" ? "is-active" : ""}" data-period="2026-08">ส.ค. 2569</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-07" ? "is-active" : ""}" data-period="2026-07">ก.ค. 2569 (ย้อนหลัง)</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-06" ? "is-active" : ""}" data-period="2026-06">มิ.ย. 2569</button>
           <button class="gl-tab ${this.selectedPeriod === "2026-05" ? "is-active" : ""}" data-period="2026-05">พ.ค. 2569</button>
@@ -307,7 +307,7 @@ export class ReportsPage {
         <div style="color: var(--muted-foreground); margin-bottom: var(--space-3);">${ICON_NO_DATA}</div>
         <h3>ไม่มีข้อมูลธุรกรรมที่ลงบัญชีแล้วในงวดนี้</h3>
         <p style="color: var(--muted-foreground); max-width: 420px; margin: 0 auto var(--space-4);">
-          รายงานการเงินจะประมวลผลเฉพาะรายการที่ผ่านการอนุมัติและลงบัญชี (Posted) ในช่วงเวลาที่เลือกเท่านั้น
+          รายงานการเงินจะประมวลผลเฉพาะรายการที่ผ่านการอนุมัติและลงบัญชีในช่วงเวลาที่เลือกเท่านั้น
         </p>
       </div>`
           : `

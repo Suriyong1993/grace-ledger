@@ -1,4 +1,5 @@
 import { Money } from "../../lib/money";
+import { escapeHtml } from "../../lib/format";
 import { OfferingSession, OfferingItem, OfferingPaymentChannel } from "../../lib/offering/types";
 import { formatDateThai } from "../../lib/format";
 import { renderOfferingStatusBadge } from "./OfferingSessionList";
@@ -78,7 +79,7 @@ function renderFundAllocationHtml(items: OfferingItem[]): string {
     .map(
       (row) => `
       <tr>
-        <td class="gl-td-lead">${row.fundName}</td>
+        <td class="gl-td-lead">${escapeHtml(row.fundName)}</td>
         <td data-label="เงินสด" class="is-right num-display">${row.cash.format()}</td>
         <td data-label="เงินโอน" class="is-right num-display">${row.transfer.format()}</td>
         <td data-label="QR" class="is-right num-display">${row.qr.format()}</td>
@@ -141,7 +142,7 @@ function renderTimelineHtml(session: OfferingSession): string {
   }
 
   if (session.varianceReason) {
-    entries.push({ label: "บันทึกคำชี้แจงผลต่าง", detail: session.varianceReason, at: null });
+    entries.push({ label: "บันทึกคำชี้แจงผลต่าง", detail: escapeHtml(session.varianceReason), at: null });
   }
 
   if (session.postedAt || session.financialTransactionId) {
@@ -218,7 +219,7 @@ export function renderOfferingDetailOverviewHtml(props: OfferingDetailOverviewPr
       </div>
       <div class="gl-rows">
         ${factRow("วันที่นมัสการ", formatDateThai(session.serviceDate))}
-        ${factRow("รอบนมัสการ", session.serviceName)}
+        ${factRow("รอบนมัสการ", escapeHtml(session.serviceName))}
         ${session.creatorName ? factRow("ผู้บันทึก", session.creatorName) : ""}
         ${session.notes ? factRow("หมายเหตุ", session.notes) : ""}
       </div>

@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
@@ -142,7 +143,7 @@ export class MembersPage {
       body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground);">ไม่มีข้อมูลการถวายในปีนี้</div>`;
     } else {
       body = `
-        <div><strong>ชื่อผู้ถวาย:</strong> ${member.name} (รหัส: ${member.code})</div>
+        <div><strong>ชื่อผู้ถวาย:</strong> ${escapeHtml(member.name)} (รหัส: ${escapeHtml(member.code)})</div>
         <div><strong>สถิติการถวายสิบลด:</strong> ${g.titheCount} ครั้ง</div>
         <div><strong>ยอดถวายสะสมรวม:</strong> <span class="num-display" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--primary);">${g.total.format()}</span></div>
         <div><strong>ถวายล่าสุด:</strong> ${g.lastGivenDate ?? "—"}</div>
@@ -243,9 +244,9 @@ export class MembersPage {
                   place-items: center;
                   font-weight: var(--weight-bold);
                   font-size: var(--text-sm);
-                ">${m.name.slice(0, 2)}</div>
+                ">${escapeHtml(m.name.slice(0, 2))}</div>
                 <div style="flex: 1; min-width: 0;">
-                  <div style="font-size: var(--text-base); font-weight: var(--weight-semibold);">${m.name}</div>
+                  <div style="font-size: var(--text-base); font-weight: var(--weight-semibold);">${escapeHtml(m.name)}</div>
                   <div style="font-size: var(--text-xs); color: var(--muted-foreground);">${m.group} · ${m.code}</div>
                 </div>
               </div>
@@ -256,7 +257,7 @@ export class MembersPage {
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: var(--space-2);">
-                <span style="font-size: var(--text-2xs); color: var(--muted-foreground);">อีเมล: ${m.email}</span>
+                <span style="font-size: var(--text-2xs); color: var(--muted-foreground);">อีเมล: ${escapeHtml(m.email)}</span>
                 <button class="gl-btn gl-btn--secondary gl-btn--sm view-cert-btn" data-member-id="${m.id}">
                   ${ICON_CERT}
                   <span>หนังสือรับรอง</span>

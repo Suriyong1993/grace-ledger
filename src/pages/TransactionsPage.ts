@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
@@ -245,7 +246,7 @@ export class TransactionsPage {
                 const borderBottom = idx < items.length - 1 ? `border-bottom: 1px solid var(--border);` : "";
 
                 return `
-                <div class="gl-txn-row" data-txn-id="${item.id}" role="button" tabindex="0" aria-label="ดูรายละเอียด ${item.description}" style="
+                <div class="gl-txn-row" data-txn-id="${item.id}" role="button" tabindex="0" aria-label="ดูรายละเอียด ${escapeHtml(item.description)}" style="
                   display: flex;
                   align-items: center;
                   gap: var(--space-3);
@@ -266,10 +267,10 @@ export class TransactionsPage {
                   ">${iconSvg}</div>
                   <div style="flex: 1; min-width: 0;">
                     <div style="font-size: var(--text-sm); font-weight: var(--weight-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                      ${item.description}
+                      ${escapeHtml(item.description)}
                     </div>
                     <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 2px;">
-                      ${item.fundName} · ${item.categoryName}
+                      ${escapeHtml(item.fundName)} · ${escapeHtml(item.categoryName)}
                     </div>
                   </div>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -302,7 +303,7 @@ export class TransactionsPage {
           </div>
 
           <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-4); text-align: center; margin-bottom: var(--space-4);">
-            <div style="font-size: var(--text-xs); color: var(--muted-foreground);">${selectedTxn.description}</div>
+            <div style="font-size: var(--text-xs); color: var(--muted-foreground);">${escapeHtml(selectedTxn.description)}</div>
             <div class="num-display" style="
               font-size: var(--text-3xl);
               font-weight: var(--weight-bold);
@@ -317,11 +318,11 @@ export class TransactionsPage {
           <div class="gl-card" style="padding: 2px var(--space-4); margin-bottom: var(--space-4);">
             <div style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-bottom: 1px solid var(--border); font-size: var(--text-sm);">
               <span style="color: var(--muted-foreground);">กองทุน</span>
-              <span style="font-weight: var(--weight-medium);">${selectedTxn.fundName}</span>
+              <span style="font-weight: var(--weight-medium);">${escapeHtml(selectedTxn.fundName)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-bottom: 1px solid var(--border); font-size: var(--text-sm);">
               <span style="color: var(--muted-foreground);">หมวด</span>
-              <span style="font-weight: var(--weight-medium);">${selectedTxn.categoryName}</span>
+              <span style="font-weight: var(--weight-medium);">${escapeHtml(selectedTxn.categoryName)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; padding: var(--space-2) 0; border-bottom: 1px solid var(--border); font-size: var(--text-sm);">
               <span style="color: var(--muted-foreground);">บัญชีการเงิน</span>

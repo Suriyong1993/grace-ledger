@@ -1,4 +1,5 @@
 import { OfferingSession } from "../../lib/offering/types";
+import { escapeHtml } from "../../lib/format";
 import { VarianceEngine } from "../../lib/offering/variance-engine";
 import { Money } from "../../lib/money";
 import { formatDateThai } from "../../lib/format";
@@ -34,7 +35,7 @@ function resolveAccountLabel(
   const pool = filtered.length > 0 ? filtered : all;
   const acc = pool.find((a) => a.id === selectedId) || pool[0];
   if (!acc) return "ไม่ระบุบัญชี";
-  return `${acc.code ? `[${acc.code}] ` : ""}${acc.name}`;
+  return `${acc.code ? `[${escapeHtml(acc.code)}] ` : ""}${escapeHtml(acc.name)}`;
 }
 
 function renderPostedDestinationRow(label: string, accountLabel: string, amount: string): string {
@@ -191,7 +192,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
             </h1>
           </div>
           <p style="font-size: 13.5px; color: var(--muted-foreground); margin: 0;">
-            ${session.serviceName} · ${formatDateThai(session.serviceDate)}
+            ${escapeHtml(session.serviceName)} · ${formatDateThai(session.serviceDate)}
           </p>
         </div>
 
@@ -374,7 +375,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
               resize: vertical;
             "
             ${isLocked ? "disabled" : ""}
-          >${explanation || session.varianceReason || ""}</textarea>
+          >${escapeHtml(explanation || session.varianceReason || "")}</textarea>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: var(--text-xs);">
             <div id="label-char-counter" style="color: ${explanationLength < 5 ? 'var(--expense)' : 'var(--income)'}; font-weight: var(--weight-semibold);">
@@ -584,7 +585,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
               <select id="select-posting-cash-account" class="gl-select">
                 ${(cashAccounts.length > 0 ? cashAccounts : accounts).map((acc) => `
                   <option value="${acc.id}" ${acc.id === selectedCashAccountId ? "selected" : ""}>
-                    ${acc.code ? `[${acc.code}] ` : ""}${acc.name}
+                    ${acc.code ? `[${escapeHtml(acc.code)}] ` : ""}${escapeHtml(acc.name)}
                   </option>
                 `).join("")}
               </select>
@@ -598,7 +599,7 @@ export function renderVarianceResolutionViewHtml(props: VarianceResolutionViewPr
                 ${!hasElectronic && bankAccounts.length === 0 ? "disabled" : ""}>
                 ${(bankAccounts.length > 0 ? bankAccounts : accounts).map((acc) => `
                   <option value="${acc.id}" ${acc.id === selectedBankAccountId ? "selected" : ""}>
-                    ${acc.code ? `[${acc.code}] ` : ""}${acc.name}
+                    ${acc.code ? `[${escapeHtml(acc.code)}] ` : ""}${escapeHtml(acc.name)}
                   </option>
                 `).join("")}
               </select>
