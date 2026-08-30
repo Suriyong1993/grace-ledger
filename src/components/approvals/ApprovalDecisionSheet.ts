@@ -1,4 +1,5 @@
 import { PendingApprovalItem, ProjectedFundBalanceResult } from "../../lib/transactions/types";
+import { escapeHtml } from "../../lib/format";
 import { renderStatusBadgeHtml } from "./StatusBadge";
 import { renderProjectedBalanceCardHtml } from "./ProjectedBalanceCard";
 
@@ -30,7 +31,7 @@ export function renderApprovalDecisionSheetHtml(props: ApprovalDecisionSheetProp
             รายการนี้ได้รับการดำเนินการไปแล้ว
           </h2>
           <p style="margin: 0 0 var(--space-3);">
-            ผู้อนุมัติท่านอื่นพิจารณา ${item.referenceNumber || item.description} ไปแล้ว
+            ผู้อนุมัติท่านอื่นพิจารณา ${escapeHtml(item.referenceNumber || item.description)} ไปแล้ว
           </p>
           <button type="button" class="gl-btn-refresh-queue gl-btn gl-btn--primary gl-btn--sm">
             ปิดหน้าต่างและรีเฟรชรายการ
@@ -83,7 +84,7 @@ export function renderApprovalDecisionSheetHtml(props: ApprovalDecisionSheetProp
       <div style="min-width: 0;">
         <div class="kicker">${item.referenceNumber || "คำขออนุมัติ"}</div>
         <h2 id="gl-decision-title" style="font-size: var(--text-xl); font-weight: var(--weight-bold); margin: var(--space-1) 0 0;">
-          ${item.description}
+          ${escapeHtml(item.description)}
         </h2>
       </div>
       <div style="display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0;">

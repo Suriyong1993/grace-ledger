@@ -1,9 +1,6 @@
-/** Escapes user- and service-provided strings before they enter markup. */
-export function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+/**
+ * Re-exported so the drawer's existing call sites keep their import path.
+ * The single definition lives in src/lib/format.ts with the other shared
+ * presentation helpers.
+ */
+export { escapeHtml } from "../../lib/format";

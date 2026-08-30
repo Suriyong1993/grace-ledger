@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../supabase/types";
 import { Money } from "../money";
 import { UserRole, assertPermission } from "../rbac";
+import { monthBounds } from "../period";
 
 export interface CategorySummary {
   category_id: string;
@@ -116,27 +117,41 @@ export class ReportsService {
 
       for (const t of txns) {
         const txnAmount = Money.from(t.amount);
-        const isExp = t.description?.includes("จ่าย") || t.description?.includes("ซื้อ") || t.description?.includes("ค่า");
-        const dir: "income" | "expense" = t.direction || (isExp ? "expense" : "income");
+
+        // Direction is read from the ledger column, never inferred from the Thai
+        // description. Substring matching classified "ค่าเช่าที่ได้รับ" as an
+        // expense because it contains "ค่า".
+        //
+        // Anything that is not explicitly income or expense is excluded from both
+        // totals rather than guessed into one. That covers posted `transfer` rows,
+        // which move money between funds without changing what the church earned
+        // or spent — counting them as expense inflated the monthly outflow and
+        // understated the surplus.
+        const dir: "income" | "expense" | null =
+          t.direction === "income" || t.direction === "expense" ? t.direction : null;
 
         if (dir === "income") {
           totalIncome = totalIncome.add(txnAmount);
-        } else {
+        } else if (dir === "expense") {
           totalExpense = totalExpense.add(txnAmount);
         }
 
         // Category breakdown — category_id lives on transaction_splits, so the
         // transaction's category is represented by its first split's category
         // (a transaction is entered against a single category at creation time).
-        const firstSplitWithCategory = Array.isArray(t.transaction_splits)
-          ? t.transaction_splits.find((sp: any) => sp.category_id)
-          : undefined;
-        const catId = firstSplitWithCategory?.category_id || "uncategorized";
-        const catName = firstSplitWithCategory?.categories?.name || "หมวดหมู่ทั่วไป";
-        const existingCat = categoryMap.get(catId) || { name: catName, type: dir, amount: Money.zero(), count: 0 };
-        existingCat.amount = existingCat.amount.add(txnAmount);
-        existingCat.count++;
-        categoryMap.set(catId, existingCat);
+        // Only classified rows get a category: CategorySummary.type is
+        // income | expense, so a transfer has no honest bucket here.
+        if (dir) {
+          const firstSplitWithCategory = Array.isArray(t.transaction_splits)
+            ? t.transaction_splits.find((sp: any) => sp.category_id)
+            : undefined;
+          const catId = firstSplitWithCategory?.category_id || "uncategorized";
+          const catName = firstSplitWithCategory?.categories?.name || "หมวดหมู่ทั่วไป";
+          const existingCat = categoryMap.get(catId) || { name: catName, type: dir, amount: Money.zero(), count: 0 };
+          existingCat.amount = existingCat.amount.add(txnAmount);
+          existingCat.count++;
+          categoryMap.set(catId, existingCat);
+        }
 
         // Fund splits breakdown
         if (t.transaction_splits && Array.isArray(t.transaction_splits)) {
@@ -248,9 +263,10 @@ export class ReportsService {
         }
       }
 
-      // 2. Get monthly posted statement
-      const monthStart = `${currentMonthIso}-01`;
-      const monthEnd = `${currentMonthIso}-31`;
+      // 2. Get monthly posted statement.
+      // The window used to end on a hardcoded -31: February and the 30-day
+      // months asked Postgres for a date that does not exist.
+      const { start: monthStart, end: monthEnd } = monthBounds(currentMonthIso);
       const stmtRes = await this.getStatementOfFinancialPosition(churchId, monthStart, monthEnd);
       if (!stmtRes.success || !stmtRes.data) {
         return { success: false, error: stmtRes.error || "ไม่สามารถดึงรายงานงบประจำเดือนได้" };

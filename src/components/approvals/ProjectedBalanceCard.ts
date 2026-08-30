@@ -1,4 +1,5 @@
 import { ProjectedFundBalanceResult } from "../../lib/transactions/types";
+import { escapeHtml } from "../../lib/format";
 
 export interface ProjectedBalanceCardProps {
   projection: ProjectedFundBalanceResult;
@@ -45,7 +46,7 @@ export function renderProjectedBalanceCardHtml(props: ProjectedBalanceCardProps)
   <div class="gl-projected-balance-card gl-card gl-card--tight${isDeficit ? " gl-card--danger" : ""}">
     <div style="display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-3);">
       <span style="font-size: var(--text-sm); font-weight: var(--weight-semibold);">
-        ${projection.fundName}
+        ${escapeHtml(projection.fundName)}
       </span>
       <span style="font-size: var(--text-2xs); color: var(--muted-foreground);">
         ยอดหลังอนุมัติ

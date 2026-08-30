@@ -1,4 +1,5 @@
 import { Money } from "../../lib/money";
+import { escapeHtml } from "../../lib/format";
 import { FundOption, OfferingEntryFormState } from "./OfferingEntryForm";
 import { formatDateThai } from "../../lib/format";
 
@@ -119,7 +120,7 @@ export function renderOfferingReviewSheetHtml(props: OfferingReviewSheetProps): 
         <div>
           <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-bottom: 2px;">รอบการนมัสการ</div>
           <div style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--foreground);">
-            ${state.serviceName}
+            ${escapeHtml(state.serviceName)}
           </div>
         </div>
 
@@ -211,7 +212,7 @@ export function renderOfferingReviewSheetHtml(props: OfferingReviewSheetProps): 
         <tbody>
           ${activeFundAllocations.map((f) => `
             <tr>
-              <td class="gl-td-lead" style="font-weight: var(--weight-semibold);">${f.name}</td>
+              <td class="gl-td-lead" style="font-weight: var(--weight-semibold);">${escapeHtml(f.name)}</td>
               <td data-label="เงินสด" class="is-right num-display">
                 ${!f.cash.isZero() ? f.cash.format() : '<span style="color: var(--muted-foreground);">-</span>'}
               </td>

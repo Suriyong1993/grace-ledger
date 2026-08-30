@@ -2,11 +2,25 @@ import { describe, it, expect } from "vitest";
 import { TransactionsPage } from "../../src/pages/TransactionsPage";
 
 describe("TransactionsPage UI — Unit Tests", () => {
-  // Dynamic dates: today, yesterday, and an earlier date for date grouping
+  // Dynamic dates: today, yesterday, and an earlier date for date grouping.
+  // "earlier" is clamped to day 1 rather than a fixed -5 days: near the start
+  // of a month, today.getDate() - 5 crosses into the previous calendar month,
+  // which the "เดือนนี้" period default would then exclude — the fixture would
+  // pass on the 6th and fail on the 3rd.
   const today = new Date();
-  const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-  const earlier = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5);
-  const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const yesterday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 1,
+  );
+  const earlier = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    Math.max(1, today.getDate() - 5),
+  );
+  const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 15);
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
   const mockTransactions = [
     {
@@ -19,7 +33,15 @@ describe("TransactionsPage UI — Unit Tests", () => {
       account_id: "acc-1",
       created_by: "user-1",
       accounts: { name: "เงินสดในมือ" },
-      transaction_splits: [{ amount: "18450.00", fund_id: "fund-1", category_id: "cat-1", funds: { name: "กองทุนทั่วไป" }, categories: { name: "ถวายทรัพย์ทั่วไป" } }],
+      transaction_splits: [
+        {
+          amount: "18450.00",
+          fund_id: "fund-1",
+          category_id: "cat-1",
+          funds: { name: "กองทุนทั่วไป" },
+          categories: { name: "ถวายทรัพย์ทั่วไป" },
+        },
+      ],
     },
     {
       id: "txn-2",
@@ -31,7 +53,15 @@ describe("TransactionsPage UI — Unit Tests", () => {
       account_id: "acc-2",
       created_by: "user-1",
       accounts: { name: "ธ.กรุงไทย ···4821" },
-      transaction_splits: [{ amount: "8500.00", fund_id: "fund-2", category_id: "cat-2", funds: { name: "กองทุนเยาวชน" }, categories: { name: "พันธกิจเยาวชน" } }],
+      transaction_splits: [
+        {
+          amount: "8500.00",
+          fund_id: "fund-2",
+          category_id: "cat-2",
+          funds: { name: "กองทุนเยาวชน" },
+          categories: { name: "พันธกิจเยาวชน" },
+        },
+      ],
     },
     {
       id: "txn-3",
@@ -43,19 +73,48 @@ describe("TransactionsPage UI — Unit Tests", () => {
       account_id: "acc-2",
       created_by: "user-1",
       accounts: { name: "ธ.กรุงไทย ···4821" },
-      transaction_splits: [{ amount: "4280.00", fund_id: "fund-1", category_id: "cat-3", funds: { name: "กองทุนทั่วไป" }, categories: { name: "สาธารณูปโภค" } }],
+      transaction_splits: [
+        {
+          amount: "4280.00",
+          fund_id: "fund-1",
+          category_id: "cat-3",
+          funds: { name: "กองทุนทั่วไป" },
+          categories: { name: "สาธารณูปโภค" },
+        },
+      ],
+    },
+    {
+      // Dated last calendar month. Large and distinctive so it is unmissable
+      // in the "เดือนนี้" default sum if the period bound ever regresses.
+      id: "txn-4",
+      description: "เงินถวายพิเศษเดือนก่อน",
+      transaction_date: fmt(lastMonth),
+      direction: "income",
+      reference_number: "RCV-2026-000",
+      status: "posted",
+      account_id: "acc-1",
+      created_by: "user-1",
+      accounts: { name: "เงินสดในมือ" },
+      transaction_splits: [
+        {
+          amount: "999000.00",
+          fund_id: "fund-1",
+          category_id: "cat-1",
+          funds: { name: "กองทุนทั่วไป" },
+          categories: { name: "ถวายทรัพย์ทั่วไป" },
+        },
+      ],
     },
   ];
 
-  const mockProfiles = [
-    { id: "user-1", full_name: "สมชาย ใจดี" },
-  ];
+  const mockProfiles = [{ id: "user-1", full_name: "สมชาย ใจดี" }];
 
   const mockSupabase = {
     from: (table: string) => {
-      const result = table === "profiles"
-        ? { data: mockProfiles, error: null }
-        : { data: mockTransactions, error: null };
+      const result =
+        table === "profiles"
+          ? { data: mockProfiles, error: null }
+          : { data: mockTransactions, error: null };
       const base: any = {
         in: () => Promise.resolve(result),
       };
@@ -75,7 +134,9 @@ describe("TransactionsPage UI — Unit Tests", () => {
     const html = page.renderHtml();
 
     expect(html).toContain("<h1>รายการเงิน</h1>");
-    expect(html).toContain("บันทึกรายรับ รายจ่าย และประวัติธุรกรรมทั้งหมดของคริสตจักร");
+    expect(html).toContain(
+      "บันทึกรายรับ รายจ่าย และประวัติธุรกรรมทั้งหมดของคริสตจักร",
+    );
     expect(html).toContain("รายรับเดือนนี้");
     expect(html).toContain("รายจ่ายเดือนนี้");
     expect(html).toContain('id="txn-search-input"');
@@ -131,5 +192,76 @@ describe("TransactionsPage UI — Unit Tests", () => {
     expect(html).toContain("รายละเอียดรายการ");
     expect(html).toContain("RCV-2026-001");
     expect(html).toContain("ประวัติการตรวจสอบ");
+  });
+
+  describe("period selector — financial correctness", () => {
+    it("defaults to เดือนนี้ and excludes last month's transaction from both the sum and the list", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      const html = page.renderHtml();
+
+      expect(html).toContain('data-period="this_month"');
+      expect(html).toContain('data-period="last_month"');
+      expect(html).toContain('data-period="all"');
+      expect(html).toContain(
+        'class="gl-tab is-active" data-period="this_month"',
+      );
+
+      // txn-4's ฿999,000.00 must not leak into the "เดือนนี้" sum or list —
+      // this is the exact bug class the Dashboard fix addressed: a total whose
+      // label says one period while it actually sums another.
+      expect(html).not.toContain("999,000.00");
+      expect(html).not.toContain("เงินถวายพิเศษเดือนก่อน");
+    });
+
+    it("switching to เดือนก่อนหน้า shows only last month's transaction and sums just that", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      (page as any).activePeriod = "last_month";
+      const html = page.renderHtml();
+
+      expect(html).toContain("เงินถวายพิเศษเดือนก่อน");
+      expect(html).toContain("+฿999,000.00");
+      expect(html).toContain("รายรับเดือนก่อนหน้า");
+      // This month's items are out of scope under "เดือนก่อนหน้า".
+      expect(html).not.toContain("เงินถวายวันอาทิตย์ (รอบเช้า)");
+    });
+
+    it("switching to ทั้งหมด restores the full unbounded history", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      (page as any).activePeriod = "all";
+      const html = page.renderHtml();
+
+      expect(html).toContain("รายรับทั้งหมด");
+      expect(html).toContain("เงินถวายพิเศษเดือนก่อน");
+      expect(html).toContain("เงินถวายวันอาทิตย์ (รอบเช้า)");
+      expect(html).toContain("+฿1,017,450.00"); // 18,450 + 999,000, this month + last month
+    });
+  });
+
+  describe("rendering — neutral fund/category tags", () => {
+    it("renders fund and category as plain outline tags, never a per-category color", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      const html = page.renderHtml();
+
+      expect(html).toContain('<span class="gl-tag">กองทุนทั่วไป</span>');
+      expect(html).toContain('<span class="gl-tag">ถวายทรัพย์ทั่วไป</span>');
+      // No inline color/background ever attached to a tag — the row-level
+      // direction color lives elsewhere; a tag is structural, not a status.
+      expect(html).not.toMatch(/<span class="gl-tag" style="[^"]*color/);
+    });
+  });
+
+  describe("rendering — modal entrance motion", () => {
+    it("gives the detail modal the same rise-in treatment as the Dashboard stat rail", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      (page as any).selectedTransactionId = "txn-1";
+      const html = page.renderHtml();
+
+      expect(html).toContain('class="gl-modal-content gl-rise"');
+    });
   });
 });

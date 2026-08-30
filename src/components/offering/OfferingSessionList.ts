@@ -1,4 +1,5 @@
 import { OfferingSession, OfferingSessionStatus } from "../../lib/offering/types";
+import { escapeHtml } from "../../lib/format";
 import { formatDateThai } from "../../lib/format";
 
 export interface OfferingSessionListProps {
@@ -104,7 +105,7 @@ export function renderOfferingSessionListHtml(props: OfferingSessionListProps): 
             ${formatDateThai(s.serviceDate)}
           </div>
           <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 2px;">
-            ${s.serviceName}
+            ${escapeHtml(s.serviceName)}
           </div>
         </td>
         <td data-label="สถานะ">

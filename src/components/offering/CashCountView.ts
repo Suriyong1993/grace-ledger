@@ -1,4 +1,5 @@
 import { Money } from "../../lib/money";
+import { escapeHtml } from "../../lib/format";
 import { OfferingSession, CashDenominations } from "../../lib/offering/types";
 import { DenominationEngine } from "../../lib/offering/denomination-engine";
 import { VarianceEngine } from "../../lib/offering/variance-engine";
@@ -86,7 +87,7 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
       <div style="min-width: 0;">
         <div class="kicker">${formatDateThai(session.serviceDate)} · <span class="num-display">${session.id.substring(0, 8)}</span></div>
         <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-1);">
-          <h1 style="margin: 0;">${session.serviceName}</h1>
+          <h1 style="margin: 0;">${escapeHtml(session.serviceName)}</h1>
           ${renderOfferingStatusBadge(session.status)}
         </div>
       </div>

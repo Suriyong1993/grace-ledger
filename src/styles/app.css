@@ -33,11 +33,14 @@
   --on-info-muted: oklch(0.86 0.07 250);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -132,7 +135,11 @@ html, body {
   overflow: hidden;
   box-shadow: var(--shadow-card);
   background:
-    radial-gradient(420px 220px at 88% -20%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+    radial-gradient(
+      420px 220px at 88% -20%,
+      color-mix(in srgb, var(--primary) 14%, transparent),
+      transparent 70%
+    ),
     var(--card);
 }
 
@@ -148,7 +155,10 @@ html, body {
    lift-on-hover language the dashboard and login screen already use. */
 a.gl-card,
 button.gl-card {
-  transition: transform var(--duration-micro) var(--ease-out), border-color var(--duration-micro) var(--ease-out), box-shadow var(--duration-micro) var(--ease-out);
+  transition:
+    transform var(--duration-micro) var(--ease-out),
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out);
 }
 a.gl-card:hover,
 button.gl-card:hover {
@@ -221,9 +231,10 @@ button.gl-card:active {
   line-height: 1.2;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color var(--duration-micro) var(--ease-out),
-              border-color var(--duration-micro) var(--ease-out),
-              color var(--duration-micro) var(--ease-out);
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    border-color var(--duration-micro) var(--ease-out),
+    color var(--duration-micro) var(--ease-out);
 }
 
 .gl-btn:disabled,
@@ -280,6 +291,7 @@ button.gl-card:active {
    so never inherits that subtree's mobile touch-target patch. */
 .gl-btn--sm {
   min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
   padding: var(--space-1) var(--space-3);
   font-size: var(--text-xs);
 }
@@ -287,6 +299,7 @@ button.gl-card:active {
 @media (pointer: fine) {
   .gl-btn--sm {
     min-height: 34px;
+    min-width: 34px;
   }
 }
 
@@ -345,6 +358,25 @@ button.gl-card:active {
   background: var(--secondary);
   border-color: var(--border);
   color: var(--muted-foreground);
+}
+
+/* Neutral structural tag — fund/category context under a list row. Unlike
+   .gl-badge it carries no status meaning, so every value gets the same
+   outline; there is no color column on categories to key off, and hashing
+   one up per category name is exactly the ungoverned-accent pattern the
+   design system forbids. */
+.gl-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+  background: transparent;
+  white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
@@ -497,8 +529,9 @@ button.gl-card:active {
   color: var(--muted-foreground);
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--duration-micro) var(--ease-out),
-              border-color var(--duration-micro) var(--ease-out);
+  transition:
+    color var(--duration-micro) var(--ease-out),
+    border-color var(--duration-micro) var(--ease-out);
 }
 
 .gl-tab:hover {
@@ -738,7 +771,9 @@ button.gl-card:active {
     left: 0;
     right: 0;
     /* Nav total = item min-height + its 1px top border + the safe-area inset. */
-    bottom: calc(var(--gl-mobilenav-h) + 1px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(
+      var(--gl-mobilenav-h) + 1px + env(safe-area-inset-bottom, 0px)
+    );
     z-index: 150;
     background: color-mix(in srgb, var(--background) 94%, transparent);
     backdrop-filter: blur(6px);
@@ -780,18 +815,31 @@ button.gl-card:active {
    and any non-none transform makes the element a containing block, which
    silently breaks position:fixed descendants such as the mobile action bar. */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 .gl-fade-in {
@@ -892,23 +940,30 @@ button.gl-card:active {
   }
 
   /* Bottom navigation replaces the sidebar. Without it the offering module
-     is unreachable on a phone. */
+     is unreachable on a phone. Scrollable for smooth navigation across all modules. */
   .gl-mobilenav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 200;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
     background: var(--card);
     border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .gl-mobilenav::-webkit-scrollbar {
+    display: none;
   }
 
   .gl-mobilenav__item {
     display: flex;
+    flex: 1 0 auto;
+    min-width: 58px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -919,6 +974,8 @@ button.gl-card:active {
     font-size: var(--text-2xs);
     font-weight: var(--weight-medium);
     text-decoration: none;
+    position: relative;
+    white-space: nowrap;
   }
 
   .gl-mobilenav__item[aria-current="page"] {
@@ -928,7 +985,8 @@ button.gl-card:active {
 
   .gl-mobilenav__badge {
     position: absolute;
-    transform: translate(14px, -12px);
+    top: 6px;
+    right: 12px;
     background: var(--primary);
     color: var(--primary-foreground);
     border-radius: var(--radius-full);
@@ -998,7 +1056,8 @@ button.gl-card:active {
   }
 
   /* Inline text links that act as the screen's back affordance. */
-  #main-content a:not(.gl-btn):not(.gl-mobilenav__item) {
+  #main-content
+    a:not(.gl-btn):not(.gl-mobilenav__item):not(.gl-row):not(.gl-quick-action) {
     display: inline-flex;
     align-items: center;
     min-height: var(--touch-target-min);
@@ -1030,6 +1089,524 @@ button.gl-card:active {
   }
 }
 
+/* --------------------------------------------------------------------------
+   Progress meter
+   Three screens hand-rolled this shape before it had an owner (FundsPage
+   budget bar, ReportsPage income and expense tables). Colour is passed in
+   through --gl-progress-fill so income / expense / primary keep their meaning.
+   Width transition is covered by the design system's global reduced-motion
+   guard in tokens/motion.css.
+   -------------------------------------------------------------------------- */
+.gl-progress {
+  height: var(--space-1);
+  background: var(--secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.gl-progress__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--gl-progress-fill, var(--primary));
+  transition: width var(--duration-page) var(--ease-out);
+  /* The page re-renders whole, so a width transition has no previous value to
+     move from. Scaling the painted bar shows the fill arriving at the width
+     the markup already states — the number is never animated, only its bar. */
+  transform-origin: left center;
+  animation: glFillGrow var(--duration-page) var(--ease-out) both;
+}
+
+@keyframes glFillGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Dashboard composition
+   The dashboard is a reading surface first: section rhythm, typography and
+   dividers do the grouping. A card appears only where a real container is
+   needed, never to decorate a section.
+   -------------------------------------------------------------------------- */
+
+/* Summary rail. The balance keeps the weight of the screen; the month's income
+   and expense are separate cards so each figure has one owner and one heading
+   rather than sharing a divided card with the balance. */
+.gl-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.gl-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gl-stat--hero {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+}
+
+/* A seven-figure baht amount is ~155px at --text-xl; two cards across a 390px
+   phone give the value 123px. Money is never clipped or shrunk to fit, so the
+   two figures take a full row each on the narrowest screens instead. */
+@media (max-width: 479px) {
+  .gl-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .gl-stats {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .gl-stat--hero {
+    grid-column: 1;
+    grid-row: span 2;
+  }
+}
+
+.gl-stat__label {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-stat__value {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: 1.15;
+}
+
+.gl-stat__value--hero {
+  margin-top: var(--space-2);
+  font-size: var(--text-5xl);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.1;
+}
+
+.gl-stat__foot {
+  margin-top: 6px;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+/* Entrance for the summary rail. Short, one direction, and staggered only far
+   enough to read as one group arriving rather than three separate events. */
+.gl-rise {
+  animation: glRiseIn var(--duration-component) var(--ease-out) both;
+  animation-delay: var(--gl-rise-delay, 0ms);
+}
+
+@keyframes glRiseIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* tokens/motion.css collapses durations under reduced motion but not delays,
+   and these animations hold their start frame during the delay. Zero the
+   delays too, or a reduced-motion reader waits on an invisible card. */
+@media (prefers-reduced-motion: reduce) {
+  .gl-rise,
+  .gl-trend__bar,
+  .gl-progress__fill {
+    animation-delay: 0ms !important;
+  }
+}
+
+/* Destinations row. Four across on a desk, two on a phone — never eight
+   thumbnails competing with the balance above them. */
+.gl-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.gl-quick-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1.3;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    border-color var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-quick-action:hover {
+  background: var(--accent);
+  border-color: var(--primary);
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.gl-quick-action:active {
+  background: var(--secondary);
+  transform: scale(0.98);
+}
+
+.gl-quick-action__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: color var(--duration-micro) var(--ease-out);
+}
+
+.gl-quick-action:hover .gl-quick-action__icon {
+  color: var(--primary);
+}
+
+.gl-quick-action--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-semibold);
+}
+
+.gl-quick-action--primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--primary-foreground);
+}
+
+.gl-quick-action--primary .gl-quick-action__icon,
+.gl-quick-action--primary:hover .gl-quick-action__icon {
+  color: var(--primary-foreground);
+}
+
+/* Navigable list row — guided actions and recent activity share one shape. */
+.gl-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  color: inherit;
+  text-decoration: none;
+}
+
+.gl-row + .gl-row {
+  border-top: 1px solid var(--border);
+}
+
+a.gl-row {
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+a.gl-row:hover {
+  background: var(--accent);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.gl-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-row__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.gl-row__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gl-row__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-row__meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-row__end {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.gl-row__chevron {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+
+/* Fund progress list — a target turns a balance into progress. */
+.gl-fundlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.gl-fundrow__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.gl-fundrow__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-fundrow__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+/* Month trend. Bars are scaled against the largest value actually present,
+   so a tall month is never silently clipped to look like an average one. */
+.gl-trend {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-2);
+  align-items: end;
+}
+
+.gl-trend__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-trend__col:hover {
+  background: var(--accent);
+}
+
+.gl-trend__bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 96px;
+  width: 100%;
+}
+
+.gl-trend__bar {
+  width: 9px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  /* Height stays in the markup; only the paint is animated, so a bar whose
+     animation never runs is still drawn at its correct value. */
+  transform-origin: bottom;
+  animation: glBarGrow var(--duration-page) var(--ease-out) both;
+  animation-delay: var(--gl-bar-delay, 0ms);
+}
+
+@keyframes glBarGrow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.gl-trend__bar--income {
+  background: var(--income);
+}
+
+.gl-trend__bar--expense {
+  background: var(--expense);
+}
+
+.gl-trend__label {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+}
+
+.gl-trend__net {
+  white-space: nowrap;
+}
+
+.gl-legend {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gl-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* The reading column splits exactly once, and only when there is room. */
+.gl-dash-split {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .gl-dash-split {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .gl-quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+
+  .gl-quick-action {
+    padding: var(--space-3);
+  }
+
+  .gl-row {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .gl-trend__bars {
+    height: 72px;
+  }
+
+  .gl-trend__bar {
+    width: 7px;
+  }
+
+  /* A formatted baht amount needs ~60px; the column is 44px at 390px, so the
+     figures collide with their neighbours. The bars and the month label carry
+     the shape here, the exact numbers live one tap away in the full report.
+     Screen readers still get every figure from .gl-visually-hidden. */
+  .gl-trend__net {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Print Styles — Formal Church Certificates & Financial Reports
+   ========================================================================== */
+@media print {
+  body,
+  html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    font-size: 12pt;
+  }
+
+  .gl-sidebar,
+  .gl-mobilenav,
+  header,
+  .gl-topbar-brand,
+  .no-print,
+  .gl-btn,
+  .gl-tablist,
+  button {
+    display: none !important;
+  }
+
+  .gl-app-container,
+  .gl-app-main,
+  #app,
+  .gl-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .gl-modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  .gl-modal-content {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .gl-card,
+  #printable-certificate {
+    box-shadow: none !important;
+    border: 1px solid #cccccc !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    page-break-inside: avoid;
+  }
+
+  .gl-table th,
+  .gl-table td {
+    border-color: #dddddd !important;
+    color: #000000 !important;
+  }
+
+  .num-display,
+  strong {
+    color: #000000 !important;
+  }
+}
 
 /* --------------------------------------------------------------------------
    Modern UI layer — shared visual language for every route.
@@ -1098,14 +1675,19 @@ body {
 
 .gl-card {
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 2px rgb(23 23 23 / 0.03), 0 10px 30px rgb(23 23 23 / 0.035);
-  transition: border-color var(--duration-micro) var(--ease-out),
-              box-shadow var(--duration-micro) var(--ease-out),
-              transform var(--duration-micro) var(--ease-out);
+  box-shadow:
+    0 1px 2px rgb(23 23 23 / 0.03),
+    0 10px 30px rgb(23 23 23 / 0.035);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
 }
 
 .gl-card--elevated {
-  box-shadow: 0 1px 2px rgb(23 23 23 / 0.04), 0 18px 44px rgb(23 23 23 / 0.07);
+  box-shadow:
+    0 1px 2px rgb(23 23 23 / 0.04),
+    0 18px 44px rgb(23 23 23 / 0.07);
 }
 
 .gl-btn {
@@ -1134,9 +1716,10 @@ body {
 .gl-textarea {
   min-height: 46px;
   border-radius: 12px;
-  transition: border-color var(--duration-micro) var(--ease-out),
-              box-shadow var(--duration-micro) var(--ease-out),
-              background-color var(--duration-micro) var(--ease-out);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out),
+    background-color var(--duration-micro) var(--ease-out);
 }
 
 .gl-input:focus-visible,
@@ -1191,7 +1774,9 @@ body {
 }
 
 .gl-sidebar {
-  box-shadow: 1px 0 0 var(--sidebar-border), 10px 0 32px rgb(23 23 23 / 0.025);
+  box-shadow:
+    1px 0 0 var(--sidebar-border),
+    10px 0 32px rgb(23 23 23 / 0.025);
 }
 
 .gl-nav-item {
@@ -1200,7 +1785,8 @@ body {
 }
 
 .gl-nav-item--active {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sidebar-primary) 12%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--sidebar-primary) 12%, transparent);
 }
 
 .gl-shell-mark,
@@ -1255,7 +1841,6 @@ body {
   }
 }
 
-
 /* --------------------------------------------------------------------------
    Route-level composition — shared patterns, not page-specific business logic.
    -------------------------------------------------------------------------- */
@@ -1278,9 +1863,10 @@ body {
   font: inherit;
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
-  transition: border-color var(--duration-micro) var(--ease-out),
-              background-color var(--duration-micro) var(--ease-out),
-              color var(--duration-micro) var(--ease-out);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    background-color var(--duration-micro) var(--ease-out),
+    color var(--duration-micro) var(--ease-out);
 }
 
 .filter-pill:hover,
@@ -1326,8 +1912,9 @@ body {
 }
 
 .gl-approval-item {
-  transition: border-color var(--duration-micro) var(--ease-out),
-              box-shadow var(--duration-micro) var(--ease-out);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out);
 }
 
 .gl-approval-item:hover {
@@ -1387,7 +1974,6 @@ body {
     width: 100%;
   }
 }
-
 
 /* Shell enhancements */
 .gl-shell-topbar {

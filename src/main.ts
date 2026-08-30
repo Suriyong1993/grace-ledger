@@ -3,7 +3,7 @@ import { router, MatchedRoute } from "./router";
 import { renderAppShellHtml, AppShellUser } from "./components/layout/AppShell";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ApprovalsPage } from "./pages/ApprovalsPage";
-import { OfferingPage } from "./pages/OfferingPage";
+import { OfferingPage, OfferingPageMode } from "./pages/OfferingPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { FundsPage } from "./pages/FundsPage";
 import { MembersPage } from "./pages/MembersPage";
@@ -57,12 +57,19 @@ export class App {
     // Detect if landing from a Magic Link / Bootstrap URL
     const hash = window.location.hash || "";
     const search = window.location.search || "";
-    if (hash.includes("type=magiclink") || hash.includes("setup-pin") || search.includes("type=magiclink")) {
+    if (
+      hash.includes("type=magiclink") ||
+      hash.includes("setup-pin") ||
+      search.includes("type=magiclink")
+    ) {
       this.isPinSetupMode = true;
     }
 
     this.supabase.auth.onAuthStateChange(async (event, authSession) => {
-      if (event === "SIGNED_IN" && (this.isPinSetupMode || hash.includes("type=magiclink"))) {
+      if (
+        event === "SIGNED_IN" &&
+        (this.isPinSetupMode || hash.includes("type=magiclink"))
+      ) {
         this.isPinSetupMode = true;
       }
 
@@ -77,7 +84,11 @@ export class App {
         this.reportsPage = null;
         this.aiDrawer = null;
         void this.render();
-      } else if (authSession.user && !this.session && !this.isBootstrappingSession) {
+      } else if (
+        authSession.user &&
+        !this.session &&
+        !this.isBootstrappingSession
+      ) {
         await this.loadSession(authSession.user.id);
         void this.render();
       }
@@ -93,7 +104,9 @@ export class App {
       await this.render();
     });
 
-    const initialRoute = router.matchRoute(window.location.hash || window.location.pathname);
+    const initialRoute = router.matchRoute(
+      window.location.hash || window.location.pathname,
+    );
     this.currentRoute = initialRoute;
     await this.render();
   }
@@ -126,7 +139,10 @@ export class App {
         .limit(1)
         .maybeSingle(),
       this.supabase.from("churches").select("name").eq("id", churchId).single(),
-    ])) as [{ data: { role: string } | null }, { data: { name: string } | null }];
+    ])) as [
+      { data: { role: string } | null },
+      { data: { name: string } | null },
+    ];
 
     const fullName: string = profile.full_name ?? "";
     const userRole = (roleRow?.role as UserRole) || "member";
@@ -157,12 +173,23 @@ export class App {
     }
 
     this.approvalsPage = new ApprovalsPage(this.supabase, churchId, userId);
-    this.offeringPage = new OfferingPage(this.supabase, churchId, userId, fullName);
+    this.offeringPage = new OfferingPage(
+      this.supabase,
+      churchId,
+      userId,
+      fullName,
+    );
     this.transactionsPage = new TransactionsPage(this.supabase, churchId);
     this.fundsPage = new FundsPage(this.supabase, churchId);
     this.membersPage = new MembersPage(this.supabase, churchId);
     this.reportsPage = new ReportsPage(this.supabase, churchId);
-    this.aiDrawer = new GraceAiDrawer(this.supabase, churchId, userRole, userId, this.aiDrawerCallbacks);
+    this.aiDrawer = new GraceAiDrawer(
+      this.supabase,
+      churchId,
+      userRole,
+      userId,
+      this.aiDrawerCallbacks,
+    );
   }
 
   private async handlePinAuthenticated(userId: string): Promise<void> {
@@ -186,7 +213,10 @@ export class App {
         this.pinSetupPage = null;
         this.session = null;
         // Clean URL hash
-        if (window.location.hash.includes("type=magiclink") || window.location.hash.includes("setup-pin")) {
+        if (
+          window.location.hash.includes("type=magiclink") ||
+          window.location.hash.includes("setup-pin")
+        ) {
           window.history.replaceState(null, "", window.location.pathname);
         }
         void this.render();
@@ -198,7 +228,8 @@ export class App {
     if (!this.session) {
       this.rootElement.innerHTML = this.loginPage.renderHtml();
       this.loginPage.attachEventListeners(this.rootElement, {
-        onPinAuthenticated: (userId) => void this.handlePinAuthenticated(userId),
+        onPinAuthenticated: (userId) =>
+          void this.handlePinAuthenticated(userId),
       });
       return;
     }
@@ -206,7 +237,10 @@ export class App {
     // 3. Authenticated App Shell & Dashboard
     let contentHtml = "";
 
-    if (this.currentRoute.pattern === "/" || this.currentRoute.pattern === "not_found") {
+    if (
+      this.currentRoute.pattern === "/" ||
+      this.currentRoute.pattern === "not_found"
+    ) {
       const data = await this.dashboardPage.loadData(this.session.churchId);
       this.pendingCount = data.pendingApprovalsCount;
       contentHtml = this.dashboardPage.renderHtml(data);
@@ -230,23 +264,29 @@ export class App {
         await this.reportsPage.loadData();
         contentHtml = this.reportsPage.renderHtml();
       }
-    } else if (this.currentRoute.pattern === "/approvals" || this.currentRoute.pattern === "/approvals/:id") {
+    } else if (
+      this.currentRoute.pattern === "/approvals" ||
+      this.currentRoute.pattern === "/approvals/:id"
+    ) {
       contentHtml = this.approvalsPage?.renderHtml() ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       if (this.offeringPage) {
-        const offeringMode = this.currentRoute.pattern === "/offerings/new"
-          ? "new"
-          : this.currentRoute.pattern === "/offerings/:id"
-            ? "detail"
-            : "list";
+        const offeringMode: OfferingPageMode =
+          this.currentRoute.pattern === "/offerings/new"
+            ? "new"
+            : this.currentRoute.pattern === "/offerings/:id"
+              ? "detail"
+              : "list";
+        const offeringSessionId =
+          this.currentRoute.pattern === "/offerings/:id"
+            ? this.currentRoute.params.id
+            : undefined;
         const shouldLoadOfferingData = this.offeringPage.syncRoute(
           offeringMode,
-          this.currentRoute.pattern === "/offerings/:id" ? this.currentRoute.params.id : undefined
+          offeringSessionId,
         );
         if (shouldLoadOfferingData) {
-          await this.offeringPage.loadInitialData(
-            this.currentRoute.pattern === "/offerings/:id" ? this.currentRoute.params.id : undefined
-          );
+          await this.offeringPage.loadInitialData(offeringSessionId);
         }
         contentHtml = this.offeringPage.renderHtml();
       }
@@ -258,7 +298,7 @@ export class App {
         pendingCount: this.pendingCount,
         user: this.session.user,
       },
-      contentHtml
+      contentHtml,
     );
 
     const aiDrawerHtml = this.aiDrawer?.renderHtml() ?? "";
@@ -266,22 +306,38 @@ export class App {
     this.rootElement.innerHTML = appShellHtml + aiDrawerHtml;
 
     if (this.currentRoute.pattern.startsWith("/approvals")) {
-      this.approvalsPage?.attachEventListeners(this.rootElement, () => this.render());
+      this.approvalsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
-      this.offeringPage?.attachEventListeners(this.rootElement, () => this.render());
+      this.offeringPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern === "/transactions") {
-      this.transactionsPage?.attachEventListeners(this.rootElement, () => this.render());
+      this.transactionsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern === "/funds") {
-      this.fundsPage?.attachEventListeners(this.rootElement, () => this.render());
+      this.fundsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern === "/members") {
-      this.membersPage?.attachEventListeners(this.rootElement, () => this.render());
+      this.membersPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern === "/reports") {
-      this.reportsPage?.attachEventListeners(this.rootElement, () => this.render());
+      this.reportsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     }
 
     // Attach AI Drawer Event Listeners
     if (this.aiDrawer) {
-      this.aiDrawer.attachEventListeners(this.rootElement, this.aiDrawerCallbacks, () => this.render());
+      this.aiDrawer.attachEventListeners(
+        this.rootElement,
+        this.aiDrawerCallbacks,
+        () => this.render(),
+      );
     }
   }
 }

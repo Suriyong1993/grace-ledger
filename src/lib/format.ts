@@ -5,6 +5,16 @@
  * error into something a treasurer can read.
  */
 
+/** Escapes user- and service-provided strings before they enter markup. */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** `2026-08-23` → `23 ส.ค. 2569`. Invalid input is returned untouched. */
 export function formatDateThai(dateString: string): string {
   try {

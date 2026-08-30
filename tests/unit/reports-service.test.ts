@@ -257,4 +257,132 @@ describe("ReportsService — Comprehensive Unit Tests", () => {
       expect(result.data?.monthly_income.format()).toBe("฿0.00");
     });
   });
+
+  describe("4. Direction typing comes from the ledger, not the description", () => {
+    // Chainable stub that records the filters applied and resolves to `rows`.
+    function makeSupabase(rows: any[]) {
+      const b: any = {};
+      for (const m of ["select", "eq", "gte", "lte", "order"]) {
+        b[m] = () => b;
+      }
+      b.then = (resolve: any) => resolve({ data: rows, error: null });
+      return { from: () => b } as any;
+    }
+
+    it("classifies by the direction column even when the Thai description reads the other way", async () => {
+      // "ค่าเช่าที่ได้รับ" contains "ค่า", which the old substring rule treated
+      // as an expense. The ledger says income, and the ledger wins.
+      const rows = [
+        {
+          id: "tx-rent-received",
+          amount: "30000.00",
+          direction: "income",
+          description: "ค่าเช่าที่ได้รับจากผู้เช่าอาคาร",
+          transaction_date: "2026-08-04",
+          status: "posted",
+          transaction_splits: [{ amount: "30000.00", fund_id: "f-1", category_id: "cat-1", categories: { id: "cat-1", name: "รายได้ค่าเช่า" }, funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
+        },
+      ];
+
+      const service = new ReportsService(makeSupabase(rows), "treasurer");
+      const res = await service.getStatementOfFinancialPosition(dummyChurchId, "2026-08-01", "2026-08-31");
+
+      expect(res.data?.total_income.format()).toBe("฿30,000.00");
+      expect(res.data?.total_expense.format()).toBe("฿0.00");
+      expect(res.data?.categories_summary[0].type).toBe("income");
+    });
+
+    it("excludes posted fund transfers from income and from expense", async () => {
+      // execute_confirmed_financial_action writes transfers as posted rows with
+      // direction='transfer'. They move money between funds; they are not money
+      // the church earned or spent.
+      const rows = [
+        {
+          id: "tx-income",
+          amount: "40000.00",
+          direction: "income",
+          description: "เงินถวายวันอาทิตย์",
+          transaction_date: "2026-08-02",
+          status: "posted",
+          transaction_splits: [{ amount: "40000.00", fund_id: "f-1", category_id: "cat-1", categories: { id: "cat-1", name: "ถวายทั่วไป" }, funds: { id: "f-1", name: "กองทุนทั่วไป" } }],
+        },
+        {
+          id: "tx-transfer",
+          amount: "25000.00",
+          direction: "transfer",
+          description: "โอนเงินระหว่างกองทุน",
+          transaction_date: "2026-08-06",
+          status: "posted",
+          transaction_splits: [{ amount: "25000.00", fund_id: "f-2", category_id: null, categories: null, funds: { id: "f-2", name: "กองทุนพันธกิจ" } }],
+        },
+      ];
+
+      const service = new ReportsService(makeSupabase(rows), "treasurer");
+      const res = await service.getStatementOfFinancialPosition(dummyChurchId, "2026-08-01", "2026-08-31");
+
+      expect(res.data?.total_income.format()).toBe("฿40,000.00");
+      expect(res.data?.total_expense.format()).toBe("฿0.00");
+      expect(res.data?.net_surplus_deficit.format()).toBe("฿40,000.00");
+      // The transfer is still a posted transaction, it just has no income or
+      // expense bucket — and no category, since CategorySummary.type cannot
+      // honestly describe it.
+      expect(res.data?.posted_transactions_count).toBe(2);
+      expect(res.data?.categories_summary).toHaveLength(1);
+      expect(res.data?.categories_summary.every((c) => c.type === "income" || c.type === "expense")).toBe(true);
+    });
+  });
+
+  describe("5. Executive summary month window", () => {
+    /** Records the date range the statement query is given. */
+    function makeSupabase(range: { start?: string; end?: string }) {
+      const build = () => {
+        const b: any = {};
+        b.select = () => b;
+        b.eq = () => b;
+        b.order = () => b;
+        b.gte = (_c: string, v: string) => {
+          range.start = v;
+          return b;
+        };
+        b.lte = (_c: string, v: string) => {
+          range.end = v;
+          return b;
+        };
+        b.then = (resolve: any) => resolve({ data: [], error: null });
+        return b;
+      };
+      return { from: () => build() } as any;
+    }
+
+    it("ends February on the 28th instead of asking Postgres for the 31st", async () => {
+      const range: { start?: string; end?: string } = {};
+      const service = new ReportsService(makeSupabase(range), "treasurer");
+      const res = await service.getExecutiveFinancialSummary(dummyChurchId, "2026-02");
+
+      expect(res.success).toBe(true);
+      expect(range.start).toBe("2026-02-01");
+      expect(range.end).toBe("2026-02-28");
+      // Regression: the old window was `${month}-31`, a date that does not exist.
+      expect(range.end).not.toBe("2026-02-31");
+    });
+
+    it("ends a 30-day month on the 30th and a 31-day month on the 31st", async () => {
+      const apr: { start?: string; end?: string } = {};
+      await new ReportsService(makeSupabase(apr), "treasurer").getExecutiveFinancialSummary(dummyChurchId, "2026-04");
+      expect(apr.end).toBe("2026-04-30");
+
+      const aug: { start?: string; end?: string } = {};
+      await new ReportsService(makeSupabase(aug), "treasurer").getExecutiveFinancialSummary(dummyChurchId, "2026-08");
+      expect(aug.end).toBe("2026-08-31");
+    });
+
+    it("reports a malformed period as an error rather than a total over a wrong window", async () => {
+      const range: { start?: string; end?: string } = {};
+      const service = new ReportsService(makeSupabase(range), "treasurer");
+      const res = await service.getExecutiveFinancialSummary(dummyChurchId, "2026-2");
+
+      expect(res.success).toBe(false);
+      expect(range.start).toBeUndefined();
+    });
+  });
 });

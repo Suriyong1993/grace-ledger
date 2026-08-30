@@ -111,7 +111,28 @@ describe("ProposalConfirmationModal — Unit & UI Security Tests", () => {
 
       expect(html).toContain("฿8,500.00");
       expect(html).toContain("คำเตือนการยกเลิกรายการถาวร");
-      expect(html).toContain("ยืนยันยกเลิกรายการ (Void) ฿8,500.00");
+      expect(html).toContain("ยืนยันยกเลิกรายการ ฿8,500.00");
+      // The action badge shows the Thai label, never the raw database enum.
+      expect(html).toContain("ยกเลิกรายการ");
+      expect(html).not.toContain("void_transaction");
+    });
+
+    it("keeps internal identifiers and debug vocabulary out of the confirmation UI", () => {
+      const html = renderProposalConfirmationModalHtml({
+        proposal: dummyProposalTransfer,
+        isOpen: true,
+        currentUserRole: "treasurer",
+      });
+
+      expect(html).not.toContain("CONFIRMATION_ID");
+      expect(html).not.toContain("PAYLOAD_HASH");
+      expect(html).not.toContain("conf-uuid-001");
+      expect(html).not.toContain("fund_transfer");
+      expect(html).not.toContain("Confirmation Gate");
+      // The design system ships no --font-mono token; nothing may reference it.
+      expect(html).not.toContain("var(--font-mono)");
+      // The money value must stay under .num-display (Inter + tabular numerals).
+      expect(html).toContain('<span class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold);">');
     });
   });
 
