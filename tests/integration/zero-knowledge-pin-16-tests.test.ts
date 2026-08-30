@@ -11,7 +11,7 @@ import { isPinAcceptable } from "../../src/components/login/PinSetupView";
  * specified for Grace Ledger PIN-Only Authentication.
  */
 
-const MIGRATION_PATH = resolve(__dirname, "../../supabase/migrations/20260824000020_auth_pins.sql");
+const MIGRATION_PATH = resolve(__dirname, "../../supabase/migrations/20260824112221_auth_pins_foundation.sql");
 const migrationSql = readFileSync(MIGRATION_PATH, "utf8");
 
 // Cryptographic hash simulation using scrypt KDF (emulates bcrypt cost 10 server-side)

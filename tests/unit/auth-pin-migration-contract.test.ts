@@ -13,7 +13,7 @@ import { resolve } from "node:path";
  * proven in the Stage 3 security matrix.
  */
 
-const MIGRATION = resolve(__dirname, "../../supabase/migrations/20260824000020_auth_pins.sql");
+const MIGRATION = resolve(__dirname, "../../supabase/migrations/20260824112221_auth_pins_foundation.sql");
 // Normalize CRLF: git on Windows may check this file out with \r\n, which
 // would otherwise break the exact-substring decoy-hash match below without
 // changing anything about the migration's actual (line-ending-agnostic) SQL.
@@ -219,7 +219,7 @@ describe("no PIN is ever seeded by a migration", () => {
 
   it("keeps every other migration clear of the credential tables", () => {
     for (const name of files) {
-      if (name.startsWith("20260824000020_") || name.startsWith("20260824000021_")) continue;
+      if (name.startsWith("20260824112221_") || name.startsWith("20260824114541_")) continue;
       const other = readFileSync(resolve(MIGRATIONS_DIR, name), "utf8");
       expect(/auth_pins|auth_pin_probes/i.test(other), `${name} touches the PIN tables`).toBe(false);
     }
