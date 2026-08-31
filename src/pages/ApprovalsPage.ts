@@ -196,7 +196,7 @@ export class ApprovalsPage {
     if (approveBtn && selectedItem && !selectedItem.isCreator) {
       approveBtn.addEventListener("click", async () => {
         approveBtn.disabled = true;
-        approveBtn.innerText = "กำลังอนุมัติ...";
+        approveBtn.innerText = "กำลังอนุมัติ…";
         const res = await this.approvalsService.approveTransaction({
           transactionId: selectedItem.id,
         });
@@ -289,7 +289,7 @@ export class ApprovalsPage {
           }
 
           modalSubmit.disabled = true;
-          modalSubmit.innerText = "กำลังบันทึก...";
+          modalSubmit.innerText = "กำลังบันทึก…";
 
           if (modalType === "revision_requested") {
             const res = await this.approvalsService.requestRevision({

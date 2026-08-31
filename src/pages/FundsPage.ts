@@ -91,7 +91,7 @@ export class FundsPage {
           <h1>กองทุนและงบประมาณ</h1>
           <p>บริหารจัดการกองทุนเฉพาะกิจ ยอดคงเหลือ และการจัดสรรงบประมาณ</p>
         </div>
-        <div class="gl-card" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
+        <div class="gl-card gl-loading-center">
           <p style="margin: 0; font-size: var(--text-sm);">กำลังโหลดข้อมูลกองทุน...</p>
         </div>
       </div>`;
@@ -130,16 +130,16 @@ export class FundsPage {
       ? `
       <div id="transfer-modal" class="gl-modal-backdrop gl-fade-in">
         <div class="gl-modal-content gl-rise" style="max-width: 440px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
-            <div style="font-size: var(--text-base); font-weight: var(--weight-bold);">โอนเงินระหว่างกองทุน</div>
-            <button id="close-transfer-btn" class="gl-btn gl-btn--ghost gl-btn--sm" style="padding: 0; border-radius: var(--radius-full);">
+          <div class="gl-funds-modal-head">
+            <div class="gl-funds-modal-title">โอนเงินระหว่างกองทุน</div>
+            <button id="close-transfer-btn" class="gl-modal-close gl-btn gl-btn--ghost gl-btn--sm">
               ${ICON_CLOSE}
             </button>
           </div>
 
           ${formErrorHtml}
 
-          <form id="transfer-form" style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <form id="transfer-form" class="gl-stack">
             <div class="gl-field">
               <label class="gl-label" for="from-fund">กองทุนต้นทาง (หักเงินออก)</label>
               <select class="gl-select" id="from-fund" required>
@@ -164,10 +164,10 @@ export class FundsPage {
               <textarea class="gl-textarea" id="transfer-reason" required placeholder="เช่น มติคณะกรรมการ หรือ สมทบโครงการพันธกิจ..."></textarea>
             </div>
 
-            <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">
-              <button type="button" id="cancel-transfer-btn" class="gl-btn gl-btn--secondary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
-              <button type="submit" class="gl-btn gl-btn--primary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>
-                ${this.isSubmitting ? "กำลังดำเนินการ..." : "ยืนยันการโอน"}
+            <div class="gl-funds-modal-actions">
+              <button type="button" id="cancel-transfer-btn" class="gl-btn gl-btn--secondary" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
+              <button type="submit" class="gl-btn gl-btn--primary" ${this.isSubmitting ? "disabled" : ""}>
+                ${this.isSubmitting ? "กำลังดำเนินการ…" : "ยืนยันการโอน"}
               </button>
             </div>
           </form>
@@ -180,16 +180,16 @@ export class FundsPage {
       ? `
       <div id="create-fund-modal" class="gl-modal-backdrop gl-fade-in">
         <div class="gl-modal-content gl-rise" style="max-width: 440px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
-            <div style="font-size: var(--text-base); font-weight: var(--weight-bold);">สร้างกองทุนใหม่</div>
-            <button id="close-create-btn" class="gl-btn gl-btn--ghost gl-btn--sm" style="padding: 0; border-radius: var(--radius-full);">
+          <div class="gl-funds-modal-head">
+            <div class="gl-funds-modal-title">สร้างกองทุนใหม่</div>
+            <button id="close-create-btn" class="gl-modal-close gl-btn gl-btn--ghost gl-btn--sm">
               ${ICON_CLOSE}
             </button>
           </div>
 
           ${formErrorHtml}
 
-          <form id="create-fund-form" style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <form id="create-fund-form" class="gl-stack">
             <div class="gl-field">
               <label class="gl-label" for="fund-name-input">ชื่อกองทุน *</label>
               <input type="text" class="gl-input" id="fund-name-input" required placeholder="เช่น กองทุนสร้างพระวิหาร, กองทุนสงเคราะห์" />
@@ -205,10 +205,10 @@ export class FundsPage {
               <input type="number" class="gl-input" id="fund-target-input" placeholder="0.00" step="0.01" min="0" />
             </div>
 
-            <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">
-              <button type="button" id="cancel-create-btn" class="gl-btn gl-btn--secondary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
-              <button type="submit" class="gl-btn gl-btn--primary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>
-                ${this.isSubmitting ? "กำลังสร้าง..." : "บันทึกกองทุน"}
+            <div class="gl-funds-modal-actions">
+              <button type="button" id="cancel-create-btn" class="gl-btn gl-btn--secondary" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
+              <button type="submit" class="gl-btn gl-btn--primary" ${this.isSubmitting ? "disabled" : ""}>
+                ${this.isSubmitting ? "กำลังสร้าง…" : "บันทึกกองทุน"}
               </button>
             </div>
           </form>
@@ -219,34 +219,34 @@ export class FundsPage {
     const fundsGridHtml = this.errorMessage
       ? ""
       : this.funds.length === 0
-        ? `<div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
-          <div style="font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--foreground); margin-bottom: 4px;">ยังไม่มีกองทุนในระบบ</div>
-          <p style="margin: 0 0 var(--space-3); font-size: var(--text-sm);">สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท</p>
+        ? `<div class="gl-card gl-empty-state gl-empty-center">
+          <div class="gl-empty-center__msg">ยังไม่มีกองทุนในระบบ</div>
+          <p style="margin: 0 0 var(--space-3); font-size: var(--text-sm); color: var(--muted-foreground);">สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท</p>
           <button id="empty-create-fund-btn" class="gl-btn gl-btn--primary gl-btn--sm">+ สร้างกองทุนแรก</button>
         </div>`
         : `
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-4);">
+        <div class="gl-funds-grid">
           ${this.funds
             .map(
               (fund) => `
-            <div class="gl-card" style="display: flex; flex-direction: column; gap: var(--space-3);">
-              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2);">
-                <div style="font-size: var(--text-base); font-weight: var(--weight-bold);">${escapeHtml(fund.name)}</div>
-                <div class="num-display" style="font-size: var(--text-xl); font-weight: var(--weight-bold); color: var(--primary);">${fund.balance.format()}</div>
+            <div class="gl-card gl-stack">
+              <div class="gl-funds-card__head">
+                <div class="gl-funds-card__name">${escapeHtml(fund.name)}</div>
+                <div class="num-display gl-funds-card__balance">${fund.balance.format()}</div>
               </div>
 
-              <div style="font-size: var(--text-xs); color: var(--muted-foreground);">${escapeHtml(fund.description)}</div>
+              <div class="gl-hint">${escapeHtml(fund.description)}</div>
 
               <!-- Budget Progress Bar -->
               <div>
-                <div style="display: flex; justify-content: space-between; font-size: var(--text-2xs); color: var(--muted-foreground); margin-bottom: 4px;">
+                <div class="gl-funds-progress-caption">
                   <span>เป้าหมายงบประมาณ: ${fund.targetAmount ? fund.targetAmount.format() : "ไม่ระบุ"}</span>
                   <span class="num-display">${fund.percentageUsed !== null ? fund.percentageUsed + "%" : "—"}</span>
                 </div>
                 ${
                   fund.targetAmount
-                    ? `<div style="height: var(--space-1); background: var(--secondary); border-radius: var(--radius-full); overflow: hidden;">
-                  <div style="height: 100%; width: ${fund.percentageUsed}%; background: var(--primary); border-radius: var(--radius-full);"></div>
+                    ? `<div class="gl-progress" role="progressbar" aria-valuenow="${fund.percentageUsed}" aria-valuemin="0" aria-valuemax="100" aria-label="ความคืบหน้าของ ${escapeHtml(fund.name)}">
+                  <div class="gl-progress__fill" style="width: ${fund.percentageUsed}%;"></div>
                 </div>`
                     : ""
                 }
@@ -258,12 +258,12 @@ export class FundsPage {
 
     return `
     <div class="gl-page gl-fade-in">
-      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
+      <div class="gl-funds-pagehead">
         <div class="gl-page-header" style="margin-bottom: 0;">
           <h1>กองทุนและงบประมาณ</h1>
           <p>บริหารจัดการกองทุนเฉพาะกิจ ยอดคงเหลือ และการจัดสรรงบประมาณ</p>
         </div>
-        <div style="display: flex; gap: var(--space-2);">
+        <div class="gl-funds-pagehead__actions">
           <button id="open-create-btn" class="gl-btn gl-btn--secondary">
             ${ICON_PLUS}
             <span>สร้างกองทุนใหม่</span>

@@ -8,3 +8,10 @@ dist/
 
 .vercel
 .freebuff/
+
+tmp_queries/
+.thumbs.db
+*.tsbuildinfo
+
+.aidesigner/*
+!.aidesigner/.gitkeep

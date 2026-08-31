@@ -26,16 +26,23 @@ interface FunctionCallResult {
   body: unknown;
 }
 
+/** Bounds how long a pre-auth call can hang before the UI can show a retry state. */
+const FUNCTION_CALL_TIMEOUT_MS = 15_000;
+
 async function callFunction(
   supabase: SupabaseClient,
   name: string,
-  body?: Record<string, unknown>
+  body?: Record<string, unknown>,
 ): Promise<FunctionCallResult> {
-  const { data, error } = await supabase.functions.invoke(name, body ? { body } : undefined);
+  const { data, error } = await supabase.functions.invoke(name, {
+    ...(body ? { body } : {}),
+    timeout: FUNCTION_CALL_TIMEOUT_MS,
+  });
 
   if (!error) return { ok: true, status: 200, body: data };
 
-  const response: Response | undefined = (error as { context?: Response }).context;
+  const response: Response | undefined = (error as { context?: Response })
+    .context;
   if (!response) return { ok: false, status: 0, body: null };
 
   let parsedBody: unknown = null;
@@ -48,24 +55,34 @@ async function callFunction(
   return { ok: false, status: response.status, body: parsedBody };
 }
 
-export async function fetchLoginProfiles(supabase: SupabaseClient): Promise<LoginProfilesResult> {
+export async function fetchLoginProfiles(
+  supabase: SupabaseClient,
+): Promise<LoginProfilesResult> {
   const result = await callFunction(supabase, "login-profiles");
   if (!result.ok) return { status: "error" };
 
   const body = result.body as { profiles?: RawLoginProfile[] } | null;
-  const profiles = (body?.profiles ?? []).map(
-    (row): LoginProfile => ({ id: row.id, name: row.name, role: row.role, initials: row.initials })
-  );
+  const profiles = (body?.profiles ?? []).map((row): LoginProfile => ({
+    id: row.id,
+    name: row.name,
+    role: row.role,
+    initials: row.initials,
+  }));
 
-  return profiles.length === 0 ? { status: "empty" } : { status: "ready", profiles };
+  return profiles.length === 0
+    ? { status: "empty" }
+    : { status: "ready", profiles };
 }
 
 export async function verifyPin(
   supabase: SupabaseClient,
   profileId: string,
-  pin: string
+  pin: string,
 ): Promise<VerifyPinResult> {
-  const result = await callFunction(supabase, "verify-pin", { profile_id: profileId, pin });
+  const result = await callFunction(supabase, "verify-pin", {
+    profile_id: profileId,
+    pin,
+  });
 
   if (result.ok) {
     const body = result.body as {
@@ -88,7 +105,10 @@ export async function verifyPin(
     });
 
     if (error || !data.session?.user?.id) {
-      console.error("verify-pin: failed to bridge real Supabase session", error);
+      console.error(
+        "verify-pin: failed to bridge real Supabase session",
+        error,
+      );
       return { status: "unavailable" };
     }
 
@@ -106,14 +126,12 @@ export async function verifyPin(
 }
 
 export type RequestPinBootstrapResult =
-  | { status: "sent" }
-  | { status: "rate_limited" }
-  | { status: "unavailable" };
+  { status: "sent" } | { status: "rate_limited" } | { status: "unavailable" };
 
 export async function requestPinBootstrap(
   supabase: SupabaseClient,
   profileId: string,
-  redirectTo?: string
+  redirectTo?: string,
 ): Promise<RequestPinBootstrapResult> {
   const result = await callFunction(supabase, "request-pin-bootstrap", {
     profile_id: profileId,

@@ -567,22 +567,138 @@ export function renderLoginStylesHtml(): string {
     .gl-login-screen {
       position: relative;
       overflow: hidden;
-      background:
-        radial-gradient(900px 500px at 50% -18%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 68%),
-        var(--background);
+      background: var(--background);
     }
     .gl-login-screen::before,
-    .gl-login-screen::after {
-      content: "";
-      position: fixed;
-      width: 240px;
-      height: 240px;
-      border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
-      border-radius: 50%;
-      pointer-events: none;
+    .gl-login-screen::after { content: none; }
+
+    /* --- split-screen shell -------------------------------------------------
+       One persistent brand panel, one working column. The panel carries the
+       wordmark and the three steps of sign-in — a real sequence, so it is
+       numbered. Flat solid surface: no gradient, no glow, no circles. */
+    .gl-login-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
     }
-    .gl-login-screen::before { top: -150px; left: -130px; }
-    .gl-login-screen::after { right: -130px; bottom: -150px; }
+    .gl-login-panel { display: none; }
+    @media (min-width: 880px) {
+      .gl-login-screen {
+        display: grid;
+        grid-template-columns: minmax(320px, 420px) 1fr;
+        padding: 0;
+        align-items: stretch;
+      }
+      .gl-login-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: var(--space-8);
+        padding: var(--space-8) var(--space-8) var(--space-8) var(--space-9);
+        background: var(--primary-dark);
+        color: var(--primary-foreground);
+      }
+      .gl-login-panel .gl-login-brand {
+        align-items: flex-start;
+        text-align: left;
+      }
+      .gl-login-panel .gl-login-mark {
+        background: var(--primary-foreground);
+        color: var(--primary-dark);
+      }
+      .gl-login-panel .gl-login-wordmark {
+        font-size: var(--text-lg);
+        letter-spacing: 0.16em;
+      }
+      .gl-login-panel .gl-login-tagline {
+        color: color-mix(in srgb, var(--primary-foreground) 72%, transparent);
+      }
+      .gl-login-steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .gl-login-steps li {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
+        font-size: var(--text-sm);
+        color: color-mix(in srgb, var(--primary-foreground) 88%, transparent);
+      }
+      .gl-login-steps li + li {
+        border-top: 1px solid color-mix(in srgb, var(--primary-foreground) 16%, transparent);
+      }
+      .gl-login-step-num {
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-xs);
+        color: color-mix(in srgb, var(--primary-foreground) 60%, transparent);
+      }
+      .gl-login-main { padding: var(--space-10) var(--space-6); }
+      .gl-login-stage--narrow { max-width: 400px; }
+    }
+    @media (max-width: 879px) {
+      .gl-login-screen {
+        flex-direction: column;
+        padding: var(--space-6) var(--space-4);
+      }
+      .gl-login-main { width: 100%; display: flex; justify-content: center; }
+      /* Compact brand header — the panel's steps belong to wide screens only. */
+      .gl-login-panel {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto var(--space-6);
+        padding: 0;
+        background: transparent;
+        color: inherit;
+      }
+      .gl-login-panel .gl-login-brand {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+        margin: 0;
+      }
+      .gl-login-panel .gl-login-wordmark { margin: 0; }
+      .gl-login-panel .gl-login-tagline { display: none; }
+      .gl-login-steps { display: none; }
+    }
+
+    /* --- view transitions ----------------------------------------------------
+       Direction-aware: selecting a profile (deeper into the flow) arrives from
+       the right; going back arrives from the left. Cross-fade under reduced
+       motion, matching the motion token contract. */
+    .gl-login-stage {
+      animation: gl-view-forward var(--duration-page) var(--ease-out);
+    }
+    .gl-login-stage--narrow {
+      animation-name: gl-view-back;
+    }
+    @keyframes gl-view-forward {
+      from { opacity: 0; transform: translateX(24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes gl-view-back {
+      from { opacity: 0; transform: translateX(-24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gl-login-stage {
+        animation-name: gl-login-rise;
+      }
+      @keyframes gl-login-rise {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    }
     .gl-login-stage { gap: var(--space-5); }
     .gl-login-brand { margin-bottom: var(--space-3); }
     .gl-login-mark {

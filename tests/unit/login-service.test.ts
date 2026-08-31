@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { fetchLoginProfiles, verifyPin } from "../../src/services/authPinService";
+import {
+  fetchLoginProfiles,
+  verifyPin,
+} from "../../src/services/authPinService";
 
 class FakeFunctionsHttpError extends Error {
   constructor(public readonly context: Response) {
@@ -9,13 +12,20 @@ class FakeFunctionsHttpError extends Error {
 }
 
 function stubSupabase(invoke: ReturnType<typeof vi.fn>): SupabaseClient {
-  return { functions: { invoke }, auth: { setSession: vi.fn() } } as unknown as SupabaseClient;
+  return {
+    functions: { invoke },
+    auth: { setSession: vi.fn() },
+  } as unknown as SupabaseClient;
 }
 
 describe("fetchLoginProfiles", () => {
   it("maps a successful roster response to LoginProfile rows", async () => {
     const invoke = vi.fn().mockResolvedValue({
-      data: { profiles: [{ id: "p1", name: "สมชาย", role: "เหรัญญิก", initials: "สช" }] },
+      data: {
+        profiles: [
+          { id: "p1", name: "สมชาย", role: "เหรัญญิก", initials: "สช" },
+        ],
+      },
       error: null,
     });
 
@@ -25,18 +35,25 @@ describe("fetchLoginProfiles", () => {
       status: "ready",
       profiles: [{ id: "p1", name: "สมชาย", role: "เหรัญญิก", initials: "สช" }],
     });
-    expect(invoke).toHaveBeenCalledWith("login-profiles", undefined);
+    expect(invoke).toHaveBeenCalledWith("login-profiles", { timeout: 15_000 });
   });
 
   it("reports an empty roster distinctly from a load failure", async () => {
-    const invoke = vi.fn().mockResolvedValue({ data: { profiles: [] }, error: null });
+    const invoke = vi
+      .fn()
+      .mockResolvedValue({ data: { profiles: [] }, error: null });
     const result = await fetchLoginProfiles(stubSupabase(invoke));
     expect(result).toEqual({ status: "empty" });
   });
 
   it("reports error when the endpoint fails", async () => {
-    const response = new Response(JSON.stringify({ error: "unavailable" }), { status: 503 });
-    const invoke = vi.fn().mockResolvedValue({ data: null, error: new FakeFunctionsHttpError(response) });
+    const response = new Response(JSON.stringify({ error: "unavailable" }), {
+      status: 503,
+    });
+    const invoke = vi.fn().mockResolvedValue({
+      data: null,
+      error: new FakeFunctionsHttpError(response),
+    });
 
     const result = await fetchLoginProfiles(stubSupabase(invoke));
 
@@ -57,8 +74,14 @@ describe("verifyPin", () => {
       },
       error: null,
     });
-    const setSession = vi.fn().mockResolvedValue({ data: { session: { user: { id: "user-1" } } }, error: null });
-    const supabase = { functions: { invoke }, auth: { setSession } } as unknown as SupabaseClient;
+    const setSession = vi.fn().mockResolvedValue({
+      data: { session: { user: { id: "user-1" } } },
+      error: null,
+    });
+    const supabase = {
+      functions: { invoke },
+      auth: { setSession },
+    } as unknown as SupabaseClient;
 
     const result = await verifyPin(supabase, "profile-id", "123456");
 
@@ -66,8 +89,14 @@ describe("verifyPin", () => {
       status: "success",
       userId: "user-1",
     });
-    expect(invoke).toHaveBeenCalledWith("verify-pin", { body: { profile_id: "profile-id", pin: "123456" } });
-    expect(setSession).toHaveBeenCalledWith({ access_token: "at", refresh_token: "rt" });
+    expect(invoke).toHaveBeenCalledWith("verify-pin", {
+      body: { profile_id: "profile-id", pin: "123456" },
+      timeout: 15_000,
+    });
+    expect(setSession).toHaveBeenCalledWith({
+      access_token: "at",
+      refresh_token: "rt",
+    });
   });
 
   it("returns requires_reset without bridging a session", async () => {
@@ -80,7 +109,10 @@ describe("verifyPin", () => {
       error: null,
     });
     const setSession = vi.fn();
-    const supabase = { functions: { invoke }, auth: { setSession } } as unknown as SupabaseClient;
+    const supabase = {
+      functions: { invoke },
+      auth: { setSession },
+    } as unknown as SupabaseClient;
 
     const result = await verifyPin(supabase, "profile-id", "123456");
 
@@ -89,30 +121,61 @@ describe("verifyPin", () => {
   });
 
   it("returns invalid on a 401", async () => {
-    const response = new Response(JSON.stringify({ error: "invalid" }), { status: 401 });
-    const invoke = vi.fn().mockResolvedValue({ data: null, error: new FakeFunctionsHttpError(response) });
+    const response = new Response(JSON.stringify({ error: "invalid" }), {
+      status: 401,
+    });
+    const invoke = vi.fn().mockResolvedValue({
+      data: null,
+      error: new FakeFunctionsHttpError(response),
+    });
 
-    const result = await verifyPin(stubSupabase(invoke), "profile-id", "000000");
+    const result = await verifyPin(
+      stubSupabase(invoke),
+      "profile-id",
+      "000000",
+    );
 
     expect(result).toEqual({ status: "invalid" });
   });
 
   it("returns locked with the lockout timestamp on a 423", async () => {
-    const response = new Response(JSON.stringify({ error: "locked", locked_until: "2026-08-25T10:00:00Z" }), {
-      status: 423,
+    const response = new Response(
+      JSON.stringify({ error: "locked", locked_until: "2026-08-25T10:00:00Z" }),
+      {
+        status: 423,
+      },
+    );
+    const invoke = vi.fn().mockResolvedValue({
+      data: null,
+      error: new FakeFunctionsHttpError(response),
     });
-    const invoke = vi.fn().mockResolvedValue({ data: null, error: new FakeFunctionsHttpError(response) });
 
-    const result = await verifyPin(stubSupabase(invoke), "profile-id", "111111");
+    const result = await verifyPin(
+      stubSupabase(invoke),
+      "profile-id",
+      "111111",
+    );
 
-    expect(result).toEqual({ status: "locked", lockedUntil: "2026-08-25T10:00:00Z" });
+    expect(result).toEqual({
+      status: "locked",
+      lockedUntil: "2026-08-25T10:00:00Z",
+    });
   });
 
   it("returns unavailable on any other failure", async () => {
-    const response = new Response(JSON.stringify({ error: "rate_limited" }), { status: 429 });
-    const invoke = vi.fn().mockResolvedValue({ data: null, error: new FakeFunctionsHttpError(response) });
+    const response = new Response(JSON.stringify({ error: "rate_limited" }), {
+      status: 429,
+    });
+    const invoke = vi.fn().mockResolvedValue({
+      data: null,
+      error: new FakeFunctionsHttpError(response),
+    });
 
-    const result = await verifyPin(stubSupabase(invoke), "profile-id", "222222");
+    const result = await verifyPin(
+      stubSupabase(invoke),
+      "profile-id",
+      "222222",
+    );
 
     expect(result).toEqual({ status: "unavailable" });
   });

@@ -34,7 +34,13 @@ const ICON_SAVE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
 const ICON_SPIN = `<svg class="gl-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
 
 export function renderCashCountViewHtml(props: CashCountViewProps): string {
-  const { session, profiles, state, isSubmitting = false, errorMessage } = props;
+  const {
+    session,
+    profiles,
+    state,
+    isSubmitting = false,
+    errorMessage,
+  } = props;
 
   const denomResult = DenominationEngine.calculateTotal({
     b1000: state.denominations.b1000,
@@ -48,7 +54,10 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
   const actualCash = denomResult.grandTotal;
   const expectedCash = session.expectedCashAmount;
 
-  const varianceResult = VarianceEngine.calculateCashVariance(expectedCash, actualCash);
+  const varianceResult = VarianceEngine.calculateCashVariance(
+    expectedCash,
+    actualCash,
+  );
   const varianceAmount = varianceResult.varianceAmount;
   const isMatch = varianceResult.isZeroMatch;
   const isShortage = varianceResult.isShortage;
@@ -58,13 +67,16 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
   const isCountersValid = hasCounters && !isSameCounter;
 
   const isDraft = session.status === "draft";
-  const isLocked = session.status === "confirmed" || session.status === "posted" || session.status === "voided";
+  const isLocked =
+    session.status === "confirmed" ||
+    session.status === "posted" ||
+    session.status === "voided";
 
   const varianceStat = isMatch
-    ? { cls: "gl-stat--success", head: "ยอดเงินสดตรวจนับตรงสมบูรณ์" }
+    ? { head: "ยอดเงินสดตรวจนับตรงสมบูรณ์" }
     : isShortage
-      ? { cls: "gl-stat--danger", head: "ยอดเงินสดตรวจนับขาด" }
-      : { cls: "gl-stat--warning", head: "ยอดเงินสดตรวจนับเกิน" };
+      ? { head: "ยอดเงินสดตรวจนับขาด" }
+      : { head: "ยอดเงินสดตรวจนับเกิน" };
 
   return `
   <div class="gl-page gl-cash-count-container gl-fade-in">
@@ -93,30 +105,35 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
       </div>
     </div>
 
-    ${errorMessage ? `
+    ${
+      errorMessage
+        ? `
       <div class="gl-notice gl-notice--error" role="alert" style="margin-bottom: var(--space-5);">
         ${ICON_ALERT}
         <div class="gl-notice__body">${errorMessage}</div>
       </div>
-    ` : ""}
+    `
+        : ""
+    }
 
-    <!-- The three numbers a counting team needs: expected, counted, variance -->
-    <section class="gl-section" aria-label="สรุปการตรวจนับ" style="margin-bottom: var(--space-6);">
-      <div class="gl-statgrid">
-        <div class="gl-stat">
-          <div class="gl-stat__label">คาดว่าจะมี</div>
-          <div class="gl-stat__value num-display">${expectedCash.format()}</div>
-        </div>
-        <div class="gl-stat">
-          <div class="gl-stat__label">นับได้</div>
-          <div class="gl-stat__value num-display">${actualCash.format()}</div>
-        </div>
-        <div class="gl-stat ${varianceStat.cls}">
-          <div class="gl-stat__label">ผลต่าง</div>
-          <div class="gl-stat__value num-display">${varianceAmount.format({ showSign: true })}</div>
-        </div>
+    <!-- The variance is what a counting team acts on; expected/counted are the
+         context behind it, not two more equal-weight boxes. -->
+    <section class="gl-card gl-cashcount-summary" aria-label="สรุปการตรวจนับ" style="margin-bottom: var(--space-6);">
+      <div class="kicker" style="margin: 0;">${varianceStat.head}</div>
+      <div class="num-display gl-cashcount-summary__value" style="color: ${
+        isMatch
+          ? "var(--income)"
+          : isShortage
+            ? "var(--expense)"
+            : "var(--pending)"
+      };">${varianceAmount.format({ showSign: true })}</div>
+
+      <div class="gl-cashcount-summary__figures">
+        <span class="gl-cashcount-summary__figure">คาดว่าจะมี<strong class="num-display">${expectedCash.format()}</strong></span>
+        <span class="gl-cashcount-summary__figure">นับได้<strong class="num-display">${actualCash.format()}</strong></span>
       </div>
-      <p style="font-size: var(--text-xs); color: var(--muted-foreground); margin: var(--space-2) 0 0;">
+
+      <p class="gl-cashcount-summary__foot">
         เทียบกับยอดเงินสดเท่านั้น · เงินโอน <span class="num-display">${session.expectedTransferAmount.format()}</span> · QR <span class="num-display">${session.expectedQrAmount.format()}</span> · รวมทุกช่องทาง <span class="num-display">${session.expectedTotalAmount.format()}</span>
       </p>
     </section>
@@ -131,13 +148,17 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
           </p>
         </div>
 
-        ${isDraft ? `
+        ${
+          isDraft
+            ? `
           <button type="button" id="btn-start-counting" class="gl-btn gl-btn--primary gl-btn--sm"
             ${!isCountersValid || isSubmitting ? "disabled" : ""}>
             ${ICON_PLAY}
             <span>เริ่มขั้นตอนตรวจนับเงิน</span>
           </button>
-        ` : ""}
+        `
+            : ""
+        }
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-4);">
@@ -149,11 +170,15 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
             style="${isSameCounter ? "border-color: var(--destructive);" : ""}"
             ${isLocked ? "disabled" : ""}>
             <option value="">เลือกผู้ตรวจนับ</option>
-            ${profiles.map((p) => `
+            ${profiles
+              .map(
+                (p) => `
               <option value="${p.id}" ${p.id === state.counter1Id ? "selected" : ""}>
                 ${p.fullName}
               </option>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </select>
         </div>
 
@@ -165,21 +190,29 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
             style="${isSameCounter ? "border-color: var(--destructive);" : ""}"
             ${isLocked ? "disabled" : ""}>
             <option value="">เลือกผู้ตรวจนับ</option>
-            ${profiles.map((p) => `
+            ${profiles
+              .map(
+                (p) => `
               <option value="${p.id}" ${p.id === state.counter2Id ? "selected" : ""}>
                 ${p.fullName}
               </option>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </select>
         </div>
       </div>
 
-      ${isSameCounter ? `
+      ${
+        isSameCounter
+          ? `
         <div class="gl-notice gl-notice--error" role="alert" style="margin-top: var(--space-3);">
           ${ICON_ALERT}
           <div class="gl-notice__body">ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกันตามหลักการควบคุมภายใน</div>
         </div>
-      ` : ""}
+      `
+          : ""
+      }
     </section>
 
     <!-- Denomination table -->
@@ -262,20 +295,30 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
       <a href="#/offerings" class="gl-btn gl-btn--ghost">กลับหน้ารายการ</a>
 
       <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;">
-        ${(session.status === 'variance_review' || session.status === 'counted' || session.status === 'confirmed') ? `
+        ${
+          session.status === "variance_review" ||
+          session.status === "counted" ||
+          session.status === "confirmed"
+            ? `
           <button type="button" id="btn-go-to-resolution" class="gl-btn gl-btn--secondary">
-            <span>${session.status === 'variance_review' ? 'จัดการผลต่างเงินสด' : 'ยืนยันรอบเงินถวาย'}</span>
+            <span>${session.status === "variance_review" ? "จัดการผลต่างเงินสด" : "ยืนยันรอบเงินถวาย"}</span>
           </button>
-        ` : ""}
+        `
+            : ""
+        }
 
-        ${!isLocked ? `
+        ${
+          !isLocked
+            ? `
           <button type="button" id="btn-save-cash-count" class="gl-btn gl-btn--primary"
             ${!isCountersValid || isSubmitting ? "disabled" : ""}>
             ${isSubmitting ? `${ICON_SPIN}<span>กำลังบันทึก...</span>` : `${ICON_SAVE}<span>บันทึกผลการตรวจนับเงิน</span>`}
           </button>
-        ` : `
+        `
+            : `
           <span style="font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--muted-foreground);">รายการนี้ถูกล็อกแล้ว แก้ไขไม่ได้</span>
-        `}
+        `
+        }
       </div>
     </div>
   </div>
@@ -287,7 +330,7 @@ function renderDenomRow(
   key: string,
   count: number,
   subtotal: Money,
-  isLocked: boolean
+  isLocked: boolean,
 ): string {
   return `
   <div class="gl-denom-row gl-surface" style="

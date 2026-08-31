@@ -175,6 +175,17 @@ export class TransactionLifecycle {
         };
       }
 
+      // TWO-PERSON RULE applies to direct posting too (Segregation of Duties):
+      // the creator of a draft cannot bypass approval by posting it themselves.
+      if (actor.userId === transaction.createdBy) {
+        return {
+          allowed: false,
+          fromStatus: currentStatus,
+          toStatus: targetStatus,
+          reason: "Segregation of Duties Violation: The creator of a draft cannot directly post it. Submit it for approval instead."
+        };
+      }
+
       if (transaction.splits) {
         const parity = SplitEngine.validateParity(transaction.amount, transaction.splits);
         if (!parity.isValid) {

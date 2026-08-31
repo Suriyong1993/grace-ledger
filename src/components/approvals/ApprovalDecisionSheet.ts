@@ -1,4 +1,7 @@
-import { PendingApprovalItem, ProjectedFundBalanceResult } from "../../lib/transactions/types";
+import {
+  PendingApprovalItem,
+  ProjectedFundBalanceResult,
+} from "../../lib/transactions/types";
 import { escapeHtml } from "../../lib/format";
 import { renderStatusBadgeHtml } from "./StatusBadge";
 import { renderProjectedBalanceCardHtml } from "./ProjectedBalanceCard";
@@ -14,10 +17,13 @@ const ICON_LOCK = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
 const ICON_RECEIPT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3v18l2-1.5L9 21l2-1.5L13 21l2-1.5L17 21l2-1.5V3z"/><path d="M9 8h6M9 12h6"/></svg>`;
 const ICON_ALERT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>`;
 
-export function renderApprovalDecisionSheetHtml(props: ApprovalDecisionSheetProps): string {
+export function renderApprovalDecisionSheetHtml(
+  props: ApprovalDecisionSheetProps,
+): string {
   const { item, projections, isStaleState } = props;
 
-  const sign = item.direction === "expense" ? "−" : item.direction === "income" ? "+" : "";
+  const sign =
+    item.direction === "expense" ? "−" : item.direction === "income" ? "+" : "";
   const formattedAmount = `${sign}${item.amount.format({ currency: "THB", showSign: false })}`;
   const statusBadge = renderStatusBadgeHtml({ status: item.status });
 
@@ -80,14 +86,14 @@ export function renderApprovalDecisionSheetHtml(props: ApprovalDecisionSheetProp
 
   return `
   <section class="gl-decision-sheet gl-card gl-card--elevated" aria-labelledby="gl-decision-title" style="max-width: 640px; margin: var(--space-6) auto 0;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); margin-bottom: var(--space-4);">
+    <div class="gl-approval-sheet__head">
       <div style="min-width: 0;">
         <div class="kicker">${item.referenceNumber || "คำขออนุมัติ"}</div>
         <h2 id="gl-decision-title" style="font-size: var(--text-xl); font-weight: var(--weight-bold); margin: var(--space-1) 0 0;">
           ${escapeHtml(item.description)}
         </h2>
       </div>
-      <div style="display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0;">
+      <div class="gl-approval-sheet__head-actions">
         ${statusBadge}
         <button type="button" class="gl-sheet-close gl-btn gl-btn--ghost gl-btn--sm" aria-label="ปิดรายละเอียด">
           ${ICON_CLOSE}
@@ -95,17 +101,12 @@ export function renderApprovalDecisionSheetHtml(props: ApprovalDecisionSheetProp
       </div>
     </div>
 
-    <div class="gl-surface" style="text-align: center; margin-bottom: var(--space-5);">
-      <div style="font-size: var(--text-xs); color: var(--muted-foreground);">จำนวนเงินที่ขออนุมัติ</div>
-      <div class="num-display" style="
-        font-size: var(--text-4xl);
-        font-weight: var(--weight-bold);
-        letter-spacing: var(--tracking-heading);
-        color: ${item.direction === "expense" ? "var(--expense)" : "var(--income)"};
-      ">
+    <div class="gl-surface gl-approval-amount">
+      <div class="gl-approval-amount__label">จำนวนเงินที่ขออนุมัติ</div>
+      <div class="num-display gl-approval-amount__value" style="color: ${item.direction === "expense" ? "var(--expense)" : "var(--income)"};">
         ${formattedAmount}
       </div>
-      <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: var(--space-1);">
+      <div class="gl-approval-amount__meta">
         ${item.creatorName || "ไม่ระบุผู้ขอ"} · ${item.accountName}
       </div>
     </div>

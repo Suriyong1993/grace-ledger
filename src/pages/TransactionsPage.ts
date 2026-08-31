@@ -591,7 +591,7 @@ export class TransactionsPage {
             <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">
               <button type="button" id="cancel-create-txn-btn" class="gl-btn gl-btn--secondary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
               <button type="submit" class="gl-btn gl-btn--primary" style="flex: 1;" ${this.isSubmitting ? "disabled" : ""}>
-                ${this.isSubmitting ? "กำลังบันทึก..." : "ส่งขออนุมัติ"}
+                ${this.isSubmitting ? "กำลังบันทึก…" : "ส่งขออนุมัติ"}
               </button>
             </div>
           </form>

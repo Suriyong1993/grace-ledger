@@ -126,7 +126,7 @@ export function renderStatusText(status: PinStatus, lockedUntil: string | null =
   }
   if (status === "requires_reset") return "ต้องตั้งรหัส PIN ใหม่ก่อนเข้าใช้งาน";
   if (status === "unavailable") return "ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง";
-  if (status === "checking") return "กำลังตรวจสอบรหัส PIN...";
+  if (status === "checking") return "กำลังตรวจสอบรหัส PIN…";
   return "";
 }
 
