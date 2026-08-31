@@ -7,7 +7,8 @@
  * so a caller cannot point either endpoint at another congregation's data.
  */
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * The church this instance serves, read from the Edge Function secret store.
@@ -28,7 +29,10 @@ export function deploymentChurchId(): string | null {
   // Trimmed because a secret set through a shell can arrive wrapped in quotes
   // or with a trailing newline, and a config value that is right apart from
   // whitespace should not take the whole deployment down.
-  const configured = Deno.env.get("DEPLOYMENT_CHURCH_ID")?.trim().replace(/^["']|["']$/g, "");
+  const configured = Deno.env
+    .get("DEPLOYMENT_CHURCH_ID")
+    ?.trim()
+    .replace(/^["']|["']$/g, "");
   if (!configured || !UUID_PATTERN.test(configured)) return null;
   return configured;
 }
@@ -42,10 +46,12 @@ export function deploymentChurchId(): string | null {
 export function deploymentConfigFault(): string | null {
   const raw = Deno.env.get("DEPLOYMENT_CHURCH_ID");
   if (!Deno.env.get("SUPABASE_URL")) return "SUPABASE_URL missing";
-  if (!Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) return "SUPABASE_SERVICE_ROLE_KEY missing";
+  if (!Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"))
+    return "SUPABASE_SERVICE_ROLE_KEY missing";
   if (raw === undefined) return "DEPLOYMENT_CHURCH_ID not set";
   if (raw.trim() === "") return "DEPLOYMENT_CHURCH_ID empty";
-  if (deploymentChurchId() === null) return "DEPLOYMENT_CHURCH_ID not a valid uuid";
+  if (deploymentChurchId() === null)
+    return "DEPLOYMENT_CHURCH_ID not a valid uuid";
   return null;
 }
 
@@ -64,19 +70,37 @@ export function isPinShaped(value: unknown): value is string {
  * deployed frontend needs this — everything else (curl, server-to-server) is
  * unaffected by CORS, so this is a browser-only restriction, not the real
  * security boundary (that's the anon-key check, rate limit, and DB lockout).
+ *
+ * Vercel mints a new preview alias for every branch push
+ * (`grace-ledger-git-<branch>-tlcs-projects-ab505ecc.vercel.app`) and every
+ * deployment (`grace-ledger-<hash>-tlcs-projects-ab505ecc.vercel.app`), so a
+ * fixed list goes stale the moment someone opens a new branch — that's what
+ * broke login on the `fix/dashboard-financial-correctness-and-ui` preview.
+ * Match the team's own Vercel domain suffix instead of enumerating aliases:
+ * still scoped to this one Vercel team, but covers every past and future
+ * deployment without a code change.
  */
-const ALLOWED_ORIGINS = new Set([
+const FIXED_ALLOWED_ORIGINS = new Set([
   "https://grace-ledger-mu.vercel.app",
+  // No hash/branch segment, so it falls outside VERCEL_TEAM_ORIGIN_PATTERN below.
   "https://grace-ledger-tlcs-projects-ab505ecc.vercel.app",
-  "https://grace-ledger-git-main-tlcs-projects-ab505ecc.vercel.app",
-  "https://grace-ledger-5r3y2kz3h-tlcs-projects-ab505ecc.vercel.app",
   "http://localhost:5500",
   "http://localhost:5173",
   "http://localhost:4173",
 ]);
 
+const VERCEL_TEAM_ORIGIN_PATTERN =
+  /^https:\/\/grace-ledger-[a-z0-9-]+-tlcs-projects-ab505ecc\.vercel\.app$/;
+
+function isAllowedOrigin(origin: string): boolean {
+  return (
+    FIXED_ALLOWED_ORIGINS.has(origin) || VERCEL_TEAM_ORIGIN_PATTERN.test(origin)
+  );
+}
+
 const BASE_CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   Vary: "Origin",
 };
@@ -87,7 +111,7 @@ export const CORS_HEADERS: Record<string, string> = BASE_CORS_HEADERS;
 /** Per-request CORS headers: reflects the caller's origin only if it's allowlisted. */
 export function corsHeadersFor(req: Request): Record<string, string> {
   const origin = req.headers.get("origin");
-  if (origin && ALLOWED_ORIGINS.has(origin)) {
+  if (origin && isAllowedOrigin(origin)) {
     return { ...BASE_CORS_HEADERS, "Access-Control-Allow-Origin": origin };
   }
   return BASE_CORS_HEADERS;
@@ -131,7 +155,9 @@ function isLegacyAnonKeyForThisProject(candidate: string): boolean {
   if (segments.length !== 3) return false;
 
   try {
-    const payload = JSON.parse(atob(segments[1]!.replace(/-/g, "+").replace(/_/g, "/")));
+    const payload = JSON.parse(
+      atob(segments[1]!.replace(/-/g, "+").replace(/_/g, "/")),
+    );
     return payload?.ref === ref && payload?.role === "anon";
   } catch {
     return false;
@@ -139,8 +165,9 @@ function isLegacyAnonKeyForThisProject(candidate: string): boolean {
 }
 
 export function hasProjectKey(req: Request): boolean {
-  const presented = req.headers.get("apikey")
-    ?? (req.headers.get("Authorization") ?? "").replace(/^Bearer /, "");
+  const presented =
+    req.headers.get("apikey") ??
+    (req.headers.get("Authorization") ?? "").replace(/^Bearer /, "");
   if (!presented) return false;
 
   // Supabase injects the browser-facing key under a name that depends on whether
@@ -191,7 +218,11 @@ export function createRateLimiter(limit: number, windowMs: number) {
   };
 }
 
-export function json(body: unknown, status: number, extraHeaders: Record<string, string> = {}): Response {
+export function json(
+  body: unknown,
+  status: number,
+  extraHeaders: Record<string, string> = {},
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
