@@ -108,11 +108,11 @@ No fake data, no placeholder identity in a production path, no hardcoded financi
 
 ### Agents ที่ใช้ร่วม
 
-| Agent | เมื่อไหร่ |
-|---|---|
+| Agent                | เมื่อไหร่                                    |
+| -------------------- | -------------------------------------------- |
 | `financial-reviewer` | หลังเขียน RPC/transaction logic ที่มีการเงิน |
-| `ui-reviewer` | หลังเขียน component ใหม่ |
-| `thai-writer` | หลังเขียน UI copy ภาษาไทย |
+| `ui-reviewer`        | หลังเขียน component ใหม่                     |
+| `thai-writer`        | หลังเขียน UI copy ภาษาไทย                    |
 
 ### กฎทั่วไป
 
@@ -126,3 +126,17 @@ No fake data, no placeholder identity in a production path, no hardcoded financi
 8. Document changed files, search evidence, remaining intentional duplicates, and verification results before claiming completion.
 
 Do not redesign the whole app at once. Do not start new milestone features inside a polish task.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues (`gh` CLI) on this repo's `origin` remote. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five canonical roles, label strings same as role names. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.

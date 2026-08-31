@@ -30,12 +30,19 @@ function renderHeaderHtml(totalCount: number, formattedTotal: string): string {
     </div>`;
 }
 
-export function renderApprovalsQueueViewHtml(props: ApprovalsQueueViewProps): string {
+export function renderApprovalsQueueViewHtml(
+  props: ApprovalsQueueViewProps,
+): string {
   const { items, isLoading, errorMessage } = props;
 
   const totalCount = items.length;
-  const totalAmount = items.reduce((sum, item) => sum.add(item.amount), Money.zero());
-  const formattedTotal = totalAmount ? totalAmount.format({ currency: "THB" }) : "฿0.00";
+  const totalAmount = items.reduce(
+    (sum, item) => sum.add(item.amount),
+    Money.zero(),
+  );
+  const formattedTotal = totalAmount
+    ? totalAmount.format({ currency: "THB" })
+    : "฿0.00";
 
   if (isLoading) {
     return `
@@ -80,7 +87,12 @@ export function renderApprovalsQueueViewHtml(props: ApprovalsQueueViewProps): st
 
   const itemsHtml = items
     .map((item) => {
-      const sign = item.direction === "expense" ? "−" : item.direction === "income" ? "+" : "";
+      const sign =
+        item.direction === "expense"
+          ? "−"
+          : item.direction === "income"
+            ? "+"
+            : "";
       const formattedItemAmount = `${sign}${item.amount.format({ currency: "THB", showSign: false })}`;
       const statusBadge = renderStatusBadgeHtml({ status: item.status });
       const fundName = item.splits?.[0]?.fundName || "กองทุนทั่วไป";
@@ -94,45 +106,34 @@ export function renderApprovalsQueueViewHtml(props: ApprovalsQueueViewProps): st
         : "";
 
       return `
-      <a class="gl-approval-item gl-card" href="#/approvals/${item.id}" data-id="${item.id}" style="
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--space-4);
-        color: inherit;
-        text-decoration: none;
-      ">
+      <a class="gl-approval-item gl-card gl-approval-item__row" href="#/approvals/${item.id}" data-id="${item.id}">
         <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-1);">
+          <div class="gl-approval-item__badges">
             ${statusBadge}
             ${receiptBadge}
             ${creatorChip}
-            <span style="font-size: var(--text-xs); color: var(--muted-foreground);">
+            <span class="gl-approval-item__ref">
               ${item.referenceNumber || ""}
             </span>
           </div>
-          <div style="font-size: var(--text-base); font-weight: var(--weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <div class="gl-approval-item__title">
             ${escapeHtml(item.description)}
           </div>
-          <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 2px;">
+          <div class="gl-approval-item__meta">
             ${escapeHtml(fundName)} · ${escapeHtml(item.creatorName ?? "")}
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: var(--space-3);">
-          <div style="text-align: right;">
-            <div class="num-display" style="
-              font-size: var(--text-lg);
-              font-weight: var(--weight-bold);
-              color: ${item.direction === "expense" ? "var(--expense)" : "var(--income)"};
-            ">
+        <div class="gl-approval-item__aside">
+          <div class="gl-approval-item__amount">
+            <div class="num-display gl-approval-item__amount-value" style="color: ${item.direction === "expense" ? "var(--expense)" : "var(--income)"};">
               ${formattedItemAmount}
             </div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">
+            <div class="gl-approval-item__account">
               ${item.accountName}
             </div>
           </div>
-          <span class="gl-btn-open-decision" data-id="${item.id}" style="color: var(--muted-foreground); display: inline-flex;">
+          <span class="gl-btn-open-decision gl-row__chevron" data-id="${item.id}" style="display: inline-flex;">
             <span class="gl-visually-hidden">ดูรายละเอียด</span>
             ${ICON_CHEVRON}
           </span>

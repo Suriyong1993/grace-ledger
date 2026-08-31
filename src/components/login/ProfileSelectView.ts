@@ -11,17 +11,10 @@ export function renderProfileSelectHtml(
 ): string {
   return `
     <div class="gl-login-stage">
-      ${renderBrandHtml()}
-
       <div class="gl-login-hero">
         <p class="gl-login-eyebrow">เข้าสู่ระบบ</p>
         <h1 class="gl-login-heading">วันนี้ใครเข้าใช้งาน?</h1>
-        <p class="gl-login-subheading">แตะโปรไฟล์ของท่านเพื่อเข้าใช้งานด้วย PIN 6 หลักแบบรวดเร็วและปลอดภัย</p>
-      </div>
-
-      <div class="gl-login-identity-strip" role="note" aria-label="คำแนะนำการใช้งาน">
-        <span class="gl-login-identity-chip">แตะเลือกโปรไฟล์</span>
-        <span class="gl-login-identity-chip gl-login-identity-chip--muted">รองรับมือถือและคีย์บอร์ด</span>
+        <p class="gl-login-subheading">แตะโปรไฟล์ของท่านเพื่อเข้าใช้งานด้วย PIN 6 หลัก</p>
       </div>
 
       ${renderProfilesBodyHtml(profiles, selectedId, status)}
@@ -38,7 +31,7 @@ function renderProfilesBodyHtml(
     return `
       <div class="gl-login-profiles-status" role="status" aria-live="polite">
         <span class="gl-login-spinner gl-login-spinner--dark" aria-hidden="true"></span>
-        <p class="gl-login-hint">กำลังโหลด...</p>
+        <p class="gl-login-hint">กำลังโหลด…</p>
       </div>
     `;
   }
@@ -56,6 +49,7 @@ function renderProfilesBodyHtml(
     return `
       <div class="gl-login-profiles-status" role="status">
         <p class="gl-login-hint">ยังไม่มีผู้ใช้งานในระบบ</p>
+        <p class="gl-login-hint">กรุณาติดต่อผู้ดูแลระบบเพื่อเพิ่มผู้ใช้งานก่อนเข้าสู่ระบบ</p>
       </div>
     `;
   }
@@ -64,7 +58,7 @@ function renderProfilesBodyHtml(
   const items = profiles.map((profile) => renderProfileItem(profile, profile.id === selectedId, layout)).join("");
 
   return `
-    <div class="gl-login-profiles gl-login-profiles--${layout}" id="login-profile-list" aria-label="รายการโปรไฟล์">
+    <div class="gl-login-profiles gl-login-profiles--${layout}" id="login-profile-list" role="group" aria-label="รายการโปรไฟล์">
       ${items}
     </div>
   `;
@@ -107,7 +101,7 @@ export function renderBrandHtml(): string {
           <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="currentColor"/>
         </svg>
       </span>
-      <p class="gl-login-wordmark">Grace Ledger</p>
+      <p class="gl-login-wordmark" translate="no">Grace Ledger</p>
       <p class="gl-login-tagline">ระบบการเงินคริสตจักร</p>
     </div>
   `;

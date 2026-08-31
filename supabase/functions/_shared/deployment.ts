@@ -76,9 +76,18 @@ export function isPinShaped(value: unknown): value is string {
  * deployment (`grace-ledger-<hash>-tlcs-projects-ab505ecc.vercel.app`), so a
  * fixed list goes stale the moment someone opens a new branch — that's what
  * broke login on the `fix/dashboard-financial-correctness-and-ui` preview.
- * Match the team's own Vercel domain suffix instead of enumerating aliases:
- * still scoped to this one Vercel team, but covers every past and future
- * deployment without a code change.
+ *
+ * A hardcoded team-wide pattern, however, lets EVERY preview alias of the
+ * team — including one built from any collaborator's branch — call these
+ * pre-auth endpoints from a browser. The allowlist is therefore configurable:
+ * set the `ALLOWED_ORIGIN_REGEX` Edge Function secret to the narrowest pattern
+ * that matches the origins actually deployed, e.g.
+ *
+ *   supabase secrets set ALLOWED_ORIGIN_REGEX='^https://grace-ledger-(main|[a-z0-9-]*fix-[a-z0-9-]+)-tlcs-projects-ab505ecc\.vercel\.app$' --project-ref <ref>
+ *
+ * When the secret is absent, only the FIXED_ALLOWED_ORIGINS below are trusted.
+ * The regex is anchored and bounded in size; a malformed or oversized secret
+ * is ignored rather than partially applied.
  */
 const FIXED_ALLOWED_ORIGINS = new Set([
   "https://grace-ledger-mu.vercel.app",
@@ -89,13 +98,35 @@ const FIXED_ALLOWED_ORIGINS = new Set([
   "http://localhost:4173",
 ]);
 
+const MAX_ORIGIN_PATTERN_LENGTH = 256;
+
 const VERCEL_TEAM_ORIGIN_PATTERN =
   /^https:\/\/grace-ledger-[a-z0-9-]+-tlcs-projects-ab505ecc\.vercel\.app$/;
 
+function configuredOriginPattern(): RegExp | null {
+  const raw = Deno.env.get("ALLOWED_ORIGIN_REGEX")?.trim();
+  if (!raw) return null;
+  if (raw.length > MAX_ORIGIN_PATTERN_LENGTH) return null;
+  try {
+    const compiled = new RegExp(raw);
+    // Only anchored full-match patterns are honored; an unanchored pattern
+    // would silently widen the allowlist beyond what was configured.
+    return compiled.source.startsWith("^") && compiled.source.endsWith("$")
+      ? compiled
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 function isAllowedOrigin(origin: string): boolean {
-  return (
-    FIXED_ALLOWED_ORIGINS.has(origin) || VERCEL_TEAM_ORIGIN_PATTERN.test(origin)
-  );
+  if (FIXED_ALLOWED_ORIGINS.has(origin)) return true;
+  // Legacy default: team-scoped Vercel pattern, retained only until
+  // ALLOWED_ORIGIN_REGEX is configured for the deployment. Set the secret
+  // (even to the same pattern) to take explicit ownership of this list.
+  const configured = configuredOriginPattern();
+  if (configured) return configured.test(origin);
+  return VERCEL_TEAM_ORIGIN_PATTERN.test(origin);
 }
 
 const BASE_CORS_HEADERS: Record<string, string> = {

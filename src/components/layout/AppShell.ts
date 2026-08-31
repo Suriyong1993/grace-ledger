@@ -28,6 +28,7 @@ const ICON_FUNDS = `<path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/><
 const ICON_APPROVALS = `<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>`;
 const ICON_MEMBERS = `<circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/>`;
 const ICON_REPORTS = `<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/>`;
+const ICON_LOGOUT = `<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>`;
 
 function icon(paths: string, size: number): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false">${paths}</svg>`;
@@ -265,10 +266,13 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         gap: var(--space-3);
       ">
         <div class="gl-shell-avatar" aria-hidden="true">${initials}</div>
-        <div style="min-width: 0;">
+        <div style="min-width: 0; flex: 1;">
           <div style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayName}</div>
           <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">${displayRole}</div>
         </div>
+        <button type="button" class="gl-logout-btn" data-logout aria-label="ออกจากระบบ" title="ออกจากระบบ">
+          ${icon(ICON_LOGOUT, 18)}
+        </button>
       </div>
     </aside>
 
@@ -300,6 +304,9 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         <div class="gl-shell-topbar__context" style="font-size: var(--text-xs); color: var(--muted-foreground); white-space: nowrap;">
           <span class="gl-shell-status-dot" aria-hidden="true"></span>
           <span>${churchName}</span>
+          <button type="button" class="gl-logout-btn gl-logout-btn--topbar" data-logout aria-label="ออกจากระบบ" title="ออกจากระบบ">
+            ${icon(ICON_LOGOUT, 18)}
+          </button>
         </div>
       </header>
 

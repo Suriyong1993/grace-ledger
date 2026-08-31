@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderLoginStylesHtml } from "../components/login/loginStyles";
-import { renderProfileSelectHtml, ProfilesStatus } from "../components/login/ProfileSelectView";
+import { renderProfileSelectHtml, renderBrandHtml, ProfilesStatus } from "../components/login/ProfileSelectView";
 import {
   renderPinEntryHtml,
   renderDots,
@@ -38,7 +38,17 @@ export class LoginPage {
   constructor(private readonly supabase: SupabaseClient) {}
 
   public renderHtml(): string {
-    return `${renderLoginStylesHtml()}<div class="gl-login-screen">${this.renderViewHtml()}</div>`;
+    return `${renderLoginStylesHtml()}<div class="gl-login-screen">
+      <aside class="gl-login-panel" aria-hidden="false">
+        ${renderBrandHtml()}
+        <ol class="gl-login-steps" aria-label="ขั้นตอนการเข้าสู่ระบบ">
+          <li><span class="gl-login-step-num" aria-hidden="true">1</span>เลือกโปรไฟล์ของท่าน</li>
+          <li><span class="gl-login-step-num" aria-hidden="true">2</span>ระบุรหัส PIN 6 หลัก</li>
+          <li><span class="gl-login-step-num" aria-hidden="true">3</span>เข้าใช้งานระบบการเงิน</li>
+        </ol>
+      </aside>
+      <main class="gl-login-main">${this.renderViewHtml()}</main>
+    </div>`;
   }
 
   private renderViewHtml(): string {
@@ -193,7 +203,7 @@ export class LoginPage {
     if (!profile || button.disabled) return;
 
     button.disabled = true;
-    button.textContent = "กำลังส่งอีเมล...";
+    button.textContent = "กำลังส่งอีเมล…";
 
     const redirectTo = `${window.location.origin}${window.location.pathname}`;
     const result = await requestPinBootstrap(this.supabase, profile.id, redirectTo);

@@ -187,7 +187,7 @@ export class ReportsPage {
           <p>งบการเงินประจำเดือน รายรับ-รายจ่าย และรายงานสถานะกองทุน</p>
         </div>
         <div class="gl-notice gl-notice--error" style="margin-bottom: var(--space-4);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="gl-actionbar">
             <div>
               <strong>เกิดข้อผิดพลาดในการโหลดรายงาน:</strong> ${this.errorMessage}
             </div>
@@ -205,9 +205,9 @@ export class ReportsPage {
 
     return `
     <div class="gl-page gl-fade-in">
-      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-3);">
+      <div class="gl-reports-pagehead">
         <div class="gl-page-header" style="margin-bottom: 0;">
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <div class="gl-reports-pagehead__title-row">
             <h1>รายงานการเงิน</h1>
             ${
               isHistorical
@@ -219,7 +219,7 @@ export class ReportsPage {
           </div>
           <p style="margin-top: 4px;">งบการเงินประจำเดือน รายรับ-รายจ่าย และข้อมูลเปรียบเทียบย้อนหลัง</p>
         </div>
-        <div style="display: flex; gap: var(--space-2);" class="no-print">
+        <div class="gl-reports-pagehead__actions no-print">
           <button id="export-csv-btn" class="gl-btn gl-btn--primary">
             ${ICON_DOWNLOAD}
             <span>ส่งออก CSV/Excel</span>
@@ -261,23 +261,23 @@ export class ReportsPage {
     const rows: string[] = [];
     if (l.pastor) {
       rows.push(`
-        <div style="display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border);">
-          <span style="color: var(--muted-foreground);">ศิษยาภิบาล</span>
-          <span style="font-weight: var(--weight-semibold); text-align: right;">${l.pastor}</span>
+        <div class="gl-reports-leadership-row">
+          <span class="gl-reports-leadership-row__label">ศิษยาภิบาล</span>
+          <span class="gl-reports-leadership-row__value">${l.pastor}</span>
         </div>`);
     }
     if (l.cashCounters.length > 0) {
       rows.push(`
-        <div style="display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--border);">
-          <span style="color: var(--muted-foreground);">ผู้นับเงิน</span>
-          <span style="font-weight: var(--weight-semibold); text-align: right;">${l.cashCounters.join(", ")}</span>
+        <div class="gl-reports-leadership-row">
+          <span class="gl-reports-leadership-row__label">ผู้นับเงิน</span>
+          <span class="gl-reports-leadership-row__value">${l.cashCounters.join(", ")}</span>
         </div>`);
     }
     if (l.auditor) {
       rows.push(`
-        <div style="display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0;">
-          <span style="color: var(--muted-foreground);">ผู้ตรวจสอบบัญชี</span>
-          <span style="font-weight: var(--weight-semibold); text-align: right;">${l.auditor}</span>
+        <div class="gl-reports-leadership-row">
+          <span class="gl-reports-leadership-row__label">ผู้ตรวจสอบบัญชี</span>
+          <span class="gl-reports-leadership-row__value">${l.auditor}</span>
         </div>`);
     }
 
@@ -286,10 +286,51 @@ export class ReportsPage {
         <div class="gl-section__head">
           <h2>ผู้รับผิดชอบและผู้ตรวจสอบ</h2>
         </div>
-        <div class="gl-card" style="padding: var(--space-4);">
+        <div class="gl-card gl-rows" style="padding: var(--space-4);">
           ${rows.join("")}
         </div>
       </section>`;
+  }
+
+  /**
+   * Net surplus/deficit is the figure the screen exists to answer — it's the
+   * hero. Income and expense explain it, so they sit as supporting figures
+   * beneath a divider rather than as two more equal-weight cards.
+   */
+  private renderFinancialHero(opts: {
+    netLabel: string;
+    net: Money;
+    netCaption: string;
+    incomeLabel: string;
+    income: Money;
+    incomeCaption: string;
+    expenseLabel: string;
+    expense: Money;
+    expenseCaption: string;
+  }): string {
+    const netColor = opts.net.isPositive() ? "var(--income)" : "var(--expense)";
+    return `
+      <section class="gl-section gl-reports-hero">
+        <div class="gl-card">
+          <div class="kicker" style="margin: 0;">${opts.netLabel}</div>
+          <div class="num-display gl-reports-hero__value" style="color: ${netColor};">${opts.net.format()}</div>
+          <div class="gl-reports-hero__caption">${opts.netCaption}</div>
+
+          <div class="gl-reports-hero__figures">
+            <span class="gl-reports-hero__figure">
+              ${opts.incomeLabel}
+              <strong class="num-display" style="color: var(--income);">+${opts.income.format()}</strong>
+              <span class="gl-reports-hero__figcaption">${opts.incomeCaption}</span>
+            </span>
+            <span class="gl-reports-hero__figure">
+              ${opts.expenseLabel}
+              <strong class="num-display" style="color: var(--expense);">−${opts.expense.format()}</strong>
+              <span class="gl-reports-hero__figcaption">${opts.expenseCaption}</span>
+            </span>
+          </div>
+        </div>
+      </section>
+    `;
   }
 
   private renderLiveMonthView(): string {
@@ -312,8 +353,8 @@ export class ReportsPage {
     ) {
       return `
       <section class="gl-section">
-        <div class="gl-empty-state" style="padding: var(--space-8); text-align: center; background: var(--card); border-radius: var(--radius-lg); border: 1px dashed var(--border);">
-          <div style="font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--foreground); margin-bottom: var(--space-1);">
+        <div class="gl-card gl-empty-state gl-empty-center" style="padding: var(--space-8); border-style: dashed;">
+          <div class="gl-empty-center__msg">
             ไม่มีข้อมูลธุรกรรมที่ลงบัญชีแล้วในงวดนี้
           </div>
           <div style="font-size: var(--text-sm); color: var(--muted-foreground);">
@@ -325,39 +366,24 @@ export class ReportsPage {
     }
 
     return `
-      <!-- Financial Summary Strip -->
-      <section class="gl-section" style="margin-bottom: var(--space-5);">
-        <div class="gl-statgrid">
-          <div class="gl-stat gl-stat--success">
-            <div class="gl-stat__label">รายรับรวมทั้งหมด</div>
-            <div class="gl-stat__value num-display">+${totalIncome.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ยอดเงินถวายและรายรับที่ลงบัญชีแล้ว
-            </div>
-          </div>
-          <div class="gl-stat gl-stat--danger">
-            <div class="gl-stat__label">รายจ่ายรวมทั้งหมด</div>
-            <div class="gl-stat__value num-display">−${totalExpense.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ค่าใช้จ่ายและพันธกิจที่ได้รับอนุมัติแล้ว
-            </div>
-          </div>
-          <div class="gl-stat ${netSurplus.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">รายรับสุทธิ (เกินดุล/ขาดดุล)</div>
-            <div class="gl-stat__value num-display">${netSurplus.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ผลต่างรายรับหักรายจ่ายในงวดนี้
-            </div>
-          </div>
-        </div>
-      </section>
+      ${this.renderFinancialHero({
+        netLabel: "รายรับสุทธิ (เกินดุล/ขาดดุล)",
+        net: netSurplus,
+        netCaption: "ผลต่างรายรับหักรายจ่ายในงวดนี้",
+        incomeLabel: "รายรับรวมทั้งหมด",
+        income: totalIncome,
+        incomeCaption: "ยอดเงินถวายและรายรับที่ลงบัญชีแล้ว",
+        expenseLabel: "รายจ่ายรวมทั้งหมด",
+        expense: totalExpense,
+        expenseCaption: "ค่าใช้จ่ายและพันธกิจที่ได้รับอนุมัติแล้ว",
+      })}
 
       <!-- Tables Grid: Income & Expense Categories -->
       <section class="gl-section" style="margin-bottom: var(--space-6);">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-4);">
           <!-- Income Table -->
           <div class="gl-card" style="padding: 0; overflow: hidden;">
-            <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); font-weight: var(--weight-bold); font-size: var(--text-sm);">
+            <div class="gl-reports-table-head">
               หมวดรายรับ
             </div>
             <table class="gl-table">
@@ -387,7 +413,7 @@ export class ReportsPage {
 
           <!-- Expense Table -->
           <div class="gl-card" style="padding: 0; overflow: hidden;">
-            <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); font-weight: var(--weight-bold); font-size: var(--text-sm);">
+            <div class="gl-reports-table-head">
               หมวดรายจ่าย
             </div>
             <table class="gl-table">
@@ -420,7 +446,7 @@ export class ReportsPage {
       <!-- Fund Breakdown -->
       <section class="gl-section">
         <div class="gl-card" style="padding: 0; overflow: hidden;">
-          <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); font-weight: var(--weight-bold); font-size: var(--text-sm);">
+          <div class="gl-reports-table-head">
             สถานะและยอดคงเหลือกองทุน
           </div>
           <table class="gl-table">
@@ -459,9 +485,9 @@ export class ReportsPage {
 
     if (!m) {
       return `
-        <div class="gl-card" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
+        <div class="gl-card gl-empty-state gl-reports-empty-icon" style="padding: var(--space-8);">
           ${ICON_NO_ARCHIVE}
-          <div style="font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--foreground); margin: var(--space-2) 0 4px;">ไม่พบข้อมูลเอกสารย้อนหลัง</div>
+          <div class="gl-reports-empty-icon__title">ไม่พบข้อมูลเอกสารย้อนหลัง</div>
           <p style="margin: 0; font-size: var(--text-sm);">ยังไม่มีการนำเข้าไฟล์สรุปบัญชีสำหรับเดือนนี้</p>
         </div>
       `;
@@ -483,36 +509,22 @@ export class ReportsPage {
           : ""
       }
 
-      <section class="gl-section" style="margin-bottom: var(--space-5);">
-        <div class="gl-statgrid">
-          <div class="gl-stat gl-stat--success">
-            <div class="gl-stat__label">รายรับรวม (${m.monthName})</div>
-            <div class="gl-stat__value num-display">+${m.incomeTotal.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              เงินสด: +${m.cashIncome.format()} · โอน/QR: +${m.onlineIncome.format()}
-            </div>
-          </div>
-          <div class="gl-stat gl-stat--danger">
-            <div class="gl-stat__label">รายจ่ายรวม</div>
-            <div class="gl-stat__value num-display">−${m.expenseTotal.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              รายจ่ายตามสมุดบัญชีดั้งเดิม
-            </div>
-          </div>
-          <div class="gl-stat ${m.net.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">รายรับสุทธิประจำเดือน</div>
-            <div class="gl-stat__value num-display">${m.net.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ยกยอดไป: ${m.closingBalanceReported ? m.closingBalanceReported.format() : "—"}
-            </div>
-          </div>
-        </div>
-      </section>
+      ${this.renderFinancialHero({
+        netLabel: "รายรับสุทธิประจำเดือน",
+        net: m.net,
+        netCaption: `ยกยอดไป: ${m.closingBalanceReported ? m.closingBalanceReported.format() : "—"}`,
+        incomeLabel: `รายรับรวม (${m.monthName})`,
+        income: m.incomeTotal,
+        incomeCaption: `เงินสด: +${m.cashIncome.format()} · โอน/QR: +${m.onlineIncome.format()}`,
+        expenseLabel: "รายจ่ายรวม",
+        expense: m.expenseTotal,
+        expenseCaption: "รายจ่ายตามสมุดบัญชีดั้งเดิม",
+      })}
 
       <!-- Weekly breakdown -->
       <section class="gl-section">
         <div class="gl-card" style="padding: 0; overflow: hidden;">
-          <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); font-weight: var(--weight-bold); font-size: var(--text-sm);">
+          <div class="gl-reports-table-head">
             รายละเอียดรายสัปดาห์ (${m.monthName} 2569)
           </div>
           <div style="overflow-x: auto;">
@@ -577,39 +589,25 @@ export class ReportsPage {
     const combinedNet = histNet.add(liveNet);
 
     return `
-      <!-- Stat Cards -->
-      <section class="gl-section" style="margin-bottom: var(--space-5);">
-        <div class="gl-statgrid">
-          <div class="gl-stat gl-stat--success">
-            <div class="gl-stat__label">รายรับสะสมทั้งปี 2569</div>
-            <div class="gl-stat__value num-display">+${combinedIncome.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ย้อนหลัง (ม.ค.-ก.ค.): +${histIncome.format()} · ส.ค.: +${liveIncome.format()}
-            </div>
-          </div>
-          <div class="gl-stat gl-stat--danger">
-            <div class="gl-stat__label">รายจ่ายสะสมทั้งปี 2569</div>
-            <div class="gl-stat__value num-display">−${combinedExpense.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ย้อนหลัง (ม.ค.-ก.ค.): −${histExpense.format()} · ส.ค.: −${liveExpense.format()}
-            </div>
-          </div>
-          <div class="gl-stat ${combinedNet.isPositive() ? "gl-stat--success" : "gl-stat--danger"}">
-            <div class="gl-stat__label">ผลสุทธิสะสมทั้งปี</div>
-            <div class="gl-stat__value num-display">${combinedNet.format()}</div>
-            <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: 4px;">
-              ผลต่างรายรับ–รายจ่ายสะสม (ไม่ใช่ยอดเงินคงเหลือในบัญชีธนาคารจริง)
-            </div>
-          </div>
-        </div>
-      </section>
+      ${this.renderFinancialHero({
+        netLabel: "ผลสุทธิสะสมทั้งปี",
+        net: combinedNet,
+        netCaption:
+          "ผลต่างรายรับ–รายจ่ายสะสม (ไม่ใช่ยอดเงินคงเหลือในบัญชีธนาคารจริง)",
+        incomeLabel: "รายรับสะสมทั้งปี 2569",
+        income: combinedIncome,
+        incomeCaption: `ย้อนหลัง (ม.ค.-ก.ค.): +${histIncome.format()} · ส.ค.: +${liveIncome.format()}`,
+        expenseLabel: "รายจ่ายสะสมทั้งปี 2569",
+        expense: combinedExpense,
+        expenseCaption: `ย้อนหลัง (ม.ค.-ก.ค.): −${histExpense.format()} · ส.ค.: −${liveExpense.format()}`,
+      })}
 
       <!-- Monthly Overview Table -->
       <section class="gl-section">
         <div class="gl-card" style="padding: 0; overflow: hidden;">
-          <div style="padding: var(--space-3) var(--space-4); background: var(--secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: var(--weight-bold); font-size: var(--text-sm);">ตารางสรุปรายเดือน ประจำปี 2569</span>
-            <span style="font-size: 12px; color: var(--muted-foreground);">ข้อมูล 8 เดือน</span>
+          <div class="gl-reports-table-head gl-reports-table-head--between">
+            <span>ตารางสรุปรายเดือน ประจำปี 2569</span>
+            <span style="font-weight: var(--weight-regular); color: var(--muted-foreground);">ข้อมูล 8 เดือน</span>
           </div>
           <div style="overflow-x: auto;">
             <table class="gl-table">

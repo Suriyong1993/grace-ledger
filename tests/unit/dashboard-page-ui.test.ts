@@ -39,7 +39,7 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).toContain("2 กองทุน · 3 บัญชีธนาคาร + เงินสดในมือ");
   });
 
-  it("gives the month's income and expense a stat card each, beside the balance", () => {
+  it("keeps the balance, income and expense inside one hero card beside the review card — not three equal stat cards", () => {
     const html = page.renderHtml({
       pendingApprovalsCount: 0,
       totalFundsBalance: "฿248,560.00",
@@ -47,15 +47,18 @@ describe("DashboardPage UI — Unit Tests", () => {
       monthlyExpense: "฿12,820.00",
     });
 
-    // Three figures, three cards. The old markup split one card with an <hr>,
-    // which read as "balance, then two footnotes" rather than three peers.
-    expect(html).toContain('class="gl-stats"');
+    // Balance card and review card, unequal weight, side by side — not a
+    // grid of equal-looking cards.
+    expect(html).toContain('class="gl-dash-hero-row"');
+    expect(html).toContain('class="gl-card gl-dash-hero gl-rise"');
+    expect(html).toContain('class="gl-card gl-dash-review gl-rise"');
     expect(html).toContain('data-testid="total-balance"');
-    expect(html).toContain('<div class="gl-stat__label">รายรับเดือนนี้</div>');
-    expect(html).toContain('<div class="gl-stat__label">รายจ่ายเดือนนี้</div>');
 
-    const cards = html.match(/class="gl-card[^"]*gl-stat/g) || [];
-    expect(cards).toHaveLength(3);
+    // Income/expense are typography inside the hero card, never their own
+    // bordered card.
+    expect(html).toContain('class="gl-dash-hero__figure">รายรับเดือนนี้');
+    expect(html).toContain('class="gl-dash-hero__figure">รายจ่ายเดือนนี้');
+    expect(html).not.toContain('class="gl-stats"');
 
     // Sign and colour stay attached to the figure they describe.
     expect(html).toContain('style="color: var(--income);">+฿18,450.00<');
@@ -98,7 +101,10 @@ describe("DashboardPage UI — Unit Tests", () => {
       expenseSatang: 50000,
     }));
 
-    const html = page.renderHtml({ pendingApprovalsCount: 0, historicalTrend: months });
+    const html = page.renderHtml({
+      pendingApprovalsCount: 0,
+      historicalTrend: months,
+    });
 
     expect(html).toContain("--gl-bar-delay: 0ms;");
     expect(html).toContain("--gl-bar-delay: 40ms;");
@@ -112,20 +118,30 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     expect(html).toContain("<h1>ภาพรวมการเงิน</h1>");
     // Same locale and month style as formatDateThai — one date language app-wide.
-    const period = new Date().toLocaleDateString("th-TH", { month: "short", year: "numeric" });
+    const period = new Date().toLocaleDateString("th-TH", {
+      month: "short",
+      year: "numeric",
+    });
     expect(html).toContain(`ข้อมูล ณ ${period}`);
   });
 
-  it("renders 4 quick action links with correct hrefs and unbroken labels", () => {
+  it("renders the hero action strip as one labeled primary button plus three labeled icon-only controls", () => {
     const html = page.renderHtml({ pendingApprovalsCount: 0 });
 
     expect(html).toContain('href="#/offerings/new"');
     expect(html).toContain('href="#/transactions"');
     expect(html).toContain('href="#/funds"');
+
+    // One real button carries a visible label.
+    expect(html).toContain('class="gl-btn gl-btn--primary"');
     expect(html).toContain("บันทึกเงินถวาย");
-    expect(html).toContain("บันทึกรายจ่าย");
-    expect(html).toContain("โอนเงินกองทุน");
-    expect(html).toContain("รายการทั้งหมด");
+
+    // The rest are icon-only — never four identical rectangles — but each
+    // still carries an accessible name for a screen reader.
+    expect(html).toContain('class="gl-icon-btn" aria-label="บันทึกรายจ่าย"');
+    expect(html).toContain('class="gl-icon-btn" aria-label="โอนเงินกองทุน"');
+    expect(html).toContain('class="gl-icon-btn" aria-label="รายการทั้งหมด"');
+
     // Labels wrap naturally; a hard <br> inside a label breaks at 390px.
     expect(html).not.toContain("<br>");
   });
@@ -134,8 +150,18 @@ describe("DashboardPage UI — Unit Tests", () => {
     const html = page.renderHtml({
       pendingApprovalsCount: 0,
       funds: [
-        { id: "f-1", name: "กองทุนอาคาร", balance: Money.from("25000.00"), targetAmount: Money.from("100000.00") },
-        { id: "f-2", name: "กองทุนทั่วไป", balance: Money.from("8000.00"), targetAmount: null },
+        {
+          id: "f-1",
+          name: "กองทุนอาคาร",
+          balance: Money.from("25000.00"),
+          targetAmount: Money.from("100000.00"),
+        },
+        {
+          id: "f-2",
+          name: "กองทุนทั่วไป",
+          balance: Money.from("8000.00"),
+          targetAmount: null,
+        },
       ],
     });
 
@@ -274,22 +300,107 @@ describe("DashboardPage UI — Unit Tests", () => {
     // Five recent rows that deliberately do NOT sum to the month's totals:
     // they span other months and include a transfer.
     const recentRows = [
-      { id: "r1", description: "ค่าเช่าที่ได้รับจากผู้เช่า", direction: "income", transaction_date: "2026-08-21", status: "posted", transaction_splits: [{ amount: "3000.00", fund_id: "f-1" }] },
-      { id: "r2", description: "เงินถวายเดือนก่อน", direction: "income", transaction_date: "2026-06-02", status: "posted", transaction_splits: [{ amount: "99000.00", fund_id: "f-1" }] },
-      { id: "r3", description: "โอนเงินระหว่างกองทุน", direction: "transfer", transaction_date: "2026-08-15", status: "posted", transaction_splits: [{ amount: "25000.00", fund_id: "f-2" }] },
-      { id: "r4", description: "ค่าไฟฟ้า", direction: "expense", transaction_date: "2026-08-19", status: "posted", transaction_splits: [{ amount: "4280.00", fund_id: "f-1" }] },
-      { id: "r5", description: "ถวายพิเศษ", direction: "income", transaction_date: "2026-05-11", status: "posted", transaction_splits: [{ amount: "6200.00", fund_id: "f-1" }] },
+      {
+        id: "r1",
+        description: "ค่าเช่าที่ได้รับจากผู้เช่า",
+        direction: "income",
+        transaction_date: "2026-08-21",
+        status: "posted",
+        transaction_splits: [{ amount: "3000.00", fund_id: "f-1" }],
+      },
+      {
+        id: "r2",
+        description: "เงินถวายเดือนก่อน",
+        direction: "income",
+        transaction_date: "2026-06-02",
+        status: "posted",
+        transaction_splits: [{ amount: "99000.00", fund_id: "f-1" }],
+      },
+      {
+        id: "r3",
+        description: "โอนเงินระหว่างกองทุน",
+        direction: "transfer",
+        transaction_date: "2026-08-15",
+        status: "posted",
+        transaction_splits: [{ amount: "25000.00", fund_id: "f-2" }],
+      },
+      {
+        id: "r4",
+        description: "ค่าไฟฟ้า",
+        direction: "expense",
+        transaction_date: "2026-08-19",
+        status: "posted",
+        transaction_splits: [{ amount: "4280.00", fund_id: "f-1" }],
+      },
+      {
+        id: "r5",
+        description: "ถวายพิเศษ",
+        direction: "income",
+        transaction_date: "2026-05-11",
+        status: "posted",
+        transaction_splits: [{ amount: "6200.00", fund_id: "f-1" }],
+      },
     ];
 
     const postedRows = [
-      { id: "p1", amount: "50000.00", direction: "income", description: "เงินถวายวันอาทิตย์", transaction_date: "2026-08-02", status: "posted", transaction_splits: [{ amount: "50000.00", fund_id: "f-1", category_id: "c1", categories: { id: "c1", name: "ถวายทั่วไป" }, funds: { id: "f-1", name: "กองทุนทั่วไป" } }] },
-      { id: "p2", amount: "12500.00", direction: "expense", description: "ค่าสาธารณูปโภค", transaction_date: "2026-08-05", status: "posted", transaction_splits: [{ amount: "12500.00", fund_id: "f-1", category_id: "c2", categories: { id: "c2", name: "สาธารณูปโภค" }, funds: { id: "f-1", name: "กองทุนทั่วไป" } }] },
-      { id: "p3", amount: "25000.00", direction: "transfer", description: "โอนเงินระหว่างกองทุน", transaction_date: "2026-08-06", status: "posted", transaction_splits: [{ amount: "25000.00", fund_id: "f-2", category_id: null, categories: null, funds: { id: "f-2", name: "กองทุนพันธกิจ" } }] },
+      {
+        id: "p1",
+        amount: "50000.00",
+        direction: "income",
+        description: "เงินถวายวันอาทิตย์",
+        transaction_date: "2026-08-02",
+        status: "posted",
+        transaction_splits: [
+          {
+            amount: "50000.00",
+            fund_id: "f-1",
+            category_id: "c1",
+            categories: { id: "c1", name: "ถวายทั่วไป" },
+            funds: { id: "f-1", name: "กองทุนทั่วไป" },
+          },
+        ],
+      },
+      {
+        id: "p2",
+        amount: "12500.00",
+        direction: "expense",
+        description: "ค่าสาธารณูปโภค",
+        transaction_date: "2026-08-05",
+        status: "posted",
+        transaction_splits: [
+          {
+            amount: "12500.00",
+            fund_id: "f-1",
+            category_id: "c2",
+            categories: { id: "c2", name: "สาธารณูปโภค" },
+            funds: { id: "f-1", name: "กองทุนทั่วไป" },
+          },
+        ],
+      },
+      {
+        id: "p3",
+        amount: "25000.00",
+        direction: "transfer",
+        description: "โอนเงินระหว่างกองทุน",
+        transaction_date: "2026-08-06",
+        status: "posted",
+        transaction_splits: [
+          {
+            amount: "25000.00",
+            fund_id: "f-2",
+            category_id: null,
+            categories: null,
+            funds: { id: "f-2", name: "กองทุนพันธกิจ" },
+          },
+        ],
+      },
     ];
 
     it("takes the month's income and expense from the posted ledger, not from the 5-row activity list", async () => {
       const captured: Captured = { statementRange: {} };
-      const page = new DashboardPage(makeSupabase({ postedRows, recentRows, captured }));
+      const page = new DashboardPage(
+        makeSupabase({ postedRows, recentRows, captured }),
+      );
       const data = await page.loadData(CHURCH);
 
       // Posted ledger for the month: 50,000 in, 12,500 out, transfer excluded.
@@ -305,7 +416,9 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     it("queries the whole current calendar month, ending on its real last day", async () => {
       const captured: Captured = { statementRange: {} };
-      const page = new DashboardPage(makeSupabase({ postedRows, recentRows, captured }));
+      const page = new DashboardPage(
+        makeSupabase({ postedRows, recentRows, captured }),
+      );
       await page.loadData(CHURCH);
 
       const { start, end } = captured.statementRange;
@@ -323,7 +436,9 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     it("types each activity row from the ledger direction column, not the Thai description", async () => {
       const captured: Captured = { statementRange: {} };
-      const page = new DashboardPage(makeSupabase({ postedRows, recentRows, captured }));
+      const page = new DashboardPage(
+        makeSupabase({ postedRows, recentRows, captured }),
+      );
       const data = await page.loadData(CHURCH);
       const rows = data.recentTransactions!;
 
@@ -346,7 +461,14 @@ describe("DashboardPage UI — Unit Tests", () => {
         pendingApprovalsCount: 0,
         loadFailed: true,
         errorMessage: PAYLOAD,
-        funds: [{ id: "f-1", name: PAYLOAD, balance: Money.from("100.00"), targetAmount: Money.from("200.00") }],
+        funds: [
+          {
+            id: "f-1",
+            name: PAYLOAD,
+            balance: Money.from("100.00"),
+            targetAmount: Money.from("200.00"),
+          },
+        ],
         recentTransactions: [
           {
             id: "t-1",
@@ -368,7 +490,14 @@ describe("DashboardPage UI — Unit Tests", () => {
     it("escapes the fund name inside the progress bar's aria-label", () => {
       const html = page.renderHtml({
         pendingApprovalsCount: 0,
-        funds: [{ id: "f-1", name: '" onmouseover="alert(1)', balance: Money.from("100.00"), targetAmount: Money.from("200.00") }],
+        funds: [
+          {
+            id: "f-1",
+            name: '" onmouseover="alert(1)',
+            balance: Money.from("100.00"),
+            targetAmount: Money.from("200.00"),
+          },
+        ],
       });
 
       expect(html).not.toContain('onmouseover="alert(1)');
@@ -425,10 +554,13 @@ describe("DashboardPage UI — Unit Tests", () => {
         b.limit = () => b;
         b.then = (resolve: any) => {
           if (table === "funds") return resolve({ data: [], error: null });
-          if (table === "accounts") return resolve({ data: [], error: null, count: 0 });
+          if (table === "accounts")
+            return resolve({ data: [], error: null, count: 0 });
           if (table === "transactions") {
-            if (b._eq.status === "posted" && b._range.start) return resolve({ data: [], error: null });
-            if (b._eq.status === "pending_approval") return resolve({ data: [], error: null });
+            if (b._eq.status === "posted" && b._range.start)
+              return resolve({ data: [], error: null });
+            if (b._eq.status === "pending_approval")
+              return resolve({ data: [], error: null });
             return resolve({ data: recentRows, error: null });
           }
           return resolve({ data: [], error: null });
@@ -441,17 +573,42 @@ describe("DashboardPage UI — Unit Tests", () => {
     async function amountsFor(rows: any[]) {
       const page = new DashboardPage(makeSupabase(rows));
       const data = await page.loadData("church-1");
-      return data.recentTransactions!.map((r) => ({ amount: r.amount.format(), direction: r.direction }));
+      return data.recentTransactions!.map((r) => ({
+        amount: r.amount.format(),
+        direction: r.direction,
+      }));
     }
 
     it("shows the header amount for a normal income row", async () => {
-      const rows = [{ id: "i", description: "เงินถวาย", amount: "18450.00", direction: "income", transaction_date: "2026-08-21", status: "posted" }];
-      expect(await amountsFor(rows)).toEqual([{ amount: "฿18,450.00", direction: "income" }]);
+      const rows = [
+        {
+          id: "i",
+          description: "เงินถวาย",
+          amount: "18450.00",
+          direction: "income",
+          transaction_date: "2026-08-21",
+          status: "posted",
+        },
+      ];
+      expect(await amountsFor(rows)).toEqual([
+        { amount: "฿18,450.00", direction: "income" },
+      ]);
     });
 
     it("shows the header amount for a normal expense row", async () => {
-      const rows = [{ id: "e", description: "ค่าไฟฟ้า", amount: "4280.00", direction: "expense", transaction_date: "2026-08-19", status: "posted" }];
-      expect(await amountsFor(rows)).toEqual([{ amount: "฿4,280.00", direction: "expense" }]);
+      const rows = [
+        {
+          id: "e",
+          description: "ค่าไฟฟ้า",
+          amount: "4280.00",
+          direction: "expense",
+          transaction_date: "2026-08-19",
+          status: "posted",
+        },
+      ];
+      expect(await amountsFor(rows)).toEqual([
+        { amount: "฿4,280.00", direction: "expense" },
+      ]);
     });
 
     it("shows the whole transaction for a multi-split row, not one fund's share", async () => {
@@ -472,7 +629,9 @@ describe("DashboardPage UI — Unit Tests", () => {
           ],
         },
       ];
-      expect(await amountsFor(rows)).toEqual([{ amount: "฿18,450.00", direction: "income" }]);
+      expect(await amountsFor(rows)).toEqual([
+        { amount: "฿18,450.00", direction: "income" },
+      ]);
     });
 
     it("shows a transfer at its real value instead of the zero its splits net to", async () => {
@@ -492,7 +651,9 @@ describe("DashboardPage UI — Unit Tests", () => {
           ],
         },
       ];
-      expect(await amountsFor(rows)).toEqual([{ amount: "฿25,000.00", direction: "transfer" }]);
+      expect(await amountsFor(rows)).toEqual([
+        { amount: "฿25,000.00", direction: "transfer" },
+      ]);
     });
 
     it("shows a half-allocated draft at its full stated value", async () => {
@@ -509,7 +670,9 @@ describe("DashboardPage UI — Unit Tests", () => {
           transaction_splits: [{ amount: "2000.00", fund_id: "f-1" }],
         },
       ];
-      expect(await amountsFor(rows)).toEqual([{ amount: "฿9,000.00", direction: "expense" }]);
+      expect(await amountsFor(rows)).toEqual([
+        { amount: "฿9,000.00", direction: "expense" },
+      ]);
     });
   });
 });

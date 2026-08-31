@@ -96,14 +96,14 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
 
     it("shows the checking spinner while the PIN is being verified", () => {
       const html = renderPinEntryHtml(profile, PIN_LENGTH, "checking");
-      expect(html).toContain("กำลังตรวจสอบรหัส PIN...");
+      expect(html).toContain("กำลังตรวจสอบรหัส PIN…");
       expect(html).toContain("gl-pin-spinner");
       expect(html).toMatch(/data-pin-key="1"\s+aria-label="เลข 1"\s+disabled/);
     });
 
     it("states incomplete, invalid, locked, requires_reset, and unavailable outcomes in plain Thai", () => {
       expect(renderStatusText("idle")).toBe("");
-      expect(renderStatusText("checking")).toBe("กำลังตรวจสอบรหัส PIN...");
+      expect(renderStatusText("checking")).toBe("กำลังตรวจสอบรหัส PIN…");
       expect(renderStatusText("incomplete")).toBe("กรุณาระบุ PIN ให้ครบ 6 หลัก");
       expect(renderStatusText("invalid")).toBe("รหัส PIN ไม่ถูกต้อง");
       expect(renderStatusText("locked", null)).toContain("ล็อก");

@@ -305,6 +305,15 @@ export class App {
 
     this.rootElement.innerHTML = appShellHtml + aiDrawerHtml;
 
+    // Sign-out affordance: available on every authenticated screen, in both
+    // the desktop sidebar and the mobile topbar. Supabase's auth listener
+    // clears the session and re-renders back to the login screen.
+    this.rootElement.querySelectorAll<HTMLButtonElement>("[data-logout]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        void this.supabase.auth.signOut();
+      });
+    });
+
     if (this.currentRoute.pattern.startsWith("/approvals")) {
       this.approvalsPage?.attachEventListeners(this.rootElement, () =>
         this.render(),

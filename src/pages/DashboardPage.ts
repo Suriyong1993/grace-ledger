@@ -232,9 +232,13 @@ export class DashboardPage {
       }
 
       // Query historical monthly summaries for dashboard trend preview
+      // Buddhist Era year so the label reads the same way the Thai reports
+      // do; derived from the clock, never hardcoded — a stale year here would
+      // quietly scope the trend to the wrong 12 months.
+      const currentBeYear = new Date().getFullYear() + 543;
       const histRes = await this.historicalService.getMonthlySummaries(
         churchId,
-        2569,
+        currentBeYear,
       );
       const historicalTrend: HistoricalTrendBar[] = (
         histRes.success && histRes.data ? histRes.data : []
@@ -486,87 +490,70 @@ export class DashboardPage {
         <p>ข้อมูล ณ ${period}</p>
       </div>
 
-      <!-- Financial position. The balance is the anchor; the month's two
-           figures stand as cards of their own so a glance lands on one number
-           instead of parsing a divided card. -->
-      <section class="gl-section" style="margin-bottom: var(--space-6);">
-        <h2 class="gl-visually-hidden">สรุปยอด</h2>
-        <div class="gl-stats">
-          <div class="gl-card gl-card--elevated gl-stat gl-stat--hero gl-rise">
+      <!-- Financial position + what needs review. The balance card is the
+           operational core; review sits beside it as real content, not a
+           twin stat card. Quick actions live inside the balance card as an
+           uneven strip: one committing action, three compact icon controls —
+           never four identical rectangles. -->
+      <section class="gl-section" style="margin-bottom: var(--space-8);">
+        <h2 class="gl-visually-hidden">สรุปยอดและรายการที่ต้องตรวจสอบ</h2>
+        <div class="gl-dash-hero-row">
+          <div class="gl-card gl-dash-hero gl-rise">
             <div class="kicker" style="margin: 0;">ยอดเงินคงเหลือทั้งหมด</div>
-            <div class="num-display gl-stat__value gl-stat__value--hero" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
-            <div class="gl-stat__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
+            <div class="num-display gl-dash-hero__value" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
+            <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
+
+            <div class="gl-dash-hero__figures">
+              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display" style="color: var(--income);">+${data.monthlyIncome || "฿0.00"}</strong></span>
+              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display" style="color: var(--expense);">−${data.monthlyExpense || "฿0.00"}</strong></span>
+            </div>
+
+            <div class="gl-dash-hero__actions">
+              <a href="#/offerings/new" class="gl-btn gl-btn--primary">
+                ${ICON_PLUS}
+                <span>บันทึกเงินถวาย</span>
+              </a>
+              <a href="#/transactions" class="gl-icon-btn" aria-label="บันทึกรายจ่าย" title="บันทึกรายจ่าย">${ICON_RECEIPT}</a>
+              <a href="#/funds" class="gl-icon-btn" aria-label="โอนเงินกองทุน" title="โอนเงินกองทุน">${ICON_TRANSFER}</a>
+              <a href="#/transactions" class="gl-icon-btn" aria-label="รายการทั้งหมด" title="รายการทั้งหมด">${ICON_LIST}</a>
+            </div>
           </div>
 
-          <div class="gl-card gl-stat gl-rise" style="--gl-rise-delay: 60ms;">
-            <div class="gl-stat__label">รายรับเดือนนี้</div>
-            <div class="num-display gl-stat__value" style="color: var(--income);">+${data.monthlyIncome || "฿0.00"}</div>
-          </div>
+          <!-- What to do next. Both rows describe either real loaded state or
+               a plain action; neither claims a status the page has not loaded. -->
+          <div class="gl-card gl-dash-review gl-rise" style="--gl-rise-delay: 60ms;">
+            <div class="gl-dash-review__head">
+              <h2>ต้องการให้คุณตรวจสอบ</h2>
+              <span class="num-display" style="font-size: var(--text-xs); font-weight: var(--weight-semibold); color: ${
+                hasPending ? "var(--pending)" : "var(--muted-foreground)"
+              };">${data.pendingApprovalsCount} เรื่อง</span>
+            </div>
 
-          <div class="gl-card gl-stat gl-rise" style="--gl-rise-delay: 120ms;">
-            <div class="gl-stat__label">รายจ่ายเดือนนี้</div>
-            <div class="num-display gl-stat__value" style="color: var(--expense);">−${data.monthlyExpense || "฿0.00"}</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="gl-section" style="margin-bottom: var(--space-8);">
-        <h2 class="gl-visually-hidden">ทางลัด</h2>
-        <div class="gl-quick-actions">
-          <a href="#/offerings/new" class="gl-quick-action gl-quick-action--primary">
-            <span class="gl-quick-action__icon">${ICON_PLUS}</span>
-            <span>บันทึกเงินถวาย</span>
-          </a>
-          <a href="#/transactions" class="gl-quick-action">
-            <span class="gl-quick-action__icon">${ICON_RECEIPT}</span>
-            <span>บันทึกรายจ่าย</span>
-          </a>
-          <a href="#/funds" class="gl-quick-action">
-            <span class="gl-quick-action__icon">${ICON_TRANSFER}</span>
-            <span>โอนเงินกองทุน</span>
-          </a>
-          <a href="#/transactions" class="gl-quick-action">
-            <span class="gl-quick-action__icon">${ICON_LIST}</span>
-            <span>รายการทั้งหมด</span>
-          </a>
-        </div>
-      </section>
-
-      <!-- What to do next. Both rows describe either real loaded state or a
-           plain action; neither claims a status the page has not loaded. -->
-      <section class="gl-section" style="margin-bottom: var(--space-8);">
-        <div class="gl-section__head">
-          <h2>ต้องการให้คุณตรวจสอบ</h2>
-          <span class="num-display" style="font-size: var(--text-xs); font-weight: var(--weight-semibold); color: ${
-            hasPending ? "var(--pending)" : "var(--muted-foreground)"
-          };">${data.pendingApprovalsCount} เรื่อง</span>
-        </div>
-
-        <div class="gl-card" style="padding: 0; overflow: hidden;">
-          <a href="#/approvals" class="gl-row">
-            <span class="gl-row__icon" aria-hidden="true" style="
-              background: ${hasPending ? "var(--pending-muted)" : "var(--secondary)"};
-              color: ${hasPending ? "var(--on-pending-muted)" : "var(--muted-foreground)"};
-            ">${ICON_CLOCK}</span>
-            <span class="gl-row__body">
-              <span class="gl-row__title" style="display: block;">
-                ${hasPending ? `${data.pendingApprovalsCount} รายการรออนุมัติจากคุณ` : "ไม่มีรายการค้างอนุมัติ"}
+            <a href="#/approvals" class="gl-row">
+              <span class="gl-row__icon" aria-hidden="true" style="
+                background: ${hasPending ? "var(--pending-muted)" : "var(--secondary)"};
+                color: ${hasPending ? "var(--on-pending-muted)" : "var(--muted-foreground)"};
+              ">${ICON_CLOCK}</span>
+              <span class="gl-row__body">
+                <span class="gl-row__title" style="display: block;">
+                  ${hasPending ? `${data.pendingApprovalsCount} รายการรออนุมัติจากคุณ` : "ไม่มีรายการค้างอนุมัติ"}
+                </span>
+                <span class="gl-row__meta" style="display: block;">
+                  ${hasPending ? "คำขอเบิกจ่ายที่รอการพิจารณา" : "ตรวจทานครบถ้วนทุกรายการแล้ว"}
+                </span>
               </span>
-              <span class="gl-row__meta" style="display: block;">
-                ${hasPending ? "คำขอเบิกจ่ายที่รอการพิจารณา" : "ตรวจทานครบถ้วนทุกรายการแล้ว"}
-              </span>
-            </span>
-            <span class="gl-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
-          </a>
+              <span class="gl-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
+            </a>
 
-          <a href="#/offerings" class="gl-row">
-            <span class="gl-row__icon" aria-hidden="true" style="background: var(--pending-muted); color: var(--on-pending-muted);">${ICON_OFFERING}</span>
-            <span class="gl-row__body">
-              <span class="gl-row__title" style="display: block;">เงินถวายวันอาทิตย์</span>
-              <span class="gl-row__meta" style="display: block;">เปิดรอบนับเงินและตรวจยอด</span>
-            </span>
-            <span class="gl-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
-          </a>
+            <a href="#/offerings" class="gl-row">
+              <span class="gl-row__icon" aria-hidden="true" style="background: var(--pending-muted); color: var(--on-pending-muted);">${ICON_OFFERING}</span>
+              <span class="gl-row__body">
+                <span class="gl-row__title" style="display: block;">เงินถวายวันอาทิตย์</span>
+                <span class="gl-row__meta" style="display: block;">เปิดรอบนับเงินและตรวจยอด</span>
+              </span>
+              <span class="gl-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
+            </a>
+          </div>
         </div>
       </section>
 
