@@ -20,7 +20,7 @@ Every significant feature passes all five before it is called done:
 1. **Functional correctness** — happy path + failure path both exercised.
 2. **Financial correctness** — amounts, signs, rounding, fund balances, posting rules. Prove with tests, not by reading.
 3. **Security review** — RLS/RBAC still enforced, no data leaked across churches, no unvalidated input reaching an RPC.
-4. **UX review** — desktop and 390px, all states present (loading / empty / error / success / disabled / permission-denied / stale / validation).
+4. **UX review** — desktop and 390px, all states present (loading / empty / error / success / disabled / permission-denied / stale / validation). `npm run lint:design` passes — no undocumented literal color/radius/shadow/font-size values were introduced.
 5. **AI-slop / writing review** — see Writing below.
 
 Blocking gate: any CRITICAL finding. A gate is not passed by intention, only by evidence (test output, screenshot, diff).
@@ -69,6 +69,26 @@ GOOD: ยังไม่มีรายการ
 ```
 
 - Dates: one format across the whole app. Today the app mixes `23 ส.ค. 2569` and `2026-08-23` — pick one and use it everywhere.
+
+## Design source of truth
+
+Read `DESIGN.md` and `COMPONENTS.md` before writing or changing any CSS, inline style, or render markup.
+
+```
+1. design-system-extracted/tokens/*.css   VALUES
+2. src/styles/app.css                      CLASSES (.gl-*)
+3. src/components/shared/*.ts              HELPERS (status, row, empty-state — once created)
+4. loginStyles.ts / aiDrawerStyles.ts      Feature-local stylesheets — only for surfaces with their own shell
+5. inline style=""                         LAYOUT ONLY — flex/grid/gap/min-width. Never color, radius, shadow, font-size.
+```
+
+Never re-declare an existing `.gl-*` selector a second time in `app.css` — edit the one declaration that
+exists. A literal color/radius/shadow/font-size value appearing in `src/**` outside `DESIGN.md`'s documented
+exceptions is either a bug or an undocumented decision — fix the bug, or add a `DECISIONS.md` entry, never
+both silently. `npm run lint:design` enforces this mechanically; it must pass.
+
+Status labels and colors for `TransactionStatus` come from exactly one place (see `DESIGN.md` → Status
+semantics). Do not add a second status→label map anywhere.
 
 ## Single source of truth — mandatory
 
