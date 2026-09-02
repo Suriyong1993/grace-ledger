@@ -502,6 +502,42 @@ export class DashboardPage {
         <p>ข้อมูล ณ ${period}</p>
       </div>
 
+      <!-- Concept B: Operational Command Center ("งานสัปดาห์นี้") -->
+      <section class="gl-command-center" aria-label="งานสัปดาห์นี้">
+        <div class="gl-command-center__head">
+          <h2 class="gl-command-center__title">
+            <span>ภารกิจประจำสัปดาห์</span>
+          </h2>
+          <span class="gl-badge gl-badge--neutral" style="font-size: var(--text-2xs);">รอบสัปดาห์ปัจจุบัน</span>
+        </div>
+        <div class="gl-command-center__grid">
+          <a href="#/offerings/new" class="gl-command-card">
+            <span class="gl-command-card__icon">${ICON_OFFERING}</span>
+            <span class="gl-command-card__body">
+              <span class="gl-command-card__title">บันทึกเงินถวายวันอาทิตย์</span>
+              <span class="gl-command-card__desc">เปิดรอบนับธนบัตรและเหรียญ พร้อมพยาน 2 ท่าน</span>
+              <span class="gl-command-card__action">เปิดรอบนับ →</span>
+            </span>
+          </a>
+          <a href="#/approvals" class="gl-command-card${hasPending ? " gl-command-card--attention" : ""}">
+            <span class="gl-command-card__icon">${ICON_CLOCK}</span>
+            <span class="gl-command-card__body">
+              <span class="gl-command-card__title">คิวอนุมัติคำขอเบิกจ่าย</span>
+              <span class="gl-command-card__desc">${hasPending ? `มี ${data.pendingApprovalsCount} รายการรอการพิจารณาอนุมัติ` : "ไม่มีคำขอเบิกจ่ายค้างตรวจสอบ"}</span>
+              <span class="gl-command-card__action">${hasPending ? "ตรวจสอบรายการ →" : "ดูประวัติอนุมัติ →"}</span>
+            </span>
+          </a>
+          <a href="#/funds" class="gl-command-card">
+            <span class="gl-command-card__icon">${ICON_TRANSFER}</span>
+            <span class="gl-command-card__body">
+              <span class="gl-command-card__title">สภาพคล่องและกองทุน</span>
+              <span class="gl-command-card__desc">ติดตาม ${funds.length} กองทุน และตรวจสอบงบประมาณ</span>
+              <span class="gl-command-card__action">ตรวจสอบกองทุน →</span>
+            </span>
+          </a>
+        </div>
+      </section>
+
       <!-- Financial position + what needs review. The balance card is the
            operational core; review sits beside it as real content. -->
       <section class="gl-section">
