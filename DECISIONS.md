@@ -16,7 +16,11 @@
 (literal, documented in `DESIGN.md`). `--touch-target-min` (44px) unchanged.
 **Why:** the second value set is what users have seen in production for two weeks; the original design-system
 tokens described a product state that no longer exists. See Strategic Review §6, D1.
-**Status:** APPROVED · IMPLEMENTED IN R1.
+**Status:** **SUPERSEDED by D8 (2026-09-02, commit `954d2f3`) — never implemented.** The Emerald Vault token
+revision landed after the Decision Record was frozen and set a third, later value set: `--radius-card` 20px
+(not 16px), `--radius-input` 10px (not 12px), `--radius-dialog` 24px (not 20px), `--radius-sheet` 28px,
+`--radius-sm` 6px, `--radius-lg` 12px. `--radius-button` 12px is the one value D1 and D8 agree on. The
+control-height literal (46px) is unaffected and still shipped. See D8 for the governing values.
 
 ### D2 — Unified transaction status semantics
 
@@ -32,7 +36,9 @@ inline) — a ledger showing different labels for the same transaction on differ
 on modal content. The sticky topbar remains the one sanctioned blur in the product.
 **Why:** CLAUDE.md bans glass cards; the modal glass predates that rule; GPU cost on low-end devices during
 Sunday counting is a real concern.
-**Status:** APPROVED · IMPLEMENTED IN R1.
+**Status:** APPROVED · **not yet implemented** — scheduled for R1-d. `.gl-modal-content` in
+`src/styles/app.css` is still `color-mix(… var(--popover) 88% …)` + `backdrop-filter: blur(20px)
+saturate(160%)` as of this entry.
 
 ### D4 — Dark mode: deferred
 
@@ -93,6 +99,39 @@ already met, via a different, identity-aligned token than the package assumed.
 during R1; this is not a new decision, it documents that an already-approved goal was reached by an earlier,
 unrelated commit before this package could land.
 **Status:** RECORDED · NO CODE CHANGE APPLIED IN R1.
+
+### D8 — "Emerald Vault" identity is the canonical token set (supersedes D1)
+
+**Decision:** the token values shipped in `design-system-extracted/tokens/{colors,radius,shadows}.css` as of
+commit `954d2f3` are canonical. The R1 hand-off package's replacement token files are **rejected** — they
+were authored against baseline `bee600e8` (`old-origin/main`), which predates this identity.
+
+**Provenance verified during R1-c:**
+
+- Commit `954d2f3`, authored by the repo owner (Suriyong1993), 2026-09-02 09:17 +0700 — newer than both the
+  frozen Decision Record's baseline (`bee600e8`) and D1's cited source commit (`a2548ed`, 2026-08-28).
+- The same commit wrote `Identity: "Emerald Vault" (2026-09) — porcelain surfaces, deep-evergreen brand,
+dark vault sidebar, brass accents. Upgrade the craft, do not replace the identity.` into `CLAUDE.md`, so
+  the decision is recorded in the governing document, not only in code.
+- Currently shipped: the built stylesheet contains `#14532D` (evergreen brand), `#0B1F17` (vault sidebar),
+  `#F4F5F2` (porcelain), `#2FA36B` (sidebar primary, ×5) and **zero** occurrences of `#f97316` (the old
+  orange brand).
+
+**What the hand-off package would have done if applied:** reverted `--primary` to orange `#f97316`, the
+background to `#FFFCF8`, and the sidebar from the dark vault (`#0B1F17`, light text) to white with dark text
+and orange accents; reverted the ink-tinted shadow ramp to neutral black; and **deleted tokens with live
+consumers** — `--gl-evergreen-*` (12 refs), `--gl-brass-*` (6), `--gl-vault-950` (2), `--surface-elevated`
+(4), `--border-subtle` (4), plus repointing `--sidebar-primary` (9 consumers across `AppShell.ts` and
+`app.css`). That is a direct violation of CLAUDE.md's identity hard-stop.
+
+**Correction to the hand-off's stated R1-c risk:** `00-README.md` claimed token edits have "no visual
+difference" until R1-d because the files are "not imported anywhere except through `app.css`'s `@import`".
+That `@import` (`src/styles/app.css:1` → `design-system-extracted/styles.css` → `tokens/*.css`) _is_ the
+consumption path, and `app.css` reads the tokens directly via `var(--radius-card)`, `var(--radius-input)`,
+`var(--radius-dialog)` and 13 more. Token edits render immediately; there is no safe no-op window.
+
+**Status:** APPROVED · already shipped. R1-c changed **no** token file; it only corrected `DESIGN.md` and
+this log to describe the shipped values.
 
 ---
 

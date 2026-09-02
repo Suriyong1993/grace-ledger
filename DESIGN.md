@@ -20,10 +20,16 @@ stop. Either the token already exists (use it) or it doesn't (this is a design d
 
 ## Colors
 
-Palette is unchanged from the original design system. Warm off-white background, white cards, charcoal
-text, one orange accent reserved for the primary CTA / active nav / focus ring — never a data value, never
-a progress bar, never a number. Finance meaning is fixed and exclusive: emerald = income/approved, red =
-expense/rejected, amber = offering/pending. Max two background colors per screen.
+**Emerald Vault (2026-09).** Porcelain background (`--gl-bg` `#F4F5F2`), white cards, ink-green text
+(`--gl-ink` `#14201A`), deep-evergreen brand (`--gl-evergreen-800` `#14532D`) for the primary CTA / active
+nav / focus ring, and a brass accent (`--gl-brass-500` `#B45309`) for secondary highlights. Neither brand nor
+accent is ever a large background fill, a data value, a progress bar, or a number. The desktop sidebar is the
+identity's signature "vault": dark evergreen chrome (`--sidebar` `#0B1F17`) over the porcelain workspace.
+Finance meaning is fixed and exclusive: emerald = income/approved, red = expense/rejected, amber =
+offering/pending. Max two background colors per screen.
+
+The token values live in `design-system-extracted/tokens/colors.css` and are canonical — see `DECISIONS.md`
+→ D8. Do not reintroduce the pre-2026-09 orange palette (`--gl-orange-*`); it has no live consumers.
 
 `--on-{income,expense,pending,info}-muted` are the text colors for content sitting on a `-muted` surface
 (badges, notices, stat tiles). The `--*-foreground` tokens are for text on the **solid** color only — pairing
@@ -36,30 +42,38 @@ Anuphan (Thai) + Space Grotesk (Latin/numerals). Body 15px/1.6. Headings 600-wei
 app: `23 ส.ค. 2569` (Thai Buddhist calendar, short month). Off-scale literal font sizes are banned; use the
 `--text-*` scale.
 
-## Radius (D1 — canonicalized 2026-09-02, see `DECISIONS.md`)
+## Radius (live values — see `DECISIONS.md` → D8; D1's earlier set is superseded)
 
-| Token             | Value               | Used by                                                                             |
-| ----------------- | ------------------- | ----------------------------------------------------------------------------------- |
-| `--radius-sm`     | 8px                 | small chips, nav item (via `AppShell.ts`'s own style block)                         |
-| `--radius-md`     | 12px                | surfaces that aren't full cards (`.gl-surface`, table-card mode, stat, notice base) |
-| `--radius-lg`     | 16px                | `.gl-notice`, `.gl-toast`, `.gl-stat` (via the shipped visual layer)                |
-| `--radius-card`   | **16px** (was 24px) | `.gl-card` and all its variants                                                     |
-| `--radius-button` | **12px** (was 18px) | `.gl-btn`                                                                           |
-| `--radius-input`  | **12px** (was 14px) | `.gl-input`, `.gl-select`, `.gl-textarea`                                           |
-| `--radius-dialog` | **20px** (was 28px) | `.gl-modal-content`                                                                 |
-| `--radius-sheet`  | **20px** (was 32px) | reserved for the R2 `.gl-sheet` primitive — not yet used                            |
-| `--radius-full`   | 9999px              | pills, badges, avatars                                                              |
-| `--radius-table`  | 0px                 | **documented but not currently honored** — see Open Findings below                  |
+Values below are read from `design-system-extracted/tokens/radius.css` as shipped. `app.css` consumes these
+tokens directly (`var(--radius-card)` at `.gl-card`, `var(--radius-input)`, `var(--radius-dialog)`, …), so
+editing the token file changes the rendered product immediately.
 
-Control height (button/input): **46px**, a literal in `app.css` (not a token) — approved as part of D1.
-`--touch-target-min` (44px) remains the accessibility floor and is unchanged.
+| Token             | Value  | Used by                                                                             |
+| ----------------- | ------ | ----------------------------------------------------------------------------------- |
+| `--radius`        | 10px   | base                                                                                |
+| `--radius-sm`     | 6px    | small chips, nav item (via `AppShell.ts`'s own style block)                         |
+| `--radius-md`     | 10px   | surfaces that aren't full cards (`.gl-surface`, table-card mode, stat, notice base) |
+| `--radius-lg`     | 12px   | `.gl-notice`, `.gl-toast`, `.gl-stat`                                               |
+| `--radius-xl`     | 14px   | —                                                                                   |
+| `--radius-2xl`    | 18px   | —                                                                                   |
+| `--radius-card`   | 20px   | `.gl-card` and all its variants                                                     |
+| `--radius-button` | 12px   | `.gl-btn`                                                                           |
+| `--radius-input`  | 10px   | `.gl-input`, `.gl-select`, `.gl-textarea`                                           |
+| `--radius-dialog` | 24px   | `.gl-modal-content`                                                                 |
+| `--radius-sheet`  | 28px   | reserved for the R2 `.gl-sheet` primitive — not yet used                            |
+| `--radius-full`   | 9999px | pills, badges, avatars                                                              |
+| `--radius-table`  | 0px    | **documented but not currently honored** — see Open Findings below                  |
+
+Control height (button/input): **46px**, a literal in `app.css` (`.gl-btn`, `.gl-input` — the later of the
+two declaration blocks wins). `--touch-target-min` (44px) remains the accessibility floor and is unchanged.
 
 ## Shadows
 
-Border beats shadow. `--shadow-card` and `--shadow-elevated` are canonicalized to the values already shipped
-(faint, two-layer). Real shadow is reserved for genuine overlap (dialogs) and the one "lifted" hero surface
-per screen (`.gl-card--elevated`, used once on the dashboard balance card — its radial-gradient wash is a
-documented, sanctioned exception, not decoration).
+Border beats shadow. Shadows are ink-green tinted (`rgb(16 32 24 / …)`) so they sit inside the porcelain
+palette — values in `design-system-extracted/tokens/shadows.css`. Real shadow is reserved for genuine overlap
+(dialogs) and the one "lifted" hero surface per screen (`.gl-card--elevated`, used once on the dashboard
+balance card — a flat card plus the faint `--shadow-card`; the old decorative radial-gradient wash was
+removed in the Emerald Vault revision and must not come back).
 
 ## Motion
 
@@ -67,9 +81,12 @@ documented, sanctioned exception, not decoration).
 on business UI. `--ease-spring` exists and is **in active use in the login surface only**
 (`src/components/login/loginStyles.ts`) — do not use it elsewhere without a documented reason.
 
-## Overlays (D3 — flattened 2026-09-02)
+## Overlays (D3 — approved, not yet applied)
 
-`.gl-modal-content` is a solid `--popover` surface with `--shadow-elevated`. Glass/blur is banned on modals.
+**Target state:** `.gl-modal-content` is a solid `--popover` surface with `--shadow-elevated`. Glass/blur is
+banned on modals. **Current state:** still glass — `background: color-mix(in srgb, var(--popover) 88%,
+transparent)` + `backdrop-filter: blur(20px) saturate(160%)` (`src/styles/app.css`). D3 lands in R1-d; until
+it does, this section documents the decision, not the shipped pixels.
 The **one** sanctioned blur in the product is the sticky topbar (`background/88%` + `blur(10px)`). The modal
 backdrop keeps a light 3px blur (cheap, aids focus, not glassmorphism on content).
 
