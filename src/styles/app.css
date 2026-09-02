@@ -645,6 +645,29 @@ button.gl-card:active {
 }
 
 /* --------------------------------------------------------------------------
+   Ledger Table & Transaction Rows
+   -------------------------------------------------------------------------- */
+.gl-txn-row {
+  transition: background var(--duration-micro) var(--ease-out), transform var(--duration-micro) var(--ease-out);
+  border-radius: var(--radius-sm);
+  padding-left: var(--space-2) !important;
+  padding-right: var(--space-2) !important;
+}
+
+.gl-txn-row:hover {
+  background: var(--muted);
+}
+
+.gl-txn-row:active {
+  transform: scale(0.995);
+}
+
+.gl-txn-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
    Concept B: Operational Command Center ("งานสัปดาห์นี้")
    -------------------------------------------------------------------------- */
 .gl-command-center {
