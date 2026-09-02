@@ -89,7 +89,8 @@ body {
   bottom: 0;
   height: 4px;
   border-top: 2px solid color-mix(in srgb, var(--foreground) 75%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 75%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--foreground) 75%, transparent);
 }
 
 /* --------------------------------------------------------------------------
@@ -1771,6 +1772,16 @@ a.gl-row:focus-visible {
   background: var(--accent);
 }
 
+/* Bars are already data-driven and describe themselves via a hidden sentence
+   per column (see DashboardPage.ts) — this only makes that reachable and
+   visible to keyboard users, reusing the same --ring halo the rest of the
+   product already uses for focus (app.css inputs, .gl-txn-row, a.gl-row). */
+.gl-trend__col:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  background: var(--accent);
+}
+
 .gl-trend__bars {
   display: flex;
   align-items: flex-end;
@@ -2388,7 +2399,11 @@ body {
 /* The vault sidebar is dark chrome — its scrollbar derives from
    --sidebar-foreground, not the light-theme ink. */
 .gl-sidebar nav {
-  scrollbar-color: color-mix(in srgb, var(--sidebar-foreground) 25%, transparent)
+  scrollbar-color: color-mix(
+      in srgb,
+      var(--sidebar-foreground) 25%,
+      transparent
+    )
     transparent;
 }
 

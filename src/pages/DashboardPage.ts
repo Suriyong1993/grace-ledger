@@ -463,7 +463,7 @@ export class DashboardPage {
                 );
                 const delay = Math.min(i, 11) * 40;
                 return `
-                <div class="gl-trend__col" style="--gl-bar-delay: ${delay}ms;">
+                <div class="gl-trend__col" tabindex="0" style="--gl-bar-delay: ${delay}ms;">
                   <span class="gl-trend__bars" aria-hidden="true">
                     <span class="gl-trend__bar gl-trend__bar--income" style="height: ${incH}px;"></span>
                     <span class="gl-trend__bar gl-trend__bar--expense" style="height: ${expH}px;"></span>
