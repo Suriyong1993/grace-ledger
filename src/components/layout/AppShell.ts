@@ -50,7 +50,7 @@ function buildSidebarDestinations(pendingCount: number): NavDestination[] {
       href: "#/transactions",
       label: "รายการเงิน",
       shortLabel: "การเงิน",
-      group: "ธุรกรรม",
+      group: "ธุรกรรมและการเงิน",
       icon: ICON_TRANSACTIONS,
       isActive: (route) => route.startsWith("/transactions"),
     },
@@ -58,7 +58,7 @@ function buildSidebarDestinations(pendingCount: number): NavDestination[] {
       href: "#/offerings",
       label: "เงินถวายวันอาทิตย์",
       shortLabel: "เงินถวาย",
-      group: "ธุรกรรม",
+      group: "ธุรกรรมและการเงิน",
       icon: ICON_OFFERINGS,
       isActive: (route) => route.startsWith("/offerings"),
     },
@@ -66,7 +66,7 @@ function buildSidebarDestinations(pendingCount: number): NavDestination[] {
       href: "#/funds",
       label: "กองทุนและงบประมาณ",
       shortLabel: "กองทุน",
-      group: "การเงิน",
+      group: "ธุรกรรมและการเงิน",
       icon: ICON_FUNDS,
       isActive: (route) => route.startsWith("/funds"),
     },
@@ -83,7 +83,7 @@ function buildSidebarDestinations(pendingCount: number): NavDestination[] {
       href: "#/members",
       label: "สมาชิกและการถวาย",
       shortLabel: "สมาชิก",
-      group: "สมาชิก",
+      group: "สารบบและรายงาน",
       icon: ICON_MEMBERS,
       isActive: (route) => route.startsWith("/members"),
     },
@@ -91,7 +91,7 @@ function buildSidebarDestinations(pendingCount: number): NavDestination[] {
       href: "#/reports",
       label: "รายงานการเงิน",
       shortLabel: "รายงาน",
-      group: "รายงาน",
+      group: "สารบบและรายงาน",
       icon: ICON_REPORTS,
       isActive: (route) => route.startsWith("/reports"),
     },
@@ -158,7 +158,7 @@ function renderSidebarLink(dest: NavDestination, isActive: boolean): string {
     ? `<span class="num-display" style="
         margin-left: auto;
         background: var(--pending);
-        color: #ffffff;
+        color: var(--primary-foreground);
         border-radius: var(--radius-full);
         padding: 1px 7px;
         font-size: var(--text-2xs);
@@ -316,7 +316,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       top: -2px;
       right: -2px;
       background: var(--pending);
-      color: #ffffff;
+      color: var(--primary-foreground);
       border-radius: var(--radius-full);
       padding: 0 4px;
       min-width: 16px;
@@ -324,7 +324,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: var(--text-2xs);
       font-weight: var(--weight-bold);
       border: 2px solid var(--card);
     }

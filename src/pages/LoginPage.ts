@@ -38,16 +38,16 @@ export class LoginPage {
   constructor(private readonly supabase: SupabaseClient) {}
 
   public renderHtml(): string {
+    const isNarrow = this.view === "pin";
     return `${renderLoginStylesHtml()}<div class="gl-login-screen">
-      <aside class="gl-login-panel" aria-hidden="false">
+      <div class="gl-login-card${isNarrow ? " gl-login-card--narrow" : ""}">
         ${renderBrandHtml()}
-        <ol class="gl-login-steps" aria-label="ขั้นตอนการเข้าสู่ระบบ">
-          <li><span class="gl-login-step-num" aria-hidden="true">1</span>เลือกโปรไฟล์ของท่าน</li>
-          <li><span class="gl-login-step-num" aria-hidden="true">2</span>ระบุรหัส PIN 6 หลัก</li>
-          <li><span class="gl-login-step-num" aria-hidden="true">3</span>เข้าใช้งานระบบการเงิน</li>
-        </ol>
-      </aside>
-      <main class="gl-login-main">${this.renderViewHtml()}</main>
+        <hr class="gl-login-divider" />
+        <main class="gl-login-main" style="width: 100%;">${this.renderViewHtml()}</main>
+        <div class="gl-login-trust-badge">
+          <span>🔒 ระบบความปลอดภัยมาตรฐานการเงิน · รหัส PIN ได้รับการปกป้องในระดับหน่วยความจำ</span>
+        </div>
+      </div>
     </div>`;
   }
 

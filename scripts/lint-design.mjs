@@ -34,21 +34,6 @@ const ALLOWLIST = {
     "rgba()/rgb() color literal": 7,
     "hex color literal": 0,
   },
-  // AppShell notification bell badge font-size (10px) and text color (#ffffff) — scheduled for R2/R3.
-  "src/components/layout/AppShell.ts": {
-    "literal font-size": 1,
-    "literal border-radius": 0,
-    "rgba()/rgb() color literal": 0,
-    "hex color literal": 2,
-  },
-  // Login surface owns its own stylesheet by design (DESIGN.md hierarchy, item 4) — its pixel sizes
-  // (avatar 50/68/72/76/190px etc.) are documented, intentional, feature-local values, not drift.
-  "src/components/login/loginStyles.ts": {
-    "literal font-size": 0,
-    "literal border-radius": 2,   // 16px / 18px card radii
-    "rgba()/rgb() color literal": 3,
-    "hex color literal": 0,
-  },
 };
 
 function walk(dir, out = []) {
