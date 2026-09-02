@@ -17,7 +17,7 @@ export function renderOfferingReviewSheetHtml(
   const {
     funds,
     state,
-    creatorName = "ศจ.สมชาย มีสุข",
+    creatorName = "อาจารย์สรรเสริญ ดวงจิตร",
     isSubmitting = false,
     errorMessage,
   } = props;

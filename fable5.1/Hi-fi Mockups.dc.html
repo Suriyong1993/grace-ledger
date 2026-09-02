@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+  <script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: #efece6; color: var(--foreground); font-family: var(--font-sans); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+    h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; margin: 0; }
+    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; }
+    .b-pend { background: var(--pending-muted); color: oklch(.38 .08 80); border: 1px solid var(--pending); }
+    .b-ok { background: var(--income-muted); color: oklch(.36 .09 155); border: 1px solid var(--approved); }
+    .b-neu { background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .b-info { background: oklch(.95 .03 250); color: oklch(.42 .11 250); border: 1px solid oklch(.8 .08 250); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 18px; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 600; border: 1px solid transparent; cursor: pointer; }
+    .btn-p { background: var(--primary); color: #fff; }
+    .btn-s { background: var(--card); border-color: var(--border); color: var(--foreground); }
+    .btn-d { background: var(--card); border-color: var(--border); color: var(--destructive); }
+    .btn-dark { background: var(--foreground); color: #fff; }
+    .btn-sm { height: 36px; padding: 0 12px; font-size: 13px; border-radius: 10px; }
+    .surface { background: var(--card); border: 1px solid var(--border); border-radius: 16px; }
+    .facts { display: grid; gap: 8px; font-size: 13px; }
+    .fact { display: flex; justify-content: space-between; gap: 12px; }
+    .fact span:first-child { color: var(--muted-foreground); }
+    .step { display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-right: 1px solid var(--border); font-size: 12px; color: var(--muted-foreground); }
+    .step:last-child { border-right: 0; }
+    .dot { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; border: 1px solid var(--border); flex: none; }
+    .done .dot { background: var(--income); border-color: var(--income); color: #fff; }
+    .done { color: var(--foreground); font-weight: 500; }
+    .cur { background: var(--pending-muted); color: oklch(.38 .08 80); font-weight: 600; }
+    .cur .dot { border: 2px solid var(--pending); color: oklch(.38 .08 80); }
+    .input { height: 44px; border: 1px solid var(--input); border-radius: 12px; background: var(--card); padding: 0 12px; display: flex; align-items: center; font-size: 14px; }
+    .label { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: block; }
+    .frame { overflow: hidden; border-radius: 10px; box-shadow: 0 8px 30px rgb(23 23 23 / .12); background: var(--background); }
+    .cap { font-size: 13px; color: var(--muted-foreground); line-height: 1.5; margin: 0; }
+    .id { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--card); border: 1px solid var(--border); color: var(--foreground); }
+    .opt { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--foreground); color: #fff; }
+    table.rows { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.rows td { padding: 10px 14px; border-top: 1px solid var(--border); }
+    table.rows th { text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-foreground); background: var(--secondary); padding: 8px 14px; font-weight: 600; }
+    .num-r { text-align: right; }
+  </style>
+</helmet>
+
+<section style="padding: 40px; display: flex; flex-direction: column; gap: 28px;">
+  <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
+    <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; background: var(--foreground); color: #fff;">Turn 2</span>
+    <h1 style="font-size: 22px; font-weight: 600;">Hi-fi mockups — Approvals sheet · Offering session lifecycle</h1>
+    <span class="cap">Direction B+A+C approved · D1 radii 16/12/20 · D2 unified status · D3 flat modal · Q3/Q4 shown as alternatives · Q5 finding at the end</span>
+  </div>
+
+  <!-- ===================== ROW 1: APPROVALS ===================== -->
+  <h2 style="font-size: 16px; font-weight: 600; color: var(--muted-foreground);">Approvals — row → URL-bound sheet (<code>/approvals/:id</code>)</h2>
+  <div style="display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start;">
+
+    <!-- 2a desktop -->
+    <div id="2a" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2a">2a</a><strong style="font-size: 15px;">Approvals · desktop 1280 · sheet open</strong></div>
+      <div class="frame" style="width: 768px; height: 570px;">
+        <div data-screen-label="2a" style="width: 1280px; height: 950px; transform: scale(.6); transform-origin: 0 0; display: flex; background: var(--background); font-size: 14px; position: relative;">
+          <aside style="width: 240px; flex: none; background: var(--card); border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px 16px;"><div style="width: 34px; height: 34px; border-radius: 9px; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; font-family: var(--font-display);">GL</div><div><div style="font-weight: 700; font-size: 14px; font-family: var(--font-display);">Grace Ledger</div><div style="font-size: 11px; color: var(--muted-foreground);">คริสตจักรเกรซแบ๊บติสต์</div></div></div>
+            <div class="kicker" style="padding: 6px 12px 4px;">งานประจำ</div>
+            <div style="padding: 10px 12px; border-radius: 10px;">สัปดาห์นี้</div>
+            <div style="padding: 10px 12px; border-radius: 10px;">เงินถวายวันอาทิตย์</div>
+            <div style="padding: 10px 12px; border-radius: 10px; background: var(--accent); color: var(--primary); font-weight: 600; display: flex; justify-content: space-between;">คิวอนุมัติ <span class="num-display" style="background: var(--primary); color: #fff; border-radius: 9999px; padding: 0 7px; font-size: 11px; font-weight: 700;">2</span></div>
+            <div class="kicker" style="padding: 14px 12px 4px;">บัญชี</div>
+            <div style="padding: 10px 12px;">รายการเงิน</div><div style="padding: 10px 12px;">กองทุนและงบประมาณ</div>
+            <div class="kicker" style="padding: 14px 12px 4px;">ภาพรวม</div>
+            <div style="padding: 10px 12px;">สมาชิกและการถวาย</div><div style="padding: 10px 12px;">รายงานการเงิน</div>
+          </aside>
+          <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+            <header style="height: 56px; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--card) 88%, transparent); display: flex; align-items: center; padding: 0 28px; font-weight: 600; font-family: var(--font-display);">คิวอนุมัติ</header>
+            <main style="padding: 24px 32px; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div><h2 style="font-size: 22px; font-weight: 600;">คิวอนุมัติ</h2><div style="font-size: 13px; color: var(--muted-foreground); margin-top: 2px;">ตรวจยอด ใบเสร็จ และผลกระทบต่อกองทุนก่อนอนุมัติ</div></div><div style="text-align: right;"><div style="font-size: 12px; color: var(--muted-foreground);">รอดำเนินการ 2 รายการ</div><div class="num-display" style="font-size: 20px; font-weight: 700;">฿12,780.00</div></div></div>
+              <div class="surface" style="overflow: hidden;">
+                <div style="display: grid; grid-template-columns: 1fr auto 20px; gap: 20px; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--accent);"><div><div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;"><span class="badge b-pend">รออนุมัติ</span><span class="num-display" style="font-size: 12px; color: var(--muted-foreground);">EXP-0248</span></div><div style="font-weight: 600;">ซื้ออุปกรณ์ระบบเสียงห้องเยาวชน</div><div style="font-size: 12px; color: var(--muted-foreground);">กองทุนเยาวชนและการศึกษา · อาจารย์ ทัศนา ดวงจิตร · มีใบเสร็จ · 2 วัน</div></div><div style="text-align: right;"><div class="num-display" style="font-size: 16px; font-weight: 700; color: var(--expense);">−฿8,500.00</div><div style="font-size: 11px; color: var(--muted-foreground);">เหลือหลังจ่าย <span class="num-display">฿3,510.00</span></div></div><span style="color: var(--muted-foreground);">›</span></div>
+                <div style="display: grid; grid-template-columns: 1fr auto 20px; gap: 20px; align-items: center; padding: 14px 20px;"><div><div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;"><span class="badge b-pend">รออนุมัติ</span><span class="num-display" style="font-size: 12px; color: var(--muted-foreground);">EXP-0247</span><span class="badge b-pend" style="border-color: transparent;">ไม่มีใบเสร็จ</span></div><div style="font-weight: 600;">ค่าไฟฟ้าและสาธารณูปโภคประจำเดือน</div><div style="font-size: 12px; color: var(--muted-foreground);">กองทุนทั่วไป · สุดารัตน์ จิณเซ่ง · 1 วัน</div></div><div style="text-align: right;"><div class="num-display" style="font-size: 16px; font-weight: 700; color: var(--expense);">−฿4,280.00</div><div style="font-size: 11px; color: var(--muted-foreground);">เหลือหลังจ่าย <span class="num-display">฿124,170.00</span></div></div><span style="color: var(--muted-foreground);">›</span></div>
+              </div>
+            </main>
+          </div>
+          <!-- backdrop + sheet -->
+          <div style="position: absolute; inset: 0; background: color-mix(in srgb, var(--foreground) 24%, transparent);"></div>
+          <div role="dialog" aria-modal="true" style="position: absolute; top: 0; right: 0; bottom: 0; width: 480px; background: var(--card); border-left: 1px solid var(--border); box-shadow: 0 1px 4px -1px rgb(0 0 0 / .05), 0 6px 16px -6px rgb(0 0 0 / .06); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px 16px; border-bottom: 1px solid var(--border);"><div><div style="display: flex; gap: 8px; align-items: center;"><span class="num-display" style="font-size: 12px; color: var(--muted-foreground);">EXP-0248</span><span class="badge b-pend">รออนุมัติ</span></div><h2 style="font-size: 18px; font-weight: 600; margin-top: 4px;">ซื้ออุปกรณ์ระบบเสียงห้องเยาวชน</h2></div><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;" aria-label="ปิด">✕</button></div>
+            <div style="flex: 1; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline;"><div><div style="font-size: 12px; color: var(--muted-foreground);">จำนวนเงินที่ขออนุมัติ</div><div class="num-display" style="font-size: 28px; font-weight: 700; color: var(--expense); letter-spacing: -.02em;">−฿8,500.00</div></div><div style="text-align: right; font-size: 12px; color: var(--muted-foreground);">23 ส.ค. 2569<br>ธนาคารกรุงไทย ···4821</div></div>
+              <div class="facts"><div class="fact"><span>กองทุน</span><strong>กองทุนเยาวชนและการศึกษา</strong></div><div class="fact"><span>หมวด</span><strong>พันธกิจเยาวชน</strong></div><div class="fact"><span>ผู้ขอ</span><strong>อาจารย์ ทัศนา ดวงจิตร</strong></div><div class="fact"><span>ใบเสร็จ</span><a href="#" style="font-weight: 600;">เปิดเอกสาร (PDF · 240 KB)</a></div></div>
+              <div><div class="kicker" style="margin-bottom: 8px;">ผลกระทบต่อกองทุน</div>
+                <div style="border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 12px;"><div style="padding: 10px 14px; border-right: 1px solid var(--border);"><div style="color: var(--muted-foreground);">ยอดปัจจุบัน</div><div class="num-display" style="font-weight: 600; font-size: 14px;">฿12,010.00</div></div><div style="padding: 10px 14px; border-right: 1px solid var(--border);"><div style="color: var(--muted-foreground);">รายการนี้</div><div class="num-display" style="font-weight: 600; font-size: 14px; color: var(--expense);">−฿8,500.00</div></div><div style="padding: 10px 14px;"><div style="color: var(--muted-foreground);">หลังอนุมัติ</div><div class="num-display" style="font-weight: 700; font-size: 14px;">฿3,510.00</div></div></div>
+                  <div style="padding: 8px 14px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted-foreground);">อนุมัติแล้วรอลงบัญชีอีก <span class="num-display">฿0.00</span> · งบประมาณปีนี้ใช้แล้ว <span class="num-display">48% → 82%</span></div>
+                </div></div>
+              <div><div class="kicker" style="margin-bottom: 8px;">ประวัติ</div><div class="facts" style="font-size: 12px;"><div class="fact"><span>สร้างรายการ · อาจารย์ ทัศนา</span><span class="num-display">21 ส.ค. 14:02</span></div><div class="fact"><span>ส่งขออนุมัติ</span><span class="num-display">21 ส.ค. 14:05</span></div></div></div>
+            </div>
+            <div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; background: var(--card);"><button class="btn btn-d">ปฏิเสธ</button><button class="btn btn-s">ขอแก้ไข</button><button class="btn btn-p">อนุมัติ</button></div>
+          </div>
+        </div>
+      </div>
+      <p class="cap" style="width: 768px;">Row carries the consequence (เหลือหลังจ่าย). Sheet order: amount → facts → impact → history → actions, all in one viewport. Approve is the only orange element; reject is quiet and first from the left (furthest from the primary). Esc / backdrop / ✕ return to <code>/approvals</code>. Existing <code>ApprovalDecisionSheet</code> content and <code>ApprovalsService</code> calls unchanged.</p>
+    </div>
+
+    <!-- 2b mobile -->
+    <div id="2b" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2b">2b</a><strong style="font-size: 15px;">Approvals · 390 · full-screen sheet · guard + deficit states</strong></div>
+      <div class="frame" style="width: 312px; height: 675px; border-radius: 28px;">
+        <div data-screen-label="2b" style="width: 390px; height: 844px; transform: scale(.8); transform-origin: 0 0; background: var(--card); font-size: 14px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border);"><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">‹</button><div style="min-width: 0;"><div class="num-display" style="font-size: 11px; color: var(--muted-foreground);">EXP-0247</div><div style="font-weight: 600; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">ค่าไฟฟ้าและสาธารณูปโภคประจำเดือน</div></div></div>
+          <div style="flex: 1; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+            <div><div style="display: flex; gap: 6px; margin-bottom: 6px;"><span class="badge b-pend">รออนุมัติ</span><span class="badge b-pend" style="border-color: transparent;">ไม่มีใบเสร็จ</span></div><div class="num-display" style="font-size: 30px; font-weight: 700; color: var(--expense); letter-spacing: -.02em;">−฿4,280.00</div><div style="font-size: 12px; color: var(--muted-foreground);">สุดารัตน์ จิณเซ่ง · กองทุนทั่วไป · 22 ส.ค. 2569</div></div>
+            <div style="border: 1px solid var(--pending); background: var(--pending-muted); color: oklch(.38 .08 80); border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.5;"><strong>คุณเป็นผู้สร้างรายการนี้</strong><br>ต้องให้ผู้อนุมัติท่านอื่นเป็นผู้พิจารณา</div>
+            <div><div class="kicker" style="margin-bottom: 8px;">ผลกระทบต่อกองทุน</div>
+              <div style="border: 1px solid var(--expense); border-radius: 12px; overflow: hidden;">
+                <div class="facts" style="padding: 12px 14px;"><div class="fact"><span>ยอดปัจจุบัน</span><strong class="num-display">฿2,010.00</strong></div><div class="fact"><span>รายการนี้</span><strong class="num-display" style="color: var(--expense);">−฿4,280.00</strong></div><div class="fact" style="border-top: 1px solid var(--border); padding-top: 8px;"><span>หลังอนุมัติ</span><strong class="num-display" style="color: var(--expense);">−฿2,270.00</strong></div></div>
+                <div style="padding: 10px 14px; background: var(--expense-muted); color: oklch(.4 .13 25); font-size: 12px; font-weight: 600; border-top: 1px solid var(--expense);">กองทุนจะติดลบ ระบบจะไม่อนุมัติรายการนี้</div>
+              </div></div>
+            <div class="facts" style="font-size: 13px;"><div class="fact"><span>หมวด</span><strong>สาธารณูปโภค</strong></div><div class="fact"><span>บัญชีจ่าย</span><strong>ธนาคารกรุงไทย ···4821</strong></div><div class="fact"><span>ใบเสร็จ</span><span style="color: oklch(.38 .08 80); font-weight: 600;">ยังไม่แนบ</span></div></div>
+          </div>
+          <div style="padding: 12px 16px calc(12px + 20px); border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"><button class="btn btn-d">ปฏิเสธ</button><button class="btn btn-s">ขอแก้ไข</button><button class="btn btn-p" disabled style="grid-column: 1 / -1; background: var(--muted); color: var(--muted-foreground); border-color: var(--border);">อนุมัติ — ไม่สามารถทำได้</button></div>
+        </div>
+      </div>
+      <p class="cap" style="width: 312px;">Two guards shown at once: two-person rule (amber notice, from <code>P0003</code> semantics) and projected deficit (red impact block). The primary is disabled <em>with a reason</em>; server RPC remains the real boundary.</p>
+    </div>
+  </div>
+
+  <!-- ===================== ROW 2: OFFERING LIFECYCLE ===================== -->
+  <h2 style="font-size: 16px; font-weight: 600; color: var(--muted-foreground); margin-top: 12px;">Offering session — one screen, one stepper, one primary per step (<code>/offerings/:id</code>)</h2>
+  <div style="display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start;">
+
+    <!-- 2c Step 1 entry + Q3-A checkpoint sheet -->
+    <div id="2c" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2c">2c</a><strong style="font-size: 15px;">Step 1 · บันทึกยอด</strong><span class="opt">Q3 · option A</span><span class="cap">form + live summary rail (left) · confirm-sheet checkpoint (right, shown open)</span></div>
+      <div class="frame" style="width: 708px; height: 560px;">
+        <div data-screen-label="2c" style="width: 1180px; height: 933px; transform: scale(.6); transform-origin: 0 0; background: var(--background); font-size: 14px; position: relative;"><div style="position: absolute; left: 32px; right: 32px; top: 0; height: 0;"></div>
+          <div style="padding: 20px 32px 0; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div><a href="#" style="font-size: 12px; color: var(--muted-foreground);">‹ รายการเงินถวาย</a><div class="kicker" style="margin-top: 8px;">23 ส.ค. 2569 · <span class="num-display">1E72B32C</span></div><h2 style="font-size: 22px; font-weight: 600; margin-top: 2px; display: flex; gap: 10px; align-items: center;">รอบนมัสการวันอาทิตย์ (เช้า) <span class="badge b-neu">ฉบับร่าง</span></h2></div></div>
+            <div class="surface" style="display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border-radius: 12px;"><div class="step cur"><span class="dot">1</span>บันทึกยอด</div><div class="step"><span class="dot">2</span>นับเงินสด</div><div class="step"><span class="dot">3</span>ผลต่างและยืนยัน</div><div class="step"><span class="dot">4</span>ลงบัญชี</div></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; padding: 16px 432px 100px 32px;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div class="surface" style="padding: 18px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;"><div><span class="label">วันที่นมัสการ</span><div class="input" style="justify-content: space-between;">อาทิตย์ 23 ส.ค. 2569 <span style="color: var(--muted-foreground); display: inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span></div></div><div><span class="label">รอบนมัสการ</span><div class="input" style="justify-content: space-between;">รอบเช้า <span style="color: var(--muted-foreground);">▾</span></div></div></div>
+              <div class="surface" style="overflow: hidden;"><div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: baseline;"><strong>1. ยอดรวมตามช่องทาง</strong><span style="font-size: 12px; color: var(--muted-foreground);">จากซอง/สลิป · เงินสดเท่านั้นที่จะถูกนับในขั้นตอนถัดไป</span></div>
+                <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 12px 22px; border-bottom: 1px solid var(--border); gap: 16px;"><div><div style="font-weight: 500;">เงินสด</div><div style="font-size: 12px; color: var(--muted-foreground);">เข้าตู้เซฟ/เงินสดในมือ · ไปนับในขั้นตอน 2</div></div><div class="input num-display" style="width: 200px; justify-content: space-between;"><span style="color: var(--muted-foreground);">฿</span><span style="font-weight: 600;">10,000.00</span></div></div>
+                <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 12px 22px; border-bottom: 1px solid var(--border); gap: 16px;"><div><div style="font-weight: 500;">เงินโอน</div><div style="font-size: 12px; color: var(--muted-foreground);">เข้าบัญชีธนาคาร · ตรวจกับสลิป</div></div><div class="input num-display" style="width: 200px; justify-content: space-between;"><span style="color: var(--muted-foreground);">฿</span><span style="font-weight: 600;">5,000.00</span></div></div>
+                <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 12px 22px; gap: 16px;"><div><div style="font-weight: 500;">พร้อมเพย์ / QR</div><div style="font-size: 12px; color: var(--muted-foreground);">เข้าบัญชีธนาคาร · ตรวจกับ statement</div></div><div class="input num-display" style="width: 200px; justify-content: space-between;"><span style="color: var(--muted-foreground);">฿</span><span style="font-weight: 600;">3,450.00</span></div></div></div>
+              <div class="surface" style="overflow: hidden;"><div style="padding: 14px 22px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;"><strong>2. จัดสรรเข้ากองทุน</strong><button class="btn btn-s btn-sm">+ เพิ่มกองทุน</button></div>
+                <table class="rows"><thead><tr><th>กองทุน</th><th>ช่องทาง</th><th class="num-r">จำนวน</th><th>หมายเหตุ</th><th></th></tr></thead><tbody>
+                  <tr><td>กองทุนทั่วไป</td><td>เงินสด</td><td class="num-display num-r" style="font-weight: 600;">฿10,000.00</td><td style="color: var(--muted-foreground);">—</td><td style="text-align: right; color: var(--muted-foreground);"><span style="display: inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></td></tr>
+                  <tr><td>กองทุนพันธกิจ</td><td>QR</td><td class="num-display num-r" style="font-weight: 600;">฿3,450.00</td><td style="color: var(--muted-foreground);">—</td><td style="text-align: right; color: var(--muted-foreground);"><span style="display: inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></td></tr>
+                  <tr style="background: var(--pending-muted);"><td colspan="5" style="color: oklch(.38 .08 80); font-weight: 600; font-size: 12px;">เงินโอน ฿5,000.00 ยังไม่ได้จัดสรร — เพิ่มกองทุนสำหรับช่องทางเงินโอน</td></tr>
+                </tbody></table></div>
+            </div>
+            <aside class="surface" style="padding: 18px 20px; align-self: start; position: sticky; top: 16px; display: flex; flex-direction: column; gap: 14px;">
+              <div class="kicker">สรุปรอบนี้ (อัปเดตสด)</div>
+              <div class="facts"><div class="fact"><span>เงินสด</span><strong class="num-display">฿10,000.00</strong></div><div class="fact"><span>เงินโอน</span><strong class="num-display">฿5,000.00</strong></div><div class="fact"><span>QR</span><strong class="num-display">฿3,450.00</strong></div><div class="fact" style="border-top: 1px solid var(--border); padding-top: 8px;"><span>รวมทุกช่องทาง</span><strong class="num-display" style="font-size: 16px;">฿18,450.00</strong></div></div>
+              <div class="facts" style="font-size: 12px;"><div class="fact"><span>จัดสรรแล้ว</span><span class="num-display" style="color: oklch(.38 .08 80); font-weight: 600;">฿13,450.00 / ฿18,450.00</span></div><div class="fact"><span>เงินสดที่จะนับ</span><span class="num-display" style="font-weight: 600;">฿10,000.00</span></div></div>
+              <div style="font-size: 12px; color: var(--muted-foreground); line-height: 1.5;">เมื่อครบถ้วน ปุ่มด้านล่างจะเปิดหน้าตรวจทานก่อนส่งไปนับเงิน — ยอดที่ส่งจะล็อกเป็น “ยอดที่คาดว่าจะมี”</div>
+            </aside>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 32px; border-top: 1px solid var(--border); background: color-mix(in srgb, var(--background) 94%, transparent); display: flex; justify-content: space-between; align-items: center;"><button class="btn btn-s">บันทึกฉบับร่าง</button><button class="btn btn-p" disabled style="background: var(--muted); color: var(--muted-foreground);">ตรวจทานและส่งไปนับเงิน · จัดสรรยังไม่ครบ</button></div>
+          <!-- Q3-A checkpoint sheet (shown as if allocation were complete) -->
+          <div style="position: absolute; inset: 0; background: color-mix(in srgb, var(--foreground) 10%, transparent);"></div>
+          <div role="dialog" aria-modal="true" style="position: absolute; top: 0; right: 0; bottom: 0; width: 400px; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column;">
+            <div style="padding: 20px 24px 16px; border-bottom: 1px solid var(--border);"><div class="kicker">ตรวจทานก่อนส่งไปนับเงิน</div><h2 style="font-size: 18px; font-weight: 600; margin-top: 4px;">ยอดนี้จะถูกล็อกเป็นยอดที่คาดว่าจะมี</h2><div style="font-size: 12px; color: var(--muted-foreground); margin-top: 4px;">แก้ไขภายหลังต้องระบุเหตุผลและจะถูกบันทึกประวัติ (Rule 6)</div></div>
+            <div style="flex: 1; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; overflow: auto;">
+              <div><div class="kicker" style="margin-bottom: 8px;">ช่องทาง</div><div class="facts"><div class="fact"><span>เงินสด → ตู้เซฟ</span><strong class="num-display">฿10,000.00</strong></div><div class="fact"><span>เงินโอน → ธนาคาร</span><strong class="num-display">฿5,000.00</strong></div><div class="fact"><span>QR → ธนาคาร</span><strong class="num-display">฿3,450.00</strong></div></div></div>
+              <div><div class="kicker" style="margin-bottom: 8px;">กองทุน × ช่องทาง</div><table class="rows" style="border: 1px solid var(--border); border-radius: 0;"><thead><tr><th>กองทุน</th><th>ช่องทาง</th><th class="num-r">จำนวน</th></tr></thead><tbody><tr><td>ทั่วไป</td><td>เงินสด</td><td class="num-display num-r">฿10,000.00</td></tr><tr><td>ทั่วไป</td><td>เงินโอน</td><td class="num-display num-r">฿5,000.00</td></tr><tr><td>พันธกิจ</td><td>QR</td><td class="num-display num-r">฿3,450.00</td></tr><tr style="background: var(--secondary);"><td colspan="2" style="font-weight: 600;">รวม</td><td class="num-display num-r" style="font-weight: 700;">฿18,450.00</td></tr></tbody></table></div>
+              <div style="display: flex; gap: 10px; align-items: flex-start; font-size: 13px;"><span style="width: 18px; height: 18px; border: 1px solid var(--input); border-radius: 5px; flex: none; margin-top: 2px;"></span>ฉันได้ตรวจทานยอดตามช่องทางกับซอง/สลิปแล้ว</div>
+            </div>
+            <div style="padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end;"><button class="btn btn-s">กลับไปแก้ไข</button><button class="btn btn-p">ยืนยันและส่งไปนับเงิน</button></div>
+          </div>
+        </div>
+      </div>
+      <p class="cap" style="width: 708px;"><strong>Q3 option A (recommended):</strong> the review <em>checkpoint</em> survives as a mandatory confirm sheet with the same fund × channel table the old review screen showed, plus an explicit attestation checkbox — but the user never leaves the form. The sticky primary is disabled with the reason while allocation ≠ expected. Rule 1 is made visible in copy ("เงินสดเท่านั้นที่จะถูกนับ").</p>
+    </div>
+
+    <!-- 2d Q3-B separate review step -->
+    <div id="2d" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2d">2d</a><strong style="font-size: 15px;">Step 2 · ตรวจทาน</strong><span class="opt" style="background: var(--muted-foreground);">Q3 · option B</span><span class="cap">review as its own lifecycle step (5 steps)</span></div>
+      <div class="frame" style="width: 472px; height: 268px;">
+        <div data-screen-label="2d" style="width: 1180px; height: 670px; transform: scale(.4); transform-origin: 0 0; background: var(--background); font-size: 14px; position: relative;">
+          <div style="padding: 20px 32px 0; display: flex; flex-direction: column; gap: 14px;">
+            <div><div class="kicker">23 ส.ค. 2569 · <span class="num-display">1E72B32C</span></div><h2 style="font-size: 22px; font-weight: 600; margin-top: 2px; display: flex; gap: 10px; align-items: center;">รอบนมัสการวันอาทิตย์ (เช้า) <span class="badge b-neu">ฉบับร่าง</span></h2></div>
+            <div class="surface" style="display: grid; grid-template-columns: repeat(5, 1fr); overflow: hidden; border-radius: 12px;"><div class="step done"><span class="dot">✓</span>บันทึกยอด</div><div class="step cur"><span class="dot">2</span>ตรวจทาน</div><div class="step"><span class="dot">3</span>นับเงินสด</div><div class="step"><span class="dot">4</span>ผลต่างและยืนยัน</div><div class="step"><span class="dot">5</span>ลงบัญชี</div></div>
+          </div>
+          <div style="padding: 16px 32px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="surface" style="overflow: hidden;"><div style="padding: 14px 22px; border-bottom: 1px solid var(--border);"><strong>ยอดตามช่องทาง</strong></div><div class="facts" style="padding: 16px 22px; font-size: 15px;"><div class="fact"><span>เงินสด → ตู้เซฟ</span><strong class="num-display">฿10,000.00</strong></div><div class="fact"><span>เงินโอน → ธนาคาร</span><strong class="num-display">฿5,000.00</strong></div><div class="fact"><span>QR → ธนาคาร</span><strong class="num-display">฿3,450.00</strong></div><div class="fact" style="border-top: 1px solid var(--border); padding-top: 10px;"><span>รวม</span><strong class="num-display" style="font-size: 20px;">฿18,450.00</strong></div></div></div>
+            <div class="surface" style="overflow: hidden;"><div style="padding: 14px 22px; border-bottom: 1px solid var(--border);"><strong>กองทุน × ช่องทาง</strong></div><table class="rows"><tbody><tr><td>ทั่วไป · เงินสด</td><td class="num-display num-r">฿10,000.00</td></tr><tr><td>ทั่วไป · เงินโอน</td><td class="num-display num-r">฿5,000.00</td></tr><tr><td>พันธกิจ · QR</td><td class="num-display num-r">฿3,450.00</td></tr></tbody></table></div>
+            <div class="surface" style="grid-column: 1 / -1; padding: 16px 22px; display: flex; gap: 12px; align-items: center; font-size: 15px;"><span style="width: 20px; height: 20px; border: 1px solid var(--input); border-radius: 6px; flex: none;"></span>ฉันได้ตรวจทานยอดตามช่องทางกับซอง/สลิปแล้ว และเข้าใจว่ายอดนี้จะถูกล็อกเป็นยอดที่คาดว่าจะมี</div>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 32px; border-top: 1px solid var(--border); background: var(--background); display: flex; justify-content: space-between;"><button class="btn btn-s">‹ กลับไปแก้ไขยอด</button><button class="btn btn-p">ยืนยันและส่งไปนับเงิน</button></div>
+        </div>
+      </div>
+      <p class="cap" style="width: 472px;"><strong>Q3 option B:</strong> keeps today's separate review screen as step 2 of a 5-step stepper. Safer for teams that print/read aloud before counting; costs one extra full-screen step every Sunday and keeps <code>OfferingReviewSheet</code> tests intact. Trade-off table in the notes below.</p>
+    </div>
+
+    <!-- 2e Step 2 count -->
+    <div id="2e" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2e">2e</a><strong style="font-size: 15px;">Step 2 · นับเงินสด</strong><span class="cap">kept from today; header unified, duplicate banner removed</span></div>
+      <div class="frame" style="width: 590px; height: 470px;">
+        <div data-screen-label="2e" style="width: 1180px; height: 940px; transform: scale(.5); transform-origin: 0 0; background: var(--background); font-size: 14px; position: relative;">
+          <div style="padding: 20px 32px 0; display: flex; flex-direction: column; gap: 14px;">
+            <div><div class="kicker">23 ส.ค. 2569 · <span class="num-display">1E72B32C</span></div><h2 style="font-size: 22px; font-weight: 600; margin-top: 2px; display: flex; gap: 10px; align-items: center;">รอบนมัสการวันอาทิตย์ (เช้า) <span class="badge b-pend">กำลังนับเงิน</span></h2></div>
+            <div class="surface" style="display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border-radius: 12px;"><div class="step done"><span class="dot">✓</span>บันทึกยอด</div><div class="step cur"><span class="dot">2</span>นับเงินสด</div><div class="step"><span class="dot">3</span>ผลต่างและยืนยัน</div><div class="step"><span class="dot">4</span>ลงบัญชี</div></div>
+          </div>
+          <div style="padding: 16px 32px 100px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;"><div style="background: var(--card); padding: 12px 18px;"><div style="font-size: 12px; color: var(--muted-foreground);">คาดว่าจะมี (เงินสด)</div><div class="num-display" style="font-size: 22px; font-weight: 700;">฿10,000.00</div></div><div style="background: var(--card); padding: 12px 18px;"><div style="font-size: 12px; color: var(--muted-foreground);">นับได้</div><div class="num-display" style="font-size: 22px; font-weight: 700;">฿9,950.00</div></div><div style="background: var(--expense-muted); padding: 12px 18px; color: oklch(.4 .13 25);"><div style="font-size: 12px;">ผลต่าง</div><div class="num-display" style="font-size: 22px; font-weight: 700;">−฿50.00</div></div></div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">เทียบกับยอดเงินสดเท่านั้น · เงินโอน ฿5,000.00 และ QR ฿3,450.00 ตรวจกับธนาคาร ไม่นับที่นี่</div>
+            <div class="surface" style="padding: 16px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;"><div><span class="label">ผู้ตรวจนับคนที่ 1</span><div class="input" style="justify-content: space-between;">อาจารย์ ทัศนา ดวงจิตร · ผู้นับเงิน <span>▾</span></div></div><div><span class="label">ผู้ตรวจนับคนที่ 2</span><div class="input" style="justify-content: space-between;">สุดารัตน์ จิณเซ่ง · ผู้นับเงิน <span>▾</span></div></div><div style="grid-column: 1 / -1; font-size: 12px; color: var(--muted-foreground);">ต้องเป็นคนละคน (Rule 4) · เวลาลงชื่อจะถูกบันทึกแยกรายบุคคล</div></div>
+            <div class="surface" style="overflow: hidden;"><table class="rows"><tbody>
+              <tr><td style="width: 120px;"><span class="badge b-neu num-display">฿1,000</span></td><td><div style="display: inline-flex; gap: 6px; align-items: center;"><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">−</button><div class="input num-display" style="width: 72px; height: 36px; justify-content: center; font-weight: 600;">9</div><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">+</button></div></td><td class="num-display num-r" style="font-weight: 600;">฿9,000.00</td></tr>
+              <tr><td><span class="badge b-neu num-display">฿500</span></td><td><div style="display: inline-flex; gap: 6px; align-items: center;"><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">−</button><div class="input num-display" style="width: 72px; height: 36px; justify-content: center; font-weight: 600;">1</div><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">+</button></div></td><td class="num-display num-r" style="font-weight: 600;">฿500.00</td></tr>
+              <tr><td><span class="badge b-neu num-display">฿100</span></td><td><div style="display: inline-flex; gap: 6px; align-items: center;"><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">−</button><div class="input num-display" style="width: 72px; height: 36px; justify-content: center; font-weight: 600;">4</div><button class="btn btn-s btn-sm" style="width: 36px; padding: 0;">+</button></div></td><td class="num-display num-r" style="font-weight: 600;">฿400.00</td></tr>
+              <tr><td><span class="badge b-neu num-display">฿50 · ฿20</span></td><td style="color: var(--muted-foreground);">0 · 0</td><td class="num-display num-r">฿0.00</td></tr>
+              <tr><td>เหรียญรวม</td><td><div class="input num-display" style="width: 140px; height: 36px; justify-content: space-between;"><span style="color: var(--muted-foreground);">฿</span><span style="font-weight: 600;">50.00</span></div></td><td class="num-display num-r" style="font-weight: 600;">฿50.00</td></tr>
+              <tr style="background: var(--secondary);"><td colspan="2" style="font-weight: 600;">รวมนับได้</td><td class="num-display num-r" style="font-weight: 700; font-size: 18px;">฿9,950.00</td></tr>
+            </tbody></table></div>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 32px; border-top: 1px solid var(--border); background: var(--background); display: flex; justify-content: space-between;"><button class="btn btn-s">บันทึกและกลับมานับต่อ</button><button class="btn btn-p">บันทึกผลนับ · ไปขั้นผลต่าง</button></div>
+        </div>
+      </div>
+      <p class="cap" style="width: 590px;">Variance appears once (in the KPI strip, red only when ≠ 0). Rule 1 stated inline. Steppers stay 36px (table-row exception) inside 44px rows; dual-counter rule visible before the fields.</p>
+    </div>
+
+    <!-- 2f Step 3 variance + confirm -->
+    <div id="2f" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2f">2f</a><strong style="font-size: 15px;">Step 3 · ผลต่างและยืนยัน</strong><span class="cap">variance review lifecycle (Rule 5) as a decision, confirm as the primary</span></div>
+      <div class="frame" style="width: 590px; height: 470px;">
+        <div data-screen-label="2f" style="width: 1180px; height: 940px; transform: scale(.5); transform-origin: 0 0; background: var(--background); font-size: 14px; position: relative;">
+          <div style="padding: 20px 32px 0; display: flex; flex-direction: column; gap: 14px;">
+            <div><div class="kicker">23 ส.ค. 2569 · <span class="num-display">1E72B32C</span></div><h2 style="font-size: 22px; font-weight: 600; margin-top: 2px; display: flex; gap: 10px; align-items: center;">รอบนมัสการวันอาทิตย์ (เช้า) <span class="badge b-pend">รอตรวจสอบผลต่าง</span></h2></div>
+            <div class="surface" style="display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border-radius: 12px;"><div class="step done"><span class="dot">✓</span>บันทึกยอด</div><div class="step done"><span class="dot">✓</span>นับเงินสด</div><div class="step cur"><span class="dot">3</span>ผลต่างและยืนยัน</div><div class="step"><span class="dot">4</span>ลงบัญชี</div></div>
+          </div>
+          <div style="padding: 16px 32px 100px; display: grid; grid-template-columns: 1fr 360px; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;"><div style="background: var(--card); padding: 12px 18px;"><div style="font-size: 12px; color: var(--muted-foreground);">คาดว่าจะมี</div><div class="num-display" style="font-size: 22px; font-weight: 700;">฿10,000.00</div></div><div style="background: var(--card); padding: 12px 18px;"><div style="font-size: 12px; color: var(--muted-foreground);">นับได้ · อาจารย์ ทัศนา + สุดารัตน์</div><div class="num-display" style="font-size: 22px; font-weight: 700;">฿9,950.00</div></div><div style="background: var(--expense-muted); padding: 12px 18px; color: oklch(.4 .13 25);"><div style="font-size: 12px;">ผลต่าง (ขาด)</div><div class="num-display" style="font-size: 22px; font-weight: 700;">−฿50.00</div></div></div>
+              <div class="surface" style="overflow: hidden;"><div style="padding: 14px 22px; border-bottom: 1px solid var(--border);"><strong>ผลต่างนี้จะจัดการอย่างไร</strong><div style="font-size: 12px; color: var(--muted-foreground);">ต้องเลือกหนึ่งข้อก่อนยืนยันรอบ (Rule 5, 7)</div></div>
+                <div style="display: flex; gap: 12px; padding: 14px 22px; border-bottom: 1px solid var(--border); align-items: flex-start;"><span style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--input); flex: none; margin-top: 2px;"></span><div><div style="font-weight: 500;">นับซ้ำ</div><div style="font-size: 12px; color: var(--muted-foreground);">กลับไปขั้นตอน 2 · ผลนับเดิมจะถูกเก็บเป็นประวัติ</div></div></div>
+                <div style="display: flex; gap: 12px; padding: 14px 22px; border-bottom: 1px solid var(--border); align-items: flex-start; background: var(--accent);"><span style="width: 18px; height: 18px; border-radius: 50%; border: 5px solid var(--primary); flex: none; margin-top: 2px;"></span><div style="flex: 1;"><div style="font-weight: 600;">ระบุสาเหตุและรับทราบผลต่าง</div><div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 8px;">บันทึกเป็นเงินสดขาด ฿50.00 พร้อมเหตุผล · ต้องอย่างน้อย 5 ตัวอักษร</div><div class="input" style="height: 72px; align-items: flex-start; padding-top: 10px; color: var(--muted-foreground);">เช่น ซองหนึ่งระบุ 100 แต่มีธนบัตร 50 จริง …</div></div></div>
+                <div style="display: flex; gap: 12px; padding: 14px 22px; align-items: flex-start; color: var(--muted-foreground);"><span style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--input); flex: none; margin-top: 2px;"></span><div><div style="font-weight: 500;">แก้ไขยอดที่คาดว่าจะมี</div><div style="font-size: 12px;">สร้างประวัติการแก้ไข (Rule 6) · ต้องระบุเหตุผล · ไม่ทับยอดเดิม</div></div></div>
+              </div>
+            </div>
+            <aside class="surface" style="padding: 18px 20px; align-self: start; display: flex; flex-direction: column; gap: 12px;"><div class="kicker">เมื่อยืนยันรอบนี้</div><div class="facts"><div class="fact"><span>สถานะ</span><strong>ยืนยันแล้ว (ล็อกข้อมูล)</strong></div><div class="fact"><span>เงินสดเข้าตู้เซฟ</span><strong class="num-display">฿9,950.00</strong></div><div class="fact"><span>เงินโอน/QR เข้าธนาคาร</span><strong class="num-display">฿8,450.00</strong></div><div class="fact"><span>ผลต่างที่บันทึก</span><strong class="num-display" style="color: var(--expense);">−฿50.00</strong></div></div><div style="font-size: 12px; color: var(--muted-foreground); line-height: 1.5;">ยังไม่ลงบัญชี — ขั้นตอน 4 แยกจากการยืนยัน (Rule 7)</div></aside>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 32px; border-top: 1px solid var(--border); background: var(--background); display: flex; justify-content: space-between;"><button class="btn btn-s">‹ กลับไปผลนับ</button><button class="btn btn-p" disabled style="background: var(--muted); color: var(--muted-foreground);">ยืนยันรอบ · ระบุสาเหตุก่อน</button></div>
+        </div>
+      </div>
+      <p class="cap" style="width: 590px;">The three variance paths are a radio decision, not three buttons; confirm is disabled with the missing prerequisite named. The right rail says what "confirm" will do and that posting is separate. The guard logic (variance from live computation) stays in <code>lib</code>; the UI only renders its result.</p>
+    </div>
+
+    <!-- 2g Step 4 posted + Q4-B hand-off -->
+    <div id="2g" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2g">2g</a><strong style="font-size: 15px;">Step 4 · ลงบัญชีแล้ว</strong><span class="opt">Q4 · option B (recommended)</span><span class="cap">deposit = post-session hand-off card</span></div>
+      <div class="frame" style="width: 590px; height: 218px;">
+        <div data-screen-label="2g" style="width: 1180px; height: 436px; transform: scale(.5); transform-origin: 0 0; background: var(--background); font-size: 14px;">
+          <div style="padding: 20px 32px 0; display: flex; flex-direction: column; gap: 14px;">
+            <div><div class="kicker">23 ส.ค. 2569 · <span class="num-display">1E72B32C</span></div><h2 style="font-size: 22px; font-weight: 600; margin-top: 2px; display: flex; gap: 10px; align-items: center;">รอบนมัสการวันอาทิตย์ (เช้า) <span class="badge b-info">ลงบัญชีแล้ว</span></h2></div>
+            <div class="surface" style="display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border-radius: 12px;"><div class="step done"><span class="dot">✓</span>บันทึกยอด</div><div class="step done"><span class="dot">✓</span>นับเงินสด</div><div class="step done"><span class="dot">✓</span>ผลต่างและยืนยัน</div><div class="step done"><span class="dot">✓</span>ลงบัญชี</div></div>
+          </div>
+          <div style="padding: 16px 32px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="surface" style="padding: 20px 22px;"><div class="kicker">ลงบัญชีเมื่อ 23 ส.ค. 2569 12:41 · โดย อาจารย์สรรเสริญ</div><div class="num-display" style="font-size: 32px; font-weight: 700; letter-spacing: -.03em; margin-top: 6px;">฿18,400.00</div><div style="font-size: 12px; color: var(--muted-foreground);">รายรับเข้ากองทุน 2 กองทุน · อ้างอิง <span class="num-display">TXN-0312</span></div>
+              <div class="facts" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);"><div class="fact"><span>เงินสดในมือ/ตู้เซฟ</span><strong class="num-display">+฿9,950.00</strong></div><div class="fact"><span>ธนาคารกรุงไทย ···4821</span><strong class="num-display">+฿8,450.00</strong></div><div class="fact"><span>ผลต่างที่บันทึก</span><strong class="num-display" style="color: var(--expense);">−฿50.00</strong></div></div></div>
+            <div class="surface" style="padding: 20px 22px; border-color: var(--primary); display: flex; flex-direction: column; gap: 10px;"><div class="kicker">ขั้นตอนถัดไป (ไม่บังคับ)</div><div style="font-weight: 600; font-size: 16px;">นำเงินสด <span class="num-display">฿9,950.00</span> ฝากธนาคาร</div><div style="font-size: 13px; color: var(--muted-foreground); line-height: 1.5;">เงินสดในตู้เซฟจากรอบนี้ยังไม่ได้ฝาก การฝากเป็นรายการโอน ตู้เซฟ → ธนาคาร (Rule 7) และเข้าคิวอนุมัติตามปกติ</div><div style="display: flex; gap: 8px; margin-top: 4px;"><button class="btn btn-p">สร้างรายการฝากธนาคาร</button><button class="btn btn-s">ไว้ทีหลัง</button></div><div style="font-size: 12px; color: var(--muted-foreground);">จะแสดงในหน้า “สัปดาห์นี้” จนกว่าจะฝาก</div></div>
+          </div>
+        </div>
+      </div>
+      <p class="cap" style="width: 590px;"><strong>Q4 option B (recommended):</strong> the session lifecycle ends at <em>posted</em> exactly as the DB does. Deposit is a hand-off card here and a reminder on the home screen; clicking it pre-fills the existing Funds transfer flow — it never auto-executes and never blocks the session. Business workflow unchanged.</p>
+    </div>
+
+    <!-- 2h Q4-A stepper variant -->
+    <div id="2h" style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;"><a class="id" href="#2h">2h</a><strong style="font-size: 15px;">Stepper variant</strong><span class="opt" style="background: var(--muted-foreground);">Q4 · option A</span><span class="cap">deposit as lifecycle step 5</span></div>
+      <div class="frame" style="width: 472px; height: 50px;">
+        <div data-screen-label="2h" style="width: 1180px; height: 125px; transform: scale(.4); transform-origin: 0 0; background: var(--background); padding: 32px; font-size: 14px;">
+          <div class="surface" style="display: grid; grid-template-columns: repeat(5, 1fr); overflow: hidden; border-radius: 12px;"><div class="step done"><span class="dot">✓</span>บันทึกยอด</div><div class="step done"><span class="dot">✓</span>นับเงินสด</div><div class="step done"><span class="dot">✓</span>ผลต่างและยืนยัน</div><div class="step done"><span class="dot">✓</span>ลงบัญชี</div><div class="step cur"><span class="dot">5</span>ฝากธนาคาร (จันทร์)</div></div>
+          <div style="margin-top: 16px; font-size: 13px; color: var(--muted-foreground);">Session shows “ยังไม่เสร็จ” until the Monday transfer is posted — but the DB session is already <code>posted</code>; the UI would be inventing a 6th state.</div>
+        </div>
+      </div>
+      <p class="cap" style="width: 472px;"><strong>Q4 option A:</strong> stronger nudge, but it invents a UI-only state the offering aggregate does not have, couples two aggregates (session ↔ transfer), and makes every session look unfinished for a day. Not recommended.</p>
+    </div>
+  </div>
+
+  <!-- ===================== NOTES ===================== -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1560px;">
+    <div class="surface" style="padding: 20px 24px; font-size: 13px; line-height: 1.55;">
+      <div class="kicker" style="margin-bottom: 8px;">Q3 — how the review checkpoint stays safe</div>
+      <table class="rows" style="font-size: 12px;"><thead><tr><th></th><th>A · checkpoint sheet (2c)</th><th>B · separate step (2d)</th></tr></thead><tbody>
+        <tr><td>Expected amount locked only after explicit attestation</td><td>✓ (checkbox + confirm)</td><td>✓</td></tr>
+        <tr><td>Fund × channel table reviewed</td><td>✓ same table, in sheet</td><td>✓ full screen</td></tr>
+        <tr><td>Can go back and edit without losing data</td><td>✓ sheet closes, form intact</td><td>✓ previous step</td></tr>
+        <tr><td>Sunday clicks (entry → counting)</td><td>2</td><td>3 + one page load</td></tr>
+        <tr><td>Test impact</td><td><code>offering-ui-components</code> review assertions move to sheet markup</td><td>none</td></tr>
+        <tr><td>390px</td><td>full-screen sheet, same content</td><td>full-screen step</td></tr>
+        <tr><td>State flow (<code>lib/offering/lifecycle</code>)</td><td>unchanged — “ส่งไปนับ” is the same transition</td><td>unchanged</td></tr>
+      </tbody></table>
+      <p style="margin: 10px 0 0;">Recommendation: <strong>A</strong>. The checkpoint is preserved as a modal commitment with the same information; only the navigation cost is removed. B remains valid if the owner prefers a printable review page.</p>
+    </div>
+    <div class="surface" style="padding: 20px 24px; font-size: 13px; line-height: 1.55;">
+      <div class="kicker" style="margin-bottom: 8px;">Q5 — "เดือนนี้" KPI: investigation result</div>
+      <p style="margin: 0 0 8px;"><strong>VERIFIED FACT.</strong> <code>TransactionsPage.loadData()</code> fetches all church transactions with no date bound and <code>renderHtml()</code> sums <code>this.transactions</code> across all statuses (draft, pending, rejected, voided included) under the label "รายรับเดือนนี้ / รายจ่ายเดือนนี้". <code>DashboardPage</code> sums only the 5 most recent rows and infers direction from keywords ("จ่าย/ซื้อ/ค่า") — same class of error.</p>
+      <p style="margin: 0 0 8px;"><strong>VERIFIED FACT.</strong> A correct, scoped source already exists: <code>ReportsService.getExecutiveFinancialSummary(churchId, "YYYY-MM")</code> returns <code>monthly_income</code>, <code>monthly_expense</code> from <em>posted</em> ledger rows within the month, with provenance and excluded states.</p>
+      <p style="margin: 0 0 8px;"><strong>RECOMMENDATION.</strong> Do not relabel. Both pages consume <code>getExecutiveFinancialSummary</code> for the two KPIs (one extra read, no new query logic). The transaction list itself stays unfiltered (it is a ledger browser). Label stays "เดือนนี้" and gains a provenance hint: "จากรายการที่ลงบัญชีแล้ว".</p>
+      <p style="margin: 0;"><strong>OPEN — flag to financial-reviewer, out of design scope.</strong> <code>ReportsService</code> line ~95 also falls back to keyword inference when <code>direction</code> is null. Direction is a real column; the fallback should be removed or made an explicit error. Reported, not changed.</p>
+    </div>
+  </div>
+</section>
+</x-dc>
+</body>
+</html>

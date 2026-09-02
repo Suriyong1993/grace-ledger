@@ -20,8 +20,8 @@ const makeItem = (overrides: Partial<any> = {}) => ({
   description: "ค่าเช่าสถานที่",
   referenceNumber: "REF-001",
   createdBy: "user-1",
-  creatorName: "สมชาย ใจดี",
-  creatorInitials: "สช",
+  creatorName: "สุดารัตน์ จิณเซ่ง",
+  creatorInitials: "สจ",
   createdAt: "2025-08-01T10:00:00Z",
   hasReceipt: false,
   splits: [
@@ -143,7 +143,7 @@ describe("ApprovalsPage", () => {
     const html = page.renderHtml(dummyUser);
     expect(html).toContain("ค่าเช่าสถานที่");
     expect(html).toContain("REF-001");
-    expect(html).toContain("สมชาย ใจดี");
+    expect(html).toContain("สุดารัตน์ จิณเซ่ง");
     expect(html).toContain("gl-approval-card");
     expect(html).toContain("gl-badge--pending");
     expect(html).toContain("gl-quick-approve");

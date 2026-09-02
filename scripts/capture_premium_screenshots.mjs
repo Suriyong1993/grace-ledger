@@ -44,10 +44,10 @@ async function installHarness(page) {
 
     const M = money.Money;
     const user = {
-      name: "ศจ.สมชาย มีสุข",
-      role: "ศิษยาภิบาล / ผู้อนุมัติ",
-      initials: "สช",
-      churchName: "คริสตจักรพระคุณ",
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "ศิษยาภิบาล",
+      initials: "สด",
+      churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
     };
 
     const funds = [
@@ -79,7 +79,7 @@ async function installHarness(page) {
       countedCashAmount: M.from("9950"),
       cashVarianceAmount: M.from("-50"),
       varianceStatus: "variance_detected",
-      creatorName: "มนัส สุขใจ",
+      creatorName: "สุดารัตน์ จิณเซ่ง",
       createdAt: "2026-08-23",
       notes: "มีซองถวายโครงการสร้างอาคาร 3 ซอง",
       items: [
@@ -93,8 +93,8 @@ async function installHarness(page) {
         b1000: 9, b500: 1, b100: 4, b50: 0, b20: 0,
         coins: M.from("50"),
         totalCashCounted: M.from("9950"),
-        countedBy1: "p1", countedBy1Name: "มนัส สุขใจ",
-        countedBy2: "p2", countedBy2Name: "ศจ.สมชาย มีสุข",
+        countedBy1: "p1", countedBy1Name: "อาจารย์ ทัศนา ดวงจิตร",
+        countedBy2: "p2", countedBy2Name: "สุดารัตน์ จิณเซ่ง",
         counter1SignedAt: "2026-08-23",
       },
       revisions: [
@@ -108,8 +108,8 @@ async function installHarness(page) {
     };
 
     const profiles = [
-      { id: "p1", fullName: "มนัส สุขใจ" },
-      { id: "p2", fullName: "ศจ.สมชาย มีสุข" },
+      { id: "p1", fullName: "อาจารย์ ทัศนา ดวงจิตร" },
+      { id: "p2", fullName: "สุดารัตน์ จิณเซ่ง" },
     ];
 
     const accounts = [
@@ -139,7 +139,7 @@ async function installHarness(page) {
     }];
 
     const detailFor = (status, extra = {}) => {
-      const page = new detailPage.OfferingPage({ from: () => ({}) }, "c1", "u1", "ศจ.สมชาย มีสุข");
+      const page = new detailPage.OfferingPage({ from: () => ({}) }, "c1", "u1", "อาจารย์สรรเสริญ ดวงจิตร");
       page.mode = "detail";
       page.profiles = profiles;
       page.accounts = accounts;

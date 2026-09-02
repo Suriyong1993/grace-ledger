@@ -23,7 +23,7 @@ describe("fetchLoginProfiles", () => {
     const invoke = vi.fn().mockResolvedValue({
       data: {
         profiles: [
-          { id: "p1", name: "สมชาย", role: "เหรัญญิก", initials: "สช" },
+          { id: "p1", name: "อาจารย์สรรเสริญ ดวงจิตร", role: "ศิษยาภิบาล", initials: "สด" },
         ],
       },
       error: null,
@@ -33,7 +33,7 @@ describe("fetchLoginProfiles", () => {
 
     expect(result).toEqual({
       status: "ready",
-      profiles: [{ id: "p1", name: "สมชาย", role: "เหรัญญิก", initials: "สช" }],
+      profiles: [{ id: "p1", name: "อาจารย์สรรเสริญ ดวงจิตร", role: "ศิษยาภิบาล", initials: "สด" }],
     });
     expect(invoke).toHaveBeenCalledWith("login-profiles", { timeout: 15_000 });
   });

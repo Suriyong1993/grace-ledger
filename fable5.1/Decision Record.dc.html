@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+  <script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+    code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; background: var(--secondary); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+    table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
+    th { text-align: left; font-size: var(--text-2xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); background: var(--secondary); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+    td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: 0; }
+    h2 { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 var(--space-3); }
+    p, li { font-size: var(--text-sm); line-height: 1.6; }
+    p { margin: 0 0 var(--space-2); }
+    ul { margin: 0; padding-left: 1.2em; }
+    li { margin-bottom: 3px; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; }
+    .ok { background: var(--income-muted); color: oklch(0.36 0.09 155); }
+    .warn { background: var(--pending-muted); color: oklch(0.38 0.08 80); }
+    .bad { background: var(--expense-muted); color: oklch(0.4 0.13 25); }
+    .neu { background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5); }
+    .lbl { width: 150px; color: var(--muted-foreground); }
+  </style>
+</helmet>
+
+<div style="max-width: 900px; margin: 0 auto; padding: 48px 32px 96px; display: flex; flex-direction: column; gap: 32px;">
+
+  <header style="display: flex; flex-direction: column; gap: var(--space-2); padding-bottom: var(--space-5); border-bottom: 1px solid var(--border);">
+    <div class="kicker">Grace Ledger · Decision Record · 2026-09-02 · strategy frozen · planning-only</div>
+    <h1 style="font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 600; letter-spacing: -0.025em; margin: 0;">Redesign Decision Record &amp; R1 Scope</h1>
+    <p style="color: var(--muted-foreground); margin: 0;">Supersedes the open items in <a href="Strategic Review.dc.html">Strategic Review</a>, <a href="Redesign Master Plan.dc.html">Master Plan</a>, <a href="Redesign Strategy & Execution Bridge.dc.html">Strategy &amp; Execution Bridge</a>. Mockups: <a href="Redesign Concepts.dc.html">Concepts</a>, <a href="Hi-fi Mockups.dc.html">Hi-fi</a>. Repo state <code>Suriyong1993/grace-ledger@bee600e8</code>, unchanged. Intended to become <code>DECISIONS.md</code> entries in R1.</p>
+  </header>
+
+  <section class="card">
+    <h2>1. Approved design direction <span class="tag ok">APPROVED</span></h2>
+    <table><tbody>
+      <tr><td class="lbl">Direction</td><td><strong>Concept B "งานสัปดาห์นี้" (guided weekly workflow) as spine</strong> · Concept A density for lookup screens (Transactions, Reports) · Concept C fund-health table for Funds. Ref <a href="Redesign Concepts.dc.html#1b">1b</a>.</td></tr>
+      <tr><td class="lbl">Identity</td><td>Evolve, not replace: palette, Sarabun + Inter, fixed finance colors, <code>.num-display</code>, sidebar + bottom-nav shell all kept. Title scale down (22px), hero amount 32px and one per screen, borders over tint, two backgrounds per screen, one orange CTA per screen.</td></tr>
+      <tr><td class="lbl">Architecture</td><td>Vanilla TS + Vite, string rendering, hash router — unchanged. No framework, no CSS-in-JS.</td></tr>
+      <tr><td class="lbl">Protected</td><td><code>src/lib/**</code>, <code>supabase/**</code>, <code>tests/integration/**</code>, router, auth/PIN, listener ids/data-attrs, variance guard, Thai strings under test.</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="card" style="border: 2px solid var(--primary);">
+    <h2>1.1 ผู้รับผิดชอบและผู้ตรวจสอบที่ถูกต้องของคริสตจักร (Authorized Officers) <span class="tag ok">CANONICAL</span></h2>
+    <p style="font-size: 13px; color: var(--muted-foreground); margin-bottom: 12px;">กำหนดให้บุคลากร 4 ท่านต่อไปนี้ เป็นผู้รับผิดชอบ ผู้ตรวจสอบ และตัวตนในระบบ (Identity &amp; Governance Roster) เพียงชุดเดียวของ <strong>คริสตจักรพระคุณ กาฬสินธุ์</strong> สำหรับการยืนยันตัวตน สิทธิ์การอนุมัติ การนับเงินสด และรอยตรวจสอบบัญชี (Audit Trail):</p>
+    <table>
+      <thead><tr><th style="width:160px;">ตำแหน่งคริสตจักร</th><th style="width:220px;">ชื่อ-นามสกุล</th><th style="width:120px;">สิทธิ์ในระบบ</th><th>ภาระหน้าที่หลักในระบบการเงิน</th></tr></thead>
+      <tbody>
+        <tr><td><strong>ศิษยาภิบาล</strong></td><td><strong>อาจารย์สรรเสริญ ดวงจิตร</strong></td><td><code>pastor</code></td><td>อนุมัติคำขอเบิกจ่าย, ดูแลภาพรวมพันธกิจและความโปร่งใส, ปิดรอบการเงินประจำเดือน</td></tr>
+        <tr><td><strong>ผู้นับเงิน (คนที่ 1)</strong></td><td><strong>อาจารย์ ทัศนา ดวงจิตร</strong></td><td><code>counter</code></td><td>ตรวจนับเงินสดถวายวันอาทิตย์ตามเกณฑ์สองคน (Dual-Counter Rule 4), คัดแยกธนบัตร/เหรียญ</td></tr>
+        <tr><td><strong>ผู้นับเงิน (คนที่ 2)</strong></td><td><strong>สุดารัตน์ จิณเซ่ง</strong></td><td><code>counter</code></td><td>ร่วมตรวจนับเงินสด, ตรวจสอบยอดซอง, ยืนยันผลนับเงินสดร่วมกับผู้นับคนที่ 1</td></tr>
+        <tr><td><strong>ผู้ตรวจสอบบัญชี</strong></td><td><strong>พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร</strong></td><td><code>super_admin</code></td><td>ตรวจสอบบัญชีและการเงินทั้งหมด, สิทธิ์ผู้ดูแลระบบสูงสุด, อนุมัติการตั้งค่าและตรวจสอบ Audit Log</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size: 12px; color: var(--muted-foreground); margin-top: 10px; margin-bottom: 0;"><strong>ข้อกำหนดการใช้งาน:</strong> ห้ามใช้ชื่อจำลองหรือ mock data อื่นใด (เช่น ศจ.สมชาย มีสุข, มนัส สุขใจ) ในเอกสารการออกแบบและหน้าจอ Mockup/Production ทุกส่วนต้องสอดคล้องกับ 4 ท่านนี้ 100%</p>
+  </section>
+
+  <section class="card">
+    <h2>2. Design decisions D1–D3 <span class="tag ok">APPROVED</span></h2>
+    <table>
+      <thead><tr><th style="width:60px;">ID</th><th>Decision</th><th>Consequence in code</th></tr></thead>
+      <tbody>
+        <tr><td><strong>D1</strong></td><td>Canonise shipped values: surface radius <strong>16px</strong>, control radius <strong>12px</strong> (button/input, 46px height), dialog/sheet <strong>20px</strong>, pills full, tables 0. Shadows: the two Modern-layer literals become <code>--shadow-card</code> / <code>--shadow-elevated</code>.</td><td><code>tokens/radius.css</code>, <code>tokens/shadows.css</code> updated; generation-1 declarations in <code>app.css</code> deleted; zero pixel change.</td></tr>
+        <tr><td><strong>D2</strong></td><td>Unified status semantics: <code>draft</code> neutral "ฉบับร่าง" · <code>pending_approval</code> pending "รออนุมัติ" · <code>approved</code> approved "อนุมัติแล้ว" · <code>posted</code> <strong>info</strong> "ลงบัญชีแล้ว" · <code>rejected</code> rejected "ปฏิเสธ" · <code>voided</code> <strong>neutral</strong> "ยกเลิกแล้ว". Dashboard "รอตรวจสอบ" → "รออนุมัติ".</td><td>One <code>STATUS</code> map in <code>src/components/shared/StatusBadge.ts</code>; consumers import (R3, not R1).</td></tr>
+        <tr><td><strong>D3</strong></td><td>Flatten modal glass: <code>.gl-modal-content</code> = solid <code>--popover</code> + <code>--shadow-elevated</code>; backdrop keeps 3px blur. Topbar blur remains the single sanctioned blur.</td><td><code>app.css</code> (R1). Only intentional pixel change in R1.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3. Workflow decisions Q3–Q5 <span class="tag ok">APPROVED</span></h2>
+    <table>
+      <thead><tr><th style="width:60px;">ID</th><th>Decision</th><th>Binding requirements</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Q3</strong></td><td><strong>Option A</strong> — review checkpoint kept as a mandatory confirm sheet inside the Offering entry step (ref <a href="Hi-fi Mockups.dc.html#2c">2c</a>). Separate review screen retired.</td><td>Sheet must show, before confirmation: fund, channel, entered amount per channel and per fund×channel, <em>counted amount and variance when they exist</em> (i.e. when re-confirming after a recount or expected-amount revision), and a required attestation checkbox. Primary disabled until attestation. Lifecycle transition unchanged (<code>lib/offering/lifecycle.ts</code>). Expected amounts lock on confirm; later edits create a revision record (Rule 6). Tests for review content move to sheet markup — never weakened.</td></tr>
+        <tr><td><strong>Q4</strong></td><td><strong>Option B</strong> — deposit is a non-blocking hand-off after <code>posted</code> (ref <a href="Hi-fi Mockups.dc.html#2g">2g</a>). No synthetic lifecycle state; stepper stays at 4 steps.</td><td>Hand-off card on the session (posted state) and a reminder on the home screen until the cash-drawer balance for that session is transferred. "สร้างรายการฝากธนาคาร" pre-fills the existing Funds transfer flow (from = Cash Drawer, to = default bank, amount = counted cash) via query params; executes only through existing <code>FundsService.proposeTransfer</code> and the normal approval queue. Never auto-executes.</td></tr>
+        <tr><td><strong>Q5</strong></td><td><strong>Approved</strong> — <code>ReportsService.getExecutiveFinancialSummary(churchId, "YYYY-MM")</code> is the single source for "รายรับ/รายจ่ายเดือนนี้" on Dashboard and Transactions. No relabelling of incorrect sums.</td><td>Both pages drop their local summation; KPI gains provenance hint "จากรายการที่ลงบัญชีแล้ว". Transaction list itself stays an unfiltered ledger browser. Implemented in R4/R6, not R1. See FRI-1/FRI-2 for the adjacent findings, which are <em>not</em> touched by this change.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>4. Deferred decisions <span class="tag neu">LATER</span></h2>
+    <table><tbody>
+      <tr><td class="lbl">D4 Dark mode</td><td>Keep <code>.dark</code> tokens; no toggle. Revisit after R5 when literal colors are gone.</td></tr>
+      <tr><td class="lbl">D5 DS package</td><td><code>design-system-extracted/</code> in-repo is canonical; external DS project syncs from it after R1 token changes. No rename.</td></tr>
+      <tr><td class="lbl">D6 Reports tint</td><td>White surface + colored value is the rule; applied in R6.</td></tr>
+      <tr><td class="lbl">Icon registry</td><td>Policy only in R1 (1.8 stroke / 2 active / 24 viewBox / aria-hidden); a shared file only if R3+ adds many icons.</td></tr>
+      <tr><td class="lbl">UX.md</td><td>Written in R7 from the approved screen table.</td></tr>
+      <tr><td class="lbl">Nav home label</td><td>"สัปดาห์นี้" vs "แดชบอร์ด" — decide with R4 mockup sign-off; hrefs unaffected.</td></tr>
+      <tr><td class="lbl">Visual diff gate</td><td>Pixel diff added to <code>capture_premium_screenshots.mjs</code> in R7; R1 uses manual before/after comparison of the same captures.</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="card" style="border-color: var(--expense);">
+    <h2>5. Financial Review Items <span class="tag bad">NOT CHANGED — for financial-reviewer</span></h2>
+    <p>Found during design analysis; outside design scope per <code>CLAUDE.md</code> hard stops. Recorded, not modified.</p>
+    <table>
+      <thead><tr><th style="width:60px;">ID</th><th>Finding · affected cases · risk · recommended remediation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>FRI-1</strong></td><td><strong>Keyword-based direction fallback in ReportsService.</strong> <code>src/lib/reports/reports-service.ts</code> ~l.95: <code>const dir = t.direction || (isExp ? "expense" : "income")</code> where <code>isExp</code> tests the description for "จ่าย/ซื้อ/ค่า". <em>Affected:</em> any posted transaction with null <code>direction</code>; feeds <code>getStatementOfFinancialPosition</code> → monthly totals, category totals, <code>getExecutiveFinancialSummary</code> (the very source approved in Q5), Reports page, and — after Q5 — Dashboard/Transactions KPIs. <em>Risk:</em> an income described with "ค่า…" (e.g. "ค่าเช่าสถานที่รับมา") is counted as expense; silent misstatement of a financial report. <span class="tag bad">HIGH if null directions exist; LOW if the column is NOT NULL</span> — verify in <code>supabase/migrations</code>. <em>Remediation:</em> if the column is NOT NULL, delete the fallback; if nullable, treat null as a data error (exclude + surface a "รายการที่ต้องตรวจสอบ" count in provenance), never infer. Add a unit test with a "ค่า…" income row.</td></tr>
+        <tr><td><strong>FRI-2</strong></td><td><strong>Same heuristic in DashboardPage.</strong> <code>src/pages/DashboardPage.ts</code> <code>loadData</code>: direction inferred from description keywords for the 5 most-recent rows; totals labelled "เดือนนี้" derived from those 5 rows. <em>Affected:</em> dashboard monthly KPIs and the +/− sign/color on recent-activity rows. <em>Risk:</em> MEDIUM — misleading home numbers and a mis-signed row. <em>Remediation:</em> KPIs → Q5 source; row direction → read the real <code>direction</code> column (already selected in TransactionsPage). Design-adjacent: the render change is R4 scope, the query change needs financial-reviewer sign-off.</td></tr>
+        <tr><td><strong>FRI-3</strong></td><td><strong>Transactions KPI sums all statuses and all time.</strong> <code>TransactionsPage.renderHtml</code> sums <code>this.transactions</code> (draft, pending, rejected, voided included; no date bound) under "เดือนนี้". <em>Risk:</em> MEDIUM — overstated figures on a high-traffic page. <em>Remediation:</em> Q5 (approved). Listed here so the reviewer can confirm no other consumer depends on the old sum.</td></tr>
+        <tr><td><strong>FRI-4</strong></td><td><strong>Hard-coded chart scale.</strong> <code>DashboardPage.ts</code> <code>maxVal = 5000000</code> satang (฿50,000) clamps trend bars; any month above ฿50k renders identical to ฿50k. <em>Risk:</em> LOW (visual only, but misleading). <em>Remediation:</em> derive max from data in R4.</td></tr>
+        <tr><td><strong>FRI-5</strong></td><td><strong><code>ReportsService.getExecutiveFinancialSummary</code> month end = <code>"YYYY-MM-31"</code>.</strong> String bound may behave inconsistently for 28/29/30-day months depending on Postgres date coercion of an invalid date. <em>Risk:</em> LOW–MEDIUM. <em>Remediation:</em> compute the real last day (or use <code>&lt; next-month-01</code>). Verify with a February test before Q5 makes this the shared source.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card" style="border-color: var(--primary);">
+    <h2>6. R1 scope — "Establish source of truth &amp; resolve CSS authority" <span class="tag warn">AWAITING APPROVAL</span></h2>
+    <p><strong>User-visible outcome:</strong> none, except the flattened modal (D3). R1 is invisible consolidation plus documentation. It contains <strong>no page render changes, no test changes, no <code>lib/</code> changes</strong>.</p>
+    <h3 style="font-family: var(--font-display); font-size: var(--text-md); margin: var(--space-4) 0 var(--space-2);">In scope</h3>
+    <ul>
+      <li><strong>R1-a Documentation.</strong> New <code>DESIGN.md</code> (visual contract: tokens post-D1, status semantics D2, the two sanctioned exceptions — topbar blur, hero gradient — icon policy, banned list), <code>COMPONENTS.md</code> (catalogue of every existing <code>.gl-*</code> class: markup, variants, don'ts), <code>DECISIONS.md</code> (this record: D1–D6, Q3–Q5, FRI-1…5). <code>CLAUDE.md</code> edit: 10-line "Design source of truth" block + rule "inline style = layout only; never color/radius/shadow/font-size" + gate "<code>npm run lint:design</code> passes".</li>
+      <li><strong>R1-b DS package truth.</strong> Rewrite stack/components sections of <code>design-system-extracted/readme.md</code>; regenerate <code>design-system-extracted/github.md</code> and <code>mockups-extracted/github.md</code> screen maps to real files; label React <code>components/*.jsx</code> and <code>ui_kits/</code> "prototyping reference — not production source".</li>
+      <li><strong>R1-c Tokens (D1).</strong> <code>tokens/radius.css</code>: <code>--radius-card</code> 16px, <code>--radius-button</code> 12px, <code>--radius-input</code> 12px, <code>--radius-dialog</code> 20px, <code>--radius-sheet</code> 20px. <code>tokens/shadows.css</code>: <code>--shadow-card</code> and <code>--shadow-elevated</code> set to the shipped Modern values. <code>tokens/colors.css</code>: add <code>--on-income-muted</code>, <code>--on-expense-muted</code>, <code>--on-pending-muted</code>, <code>--on-info-muted</code> (light + dark) moved verbatim from <code>app.css</code>. <code>tokens/motion.css</code>: remove <code>--ease-spring</code> <em>only after</em> grep confirms zero consumers in <code>src/</code>.</li>
+      <li><strong>R1-d app.css consolidation.</strong> Delete the generation-1 <code>:root</code> layout block and every generation-1 declaration of a selector re-declared in the Modern layer (<code>.gl-card*</code>, <code>.gl-btn*</code>, <code>.gl-input/.gl-select/.gl-textarea</code>, <code>.gl-page-header*</code>, <code>.gl-section*</code>, <code>.gl-modal-content</code>, <code>.gl-table*</code>, <code>.gl-stat*</code>, <code>.gl-notice/.gl-toast</code> radius, <code>.gl-nav-item</code>); merge each into one declaration using tokens where the literal equals the new token. Remove dead <code>.filter-pill.is-active</code> rule and the <code>.gl-shell-mark/.gl-shell-avatar</code> <code>!important</code> pair (source made flat in <code>AppShell.ts</code> inline <code>&lt;style&gt;</code> — the only <code>.ts</code> touched, style block only). Apply D3 to <code>.gl-modal-content</code>.</li>
+      <li><strong>R1-e Design lint.</strong> New <code>scripts/lint-design.mjs</code>: fails on <code>font-size:\s*[0-9.]+px</code>, <code>border-radius:\s*[0-9]+px</code>, <code>rgba?\(</code>, <code>#[0-9a-fA-F]{3,8}</code> in <code>src/**/*.ts</code> outside an explicit allowlist (initial allowlist = today's offering/login/proposal-modal hits, so R1 passes; allowlist shrinks in R5). <code>package.json</code>: <code>"lint:design"</code> script, added to <code>"lint"</code>. <code>.github/workflows/ci.yml</code>: run it.</li>
+    </ul>
+    <h3 style="font-family: var(--font-display); font-size: var(--text-md); margin: var(--space-4) 0 var(--space-2);">Explicitly out of scope</h3>
+    <ul>
+      <li>Any change to <code>src/pages/**</code>, <code>src/components/**</code> render strings (except the AppShell style block), <code>src/lib/**</code>, <code>supabase/**</code>, <code>tests/**</code>.</li>
+      <li>New classes (<code>.gl-sheet</code>, <code>.gl-stepper</code>, …) — R2. Status map — R3. Q5 consumers — R4/R6. Offering changes — R5. FRI-1…5 — financial-reviewer track.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>7. Files expected to change in R1</h2>
+    <table>
+      <thead><tr><th>File</th><th style="width:90px;">Op</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td><code>DESIGN.md</code></td><td>new</td><td>Visual contract</td></tr>
+        <tr><td><code>COMPONENTS.md</code></td><td>new</td><td><code>.gl-*</code> catalogue</td></tr>
+        <tr><td><code>DECISIONS.md</code></td><td>new</td><td>D1–D6, Q3–Q5, FRI-1…5</td></tr>
+        <tr><td><code>CLAUDE.md</code></td><td>edit</td><td>Design source-of-truth block, inline-style rule, lint gate</td></tr>
+        <tr><td><code>design-system-extracted/readme.md</code>, <code>github.md</code>; <code>mockups-extracted/github.md</code></td><td>edit</td><td>Stack + screen maps corrected; prototyping label</td></tr>
+        <tr><td><code>design-system-extracted/tokens/radius.css</code>, <code>shadows.css</code>, <code>colors.css</code>, <code>motion.css</code></td><td>edit</td><td>D1 values; <code>--on-*-muted</code>; −spring (conditional)</td></tr>
+        <tr><td><code>src/styles/app.css</code></td><td>edit</td><td>Single generation per selector; D3; dead rules removed; <code>--on-*-muted</code> block removed (now in tokens)</td></tr>
+        <tr><td><code>src/components/layout/AppShell.ts</code></td><td>edit (style block only)</td><td>Flat <code>.gl-shell-mark/.gl-shell-avatar</code>; no markup, no logic</td></tr>
+        <tr><td><code>scripts/lint-design.mjs</code></td><td>new</td><td>Literal-value grep with allowlist</td></tr>
+        <tr><td><code>package.json</code>, <code>.github/workflows/ci.yml</code></td><td>edit</td><td><code>lint:design</code> wired</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top: var(--space-2);">Not changed: everything else. Expected diff: ~11 files, of which one <code>.ts</code> (style-string only).</p>
+  </section>
+
+  <section class="card">
+    <h2>8. Validation and rollback criteria for R1</h2>
+    <table>
+      <thead><tr><th style="width:150px;">Gate</th><th>Acceptance criterion</th></tr></thead>
+      <tbody>
+        <tr><td>Build / tests</td><td><code>npm run build</code> exit 0; <code>npm test</code> same pass count as baseline (no test file modified).</td></tr>
+        <tr><td>CSS authority</td><td>For every <code>.gl-*</code> selector, exactly one declaration block in <code>app.css</code> (<code>grep -c "^\.gl-card {"</code> = 1, etc.). No <code>:root</code> layout tokens declared twice.</td></tr>
+        <tr><td>Token agreement</td><td>Computed styles of <code>.gl-card</code>, <code>.gl-btn</code>, <code>.gl-input</code>, <code>.gl-modal-content</code> equal the token values (16 / 12 / 12 / 20) — checked in browser.</td></tr>
+        <tr><td>Visual regression</td><td>Run <code>scripts/capture_premium_screenshots.mjs</code> before and after (1280 + 390, all 13 fixture screens). Pixel-identical for every screen except the reject/revision dialog and other modals (D3 flattening). Overflow assertion still passes.</td></tr>
+        <tr><td>Live routes</td><td>Manual check of all 9 routes at desktop and 390px against the "before" captures; login and AI drawer unchanged.</td></tr>
+        <tr><td>Lint</td><td><code>npm run lint:design</code> exit 0 with the initial allowlist; allowlist file committed with a comment per entry naming the phase that removes it.</td></tr>
+        <tr><td>Docs</td><td>Every path in the three <code>github.md</code>/readme screen maps resolves in the tree; DS readme contains no "React", "Tailwind", "shadcn", "Lucide" claim about the production app.</td></tr>
+        <tr><td>Reviewers</td><td>ui-reviewer: PASS on tokens/anti-slop; financial-reviewer: confirms diff touches no <code>lib/</code>, <code>supabase/</code>, or test file.</td></tr>
+        <tr><td>Rollback</td><td>R1 lands as one PR with atomic commits per sub-item (a–e). Any failed gate → revert the sub-item commit; full revert restores <code>bee600e8</code> state. No data, schema or behaviour change exists to roll back.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card" style="border-color: var(--pending); background: var(--pending-muted); color: oklch(0.38 0.08 80);">
+    <strong>Status: strategy frozen. Planning-only. Requesting explicit approval of §6 R1 scope and §8 acceptance criteria before any repository file is modified.</strong>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

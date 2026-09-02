@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+  <script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+    code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; background: var(--secondary); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+    table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
+    th { text-align: left; font-size: var(--text-2xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); background: var(--secondary); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+    td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: 0; }
+    h2 { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 var(--space-4); text-wrap: balance; }
+    h3 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; letter-spacing: -0.015em; margin: var(--space-5) 0 var(--space-2); }
+    p, li { font-size: var(--text-base); line-height: 1.6; }
+    p { margin: 0 0 var(--space-3); }
+    ul { margin: 0 0 var(--space-3); padding-left: 1.2em; }
+    li { margin-bottom: 4px; }
+    pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--text-xs); line-height: 1.55; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: var(--space-4); overflow-x: auto; margin: 0 0 var(--space-3); white-space: pre; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; }
+    .ok { background: var(--income-muted); color: oklch(0.36 0.09 155); }
+    .warn { background: var(--pending-muted); color: oklch(0.38 0.08 80); }
+    .bad { background: var(--expense-muted); color: oklch(0.4 0.13 25); }
+    .neu { background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5); }
+  </style>
+</helmet>
+
+<div style="max-width: 940px; margin: 0 auto; padding: 48px 32px 96px; display: flex; flex-direction: column; gap: 48px;">
+
+  <header style="display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-6); border-bottom: 1px solid var(--border);">
+    <div class="kicker">Grace Ledger · Report 3 of 3 · Understand → Challenge → Reimagine → Design → Plan → Present</div>
+    <h1 style="font-family: var(--font-display); font-size: var(--text-4xl); font-weight: 600; letter-spacing: -0.025em; margin: 0; text-wrap: balance;">Redesign Master Plan</h1>
+    <p style="color: var(--muted-foreground); margin: 0;">Built on the verified facts in the <a href="Strategic Review.dc.html">Strategic Review</a>. Scope agreed: <strong>evolve the identity</strong> (same palette family, Sarabun + Inter, fixed finance colors), redesign hierarchy, IA, workflows and components. Concepts are mocked in <a href="Redesign Concepts.dc.html">Redesign Concepts</a>. No code modified.</p>
+  </header>
+
+  <section>
+    <h2>Executive summary</h2>
+    <p>Grace Ledger's screens are individually competent and collectively <strong>page-shaped, not work-shaped</strong>. Every route opens with a big number and cards; none opens with the thing the user came to do. The weekly job (count Sunday cash with two people, resolve a variance, post, deposit Monday) is buried three clicks deep behind a dashboard that repeats the Funds page. Approvals — the highest-stakes decision — render the detail inline under the queue with no focus change. Amounts are excellent (tabular Inter, sign + color, decimal.js); hierarchy around them is not.</p>
+    <p><strong>Vision:</strong> a calm financial workbench where the home screen is <em>this week's work</em>, every workflow has a visible lifecycle, every decision shows its fund impact before the button, and the visual system uses one card grammar, one radius family (16 / 12), one accent, and borders — not tint — for structure. Direction: <strong>Concept B (Guided Workflow) as the spine, with A's density in Transactions/Reports and C's fund-health table in Funds.</strong></p>
+  </section>
+
+  <section>
+    <h2>Current product audit</h2>
+    <table>
+      <thead><tr><th style="width:120px;">Screen</th><th>User · goal · primary action</th><th>Problems (UX / hierarchy / visual / workflow)</th><th style="width:170px;">Opportunity</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Dashboard</strong><br><span style="font-size:11px;color:var(--muted-foreground);">live/01</span></td><td>Treasurer · know what needs me · go do it</td><td>Hero balance repeats Funds hero verbatim. 4 quick actions before the attention list (action before context). "นับเงินถวายวันอาทิตย์" row is static — never shows the live session state. Recent activity duplicates Transactions. Trend chart hard-codes max scale 50,000 THB (<code>DashboardPage.ts</code> <code>maxVal</code>) — misleading for any other church.</td><td>Become "สัปดาห์นี้": live offering lifecycle + decisions + quiet balance.</td></tr>
+        <tr><td><strong>Transactions</strong><br><span style="font-size:11px;color:var(--muted-foreground);">live/02</span></td><td>Treasurer · find / verify a record · open detail</td><td>Two KPI cards labelled "เดือนนี้" actually sum <em>all</em> loaded transactions (code sums <code>this.transactions</code> unfiltered by month) — label is wrong. Grouped rows are good but cards-in-cards; detail opens as a centered modal with a second nested card set. No date range, no export, no column view for desk use. Filter pills styled as primary buttons.</td><td>Table view for desktop, row list at ≤900; correct KPI labels; detail as side sheet.</td></tr>
+        <tr><td><strong>Approvals</strong><br><span style="font-size:11px;color:var(--muted-foreground);">live/06–07</span></td><td>Approver · decide safely · approve / revise / reject</td><td>Detail renders <em>below</em> the queue (PREMIUM P1-10 still open): no focus move, no overlay, user lands mid-page. Fund impact is present (good) but beneath a large red hero amount; decision buttons off-screen at 1280×900. Header bypasses <code>.gl-page-header</code>.</td><td>Detail = route-level sheet; impact → decision in one viewport.</td></tr>
+        <tr><td><strong>Offering entry</strong><br><span style="font-size:11px;color:var(--muted-foreground);">live/09</span></td><td>Treasurer · record channel totals + allocation · continue</td><td>Native date input shows US <code>08/23/2026</code> (P1-8 still open). Three channel tiles use three ad-hoc badge styles (green/blue/amber) — blue is not a finance color. Allocation rows are a 4-col grid with delete icon; sum-check message location unclear. Step label "ขั้นตอนที่ 1 / 2" but the real lifecycle has 5 steps.</td><td>Single lifecycle stepper shared across entry → count → variance → post.</td></tr>
+        <tr><td><strong>Cash count</strong><br><span style="font-size:11px;color:var(--muted-foreground);">after/09</span></td><td>2 counters · count denominations · save</td><td>Best screen in the product: stat strip, steppers, live variance. Issues: the variance is shown twice (strip + red banner); "กลับหน้ารายการ" text link beside the primary; tabs + back link + title = 3 header rows.</td><td>Keep; drop duplicate banner; unify header.</td></tr>
+        <tr><td><strong>Variance / post</strong><br><span style="font-size:11px;color:var(--muted-foreground);">after/11–13</span></td><td>Treasurer · explain, confirm, post</td><td>Literal-heavy markup; explain button color toggled imperatively (<code>OfferingPage.ts:755</code> uses <code>--info</code>); confirm was once green (fixed). Posting card lives on the same tab as variance.</td><td>Steps 3 → 4 as distinct lifecycle states with one primary each.</td></tr>
+        <tr><td><strong>Funds</strong><br><span style="font-size:11px;color:var(--muted-foreground);">live/03</span></td><td>Treasurer/pastor · fund health · transfer</td><td>Balances in brand orange (reads as buttons). Hero duplicates dashboard. Budget bars orange too — three meanings of orange on one screen.</td><td>Fund-health table (Concept C); orange only on "โอนเงินกองทุน".</td></tr>
+        <tr><td><strong>Reports</strong><br><span style="font-size:11px;color:var(--muted-foreground);">live/05</span></td><td>Treasurer/board · monthly statement · print</td><td>Fully tinted KPI tiles and tinted table headers — loudest screen in the app; violates "max two backgrounds". Period tabs good. Print action good.</td><td>White surfaces, colored values; add year view density from A.</td></tr>
+        <tr><td><strong>Members</strong></td><td>Treasurer · giving history · certificate</td><td>Not screenshotted in depth; card grid + modal, totals in orange (<code>MembersPage.ts:147</code>).</td><td>Same row/list grammar; privacy reason prompt stays.</td></tr>
+        <tr><td><strong>Login / PIN</strong></td><td>Any staff · pick profile · enter PIN</td><td>Own stylesheet (fine — separate shell). <code>design-plans/01–03</code> already specify fixes.</td><td>Out of redesign scope; follow existing plans.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>User journey analysis</h2>
+    <table>
+      <thead><tr><th style="width:170px;">Journey</th><th>Frequency · risk</th><th>Today</th><th>Redesigned</th></tr></thead>
+      <tbody>
+        <tr><td><strong>J1 Sunday offering</strong><br>record → count (2 people) → variance → confirm → post → deposit Monday</td><td>Weekly · <span class="tag bad">highest</span> (cash custody, M3 Rule 1–7)</td><td>Dashboard → เงินถวาย → list → new → 2-step form → review → save → reopen → tab 2 count → tab 3 variance → confirm → post (same tab). Monday deposit is not represented anywhere; the "ขั้นตอน 1/2" label contradicts the 5-state lifecycle.</td><td>Home shows the current round and its lifecycle step with one CTA. Session detail = one screen, one stepper (บันทึกยอด · นับ · ผลต่าง/ยืนยัน · ลงบัญชี · ฝากธนาคาร); each step has exactly one primary. Monday deposit becomes a pre-filled transfer draft (Cash Drawer → Bank) — uses existing <code>transfer_funds</code>; no new RPC.</td></tr>
+        <tr><td><strong>J2 Expense approval</strong><br>see request → check receipt + fund impact → approve / revise / reject</td><td>Several per week · <span class="tag bad">high</span> (two-person rule, projected deficit)</td><td>Queue → click → detail appears below (scroll) → decision. Deficit warning legible now; buttons below fold.</td><td>Queue row → route <code>/approvals/:id</code> opens a right sheet (desktop) / full screen (mobile): amount, receipt, fund impact, then actions — all in one viewport. Approve = single primary; reject quiet and last (already the rule).</td></tr>
+        <tr><td><strong>J3 Record expense</strong></td><td>Weekly · medium</td><td>Quick action → Transactions (list) — there is no create form on the route; the tile is a dead-end.</td><td>Quick action opens a create sheet (draft → pending_approval via existing service).</td></tr>
+        <tr><td><strong>J4 Find / verify a record</strong></td><td>Daily · low</td><td>Grouped list, search, pills; detail modal.</td><td>Desktop table with date range + status columns; ≤900px keeps grouped rows. Detail sheet shared with J2.</td></tr>
+        <tr><td><strong>J5 Month-end report</strong></td><td>Monthly · medium (board trust)</td><td>Reports tabs, print.</td><td>Keep; calmer surfaces; add fund-health view.</td></tr>
+        <tr><td><strong>J6 Fund transfer</strong></td><td>Monthly · medium</td><td>Funds → modal.</td><td>Same, plus the Monday-deposit entry point from J1.</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Missing feedback today:</strong> no "posted" confirmation on the home; no indication a session is mid-count when you leave it; no deposit reminder. <strong>Unnecessary steps:</strong> save-draft → reopen to reach the count tab; separate review screen that shows what the form already shows.</p>
+  </section>
+
+  <section>
+    <h2>Redesign concepts</h2>
+    <p>Three home-screen directions are mocked side by side in <a href="Redesign Concepts.dc.html"><strong>Redesign Concepts</strong></a> (ids 1a · 1b · 1c). All use the existing tokens; none introduces a color.</p>
+    <table>
+      <thead><tr><th style="width:120px;"></th><th>A · โต๊ะเหรัญญิก <a href="Redesign Concepts.dc.html#1a">1a</a></th><th>B · งานสัปดาห์นี้ <a href="Redesign Concepts.dc.html#1b">1b</a></th><th>C · ภาพรวมการดูแลทรัพย์ <a href="Redesign Concepts.dc.html#1c">1c</a></th></tr></thead>
+      <tbody>
+        <tr><td>Philosophy</td><td>The ledger is the home. Dense table, context rail, ⌘K.</td><td>The home answers "what next?". Lifecycle-led, one CTA.</td><td>The home is a stewardship statement. Fund health, budget, trend.</td></tr>
+        <tr><td>Primary user</td><td>Full-time treasurer at a desk</td><td>Volunteer treasurer + Sunday counters, often on a phone</td><td>Pastor / finance committee</td></tr>
+        <tr><td>Strengths</td><td>Fastest lookup; most data per screen; professional</td><td>Matches the real weekly rhythm; hardest to do the wrong thing; collapses to 390px cleanly</td><td>Best decision support; budget visibility the product lacks today</td></tr>
+        <tr><td>Weaknesses</td><td>Poor on mobile; hides the Sunday workflow; intimidating for non-accountants (the stated audience)</td><td>Lower data density; needs live session state on home (one extra query)</td><td>Counting team must dig; charts invite decoration; monthly not weekly</td></tr>
+        <tr><td>Density / efficiency</td><td>High / high for lookup</td><td>Medium / highest for the weekly task</td><td>Medium / high for review</td></tr>
+        <tr><td>Implementation complexity</td><td>Medium (new table component, ⌘K)</td><td>Medium (home rewrite, stepper, sheet)</td><td>Medium (fund table, chart scaling)</td></tr>
+        <tr><td>Long-term risk</td><td>Drifts toward generic admin panel</td><td>Low — mirrors <code>M3</code> lifecycle already in the DB</td><td>Chart decoration creep; contradicts "no fake charts" if data is thin</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Recommended direction</h2>
+    <div class="card">
+      <p style="margin:0 0 8px;"><strong>B as spine · A's density where the job is lookup · C's fund-health table where the job is oversight.</strong></p>
+      <ul style="margin:0;">
+        <li><strong>Why B:</strong> the product's own audit (<code>M3_PRODUCT_AUDIT</code>) names treasurer + 2 counters as primary users, weekly frequency, cash-loss as the risk. B is the only concept whose home screen serves that. It also fixes the two open PREMIUM findings (P1-10 detail-not-a-sheet, P1-8 dates) as part of the flow, not as patches.</li>
+        <li><strong>Why not pure A:</strong> CLAUDE.md audience is "not accounting experts"; a ledger-first home optimises for the wrong person and fails on the device counters actually hold.</li>
+        <li><strong>Why not pure C:</strong> beautiful monthly, useless on Sunday. Its fund-health table is the right <em>Funds page</em>, not the home.</li>
+        <li><strong>Consistency:</strong> all three share the shell, tokens and card grammar — mixing them is a page-level choice, not a visual fork.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>New design language (evolution, not replacement)</h2>
+    <h3>Personality → decisions</h3>
+    <table>
+      <tbody>
+        <tr><td style="width:120px;"><strong>Calm</strong></td><td>Two backgrounds only (off-white page, white surface). Tint is reserved for <em>state</em> (variance red, pending amber) — never for KPI tiles or table headers (fixes Reports).</td></tr>
+        <tr><td><strong>Exact</strong></td><td>Every amount: <code>.num-display</code>, sign + color, 2 decimals, right-aligned in tables. ฿ in its own span at normal tracking (PREMIUM P1-1). One date format: <code>23 ส.ค. 2569</code>, native date inputs replaced by a formatted trigger.</td></tr>
+        <tr><td><strong>Structured</strong></td><td>Borders carry structure. Lists are <em>ledger rows</em> inside one bordered surface, not stacks of cards; KPI groups are border-joined strips (Concept A) not four floating cards. Cards-in-cards banned.</td></tr>
+        <tr><td><strong>Guided</strong></td><td>Every multi-step workflow renders the same lifecycle stepper; the current step is the only place amber appears; exactly one orange button per screen.</td></tr>
+        <tr><td><strong>Honest</strong></td><td>Labels match the query (no "เดือนนี้" on an all-time sum); no fixed chart scales; empty states say the one true thing + next action.</td></tr>
+      </tbody>
+    </table>
+    <h3>Color</h3>
+    <p>Unchanged palette. Rules tightened: <code>--primary</code> = the one CTA + active nav + focus ring, <strong>never a number, never a bar</strong> (fixes Funds/Members). Budget progress bars use <code>--foreground</code>. <code>--info</code> (blue) is retired from the UI except the "posted" badge (D2). Surface: <code>--card</code>; elevated surface: <code>--card</code> + <code>--shadow-elevated</code>, max one per screen. Text: <code>--foreground</code>; muted: <code>--muted-foreground</code>; on-tint text: <code>--on-*-muted</code>.</p>
+    <h3>Typography</h3>
+    <table>
+      <tbody>
+        <tr><td style="width:160px;">Page title</td><td><code>--text-2xl</code> 22px (desktop) / <code>--text-xl</code> (mobile), display 600, −0.02em. Down from 26–40px: titles were competing with money.</td></tr>
+        <tr><td>Section heading</td><td><code>--text-md</code> 16px, 600</td></tr>
+        <tr><td>Kicker</td><td><code>.kicker</code> 11px caps — the universal section label</td></tr>
+        <tr><td>Body / row title</td><td><code>--text-base</code> 15px 500 / meta <code>--text-xs</code> 12px muted</td></tr>
+        <tr><td>Hero amount</td><td><code>--text-4xl</code> 32px 700 (was 40–60px); only one per screen</td></tr>
+        <tr><td>Table numerals</td><td><code>--text-sm</code> 13px, tabular, right-aligned, 600 for totals</td></tr>
+        <tr><td>Off-scale sizes</td><td>Banned (lint).</td></tr>
+      </tbody>
+    </table>
+    <h3>Spacing · layout · elevation</h3>
+    <ul>
+      <li>4px scale unchanged. Page padding 24/32; section gap 28; row padding 14 × 24; table cell 10 × 14.</li>
+      <li>Shell: sidebar 240 (desktop), bottom nav (≤768) — unchanged. Content max 1180. Right <strong>sheet</strong> 480px for details (approvals, transaction, create) — new primitive replacing centered modals for anything with more than one field.</li>
+      <li>Radius family (post-D1): surfaces 16, controls 12, pills full, tables 0. Shadow: border by default; <code>--shadow-elevated</code> on sheets/dialogs and the one hero surface.</li>
+      <li>Motion: unchanged tokens; sheet slide 220ms ease-out; nothing else animates.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>New information architecture</h2>
+    <pre>CURRENT (flat, 7 items, 6 group labels)         PROPOSED (3 groups, same 7 routes + 1 sheet route)
+ภาพรวม    แดชบอร์ด                               งานประจำ   สัปดาห์นี้ (home: live round + decisions)
+ธุรกรรม   รายการเงิน · เงินถวายวันอาทิตย์                  เงินถวายวันอาทิตย์  →  /offerings/:id  (one screen, 5-step stepper)
+การเงิน   กองทุนและงบประมาณ                                คิวอนุมัติ         →  /approvals/:id  (right sheet)
+กำกับดูแล คิวอนุมัติ                              บัญชี      รายการเงิน (table ≥900 / rows &lt;900; create sheet)
+สมาชิก    สมาชิกและการถวาย                                  กองทุนและงบประมาณ (fund-health table; transfer sheet)
+รายงาน    รายงานการเงิน                          ภาพรวม     สมาชิกและการถวาย
+                                                            รายงานการเงิน</pre>
+    <p><strong>Why better:</strong> groups follow frequency (weekly work → bookkeeping → oversight) instead of nouns; six one-item groups collapse to three; no route is removed, so <code>router.ts</code> is untouched except that <code>/approvals/:id</code> becomes a real view state. Mobile bottom nav keeps 5 + more, per <code>RESPONSIVE_GUIDELINES</code> rules cited by the mobile mockup.</p>
+  </section>
+
+  <section>
+    <h2>New design system (deltas to the existing <code>.gl-*</code> layer)</h2>
+    <table>
+      <thead><tr><th style="width:120px;">Tier</th><th>Keep</th><th>Add</th><th>Retire</th></tr></thead>
+      <tbody>
+        <tr><td>Foundations</td><td>All tokens (post-D1), <code>.num-display</code>, <code>.kicker</code></td><td><code>--on-*-muted</code> into tokens; <code>.gl-currency</code> span rule</td><td><code>--ease-spring</code>, <code>--radius-card/dialog/sheet</code> legacy values</td></tr>
+        <tr><td>Navigation</td><td>Sidebar, bottom nav, topbar</td><td><code>.gl-stepper</code> (lifecycle), <code>.gl-tabs</code> (existing underline tabs → segmented for period)</td><td>Topbar church-name duplicate (already in sidebar)</td></tr>
+        <tr><td>Buttons</td><td><code>.gl-btn</code> primary/secondary/ghost/destructive/sm</td><td><code>.gl-btn--quiet-dark</code> (foreground-filled secondary action, used for "อนุมัติ" in lists so orange stays unique)</td><td><code>.filter-pill</code> stacked on <code>.gl-btn--primary</code></td></tr>
+        <tr><td>Forms</td><td><code>.gl-field/.gl-input/.gl-select/.gl-textarea</code></td><td><code>.gl-amount-input</code> (฿ prefix, numeric, right-aligned), <code>.gl-date-trigger</code> (formatted Thai date, opens native picker), <code>.gl-allocation-row</code> desktop rule, <code>.gl-stepper-input</code> (−/+, exists inline in CashCount)</td><td>Native visible <code>type=date</code> rendering</td></tr>
+        <tr><td>Data display</td><td><code>.gl-table(--cards)</code>, <code>.gl-statgrid/.gl-stat</code>, <code>.gl-badge</code></td><td><code>.gl-kpi-strip</code> (border-joined), <code>.gl-rows</code> (ledger rows in one surface) + <code>renderTxnRowHtml</code>, <code>.gl-fund-row</code> (balance · budget bar · delta), <code>.gl-progress</code> (foreground fill)</td><td>Tinted KPI tiles; orange progress bars; cards-in-cards</td></tr>
+        <tr><td>Feedback</td><td><code>.gl-notice</code>, <code>.gl-skeleton</code>, <code>.gl-toast</code></td><td><code>renderEmptyStateHtml</code>, single <code>STATUS</code> map</td><td>3 status maps; duplicate variance banner</td></tr>
+        <tr><td>Overlays</td><td><code>.gl-modal-*</code> for single-question dialogs (reject reason, confirm)</td><td><code>.gl-sheet</code> right panel 480px / full-screen ≤768, <code>role=dialog</code>, focus trap, Esc, URL-bound</td><td>Glass on modal (D3)</td></tr>
+        <tr><td>Patterns</td><td>Page header, section head, sticky action bar</td><td>Home "current round" card; approval decision layout (amount → receipt → impact → actions); session screen (stepper + step body + one primary)</td><td>Hero balance duplicated on 3 routes</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Screen-by-screen redesign plan</h2>
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+      <div class="card"><strong>Home → สัปดาห์นี้</strong> <span class="tag warn">rewrite</span>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:160px;color:var(--muted-foreground);">Hierarchy</td><td>1 Current offering round (title, state, expected/counted/variance, stepper, one CTA) · 2 Decisions waiting (rows with fund impact + อนุมัติ/ดู) · 3 Balance (32px) + month delta · 4 Shortcuts (4 quiet tiles).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Primary / secondary</td><td>Next lifecycle step (orange) / approve (foreground-filled), shortcuts.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Components</td><td><code>.gl-stepper</code>, <code>.gl-rows</code>, <code>.gl-kpi-strip</code>, TxnRow.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Interaction / responsive</td><td>Round card CTA deep-links to the current step; ≤768 stepper becomes a 5-dot progress + label; decisions stack.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Data / risk</td><td>Needs latest <code>offering_sessions</code> row for the church (existing service <code>offering-service.ts</code> list call) — read-only. Remove hard-coded chart scale. Tests <code>dashboard-page-ui</code> rewritten.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Offering session (entry · count · variance · post)</strong> <span class="tag warn">restructure</span>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:160px;color:var(--muted-foreground);">Hierarchy</td><td>Header: back · date+id kicker · title + status badge. Stepper (5). Step body only. Sticky action bar with one primary.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Changes</td><td>Entry: drop separate review screen (summary block inline above "บันทึกและไปนับเงิน"); Thai date trigger; channel tiles → <code>.gl-amount-input</code> rows, badges retired. Count: keep; remove duplicate banner. Variance: explain/recount/acknowledge as a radio group; confirm primary. Post: own step; destination accounts; posted hero. Deposit: step 5 shows "ฝากเงินสด ฿9,950.00 เข้าธนาคาร" → pre-filled transfer sheet (existing <code>transfer_funds</code> path via Funds service).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Protected</td><td>All ids/data-attrs used by <code>OfferingPage.attachEventListeners</code>; variance guard logic; lifecycle rules in <code>lib/offering</code>. Removing the review screen must be a product decision (Q3).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Tests</td><td>4 offering UI test files updated deliberately.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Approvals</strong> <span class="tag warn">detail → sheet</span>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:160px;color:var(--muted-foreground);">Hierarchy</td><td>Queue: page header (<code>.gl-page-header</code>) with count + total right; rows (status · title · fund · creator · receipt flag · amount). Sheet at <code>/approvals/:id</code>: amount (24px, not 48) · receipt · projected fund balance · two-person guard · actions (อนุมัติ primary, ขอแก้ไข secondary, ปฏิเสธ destructive-quiet, last).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Interaction</td><td>Sheet opens on row click/route; Esc/backdrop close → <code>/approvals</code>; focus moves in; ≤768 full-screen.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Protected</td><td><code>ApprovalsService</code> calls, stale-state banner, <code>RejectionModal</code> semantics.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Transactions</strong> <span class="tag ok">evolve</span>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:160px;color:var(--muted-foreground);">Changes</td><td>KPI labels honest (period-filtered or renamed "รวมที่แสดง"); desktop ≥900 = <code>.gl-table</code> (วันที่ · รายการ · กองทุน · สถานะ · จำนวน); &lt;900 = grouped <code>.gl-rows</code> (today's design); detail → shared sheet; "บันทึกรายจ่าย" create sheet (J3) using <code>TransactionsService.submit</code> draft flow; filter pills → neutral segmented.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Funds</strong> <span class="tag ok">evolve (Concept C table)</span>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:160px;color:var(--muted-foreground);">Changes</td><td>Drop hero (home has it); fund-health rows: name · balance (foreground) · budget bar (foreground) · month delta (income/expense) · pending badge; transfer = orange CTA only; transfer sheet.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Reports</strong> <span class="tag ok">calm</span>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:160px;color:var(--muted-foreground);">Changes</td><td>KPI strip white with colored values; tables with neutral headers and 0 radius; period as segmented control; print unchanged; year view adds month × income/expense table (density from A).</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Members</strong> <span class="tag ok">align</span><p style="margin:6px 0 0;font-size:var(--text-sm);">Rows not cards; totals in foreground; giving-history opens the shared sheet with the mandatory reason field first (privacy rule unchanged).</p></div>
+      <div class="card"><strong>Login / PIN · AI drawer</strong> <span class="tag neu">unchanged</span><p style="margin:6px 0 0;font-size:var(--text-sm);">Separate shells with token-pure stylesheets; follow <code>design-plans/01–03</code>. Drawer adopts the sheet radius/shadow tokens only.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Technical migration strategy</h2>
+    <p>No framework. The redesign is expressed entirely as: (1) token value updates, (2) <code>app.css</code> classes, (3) string-returning helpers in <code>src/components/shared/</code>, (4) render-string edits in pages, (5) one new routing-visible state (approval sheet) handled by the existing <code>/approvals/:id</code> pattern. Full re-render remains; the sheet is re-rendered open from route state, so no transition state is lost. Focus management is done in <code>attachEventListeners</code> after render (already the pattern in <code>RejectionModal</code>).</p>
+    <pre>Protect lib/ + supabase/            (read-only; financial-reviewer on every PR)
+  → Phase 1–2 of Strategic Review    (docs, CSS authority, tokens = D1)          ← prerequisite
+  → Shared primitives                (.gl-sheet .gl-stepper .gl-rows .gl-kpi-strip .gl-amount-input .gl-date-trigger .gl-progress
+                                      + shared/StatusBadge TxnRow EmptyState)     ← no page changes yet
+  → Redesign ONE area: Approvals     (smallest, highest stakes, exercises sheet + rows + status)
+  → Validate: tests · 1280/390 screenshots · financial-reviewer · thai-writer
+  → Home (สัปดาห์นี้)  →  Offering session  →  Transactions  →  Funds  →  Reports  →  Members
+  → Regression baseline + CI diff</pre>
+  </section>
+
+  <section>
+    <h2>Phased roadmap</h2>
+    <table>
+      <thead><tr><th style="width:90px;">Phase</th><th>Scope</th><th style="width:150px;">Gate</th></tr></thead>
+      <tbody>
+        <tr><td><strong>R0</strong></td><td>Approve direction (B+A+C), answer open questions Q1–Q4 below, approve D1–D3.</td><td>Owner sign-off</td></tr>
+        <tr><td><strong>R1</strong></td><td>= Strategic Review Phases 1–2 (docs, CSS consolidation, token values).</td><td>Pixel diff 0</td></tr>
+        <tr><td><strong>R2</strong></td><td>Primitives: sheet, stepper, rows, kpi-strip, amount-input, date-trigger, progress; shared helpers; COMPONENTS.md rows.</td><td>Unit tests for helpers; storybook-style page in <code>docs/</code> optional</td></tr>
+        <tr><td><strong>R3</strong></td><td>Approvals queue + sheet.</td><td>5 quality gates; 1280/390 shots</td></tr>
+        <tr><td><strong>R4</strong></td><td>Home "สัปดาห์นี้" (needs latest-session read).</td><td>Same + financial-reviewer on the new read</td></tr>
+        <tr><td><strong>R5</strong></td><td>Offering session screen (entry/count/variance/post/deposit) — one PR per step.</td><td>Full-lifecycle 390px walkthrough</td></tr>
+        <tr><td><strong>R6</strong></td><td>Transactions (table + create sheet), Funds (health table), Reports (calm), Members.</td><td>Per route</td></tr>
+        <tr><td><strong>R7</strong></td><td>Regression baseline, CI diff, UX.md, DS sync.</td><td>CI green</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Migration risk analysis</h2>
+    <table>
+      <thead><tr><th style="width:130px;">Area</th><th>Business logic</th><th>DOM / tests</th><th>CSS</th><th>DB</th><th>Rollback</th></tr></thead>
+      <tbody>
+        <tr><td>Home</td><td>New read of latest session (read-only)</td><td><code>dashboard-page-ui</code> rewritten; hrefs preserved</td><td>Low</td><td>None</td><td>Easy (one page)</td></tr>
+        <tr><td>Offering session</td><td><span class="tag bad">Guard logic adjacent</span> — restyle only; removing review screen changes state flow → needs decision + tests</td><td>ids for listeners; 4 test files</td><td>Medium (390px density)</td><td>None</td><td>Per-step PR revert</td></tr>
+        <tr><td>Approvals sheet</td><td>None (service unchanged)</td><td><code>approvals-ui-components</code>; selectors <code>.gl-approval-item</code>, <code>.gl-btn-open-decision</code></td><td>Low</td><td>None</td><td>Easy</td></tr>
+        <tr><td>Transactions create</td><td>Uses existing <code>submit</code> draft path — verify RBAC <code>can()</code> in UI</td><td>New tests</td><td>Low</td><td>None (existing RPC)</td><td>Feature-flag the tile</td></tr>
+        <tr><td>Monday deposit</td><td>Pre-fills existing transfer; no new RPC; must not auto-execute</td><td>New tests</td><td>Low</td><td>None</td><td>Remove step 5 link</td></tr>
+        <tr><td>Reports / Funds / Members</td><td>None</td><td>3 test files (labels)</td><td>Low</td><td>None</td><td>Easy</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Risks and open questions</h2>
+    <ul>
+      <li><strong>Q1</strong> Approve direction B + A + C as described? (Alternative: pure B.)</li>
+      <li><strong>Q2</strong> Home title "สัปดาห์นี้" vs keep "แดชบอร์ด"? Nav grouping change acceptable (routes unchanged)?</li>
+      <li><strong>Q3</strong> May the separate Offering <em>review</em> screen be folded into the entry step? It has its own test file and screenshots; folding is a state-flow change.</li>
+      <li><strong>Q4</strong> Monday deposit as step 5 (pre-filled transfer draft) — product wants it? It formalises <code>M3</code> Rule 7's "Transfer Transaction" in the UI.</li>
+      <li><strong>Q5</strong> Transactions KPI: filter to real current month, or relabel? (Relabel is safe; filtering touches <code>loadData</code>.)</li>
+      <li><strong>Assumption:</strong> the live screenshots (2026-08-28) reflect current production. <strong>Uncertainty:</strong> Members and Login were not visually audited in depth.</li>
+      <li><strong>Dependency:</strong> everything above D1 (radius) — the mockups assume 16/12.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Final recommendation</h2>
+    <div class="card" style="border-color: var(--pending); background: var(--pending-muted); color: oklch(0.38 0.08 80);">
+      <strong>Approve R0: direction B + A + C, decisions D1–D3, questions Q1–Q5.</strong>
+      <p style="margin:8px 0 0;font-size:var(--text-sm);">Then execute R1 (docs + CSS consolidation, zero visual change) while the mockups for Approvals sheet and the Offering session screen are produced for review — those two screens carry every new primitive and should be seen before any page code changes.</p>
+      <p style="margin:8px 0 0;font-size:var(--text-sm);">STOP. No repository files modified.</p>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

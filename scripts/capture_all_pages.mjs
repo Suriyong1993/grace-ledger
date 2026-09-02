@@ -60,10 +60,10 @@ async function installScreensHarness(page) {
 
     const M = money.Money;
     const user = {
-      name: "ศจ.สมชาย มีสุข",
-      role: "ศิษยาภิบาล / ผู้อนุมัติ",
-      initials: "สช",
-      churchName: "คริสตจักรเกรซแบ๊บติสต์",
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "ศิษยาภิบาล",
+      initials: "สด",
+      churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
     };
 
     const dummyFunds = [

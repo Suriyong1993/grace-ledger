@@ -12,7 +12,9 @@ import { LoginProfile } from "../../src/components/login/types";
 
 const TEST_PROFILES: LoginProfile[] = [
   { id: "11111111-1111-1111-1111-111111111111", name: "อาจารย์สรรเสริญ ดวงจิตร", role: "ศิษยาภิบาล", initials: "สด" },
-  { id: "22222222-2222-2222-2222-222222222222", name: "สุดารัตน์ จิณเซ่ง", role: "ผู้นับเงิน", initials: "สจ" },
+  { id: "22222222-2222-2222-2222-222222222222", name: "อาจารย์ ทัศนา ดวงจิตร", role: "ผู้นับเงิน", initials: "ทด" },
+  { id: "33333333-3333-3333-3333-333333333333", name: "สุดารัตน์ จิณเซ่ง", role: "ผู้นับเงิน", initials: "สจ" },
+  { id: "44444444-4444-4444-4444-444444444444", name: "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร", role: "ผู้ตรวจสอบบัญชี", initials: "สบ" },
 ];
 
 /** LoginPage never calls a Supabase method in these tests (no DOM root is attached), so an unresolved stub is enough. */

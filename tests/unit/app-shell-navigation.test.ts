@@ -8,9 +8,9 @@ describe("Authenticated App Shell & Navigation", () => {
     activeRoute: "/",
     pendingCount: 3,
     user: {
-      name: "อาจารย์ สมชาย ใจดี",
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
       role: "ศิษยาภิบาล",
-      initials: "สจ",
+      initials: "สด",
       churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
     },
   };
@@ -65,9 +65,9 @@ describe("Authenticated App Shell & Navigation", () => {
     const html = renderAppShellHtml(mockProps, "<div>Content</div>");
 
     expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
-    expect(html).toContain("อาจารย์ สมชาย ใจดี");
+    expect(html).toContain("อาจารย์สรรเสริญ ดวงจิตร");
     expect(html).toContain("ศิษยาภิบาล");
-    expect(html).toContain("สจ");
+    expect(html).toContain("สด");
   });
 
   it("renders ProfilePage component with identity card, quick links, and logout", () => {
@@ -79,7 +79,7 @@ describe("Authenticated App Shell & Navigation", () => {
 
     const html = profilePage.renderHtml();
 
-    expect(html).toContain("อาจารย์ สมชาย ใจดี");
+    expect(html).toContain("อาจารย์สรรเสริญ ดวงจิตร");
     expect(html).toContain("ศิษยาภิบาล");
     expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
     expect(html).toContain("11111111...555555");

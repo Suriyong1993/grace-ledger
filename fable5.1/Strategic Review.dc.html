@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+  <script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+    code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; background: var(--secondary); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+    table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
+    th { text-align: left; font-size: var(--text-2xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); background: var(--secondary); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+    td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: 0; }
+    h2 { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 var(--space-4); text-wrap: balance; }
+    h3 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; letter-spacing: -0.015em; margin: var(--space-5) 0 var(--space-2); }
+    p, li { font-size: var(--text-base); line-height: 1.6; }
+    p { margin: 0 0 var(--space-3); }
+    ul { margin: 0 0 var(--space-3); padding-left: 1.2em; }
+    li { margin-bottom: 4px; }
+    pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--text-xs); line-height: 1.55; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: var(--space-4); overflow-x: auto; margin: 0 0 var(--space-3); white-space: pre; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; }
+    .ok { background: var(--income-muted); color: oklch(0.36 0.09 155); }
+    .warn { background: var(--pending-muted); color: oklch(0.38 0.08 80); }
+    .bad { background: var(--expense-muted); color: oklch(0.4 0.13 25); }
+    .neu { background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5); }
+  </style>
+</helmet>
+
+<div style="max-width: 940px; margin: 0 auto; padding: 48px 32px 96px; display: flex; flex-direction: column; gap: 48px;">
+
+  <header style="display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-6); border-bottom: 1px solid var(--border);">
+    <div class="kicker">Grace Ledger · Report 2 of 3 · Read → Verify → Challenge → Plan → Stop</div>
+    <h1 style="font-family: var(--font-display); font-size: var(--text-4xl); font-weight: 600; letter-spacing: -0.025em; margin: 0; text-wrap: balance;">Design System Strategic Review</h1>
+    <p style="color: var(--muted-foreground); margin: 0;">Verifies and red-teams the <a href="Design System Discovery Report.dc.html">Discovery Report</a> against <code>Suriyong1993/grace-ledger@bee600e8</code> (unchanged since the report), plus sources the report missed: <code>docs/PREMIUM_DESIGN_AUDIT.md</code>, <code>docs/UI_REDESIGN_QA_NOTES.md</code>, <code>docs/screenshots/live/*</code>, <code>design-plans/</code>, <code>mockups-extracted/</code>, <code>IMPLEMENTATION_PLAN.md</code>. No repo files modified. Followed by the <a href="Redesign Master Plan.dc.html">Redesign Master Plan</a>.</p>
+  </header>
+
+  <section id="s1">
+    <h2>1. Executive verdict</h2>
+    <p><strong>The Discovery Report is substantially accurate on facts and partially wrong on interpretation.</strong> Every architectural and code-level claim re-verified true. Two interpretations need revision:</p>
+    <ul>
+      <li><strong>The "Modern UI layer" is not a legacy artifact.</strong> It is the <em>newest deliberate decision</em>: commit <code>a2548ed</code> "modernize shared app shell and all routes", QA'd in production 2026-08-28 (<code>docs/UI_REDESIGN_QA_NOTES.md</code>). The drift is real (two declarations per selector) but the <em>values that win are the intended ones</em>. Severity downgraded CRITICAL → HIGH; remedy changes from "decide which layer" to "canonise the shipped layer and delete the dead one".</li>
+      <li><strong>The report reinvented work already done.</strong> <code>docs/PREMIUM_DESIGN_AUDIT.md</code> (2026-08-20) already diagnosed T1 "design system loaded but not used" and prescribed the exact <code>.gl-*</code> class layer; its Wave 1–2 was implemented (<code>docs/screenshots/after/</code>). The Discovery Report's recommendation to "build a class layer" is therefore <em>continue the existing migration</em>, not start one. Offering screens <code>CashCountView</code>, <code>OfferingSessionList</code>, <code>OfferingDetailOverview</code> already use <code>.gl-card/.gl-table--cards/.gl-statgrid</code>; only <code>OfferingEntryForm</code>, <code>OfferingReviewSheet</code>, <code>VarianceResolutionView</code> remain literal-heavy.</li>
+    </ul>
+    <p><strong>Confirmed:</strong> vanilla-TS stack; stale React-era DS guide (and a second stale artifact, <code>mockups-extracted/github.md</code>, mapping to non-existent <code>src/routes/*.tsx</code>); three status maps; duplicated transaction-row markup; off-scale literals in 3 offering files; string-asserting UI tests; no visual regression.</p>
+    <p><strong>Accept:</strong> collapse CSS layers · single status map · finish offering migration · refresh DS package · shared TxnRow · DESIGN/COMPONENTS/DECISIONS docs. <strong>Modify:</strong> shared helpers (fewer), layout tokens (delete, don't move), icons (policy first, file later), QUALITY.md (fold into CLAUDE.md + a lint script). <strong>Defer:</strong> UX.md, dark mode, icon registry. <strong>Reject:</strong> none outright.</p>
+    <p><strong>Final recommendation: C — product decisions required before implementation</strong> (four decisions, each with a recommended default in §6). Phase 1 (docs) can start immediately without them.</p>
+  </section>
+
+  <section id="s2">
+    <h2>2. Verified current architecture</h2>
+    <table>
+      <thead><tr><th style="width: 160px;">Claim</th><th>Status</th><th>Verification</th></tr></thead>
+      <tbody>
+        <tr><td>Vanilla TS + Vite, no framework</td><td><span class="tag ok">VERIFIED FACT</span></td><td><code>package.json</code> deps: supabase-js, decimal.js, zod. <code>CLAUDE.md</code> "No React". ADR <code>docs/M2_PHASE_2_2_FRONTEND_ARCHITECTURE_DECISION.md</code> chose "Option C: native shell + hash router" explicitly rejecting React (2026-08-18).</td></tr>
+        <tr><td>String render + full re-render</td><td><span class="tag ok">VERIFIED FACT</span></td><td><code>src/main.ts</code> <code>render()</code>: <code>rootElement.innerHTML = appShellHtml + aiDrawerHtml</code> then re-attach listeners. Consequence noted in PREMIUM audit §8: no CSS transition survives an update; focus is lost on each render.</td></tr>
+        <tr><td>Hash router, 10 patterns</td><td><span class="tag ok">VERIFIED FACT</span></td><td><code>src/router.ts</code>. Offering page keeps its own <code>mode</code> state — route/state desync bug fixed in <code>89450ea</code> (QA notes).</td></tr>
+        <tr><td>Styling = tokens → app.css → inline</td><td><span class="tag ok">VERIFIED FACT</span></td><td><code>app.css</code> line 1 imports DS; pages mix <code>.gl-*</code> classes with inline <code>style=""</code>; 4 files inject their own <code>&lt;style&gt;</code> (AppShell, DashboardPage, loginStyles, aiDrawerStyles).</td></tr>
+        <tr><td>Two declarations per core selector</td><td><span class="tag ok">VERIFIED FACT</span></td><td><code>app.css</code>: <code>:root</code> layout tokens at l.12 and ~1050; <code>.gl-card</code>, <code>.gl-btn</code>, <code>.gl-input</code>, <code>.gl-page-header</code>, <code>.gl-modal-content</code>, <code>.gl-table</code> each declared twice; later block wins. Intentional origin: <code>a2548ed</code>.</td></tr>
+        <tr><td>Offering relies on inline literals</td><td><span class="tag ok">VERIFIED (3 of 6 files)</span></td><td><code>OfferingEntryForm</code>, <code>OfferingReviewSheet</code>, <code>VarianceResolutionView</code>: hand-built cards <code>var(--radius-lg, 12px)</code>, <code>22px 24px</code>, <code>13.5/12.5/11.5px</code>. <code>CashCountView</code>, <code>SessionList</code>, <code>DetailOverview</code> already on <code>.gl-*</code>.</td></tr>
+        <tr><td>DS guide describes React/Tailwind</td><td><span class="tag ok">VERIFIED FACT</span></td><td>DS readme + <code>design-system-extracted/github.md</code> + <code>mockups-extracted/github.md</code> all map to <code>src/routes/_app.*.tsx</code>, <code>src/components/ui/*.tsx</code> — absent from tree.</td></tr>
+        <tr><td>.gl-* can replace offering inline styles</td><td><span class="tag ok">VERIFIED — with 2 gaps</span></td><td>Card/badge/heading/input/notice all have <code>.gl-*</code> equivalents. Gaps: (a) 3-channel "amount tile" with ฿ prefix inside input — no class; (b) allocation-row 4-col grid — currently patched by <code>.gl-allocation-row</code> mobile override only. Both need one new class each, not a new primitive family.</td></tr>
+        <tr><td>Tests assert HTML strings</td><td><span class="tag ok">VERIFIED FACT</span></td><td><code>tests/unit/*-ui.test.ts</code> use <code>toContain()</code> on text, hrefs, class names (<code>gl-notice--error</code>). Markup-stable wrapper changes are safe; class renames and copy changes are not.</td></tr>
+        <tr><td>No visual regression tooling</td><td><span class="tag warn">PARTIALLY WRONG</span></td><td><code>scripts/capture_premium_screenshots.mjs</code> exists (Playwright, 1280 + 390, asserts no horizontal overflow; renders from fixtures without Supabase). It captures but does not diff. So: capture harness exists, diff gate does not.</td></tr>
+        <tr><td>Previous audit already prescribed gl-* layer</td><td><span class="tag ok">VERIFIED FACT — missed by report</span></td><td><code>docs/PREMIUM_DESIGN_AUDIT.md</code> §6 item 1; waves 1–2 shipped (screenshots/after README).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s3">
+    <h2>3. Design source of truth — where to look first</h2>
+    <p>The current hierarchy is <strong>clear in intent, muddied in practice</strong> because <code>app.css</code> holds two generations and four files carry private stylesheets. The rule to establish:</p>
+    <pre>1. design-system-extracted/tokens/*.css     VALUES   — colors, type scale, spacing, radius, shadow, motion
+2. src/styles/app.css                        CLASSES  — every .gl-* primitive/composite + shell + responsive rules
+3. src/components/shared/*.ts  (to create)   HELPERS  — render*Html for patterns that need logic (status, row, empty)
+4. feature stylesheets (loginStyles, aiDrawerStyles)   — allowed ONLY for a surface with its own shell (login, drawer)
+5. inline style=""                           LAYOUT ONLY — flex/grid/gap/min-width; never color, radius, shadow, font-size</pre>
+    <table>
+      <thead><tr><th style="width: 130px;">Need</th><th>Look here</th><th>Today's conflict</th></tr></thead>
+      <tbody>
+        <tr><td>Colors</td><td><code>tokens/colors.css</code> + <code>--on-*-muted</code> (currently <code>app.css</code> :root)</td><td><code>--on-*-muted</code> lives in app.css, not tokens.</td></tr>
+        <tr><td>Typography</td><td><code>tokens/typography.css</code> (<code>--text-*</code>, <code>.num-display</code>, <code>.kicker</code>)</td><td><code>.kicker</code> redeclared in app.css; offering literals.</td></tr>
+        <tr><td>Spacing</td><td><code>tokens/spacing.css</code></td><td>None material.</td></tr>
+        <tr><td>Radius</td><td><code>tokens/radius.css</code></td><td><strong>Tokens say 24/18/14/28; shipped CSS says 16/12/12/20.</strong> Decision D1.</td></tr>
+        <tr><td>Shadows</td><td><code>tokens/shadows.css</code></td><td>Modern layer uses 8 literal shadows; tokens unused for cards.</td></tr>
+        <tr><td>Layout</td><td><code>app.css</code> :root <code>--gl-*</code> (second block)</td><td>First block is dead.</td></tr>
+        <tr><td>Components</td><td><code>app.css</code> <code>.gl-*</code></td><td>AppShell/Dashboard/login/drawer inject private rules.</td></tr>
+        <tr><td>Page patterns</td><td><code>.gl-page / .gl-page-header / .gl-section</code></td><td>Approvals + 2 offering views bypass.</td></tr>
+        <tr><td>Icons</td><td>Per-file <code>ICON_*</code> SVG constants</td><td>No single owner; stroke 1.6–2.5.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s4">
+    <h2>4. Critical problems (re-ranked)</h2>
+    <table>
+      <thead><tr><th style="width: 84px;">Severity</th><th>Problem · Evidence · Impact · Risk of leaving · Action</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag bad">CRITICAL</span></td><td><strong>Stale architecture docs mislead every AI session.</strong> DS readme, <code>design-system-extracted/github.md</code>, <code>mockups-extracted/github.md</code> reference React/Tailwind/TanStack files. Impact: an agent following the attached DS will import React components into a vanilla app. Leaving it: recurring drift on every session. Action: rewrite stack + screen map (Phase 1, docs only).</td></tr>
+        <tr><td><span class="tag bad">CRITICAL</span></td><td><strong>Three status label/color maps disagree.</strong> <code>approvals/StatusBadge.ts</code> (posted=info "บันทึกบัญชีแล้ว", voided=neutral) vs <code>TransactionsPage.ts</code> (posted=approved "ลงบัญชีแล้ว", voided=rejected) vs Dashboard inline. Impact: a treasurer sees the same transaction labelled differently on two screens — a trust problem in a ledger. Action: one map (Phase 3), decision D2.</td></tr>
+        <tr><td><span class="tag bad">HIGH</span></td><td><strong>Two CSS generations in one file.</strong> Any edit to the first declaration has no effect; tokens for radius/shadow are dead. Impact: wasted AI/dev effort, silent no-ops. Action: canonise shipped values, delete first generation (Phase 2), decision D1.</td></tr>
+        <tr><td><span class="tag bad">HIGH</span></td><td><strong>3 offering views bypass the class layer</strong> — the weekly, highest-risk workflow. Impact: inconsistent type sizes, 4px badges, 6px inputs; every future change costs 3×. Action: Phase 4.</td></tr>
+        <tr><td><span class="tag warn">MEDIUM</span></td><td><strong>Modal glass + duplicate topbar blur</strong> contradict CLAUDE.md ban. Action: flatten (Phase 2), decision D3.</td></tr>
+        <tr><td><span class="tag warn">MEDIUM</span></td><td><strong>Duplicated txn-row markup</strong> (Dashboard/Transactions). Action: <code>shared/TxnRow.ts</code> (Phase 3).</td></tr>
+        <tr><td><span class="tag warn">MEDIUM</span></td><td><strong>Reports uses full-tint stat cards</strong> (green/red backgrounds on three KPI tiles + table headers — <code>live/05_reports_desktop.png</code>) while Dashboard/Funds use white cards with colored values. Two vocabularies for the same "amount tile". Action: pick one in DESIGN.md; redesign plan addresses.</td></tr>
+        <tr><td><span class="tag warn">MEDIUM</span></td><td><strong>Funds page paints balances in brand orange</strong> (<code>FundsPage.ts:172</code>) — violates "orange = CTA/active only"; balance reads as a button. Action: <code>--foreground</code> (Phase 3, one line).</td></tr>
+        <tr><td><span class="tag warn">MEDIUM</span></td><td><strong><code>[style*="repeat(4, 1fr)"]</code> responsive hacks</strong> in app.css. Action: <code>.gl-grid-{2,3,4}</code> classes (Phase 3).</td></tr>
+        <tr><td><span class="tag neu">LOW</span></td><td>rgba tints + undefined <code>--font-mono</code> in <code>ProposalConfirmationModal</code>; <code>--ease-spring</code> defined; unused <code>.filter-pill.is-active</code>; shell gradient flattened by <code>!important</code>; icon stroke variance; <code>aria-hidden="false"</code> on decorative icon.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="s5">
+    <h2>5. Recommendations review (red-team)</h2>
+    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Consolidate the two app.css layers</strong><span class="tag ok">ACCEPT (modified)</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);"><strong>Problem still present:</strong> yes. <strong>Correct:</strong> yes, but the report framed it as "choose a layer". Evidence (<code>a2548ed</code>, QA notes) shows the second layer is the product owner's current intent. <strong>Smaller change:</strong> delete generation 1, keep generation 2 verbatim, then update <code>tokens/radius.css</code>/<code>shadows.css</code> to the shipped values so tokens and CSS agree. <strong>Tests:</strong> none touch CSS. <strong>Identity:</strong> preserved — pixel output unchanged. <strong>Overlooked dependency:</strong> <code>capture_premium_screenshots.mjs</code> gives a free before/after; run it both sides.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Migrate offering screens to .gl-*</strong><span class="tag ok">ACCEPT (scoped to 3 files)</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Half the module is already migrated. Scope = <code>OfferingEntryForm</code>, <code>OfferingReviewSheet</code>, <code>VarianceResolutionView</code>. <strong>Risk the report understated:</strong> <code>VarianceResolutionView</code> contains the variance-guard logic that had a real financial bug (PREMIUM audit §5) — its tests (<code>offering-variance-confirmation-guard.test.ts</code>) must stay untouched; restyle only render strings. <strong>DOM dependencies:</strong> <code>OfferingPage.attachEventListeners</code> queries by id (<code>#explain-btn</code> etc., e.g. <code>OfferingPage.ts:755</code> sets <code>style.background</code> imperatively — that inline mutation must be replaced by a class toggle or it will fight the CSS). Two new classes needed (amount tile, allocation row).</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Create shared render helpers</strong><span class="tag warn">MODIFY — 3 not 5</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Keep: <code>StatusBadge</code> (move + single map), <code>TxnRow</code> (real duplication), <code>EmptyState</code> (6 call sites, 3 paddings). Drop: <code>PageHeader</code> helper — <code>.gl-page-header</code> CSS already is the pattern; Approvals just needs to adopt the class. Drop for now: <code>icons.ts</code> (see below). Over-abstraction guard: helpers return strings, take plain props, no state.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Centralise icons</strong><span class="tag warn">DEFER</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Icons are already SVG constants (emoji were removed in <code>design-plans/approvals-emoji-to-svg-icons.md</code>). A registry file adds import churn across 8 files for a cosmetic stroke-width alignment. Cheaper: write the policy in DESIGN.md (1.8 default / 2 active / 24 viewBox / aria-hidden) and fix the 3 outliers in place. Registry only if the redesign adds many icons.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Consolidate status configurations</strong><span class="tag ok">ACCEPT</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Necessary and user-visible. <strong>Tests will break deliberately:</strong> <code>approvals-ui-components.test.ts</code>, <code>dashboard-page-ui.test.ts</code> assert Thai labels. <strong>Type change:</strong> <code>RecentTransaction.status</code> is a 3-value union; widening to <code>TransactionStatus</code> touches <code>DashboardPage.loadData</code> mapping — UI-only, no money math, but it is a TS change in a page that also computes monthly totals; keep the diff to the status field.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>New governance documents (7 files)</strong><span class="tag warn">MODIFY — 3 files + 1 edit</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">The repo already has 35 docs in <code>docs/</code>, most historical. Adding 7 more dilutes. Keep DESIGN.md, COMPONENTS.md, DECISIONS.md + a CLAUDE.md edit; fold QUALITY into CLAUDE.md gates + <code>npm run lint:design</code>; defer UX.md until the redesign fixes the journeys it would document. See §6.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Move layout tokens to tokens/layout.css</strong><span class="tag warn">MODIFY</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Layout tokens are app-frame values, not brand tokens; the DS package should stay brand-only so it can serve mockups. Just delete the dead first <code>:root</code> block in app.css. <code>--on-*-muted</code> <em>should</em> move into <code>tokens/colors.css</code> — they are colors.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Deprecate legacy CSS (filter-pill, ease-spring, glass, gradients)</strong><span class="tag ok">ACCEPT after grep proof</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Verified: <code>.filter-pill.is-active</code> never applied (Transactions toggles <code>gl-btn--primary</code> instead); <code>--ease-spring</code> referenced only in <code>design-plans/01</code> reuse list — confirm <code>loginStyles.ts</code> before deleting the token. Shell gradient is already visually dead (<code>!important</code> flat). Glass: decision D3.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>Refresh the DS package</strong><span class="tag ok">ACCEPT + extend to mockups-extracted</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Report missed <code>mockups-extracted/github.md</code> (same stale React map) and that the DS <code>ui_kits/</code> was the <em>source</em> of today's AppShell (ADR §2). Label both folders "prototyping reference — not production source".</p></div>
+    </div>
+  </section>
+
+  <section id="s6">
+    <h2>6. §12 decisions — options, trade-offs, recommendation</h2>
+    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>D1 · Radius / shadow / control height</strong><span class="tag bad">NEEDS APPROVAL</span></div>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:170px;color:var(--muted-foreground);">Option A — canonise shipped</td><td>Update tokens to card 16 · button 12/46px · input 12/46px · dialog 20; shadows: promote the two Modern literals to <code>--shadow-card</code>/<code>--shadow-elevated</code>. Zero pixel change; QA'd in production; matches every screenshot in <code>docs/screenshots/live</code>.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Option B — revert to DS tokens</td><td>Card 24 · button 18 · dialog 28, faint shadows. Restores the React-era spec; visibly changes every route; contradicts an owner-approved commit 5 days old; no user has seen it in the vanilla app.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Recommendation</td><td><strong>A.</strong> The "identity" in the DS guide describes a product that no longer exists; the live app is the identity. Redesign plan then evolves from 16px as the base.</td></tr>
+        </tbody></table></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>D2 · Canonical status labels/colors</strong><span class="tag warn">RECOMMEND — confirm copy</span></div>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:170px;color:var(--muted-foreground);">posted</td><td>"ลงบัญชีแล้ว" (Transactions) vs "บันทึกบัญชีแล้ว" (Approvals). Recommend <strong>"ลงบัญชีแล้ว"</strong> — shorter, the accounting verb, on the higher-traffic page. Variant: <strong>info</strong> (neutral-blue) not approved-green — posted is a ledger state, approved is a decision; conflating them hides whether money has actually moved.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">voided</td><td>neutral vs rejected. Recommend <strong>neutral</strong> "ยกเลิกแล้ว" — a void is a reversal of a posted item, not a refusal; red should stay reserved for expense/rejected.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">pending (dashboard)</td><td>"รอตรวจสอบ" vs "รออนุมัติ". Recommend <strong>"รออนุมัติ"</strong> everywhere (matches the nav label คิวอนุมัติ).</td></tr>
+        </tbody></table></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>D3 · Modal glass</strong><span class="tag ok">RECOMMEND — low stakes</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Keep: "overlay material" argument in the app.css comment. Flatten: CLAUDE.md bans glass; blur(20px)+saturate costs GPU on low-end Android counters use on Sunday; DS says blur in exactly one place. <strong>Recommend flatten</strong> to solid <code>--popover</code> + <code>--shadow-elevated</code>; keep topbar blur. Backdrop can keep its 3px blur (cheap, aids focus).</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>D4 · Dark mode</strong><span class="tag ok">RECOMMEND — defer, keep tokens</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Tokens are complete; no toggle exists; PREMIUM audit P2-9 notes literals would defeat it. Building it now doubles QA surface during a redesign. <strong>Recommend LATER</strong>: keep <code>.dark</code> tokens, add a DECISIONS entry, revisit after Phase 4 when literals are gone.</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>D5 · Where the DS lives</strong><span class="tag ok">RECOMMEND</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);"><code>design-system-extracted/</code> in-repo is what <code>app.css</code> imports and CLAUDE.md names — it is canonical by construction. The external DS project (this workspace's <code>_ds/</code>) should sync <em>from</em> the repo after Phase 2 changes tokens. No rename (path is referenced in 3 places).</p></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><strong>D6 · Reports' tinted stat tiles vs white cards</strong><span class="tag warn">NEW — surfaced by screenshots</span></div>
+        <p style="margin:6px 0 0;font-size:var(--text-sm);">Reports fills whole KPI cards and table headers with income/expense tint; Dashboard/Funds keep white cards and color only the number. Recommend <strong>white card + colored value</strong> as the single rule (DS: "max two background colors per screen"), reserving full tint for <code>.gl-stat--danger</code> variance warnings where alarm is the point.</p></div>
+    </div>
+  </section>
+
+  <section id="s7">
+    <h2>7. Minimum governance system</h2>
+    <table>
+      <thead><tr><th style="width:130px;">File</th><th>Purpose · who · when · prevents · source · cost</th><th style="width:90px;">Required</th></tr></thead>
+      <tbody>
+        <tr><td><code>CLAUDE.md</code> (edit)</td><td>Add a 10-line "Design source of truth" block (§3 hierarchy), the rule "never inline color/radius/shadow/font-size", the pointer to COMPONENTS.md, and a design quality gate: <code>npm run lint:design</code> must pass. Read by every agent every session. Cost: near zero.</td><td><span class="tag ok">YES</span></td></tr>
+        <tr><td><code>DESIGN.md</code></td><td>The visual contract in one page: resolved token values (post-D1), the two sanctioned exceptions (topbar blur, hero gradient), status color meanings, icon policy, banned list. Replaces the stale DS readme as the thing an agent reads before CSS. Source: tokens + app.css + D1–D6. Cost: one write, edits on each DECISIONS entry.</td><td><span class="tag ok">YES</span></td></tr>
+        <tr><td><code>COMPONENTS.md</code></td><td>Catalogue of every <code>.gl-*</code> class and shared helper: markup, variants, don'ts. Read before writing markup. Prevents the #1 drift (re-implementing a card inline). Source: app.css. Cost: medium to write, low to maintain (one row per new class).</td><td><span class="tag ok">YES</span></td></tr>
+        <tr><td><code>DECISIONS.md</code></td><td>Dated entries: D1–D6 + future. Prevents the "Modern layer" pattern (a decision taken in a commit message). Cost: 5 lines per decision.</td><td><span class="tag ok">YES</span></td></tr>
+        <tr><td><code>QUALITY.md</code></td><td>Not as a file. Enforce in code: <code>scripts/lint-design.mjs</code> greps <code>src/</code> for <code>font-size:\s*\d</code>, <code>border-radius:\s*\d</code>, <code>rgba?\(</code>, <code>#[0-9a-f]{3,6}</code> outside allowlist; wire to <code>npm run lint</code> and <code>ci.yml</code>. The DS folder already ships <code>_adherence.oxlintrc.json</code> — evaluate reuse.</td><td><span class="tag warn">AS CODE</span></td></tr>
+        <tr><td><code>UX.md</code></td><td>Per-route goals/actions/failure states. Valuable, but the redesign plan will change the journeys — write it once after the direction is approved, from the Master Plan's screen table.</td><td><span class="tag neu">LATER</span></td></tr>
+        <tr><td>DS readme / github.md / mockups github.md</td><td>Fix stack section and screen maps; label React kits as prototyping-only.</td><td><span class="tag ok">YES</span></td></tr>
+      </tbody>
+    </table>
+    <h3>What AI must never guess</h3>
+    <ul>
+      <li>A color, radius, shadow, or font-size value — read the token.</li>
+      <li>Whether a class exists — grep <code>app.css</code> and COMPONENTS.md first.</li>
+      <li>A status label or color — import the single map.</li>
+      <li>Thai copy — reuse existing strings; new strings go through thai-writer.</li>
+      <li>Anything under <code>src/lib</code>, <code>supabase/</code> — read-only for design tasks.</li>
+    </ul>
+  </section>
+
+  <section id="s8">
+    <h2>8. Phased implementation plan</h2>
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+      <div class="card"><strong>Phase 0 — Verification</strong> <span class="tag ok">DONE (this report)</span><p style="margin:6px 0 0;font-size:var(--text-sm);">Goal: confirm facts. Evidence: §2. Definition of done: owner accepts §1 verdict and answers D1–D3.</p></div>
+      <div class="card"><strong>Phase 1 — Establish source of truth (docs only)</strong>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:170px;color:var(--muted-foreground);">Problem</td><td>Stale DS guide; no catalogue; decisions live in commit messages.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Files change</td><td><code>CLAUDE.md</code>, new <code>DESIGN.md</code>, <code>COMPONENTS.md</code>, <code>DECISIONS.md</code>, <code>design-system-extracted/readme.md</code> + <code>github.md</code>, <code>mockups-extracted/github.md</code></td></tr>
+          <tr><td style="color:var(--muted-foreground);">Not changed</td><td>Any <code>src/</code>, <code>tests/</code>, <code>supabase/</code>, tokens.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Dependencies / risk / rollback</td><td>None · None · trivial (git revert).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Validation / DoD</td><td>Every path in screen maps resolves; DS readme has no React/Tailwind/Lucide claim; DECISIONS has D1–D6 with status.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Phase 2 — Resolve CSS authority conflicts</strong>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:170px;color:var(--muted-foreground);">Problem</td><td>Two generations in app.css; tokens disagree with shipped CSS; glass modal; dead rules.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Files change</td><td><code>src/styles/app.css</code> (delete gen-1 declarations, merge), <code>tokens/radius.css</code>, <code>tokens/shadows.css</code>, <code>tokens/colors.css</code> (+<code>--on-*-muted</code>), <code>tokens/motion.css</code> (−spring after grep), <code>AppShell.ts</code> (flat mark/avatar, remove the <code>!important</code> pair), new <code>scripts/lint-design.mjs</code>, <code>package.json</code> scripts, <code>.github/workflows/ci.yml</code></td></tr>
+          <tr><td style="color:var(--muted-foreground);">Not changed</td><td>Page/component render strings, tests, lib.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Dependencies</td><td>D1, D3 approved.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Risk / rollback</td><td>Medium (cascade) · easy (single-file revert).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Validation / DoD</td><td>Run <code>capture_premium_screenshots.mjs</code> before and after; pixel diff = 0 except modal (D3). Each <code>.gl-*</code> selector appears once (<code>grep -c</code>). <code>npm test</code>, <code>npm run build</code> green.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Phase 3 — Standardise existing components</strong>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:170px;color:var(--muted-foreground);">Problem</td><td>3 status maps; duplicate txn row; 6 empty states; orange fund balances; attribute-selector grids; Approvals header bypass.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Files change</td><td>new <code>src/components/shared/{StatusBadge,TxnRow,EmptyState}.ts</code>; edit <code>DashboardPage.ts</code>, <code>TransactionsPage.ts</code>, <code>FundsPage.ts:172</code>, <code>ApprovalsQueueView.ts</code>, <code>approvals/index.ts</code>; delete <code>approvals/StatusBadge.ts</code>; app.css add <code>.gl-grid-{2,3,4}</code>, remove <code>[style*=]</code> rules; tests: <code>approvals-ui-components</code>, <code>dashboard-page-ui</code>, <code>funds-page-ui</code>.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Not changed</td><td><code>loadData()</code> queries and money math in every page (diff limited to render strings + the status field type).</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Dependencies / risk / rollback</td><td>Phase 2, D2 · Low–medium (copy changes) · per-file revert.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Validation / DoD</td><td>grep shows one <code>STATUS</code> map and one row template; tests updated deliberately; thai-writer sign-off on labels.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Phase 4 — Controlled offering migration</strong>
+        <table style="margin-top:8px;"><tbody>
+          <tr><td style="width:170px;color:var(--muted-foreground);">Problem</td><td>3 literal-heavy views in the weekly workflow.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Files change</td><td>One PR each: <code>OfferingEntryForm.ts</code> → <code>OfferingReviewSheet.ts</code> → <code>VarianceResolutionView.ts</code>; app.css +<code>.gl-amount-tile</code>, +<code>.gl-allocation-row</code> desktop rule; <code>OfferingPage.ts:755</code> imperative style → class toggle; tests <code>offering-ui-components</code>, <code>offering-variance-ui</code>, <code>offering-posting-ui</code>.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Not changed</td><td><code>lib/offering/*</code>, variance guard logic, ids/data-attrs used by <code>attachEventListeners</code>, Thai strings.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Dependencies / risk / rollback</td><td>Phase 2–3 · Medium (390px density, id coupling) · per-file revert.</td></tr>
+          <tr><td style="color:var(--muted-foreground);">Validation / DoD</td><td>lint:design = 0 hits in <code>components/offering</code>; full lifecycle walkthrough at 390px (new → count → variance → confirm → post) screenshot set; financial-reviewer confirms no <code>lib/</code> in diff.</td></tr>
+        </tbody></table></div>
+      <div class="card"><strong>Phase 5 — Governance hardening</strong><p style="margin:6px 0 0;font-size:var(--text-sm);">Write UX.md from the approved redesign screen table; update COMPONENTS.md with new classes; sync external DS from repo tokens. Docs only.</p></div>
+      <div class="card"><strong>Phase 6 — Regression verification</strong><p style="margin:6px 0 0;font-size:var(--text-sm);">Add pixel diff to the existing capture script (baseline PNGs committed under <code>docs/screenshots/baseline/</code>, threshold 0.1%); CI fails on diff without an approved baseline update. Files: <code>scripts/capture_premium_screenshots.mjs</code>, <code>ci.yml</code>. Not changed: app code.</p></div>
+    </div>
+  </section>
+
+  <section id="s9">
+    <h2>9. Explicitly protected systems</h2>
+    <ul>
+      <li><code>src/lib/**</code> — money, lifecycle, RBAC, services, AI boundary, idempotency, confirmation engine.</li>
+      <li><code>supabase/**</code> — migrations, RPCs, RLS, config.</li>
+      <li><code>tests/integration/**</code>; unit tests may change only where a label/markup change is deliberate and reviewed.</li>
+      <li><code>src/router.ts</code>, <code>src/main.ts</code> render pipeline, <code>src/services/authPinService.ts</code>, login PIN flow logic.</li>
+      <li><code>attachEventListeners</code> selectors (ids, <code>data-*</code>) in every page — the redesign must keep or migrate them explicitly.</li>
+      <li>Variance guard (<code>VarianceResolutionView</code> lines ~35–52) — fixed financial bug; restyle only.</li>
+      <li>Thai copy strings asserted by tests.</li>
+    </ul>
+  </section>
+
+  <section id="s10">
+    <h2>10. Final recommendation</h2>
+    <div class="card" style="border-color: var(--pending); background: var(--pending-muted); color: oklch(0.38 0.08 80);">
+      <strong>C — Product/design decision required before implementation.</strong>
+      <p style="margin:8px 0 0;font-size:var(--text-sm);">D1 (radius direction) and D2 (status labels) change what Phase 2–3 write; D3 is minor. Recommended defaults are stated. <strong>Phase 1 (documentation) needs no decision and can be approved now.</strong> The Discovery Report stands with the §1 revisions; it does not need a rewrite.</p>
+      <p style="margin:8px 0 0;font-size:var(--text-sm);">STOP. No repository files modified. The <a href="Redesign Master Plan.dc.html" style="color: inherit; text-decoration: underline;">Redesign Master Plan</a> builds on these verified facts.</p>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

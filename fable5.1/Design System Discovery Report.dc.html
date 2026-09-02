@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+  <script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+    code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; background: var(--secondary); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+    table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
+    th { text-align: left; font-size: var(--text-2xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); background: var(--secondary); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+    td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: 0; }
+    h2 { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 var(--space-4); text-wrap: balance; }
+    h3 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; letter-spacing: -0.015em; margin: var(--space-5) 0 var(--space-2); }
+    p, li { font-size: var(--text-base); line-height: 1.6; }
+    p { margin: 0 0 var(--space-3); }
+    ul { margin: 0 0 var(--space-3); padding-left: 1.2em; }
+    li { margin-bottom: 4px; }
+    pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--text-xs); line-height: 1.55; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); overflow-x: auto; margin: 0 0 var(--space-3); white-space: pre; }
+  </style>
+</helmet>
+
+<div style="max-width: 920px; margin: 0 auto; padding: 48px 32px 96px; display: flex; flex-direction: column; gap: 48px;">
+
+  <header style="display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-6); border-bottom: 1px solid var(--border);">
+    <div class="kicker">Grace Ledger · Discovery &amp; Planning · No code modified</div>
+    <h1 style="font-family: var(--font-display); font-size: var(--text-4xl); font-weight: 600; letter-spacing: -0.025em; margin: 0; text-wrap: balance;">Design System Discovery Report</h1>
+    <p style="color: var(--muted-foreground); margin: 0;">Source: <code>Suriyong1993/grace-ledger</code> @ main, read 2026-09-02. Every finding cites a file path. Status: <strong>awaiting approval before any implementation.</strong></p>
+    <nav style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2);">
+      <a href="#s1" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">1 Summary</a>
+      <a href="#s2" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">2 Architecture</a>
+      <a href="#s3" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">3 Inventory</a>
+      <a href="#s4" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">4 Patterns</a>
+      <a href="#s5" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">5 Drift</a>
+      <a href="#s6" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">6 Components</a>
+      <a href="#s7" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">7 Proposed DS</a>
+      <a href="#s8" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">8 AI Governance</a>
+      <a href="#s9" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">9 Roadmap</a>
+      <a href="#s10" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">10 Plan</a>
+      <a href="#s11" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">11 Do not change</a>
+      <a href="#s12" style="font-size: var(--text-xs); border: 1px solid var(--border); border-radius: 9999px; padding: 4px 10px; background: var(--card);">12 Facts vs assumptions</a>
+    </nav>
+  </header>
+
+  <!-- 1 -->
+  <section id="s1">
+    <h2>1. Executive summary</h2>
+    <p>Grace Ledger already has a <strong>real, documented design system</strong> — not an implicit one. Tokens live in <code>design-system-extracted/tokens/*.css</code>, a class layer (<code>.gl-*</code>) lives in <code>src/styles/app.css</code>, and <code>CLAUDE.md</code> codifies the rules (one accent, fixed finance colors, border-over-shadow, 44px targets, 400ms ceiling, Thai copy rules). The identity is coherent and worth preserving.</p>
+    <p>The problems are not missing foundations; they are <strong>three specific forms of drift</strong>:</p>
+    <ul>
+      <li><strong>Two competing visual layers inside one file.</strong> <code>app.css</code> lines 1–~1000 define the token-faithful system (cards 24px radius, buttons 18px, faint <code>--shadow-*</code>). A later "Modern UI layer" block (line ~1050 onward) re-declares the same selectors with new literals: <code>.gl-btn</code> → 46px/12px, <code>.gl-card</code> → <code>--radius-lg</code> + a 30px shadow, page max 1080→1180px, sidebar 240→248px, topbar 56→64px. The design-system tokens for radius/shadow are therefore <em>defined but overridden</em>.</li>
+      <li><strong>Inline-style screens that pre-date the class layer.</strong> The offering module (<code>OfferingEntryForm.ts</code>, <code>OfferingReviewSheet.ts</code>, <code>VarianceResolutionView.ts</code>) hand-writes cards, badges, headings and inputs with literals (<code>24px</code>, <code>13.5px</code>, <code>12.5px</code>, <code>11.5px</code>, <code>rgba(0,0,0,0.02)</code>, <code>border-radius: 4px/6px/10px</code>) instead of <code>.gl-card</code>, <code>.gl-badge</code>, <code>.gl-page-header</code>, <code>.gl-input</code>.</li>
+      <li><strong>The attached design-system guide describes a different stack.</strong> It says React 19 + Tailwind v4 + shadcn/ui and maps to <code>src/components/ui/*.tsx</code>, <code>src/routes/*</code>. Those files do not exist on <code>main</code>. The live app is vanilla TypeScript + Vite with <code>render*Html(): string</code> functions (<code>CLAUDE.md</code>: "No React, no framework"). The DS <em>tokens</em> are still accurate; its <em>component library and screen map</em> are stale.</li>
+    </ul>
+    <p>Recommended direction: <strong>consolidate, do not redesign.</strong> Resolve the two-layer conflict by making one deliberate decision per token, migrate offering screens onto the existing <code>.gl-*</code> classes, refresh the design-system's stack description and screen map, and add governance docs that point at code, not prose. All of this is CSS/markup-only; the financial core, RPCs, RLS and tests are untouched.</p>
+  </section>
+
+  <!-- 2 -->
+  <section id="s2">
+    <h2>2. Project architecture map</h2>
+    <table>
+      <thead><tr><th style="width: 190px;">Layer</th><th>Finding</th><th style="width: 260px;">Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td>Vanilla TypeScript + Vite 7. No React, no UI library, no CSS framework. <code>package.json</code> dependencies: <code>@supabase/supabase-js</code>, <code>decimal.js</code>, <code>zod</code> only.</td><td><code>package.json</code>, <code>CLAUDE.md</code> §Stack</td></tr>
+        <tr><td>Rendering model</td><td>Each page/component exports <code>renderXHtml(props): string</code> and <code>attachEventListeners(root)</code>. <code>App.render()</code> rebuilds <code>#app</code> via <code>innerHTML</code> on every state change (full re-render).</td><td><code>src/main.ts</code> lines 170–260</td></tr>
+        <tr><td>Routing</td><td>Hand-written hash router, 10 route patterns: <code>/</code>, <code>/transactions</code>, <code>/funds</code>, <code>/members</code>, <code>/reports</code>, <code>/approvals[/:id]</code>, <code>/offerings[/new|/:id]</code>. Navigation via <code>window.location.hash</code>.</td><td><code>src/router.ts</code></td></tr>
+        <tr><td>Feature organisation</td><td><code>src/pages/*Page.ts</code> (9 pages, 8k–42k bytes each) own data-loading + markup. <code>src/components/{ai, ai-drawer, approvals, layout, login, offering}</code> hold feature views. <code>src/lib/*</code> is the service/financial layer.</td><td><code>github_get_tree src/</code></td></tr>
+        <tr><td>State management</td><td>Per-page class fields (<code>activeFilter</code>, <code>selectedTransactionId</code>…) + <code>onStateChange()</code> callback → <code>App.render()</code>. No store.</td><td><code>TransactionsPage.ts</code> lines 60–70, 330–400</td></tr>
+        <tr><td>Styling system</td><td>Three tiers: (1) <code>design-system-extracted/tokens/*.css</code> → imported by (2) <code>src/styles/app.css</code> (35 KB, <code>.gl-*</code> classes) → consumed by (3) inline <code>style=""</code> in template strings, plus per-component <code>&lt;style&gt;</code> blocks injected into the HTML string (<code>AppShell.ts</code>, <code>DashboardPage.ts</code>, <code>loginStyles.ts</code>, <code>aiDrawerStyles.ts</code>).</td><td><code>app.css</code> line 1; grep <code>&lt;style&gt;</code> in <code>src/</code></td></tr>
+        <tr><td>Design tokens</td><td>Colors (hex primitives + oklch semantic), typography scale (11–52px), spacing (Tailwind 4px scale), radius (8 named), shadows (5), motion (4 easings, 4 durations). App adds <code>--on-*-muted</code> text tokens and <code>--gl-page-*</code>/<code>--gl-sidebar-w</code> layout tokens.</td><td><code>tokens/*.css</code>, <code>app.css</code> :root</td></tr>
+        <tr><td>Theme</td><td><code>.dark</code> token set exists in <code>colors.css</code> and <code>app.css</code> but nothing toggles it — no code adds the class.</td><td>grep <code>.dark</code> → tokens only</td></tr>
+        <tr><td>Icons</td><td>Inline SVG strings per file (<code>ICON_*</code> constants), 16–22px, <code>stroke-width</code> 1.6/1.8/2/2.5. No icon library. Note the DS guide says "Lucide React exclusively" — <strong>false for this codebase</strong>.</td><td><code>AppShell.ts</code> 24–31, <code>DashboardPage.ts</code> 48–52</td></tr>
+        <tr><td>Fonts</td><td>Sarabun + Inter from Google Fonts in <code>index.html</code>. <code>--font-mono</code> is referenced once (<code>ProposalConfirmationModal.ts:162</code>) but never defined → silent fallback.</td><td><code>index.html</code>, <code>typography.css</code></td></tr>
+        <tr><td>Testing</td><td>Vitest: 50+ unit files, 9 integration. <strong>UI tests assert on rendered HTML strings</strong> (e.g. <code>expect(html).toContain("gl-notice--error")</code>). No screenshot / visual regression tooling; Playwright is a devDependency but no e2e specs exist.</td><td><code>tests/unit/dashboard-page-ui.test.ts</code>, <code>package.json</code></td></tr>
+        <tr><td>AI governance (existing)</td><td><code>CLAUDE.md</code> working agreement; <code>.claude/agents/{ui-reviewer, financial-reviewer, thai-writer}.md</code>; <code>.claude/commands/gl-*.md</code> workflow; prettier PostToolUse hook.</td><td><code>.claude/</code></td></tr>
+      </tbody>
+    </table>
+    <pre>index.html ─► src/main.ts (App)
+                 ├─ router.ts (hash routes)
+                 ├─ components/layout/AppShell.ts ── sidebar · topbar · mobilenav (+ inline &lt;style&gt;)
+                 ├─ pages/*Page.ts ───────────────── loadData() + renderHtml() + attachEventListeners()
+                 │     └─ components/{approvals,offering,ai,...}/*.ts   (render*Html helpers)
+                 ├─ components/ai-drawer/GraceAiDrawer.ts (+ aiDrawerStyles.ts)
+                 └─ lib/** (money, rbac, services, ai)  ← FINANCIAL CORE — out of scope
+
+src/styles/app.css ──► @import design-system-extracted/styles.css ──► tokens/*.css</pre>
+  </section>
+
+  <!-- 3 -->
+  <section id="s3">
+    <h2>3. Current design system inventory</h2>
+    <h3>Colors — real token system: YES</h3>
+    <ul>
+      <li>Primitives <code>--gl-*</code> (white, bg <code>#FFFCF8</code>, ink <code>#171717</code>, stone 50/200/500, orange 50/600/700/900, emerald, amber, red, blue) → semantic (<code>--background</code>, <code>--card</code>, <code>--border</code>, <code>--primary</code>, <code>--ring</code>…) → finance (<code>--income/--expense/--offering</code> + <code>-muted</code>/<code>-foreground</code>, aliased to <code>--pending/--approved/--rejected</code>).</li>
+      <li>App-level addition <code>--on-{income,expense,pending,info}-muted</code> for text on muted surfaces — well-reasoned, documented in <code>app.css</code> and <code>StatusBadge.ts</code>. Should be promoted into the token package.</li>
+      <li>Hard-coded colors in <code>src/</code>: <strong>44 matches</strong>, almost all shadow alphas (<code>rgb(23 23 23 / …)</code>) and 5 semantic tints in <code>ProposalConfirmationModal.ts</code> (<code>rgba(245,158,11,…)</code>, <code>rgba(239,68,68,…)</code>) that should be <code>--pending-muted</code>/<code>--expense-muted</code>. One <code>color: #ffffff</code> in <code>AppShell.ts:211</code>.</li>
+    </ul>
+    <h3>Typography — systematic with local fragmentation</h3>
+    <ul>
+      <li>Scale: <code>--text-2xs</code> 11px → <code>--text-6xl</code> 52px; body 15px/1.6; headings <code>--font-display</code> (Inter) 600, −0.02em. <code>.num-display</code> for all money (tabular, lining, slashed-zero). <code>.kicker</code> eyebrow.</li>
+      <li>Off-scale literals: <code>13.5px</code>, <code>12.5px</code>, <code>11.5px</code>, <code>14px</code>, <code>24px</code>, <code>10px</code> — ~30 occurrences, all in <code>components/offering/*</code> and <code>ProposalConfirmationModal.ts</code>. Everything in <code>pages/*</code>, <code>approvals/*</code>, <code>ai-drawer/*</code> uses tokens.</li>
+      <li>Weight conflict: DS <code>base.css</code> sets headings to 600; <code>app.css</code> <code>.gl-page-header h1</code> uses <code>--weight-bold</code> (700); offering screens hard-code <code>--weight-bold</code> on h1 at 24px.</li>
+    </ul>
+    <h3>Spacing — clean scale, one exception zone</h3>
+    <ul>
+      <li>4px scale <code>--space-1…24</code>; table cells 20/12; <code>--touch-target-min</code> 44px. Pages/approvals/dashboard use tokens plus a few 2/3/4/6px micro-offsets (acceptable).</li>
+      <li>Offering module uses <code>22px 24px</code>, <code>20px</code>, <code>14px 18px</code> paddings/margins — not on scale.</li>
+      <li>Layout tokens defined twice: <code>--gl-page-max</code> 1080 → 1180, <code>--gl-page-pad-x</code> <code>--space-8</code> → <code>clamp(16px,3vw,40px)</code>, <code>--gl-sidebar-w</code> 240 → 248, <code>--gl-topbar-h</code> 56 → 64, <code>--gl-mobilenav-h</code> 60 → 68. Second declaration wins; first is dead code.</li>
+    </ul>
+    <h3>Radius / elevation — tokens exist, overrides win</h3>
+    <table>
+      <thead><tr><th>Element</th><th>Token (radius.css)</th><th>app.css base layer</th><th>app.css "Modern UI layer" (wins)</th><th>Offering inline</th></tr></thead>
+      <tbody>
+        <tr><td>Card</td><td><code>--radius-card</code> 24px</td><td><code>--radius-card</code></td><td><code>--radius-lg</code> 16px; 16px at ≤768</td><td><code>var(--radius-lg, 12px)</code></td></tr>
+        <tr><td>Button</td><td><code>--radius-button</code> 18px</td><td><code>--radius-button</code></td><td><code>12px</code>, min-height 46px</td><td>—</td></tr>
+        <tr><td>Input</td><td><code>--radius-input</code> 14px</td><td><code>--radius-input</code></td><td><code>12px</code>, 46px</td><td>literal 6px</td></tr>
+        <tr><td>Dialog</td><td><code>--radius-dialog</code> 28px</td><td><code>--radius-dialog</code></td><td><code>20px</code></td><td>—</td></tr>
+        <tr><td>Badge</td><td><code>--radius-full</code></td><td><code>--radius-full</code></td><td>—</td><td>4px / 999px / 6px</td></tr>
+        <tr><td>Card shadow</td><td><code>--shadow-card</code> (faint)</td><td>none (border only)</td><td><code>0 10px 30px rgb(23 23 23/.035)</code></td><td><code>rgba(0,0,0,0.02)</code></td></tr>
+      </tbody>
+    </table>
+    <h3>Motion</h3>
+    <p>Consistent: <code>--ease-out</code> + <code>--duration-micro/component</code> everywhere; reduced-motion guard global. Two extra easings (<code>--ease-drawer</code>, <code>--ease-spring</code>) are defined but unused — <code>--ease-spring</code> contradicts the "no spring" rule and should be removed from tokens.</p>
+    <h3>Component inventory (as implemented today)</h3>
+    <table>
+      <thead><tr><th style="width: 130px;">Tier</th><th>Exists as</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>Foundation</td><td>Tokens, <code>.num-display</code>, <code>.kicker</code>, inline SVG icons</td><td><code>tokens/</code>, <code>typography.css</code>, per-file <code>ICON_*</code></td></tr>
+        <tr><td>Primitives</td><td><code>.gl-btn</code> (primary/secondary/ghost/destructive/sm/block), <code>.gl-input/.gl-select/.gl-textarea</code>, <code>.gl-field/.gl-label/.gl-hint/.gl-error-text</code>, <code>.gl-badge</code> (5 variants), <code>.gl-card</code> (tight/elevated/attention/danger), <code>.gl-notice</code>, <code>.gl-skeleton</code>, <code>.gl-toast</code></td><td><code>app.css</code></td></tr>
+        <tr><td>Composites</td><td><code>.gl-page/.gl-page-header/.gl-section(__head)</code>, <code>.gl-table(--cards)</code> responsive table, <code>.gl-tablist/.gl-tab</code>, <code>.gl-modal-backdrop/.gl-modal-content</code>, <code>.gl-statgrid/.gl-stat</code>, <code>.gl-actionbar(--sticky)</code>, <code>.filter-pill</code>, <code>.gl-txn-row</code></td><td><code>app.css</code></td></tr>
+        <tr><td>Shell</td><td>Sidebar + topbar + mobilenav (<code>.gl-nav-item</code>, <code>.gl-shell-*</code>, <code>.gl-mobilenav*</code>)</td><td><code>AppShell.ts</code> + <code>app.css</code></td></tr>
+        <tr><td>Feature</td><td><code>renderStatusBadgeHtml</code>, <code>ApprovalsQueueView</code>, <code>ApprovalDecisionSheet</code>, <code>ProjectedBalanceCard</code>, <code>RejectionModal</code>, offering views (6), login views (3), AI drawer + 3 cards, <code>ProposalConfirmationModal</code></td><td><code>src/components/*</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4 -->
+  <section id="s4">
+    <h2>4. Existing design patterns</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4);">
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>App shell</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--income-muted); color: oklch(0.36 0.09 155);">KEEP</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">240/248px sidebar with grouped nav + kicker group labels + 3px active bar; sticky blurred topbar (the one sanctioned blur); fixed bottom nav at ≤768px with badge. <code>AppShell.ts</code>. Strong, intentional, tested. Problem: its styles are split between an inline <code>&lt;style&gt;</code> and two <code>app.css</code> blocks; gradient on <code>.gl-shell-mark/.gl-shell-avatar</code> is then overridden with <code>!important</code> to flat orange.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Page header</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">IMPROVE</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">h1 + one-line p, optional right action. Used via <code>.gl-page-header</code> in Transactions, Funds, Members, Reports, CashCount, SessionList. <strong>Not</strong> used by Approvals (re-implements in <code>.gl-section__head</code>), OfferingEntryForm / ReviewSheet (inline 24px h1). Three implementations of one pattern.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Hero balance card</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--income-muted); color: oklch(0.36 0.09 155);">KEEP</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">Dashboard only. <code>.gl-card--elevated</code>: kicker → 40px <code>.num-display</code> → meta line → 2-col income/expense with border-top. The one "lifted" surface per screen, matches DS rule. Note it carries a radial orange gradient wash — the sole gradient in the product; decide explicitly whether it is the sanctioned exception (recommend: yes, document it).</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Transaction row</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MERGE</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">36px tinted icon tile + title/subtitle + right-aligned signed <code>.num-display</code> amount + tiny badge, inside a <code>.gl-card</code> with <code>padding: 2px var(--space-4)</code>. Rendered <em>twice</em> with near-identical 40-line inline markup in <code>DashboardPage.ts</code> and <code>TransactionsPage.ts</code>. Direction → sign/color mapping duplicated too. Should be one <code>renderTxnRowHtml()</code>.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Status badge</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MERGE</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;"><code>approvals/StatusBadge.ts</code> holds <code>STATUS_CONFIG</code> (posted → info "บันทึกบัญชีแล้ว"). <code>TransactionsPage.ts</code> holds a second <code>TXN_STATUS</code> map (posted → approved "ลงบัญชีแล้ว", voided → rejected "ยกเลิก"). Same status, two labels, two colors. Dashboard uses a third ad-hoc set ("รอตรวจสอบ"). Direct violation of CLAUDE.md single-source-of-truth.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Responsive data table</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--income-muted); color: oklch(0.36 0.09 155);">KEEP</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;"><code>.gl-table--cards</code>: one markup, table ≥900px, stacked cards with <code>data-label</code> below. Used in OfferingSessionList, OfferingReviewSheet, OfferingDetailOverview. Well-built. Only tension: Modern layer adds <code>border-radius: --radius-lg</code> to <code>.gl-table</code>, contradicting the DS "tables are always 0px" rule.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Modal dialog</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">IMPROVE</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;"><code>.gl-modal-backdrop + .gl-modal-content</code> used in Transactions, Funds, Members, RejectionModal, ProposalConfirmationModal — consistent. But content is <code>popover/88% + blur(20px) saturate(160%)</code> glass, which the DS guide and CLAUDE.md ("banned: generic glass cards") both disallow. Escape/backdrop-click handling is re-implemented per page.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Quick-action grid</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--income-muted); color: oklch(0.36 0.09 155);">KEEP</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">4 tiles, one primary (orange) + three muted, 2-line labels, 76→88px min-height. Dashboard only; asserted by tests (<code>href</code>, label text). Hover is <code>translateY(-2px)</code> — consistent with card hover language.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Stat strip</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--income-muted); color: oklch(0.36 0.09 155);">KEEP</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;"><code>.gl-statgrid/.gl-stat</code> with success/danger/warning tints for expected / counted / variance in cash count. Collapses to label–value rows at ≤768. Good.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Filter pills</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">IMPROVE</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">Transactions stacks <code>filter-pill gl-btn gl-btn--sm gl-btn--primary|secondary</code> + inline radius; <code>app.css</code> also defines a standalone <code>.filter-pill.is-active</code> that is never applied. Two competing active states — the primary-button one wins visually. Pick one.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>Empty / error / loading</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">IMPROVE</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">Error → <code>.gl-notice--error</code> with retry (consistent). Loading → skeletons (Approvals) vs text-in-card (Transactions) vs nothing (Dashboard). Empty → <code>.gl-card</code> centered text with 3 different paddings. Copy is good and honest; presentation needs one <code>renderEmptyStateHtml()</code>.</p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><strong>AI drawer</strong><span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; background: var(--income-muted); color: oklch(0.36 0.09 155);">KEEP</span></div>
+        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 6px 0 0;">Right sheet 420px, token-pure stylesheet (<code>aiDrawerStyles.ts</code>), proposal cards with <code>--warning</code> border, provenance footer. The cleanest newer code in the repo — use it as the reference for how feature stylesheets should be written.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="s5">
+    <h2>5. Design drift findings</h2>
+    <table>
+      <thead><tr><th style="width: 84px;">Severity</th><th>Finding</th><th>Evidence</th><th style="width: 150px;">Intentional?</th></tr></thead>
+      <tbody>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--expense-muted); color: oklch(0.4 0.13 25);">CRITICAL</span></td><td>Two full visual layers in <code>app.css</code> redefine <code>.gl-card/.gl-btn/.gl-input/.gl-modal-content/.gl-table/.gl-page-header</code> and layout tokens. Radius/shadow tokens are dead in practice. Any AI edit to the first block silently has no effect.</td><td><code>app.css</code> lines ~1040–1215 ("Modern UI layer") vs 1–1000</td><td>Legacy artifact of an incremental "modernize" pass — not a product requirement.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--expense-muted); color: oklch(0.4 0.13 25);">CRITICAL</span></td><td>Attached design system's stack, component sources and screen map describe files that don't exist (<code>src/components/ui/*.tsx</code>, <code>src/routes/*</code>, Lucide, Tailwind). Any AI following it will build React/shadcn patterns into a vanilla-TS app.</td><td><code>design-system-extracted/github.md</code>, DS guide vs <code>package.json</code>, tree</td><td>Stale — DS was extracted 2026-08-14 from an earlier architecture.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--expense-muted); color: oklch(0.4 0.13 25);">HIGH</span></td><td>Transaction status → label/color defined 3 times with conflicting values (posted = "บันทึกบัญชีแล้ว"/info vs "ลงบัญชีแล้ว"/approved; voided = neutral vs rejected).</td><td><code>approvals/StatusBadge.ts</code>, <code>TransactionsPage.ts</code> TXN_STATUS, <code>DashboardPage.ts</code> inline</td><td>No — violates CLAUDE.md single-source rule; user-visible inconsistency.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--expense-muted); color: oklch(0.4 0.13 25);">HIGH</span></td><td>Offering module bypasses the class layer: hand-built cards (<code>var(--radius-lg, 12px)</code>, <code>22px 24px</code>), badges (4px radius), inputs (6px radius), h1 (24px literal), ~30 off-scale font sizes.</td><td><code>OfferingEntryForm.ts</code>, <code>OfferingReviewSheet.ts</code>, <code>VarianceResolutionView.ts</code></td><td>Legacy — written before <code>.gl-*</code> existed. Cash-count is the highest-risk workflow; migrate carefully.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--expense-muted); color: oklch(0.4 0.13 25);">HIGH</span></td><td>Glass/blur on <code>.gl-modal-content</code> (blur 20px, saturate 160%) and topbar 88%/92% alpha declared twice; CLAUDE.md bans glass cards.</td><td><code>app.css</code> .gl-modal-content; <code>AppShell.ts</code> topbar + <code>.gl-shell-topbar</code> override</td><td>Partly — topbar blur is the documented exception; modal glass is not.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MEDIUM</span></td><td>Duplicated 40-line transaction-row markup + direction→sign/color logic in two pages.</td><td><code>DashboardPage.ts</code> 240–285, <code>TransactionsPage.ts</code> 220–270</td><td>No.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MEDIUM</span></td><td>Semantic tints written as raw rgba instead of <code>--pending-muted</code>/<code>--expense-muted</code>; <code>--font-mono</code> used but undefined.</td><td><code>ProposalConfirmationModal.ts</code> 58, 102, 142, 162, 171, 182</td><td>No.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MEDIUM</span></td><td>Shell brand mark/avatar: gradient defined inline, then <code>!important</code>-flattened in <code>app.css</code>. Dead gradient + <code>!important</code> smell.</td><td><code>AppShell.ts</code> 197–215; <code>app.css</code> <code>.gl-shell-mark</code></td><td>Flattening was the correct call; source should just be flat.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MEDIUM</span></td><td>Page-header pattern implemented 3 ways (class / section-head / inline h1).</td><td>§4 Page header</td><td>No.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--pending-muted); color: oklch(0.38 0.08 80);">MEDIUM</span></td><td><code>[style*="repeat(4, 1fr)"]</code> attribute-selector overrides in <code>app.css</code> patch inline grids from CSS. Fragile: a reformat of the inline string breaks responsiveness.</td><td><code>app.css</code> @media 900 / 540 blocks</td><td>Deliberate stopgap — replace with a <code>.gl-grid-4</code> class.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border);">LOW</span></td><td>Unused/contradictory tokens: <code>--ease-spring</code>, <code>--ease-drawer</code>, <code>--radius-sheet</code>, <code>--radius-table</code> (never applied), whole <code>.dark</code> set with no toggle.</td><td><code>motion.css</code>, <code>radius.css</code>, grep</td><td>Dark set may be future intent — ask.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border);">LOW</span></td><td>Icon stroke widths vary 1.6 / 1.8 / 2 / 2.5 across files; <code>ICON_TRANSFER</code> has <code>aria-hidden="false"</code> on a decorative icon.</td><td><code>DashboardPage.ts</code> 48–52, <code>AppShell.ts</code></td><td>No.</td></tr>
+        <tr><td><span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border);">LOW</span></td><td>Filter pill has two competing active-state definitions.</td><td>§4 Filter pills</td><td>No.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 6 -->
+  <section id="s6">
+    <h2>6. Components audit</h2>
+    <table>
+      <thead><tr><th style="width: 100px;">Verdict</th><th>Component</th><th>Reason / evidence</th></tr></thead>
+      <tbody>
+        <tr><td><strong>KEEP</strong></td><td>Tokens (<code>tokens/*.css</code>), <code>.num-display</code>, <code>.kicker</code>, <code>--on-*-muted</code></td><td>Accurate, used everywhere, tested indirectly. Promote <code>--on-*-muted</code> into <code>tokens/colors.css</code>.</td></tr>
+        <tr><td><strong>KEEP</strong></td><td>AppShell (sidebar/topbar/mobilenav), <code>.gl-table--cards</code>, <code>.gl-statgrid</code>, <code>.gl-actionbar--sticky</code>, <code>.gl-notice</code>, <code>.gl-skeleton</code>, AI drawer + cards, <code>ProjectedBalanceCard</code>, <code>ApprovalDecisionSheet</code></td><td>Consistent, token-based, covered by <code>*-ui.test.ts</code>.</td></tr>
+        <tr><td><strong>REUSE</strong></td><td><code>.gl-btn</code>, <code>.gl-input/.gl-select/.gl-textarea</code>, <code>.gl-field</code>, <code>.gl-badge</code>, <code>.gl-card</code>, <code>.gl-page-header</code>, <code>.gl-modal-*</code>, <code>.gl-tablist</code></td><td>Already the primitives — offering screens and Approvals header should adopt them instead of inline equivalents.</td></tr>
+        <tr><td><strong>MERGE</strong></td><td><code>STATUS_CONFIG</code> + <code>TXN_STATUS</code> + dashboard inline labels → one <code>lib/status.ts</code> (or keep <code>approvals/StatusBadge.ts</code> as the owner and import it)</td><td>Three sources of truth for one enum. Requires product decision on the canonical label for <code>posted</code>/<code>voided</code>.</td></tr>
+        <tr><td><strong>MERGE</strong></td><td>Transaction row (Dashboard + Transactions) → <code>components/shared/TxnRow.ts</code></td><td>Identical markup and logic; tests assert on text not markup, so low risk.</td></tr>
+        <tr><td><strong>MERGE</strong></td><td>Empty-state blocks (Transactions, Approvals, Dashboard, Funds…) → <code>renderEmptyStateHtml({title, body, action?})</code></td><td>Same copy shape, 3 padding values.</td></tr>
+        <tr><td><strong>REFACTOR</strong></td><td><code>app.css</code></td><td>Collapse the two layers into one declaration per selector; move <code>[style*=]</code> hacks to classes; drop <code>!important</code> where the source can be fixed.</td></tr>
+        <tr><td><strong>REFACTOR</strong></td><td>Offering module views (6 files, ~117 KB)</td><td>Replace inline card/badge/input/heading literals with <code>.gl-*</code>. Keep DOM structure and ids stable — <code>offering-*-ui.test.ts</code> assert HTML strings.</td></tr>
+        <tr><td><strong>REFACTOR</strong></td><td><code>ProposalConfirmationModal.ts</code> tints</td><td>rgba → tokens; define or remove <code>--font-mono</code>.</td></tr>
+        <tr><td><strong>REFACTOR</strong></td><td>Per-file inline SVG icon constants</td><td>Centralise into <code>lib/icons.ts</code> with one stroke-width policy (1.8 default, 2 active) — no new library.</td></tr>
+        <tr><td><strong>DEPRECATE</strong></td><td>Standalone <code>.filter-pill.is-active</code> rule, <code>--ease-spring</code>, gradient on <code>.gl-shell-mark/avatar</code>, glass on <code>.gl-modal-content</code></td><td>Unused or rule-violating; deletion is safe (no selector consumers) once verified by grep.</td></tr>
+        <tr><td><strong>DEPRECATE</strong></td><td>DS package's <code>components/*.jsx</code> React library + <code>ui_kits/</code> as a <em>production</em> reference</td><td>Not consumable by a vanilla-TS app. Keep as a prototyping kit only; label it so.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 7 -->
+  <section id="s7">
+    <h2>7. Proposed design system architecture</h2>
+    <p>Adapted to what exists: CSS tokens + CSS class layer + TS render helpers. No component framework is introduced.</p>
+    <pre>design-system-extracted/            (rename optional; keep path — CLAUDE.md and app.css point here)
+├── tokens/                          FOUNDATIONS — unchanged files, plus:
+│   ├── colors.css                    + --on-{income,expense,pending,info}-muted (moved from app.css)
+│   ├── layout.css          NEW       --gl-page-max, --gl-sidebar-w, --gl-topbar-h, --gl-mobilenav-h (single values)
+│   ├── motion.css                    − --ease-spring
+│   └── …
+├── readme.md                        REWRITE stack section: vanilla TS, .gl-* classes, render*Html
+├── github.md                        REFRESH screen map to real files
+└── components/ + ui_kits/           label "prototyping kit (React) — not the production component source"
+
+src/styles/
+├── app.css                          ONE declaration per selector (layers collapsed)
+│   ├── primitives   .gl-btn .gl-input .gl-badge .gl-card .gl-notice .gl-skeleton
+│   ├── composites   .gl-page(-header) .gl-section .gl-table .gl-tabs .gl-modal .gl-stat .gl-actionbar .gl-grid-{2,3,4}
+│   └── shell        .gl-sidebar .gl-nav-item .gl-shell-* .gl-mobilenav (moved out of AppShell.ts &lt;style&gt;)
+└── (feature stylesheets stay co-located: aiDrawerStyles.ts, loginStyles.ts — pattern already proven)
+
+src/components/shared/      NEW      TS render helpers = the "component" tier for this stack
+├── StatusBadge.ts                   moved from approvals/, single STATUS map
+├── TxnRow.ts                        shared transaction row
+├── EmptyState.ts
+├── PageHeader.ts                    renderPageHeaderHtml({title, subtitle, actionHtml})
+└── icons.ts                         inline SVG registry, one stroke policy
+
+docs (repo root)                     GOVERNANCE — see §8</pre>
+  </section>
+
+  <!-- 8 -->
+  <section id="s8">
+    <h2>8. AI governance strategy</h2>
+    <p><code>CLAUDE.md</code> is already strong on <em>rules</em>. What is missing is <em>reference</em>: an AI reading it cannot tell which class to use for a card, which file owns status labels, or that the second half of <code>app.css</code> wins. Proposed additions, each with an operational purpose:</p>
+    <table>
+      <thead><tr><th style="width: 150px;">File</th><th>Why needed</th><th>Contents &amp; source</th></tr></thead>
+      <tbody>
+        <tr><td><code>CLAUDE.md</code> (edit)</td><td>Currently says "Design tokens: design-system-extracted/tokens" but not where <em>classes</em> live or that inline styles are the legacy path.</td><td>Add 6 lines: "Use <code>.gl-*</code> from <code>src/styles/app.css</code>; never inline a card/button/badge/input; read DESIGN.md before touching CSS; status labels come from <code>components/shared/StatusBadge.ts</code>."</td></tr>
+        <tr><td><code>DESIGN.md</code></td><td>The DS readme is stale and framework-mismatched; there is no single page describing the real visual contract.</td><td>Token table with allowed values; radius/shadow/motion decisions from §3 resolved; the two sanctioned exceptions (topbar blur, hero gradient — if approved); banned list. Source: <code>tokens/*.css</code>, <code>app.css</code>, this report.</td></tr>
+        <tr><td><code>COMPONENTS.md</code></td><td>AI must know what exists before writing markup — "reuse before adding" is unenforceable without a catalogue.</td><td>One row per <code>.gl-*</code> class and shared render helper: purpose, required markup, variants, don'ts, example. Source: <code>app.css</code>, <code>components/shared/*</code>.</td></tr>
+        <tr><td><code>UX.md</code></td><td>Financial screens have workflow rules (one primary action, two-person approval, variance thresholds) that constrain layout.</td><td>Per route: user goal, must-show data, primary action, failure states, mobile behaviour. Source: <code>pages/*</code>, <code>lib/offering/lifecycle.ts</code>, <code>lib/transactions/lifecycle.ts</code>.</td></tr>
+        <tr><td><code>DECISIONS.md</code></td><td>The "Modern UI layer" happened because a decision (24px vs 16px cards) was never recorded; it will happen again.</td><td>Dated ADR-style entries: card radius, button height, glass, gradient, status labels, dark mode status. Source: §3 tables + owner's answers to §12.</td></tr>
+        <tr><td><code>QUALITY.md</code></td><td><code>ui-reviewer.md</code> lists checks but no mechanical procedure.</td><td>Grep commands that must return 0 (<code>rgba(</code> in <code>src/</code> outside shadows; <code>font-size: [0-9.]+px</code>; <code>border-radius: [0-9]+px</code> outside app.css); routes × 2 viewports screenshot checklist; test/typecheck gate. Add an <code>_adherence</code> lint (a config already exists in the DS folder — wire it into <code>npm run lint</code>).</td></tr>
+        <tr><td><code>REFERENCE.md</code></td><td>Not recommended as a separate file — its content is the DS readme + COMPONENTS.md. Avoid duplicating truth.</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <h3>Interaction rules for Claude on this repo</h3>
+    <ul>
+      <li>Before any UI change: read <code>DESIGN.md</code> + <code>COMPONENTS.md</code>; grep for an existing class/helper; cite it in the plan.</li>
+      <li>Never add a second declaration of an existing <code>.gl-*</code> selector; edit the one that exists.</li>
+      <li>New literal px/hex/rgba in <code>src/</code> = a DECISIONS.md entry or a rejected diff.</li>
+      <li>UI tests assert HTML strings — update tests deliberately with the markup, never loosen them.</li>
+      <li>Financial core (<code>lib/money</code>, services, RPC, SQL) is read-only for any design task; stop and report if a UI change seems to need it.</li>
+    </ul>
+  </section>
+
+  <!-- 9 -->
+  <section id="s9">
+    <h2>9. Implementation roadmap</h2>
+    <table>
+      <thead><tr><th style="width: 150px;">Phase</th><th>Scope</th><th style="width: 200px;">Exit criterion</th></tr></thead>
+      <tbody>
+        <tr><td><strong>0 — Discovery</strong></td><td>This report. Owner answers §12 questions.</td><td>Decisions logged.</td></tr>
+        <tr><td><strong>1 — Documentation &amp; DS refresh</strong></td><td>Write DESIGN/COMPONENTS/UX/DECISIONS/QUALITY; fix DS readme stack + screen map; edit CLAUDE.md. No code.</td><td>Docs merged; DS readme no longer mentions React/Tailwind/Lucide.</td></tr>
+        <tr><td><strong>2 — Token consolidation</strong></td><td>Collapse <code>app.css</code> layers; move layout + <code>--on-*-muted</code> to tokens; remove <code>--ease-spring</code>, dead <code>.filter-pill</code> rule, modal glass, shell gradients; wire adherence lint.</td><td>Each selector declared once; before/after screenshots of 9 routes × 2 viewports identical except approved decisions.</td></tr>
+        <tr><td><strong>3 — Shared helpers</strong></td><td>Create <code>components/shared/</code>: StatusBadge (single map), TxnRow, EmptyState, PageHeader, icons. Adopt in Dashboard, Transactions, Approvals.</td><td>Tests green (labels updated deliberately); grep shows one STATUS map.</td></tr>
+        <tr><td><strong>4 — Offering migration</strong></td><td>File by file: SessionList → DetailOverview → EntryForm → ReviewSheet → CashCount → VarianceResolution. Inline literals → <code>.gl-*</code>. Keep ids/data-attrs.</td><td>0 off-scale font-size/radius literals in <code>components/offering</code>; offering UI tests green; 390px walkthrough of cash count.</td></tr>
+        <tr><td><strong>5 — Residual cleanup</strong></td><td><code>ProposalConfirmationModal</code> tints, <code>--font-mono</code>, <code>[style*=]</code> hacks → <code>.gl-grid-*</code>, icon stroke policy.</td><td>QUALITY.md greps return 0.</td></tr>
+        <tr><td><strong>6 — Visual regression</strong></td><td>Add Playwright screenshot specs (already a devDependency) for 9 routes × {1280, 390}; run against seeded pg-mem/embedded-postgres.</td><td>Baseline committed; CI diff gate.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 10 -->
+  <section id="s10">
+    <h2>10. Detailed implementation plan</h2>
+
+    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5);">
+        <h3 style="margin-top: 0;">10.1 Collapse the two CSS layers</h3>
+        <table>
+          <tbody>
+            <tr><td style="width: 150px; color: var(--muted-foreground);">Problem</td><td>Same selectors declared twice; tokens overridden by literals.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Evidence</td><td><code>app.css</code>: <code>.gl-card</code> at ~line 130 and ~1100; <code>.gl-btn</code> ~215 and ~1112; <code>:root</code> layout tokens at 12 and 1050.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Recommendation</td><td>For each token decide once (proposed: keep the <em>shipped</em> look users see today — card 16px, button 12px/46px, dialog 20px — and update <code>radius.css</code> to match, since that is what the product is now; alternative: revert to 24/18/28 DS values). Record in DECISIONS.md. Then merge declarations.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Files</td><td><code>src/styles/app.css</code>, <code>design-system-extracted/tokens/radius.css</code>, <code>shadows.css</code>, new <code>layout.css</code></td></tr>
+            <tr><td style="color: var(--muted-foreground);">Dependencies</td><td>Owner decision on radius direction (§12).</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Risk</td><td>Medium — cascade order changes could alter any route. No JS/test impact.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Validation</td><td>Screenshot every route at 1280 and 390 before/after; pixel diff must be zero outside approved changes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5);">
+        <h3 style="margin-top: 0;">10.2 Single status map</h3>
+        <table>
+          <tbody>
+            <tr><td style="width: 150px; color: var(--muted-foreground);">Problem</td><td>Three label/color maps for <code>TransactionStatus</code>.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Evidence</td><td><code>approvals/StatusBadge.ts</code> STATUS_CONFIG; <code>TransactionsPage.ts</code> TXN_STATUS; <code>DashboardPage.ts</code> inline ternary.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Recommendation</td><td>Move <code>StatusBadge.ts</code> to <code>components/shared/</code>; delete TXN_STATUS; Dashboard's <code>RecentTransaction.status</code> should carry the real <code>TransactionStatus</code> instead of a collapsed 3-value union.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Files</td><td>3 above + <code>tests/unit/{approvals-ui-components,dashboard-page-ui}.test.ts</code></td></tr>
+            <tr><td style="color: var(--muted-foreground);">Dependencies</td><td>Product decision: canonical Thai label for <code>posted</code> and <code>voided</code>.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Risk</td><td>Low–medium. Changes user-visible copy; touches a type in <code>DashboardPage</code> (UI-only, no money math).</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Validation</td><td>grep <code>"รออนุมัติ"</code> / <code>posted</code> → one definition; tests updated deliberately; thai-writer agent review.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5);">
+        <h3 style="margin-top: 0;">10.3 Offering module onto <code>.gl-*</code></h3>
+        <table>
+          <tbody>
+            <tr><td style="width: 150px; color: var(--muted-foreground);">Problem</td><td>Highest-value workflow uses the oldest, literal-heavy markup.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Evidence</td><td>grep results §3/§5: 30 off-scale sizes, 6 hard-coded shadows, badges with 4px radius, inputs with 6px radius, h1 24px.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Recommendation</td><td>Mechanical substitution, one file per PR: card div → <code>.gl-card</code>; span badge → <code>.gl-badge--*</code>; heading → <code>.gl-page-header</code>; inputs → <code>.gl-input</code>; keep every <code>id</code>, <code>data-*</code>, <code>name</code>, and Thai string unchanged.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Files</td><td><code>components/offering/*.ts</code> (6), <code>pages/OfferingPage.ts</code>, <code>tests/unit/offering-*-ui.test.ts</code> (4)</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Dependencies</td><td>10.1 done first (so class values are stable).</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Risk</td><td>Medium — cash-count and variance screens have dense 390px layouts patched by <code>.gl-denom-row</code>/<code>.gl-allocation-row</code> overrides in <code>app.css</code>; those hooks must survive.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Validation</td><td>Offering UI tests; manual 390px walkthrough of full lifecycle (new → count → review → variance → post) with screenshots; financial-reviewer confirms no service/RPC file in the diff.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5);">
+        <h3 style="margin-top: 0;">10.4 Shared TxnRow / EmptyState / PageHeader / icons</h3>
+        <table>
+          <tbody>
+            <tr><td style="width: 150px; color: var(--muted-foreground);">Problem</td><td>Duplicated markup; three page-header implementations; scattered SVG constants.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Evidence</td><td>§4 Transaction row, Page header; <code>ICON_*</code> in 4+ files.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Recommendation</td><td>Pure string-returning helpers in <code>components/shared/</code>; adopt where duplicates exist. No new abstraction beyond a function per pattern.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Files</td><td>new <code>components/shared/{TxnRow,EmptyState,PageHeader,icons}.ts</code>; <code>DashboardPage.ts</code>, <code>TransactionsPage.ts</code>, <code>ApprovalsQueueView.ts</code>, <code>AppShell.ts</code></td></tr>
+            <tr><td style="color: var(--muted-foreground);">Dependencies</td><td>10.2 (TxnRow needs the single status map).</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Risk</td><td>Low. Tests assert text/hrefs, not wrapper markup.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Validation</td><td>Tests green; grep shows one definition of the row markup.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5);">
+        <h3 style="margin-top: 0;">10.5 Refresh the attached design system package</h3>
+        <table>
+          <tbody>
+            <tr><td style="width: 150px; color: var(--muted-foreground);">Problem</td><td>Guide and screen map reference a non-existent React codebase; misleads every AI session.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Evidence</td><td><code>design-system-extracted/github.md</code> screen map → <code>src/components/ui/button.tsx</code>, <code>src/routes/_app.dashboard.tsx</code> (absent from tree).</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Recommendation</td><td>Rewrite readme "Stack" and "Components" sections; regenerate screen map to <code>app.css</code> classes and <code>components/shared</code>; mark <code>components/*.jsx</code> + <code>ui_kits</code> as prototyping-only.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Files</td><td><code>design-system-extracted/readme.md</code>, <code>github.md</code>, <code>SKILL.md</code></td></tr>
+            <tr><td style="color: var(--muted-foreground);">Risk</td><td>None to runtime.</td></tr>
+            <tr><td style="color: var(--muted-foreground);">Validation</td><td>Every path in the screen map resolves in the tree.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section id="s11">
+    <h2>11. What should NOT be changed</h2>
+    <ul>
+      <li><strong>Everything under <code>src/lib/</code>, <code>supabase/</code>, <code>tests/integration/</code></strong> — money math, lifecycle, RBAC, RPCs, RLS, idempotency, AI boundary. Out of scope for any design work (CLAUDE.md hard stops).</li>
+      <li><strong>The rendering architecture</strong> (<code>render*Html</code> strings + <code>attachEventListeners</code>, hash router, full re-render). It is tested, simple, and deliberate. Do not introduce React, a component framework, Tailwind, or a CSS-in-JS layer.</li>
+      <li><strong>Color semantics</strong>: single orange accent; emerald/red/amber fixed meanings; <code>--on-*-muted</code> pairing rule; <code>.num-display</code> on every amount; sign + color always together.</li>
+      <li><strong>Typography pairing</strong> Sarabun (Thai) + Inter (Latin/numerals); 15px body.</li>
+      <li><strong>Shell pattern</strong>: sidebar groups with kicker labels, active bar, topbar blur (the sanctioned exception), bottom nav at ≤768 with pending badge.</li>
+      <li><strong>Copy voice</strong> and the existing Thai strings — tests assert on them; changes go through the thai-writer review, not design PRs.</li>
+      <li><strong>Test contract</strong>: UI tests assert HTML strings. Do not loosen them; update alongside markup.</li>
+      <li><strong>Responsive mechanics</strong> already proven: <code>.gl-table--cards</code>, <code>.gl-actionbar--sticky</code> (fixed, not sticky — the comment explains why), <code>.gl-denom-row</code>/<code>.gl-allocation-row</code> 390px patches until offering migration replaces them.</li>
+    </ul>
+  </section>
+
+  <!-- 12 -->
+  <section id="s12">
+    <h2>12. Facts, assumptions, uncertainties, recommendations</h2>
+    <h3>Facts (verified in source)</h3>
+    <ul>
+      <li>Stack is vanilla TS + Vite; no React/Tailwind/shadcn/Lucide in <code>package.json</code> or tree.</li>
+      <li><code>app.css</code> declares layout tokens and core selectors twice; the later block wins.</li>
+      <li>Three transaction-status label maps exist with conflicting values.</li>
+      <li>Offering components contain ~30 off-scale font sizes and literal radii/shadows; pages/approvals/ai-drawer do not.</li>
+      <li>UI tests assert on rendered HTML strings; no visual regression tooling exists.</li>
+      <li>DS package's screen map points at files absent from <code>main</code>.</li>
+    </ul>
+    <h3>Assumptions</h3>
+    <ul>
+      <li>The "Modern UI layer" reflects the look currently shipped and seen by users (it wins the cascade) — so "what users know" is 16px cards / 12px buttons, not the 24/18 DS tokens.</li>
+      <li>The hero card's radial gradient and the topbar blur are intentional exceptions (they are commented as such in code), not drift.</li>
+      <li>The <code>.dark</code> token set is future intent rather than dead code.</li>
+      <li>Not every file was read line-by-line: <code>ReportsPage.ts</code>, <code>FundsPage.ts</code>, <code>MembersPage.ts</code>, <code>OfferingPage.ts</code>, <code>loginStyles.ts</code>, <code>CashCountView.ts</code> were assessed by targeted grep only. Their drift counts may be higher.</li>
+    </ul>
+    <h3>Uncertainties — need owner input</h3>
+    <ul>
+      <li><strong>Radius/shadow direction:</strong> canonise the shipped Modern values (update tokens to 16/12/20) or revert to the DS tokens (24/18/28)? This is the single most visible decision.</li>
+      <li><strong>Canonical labels</strong> for <code>posted</code> ("บันทึกบัญชีแล้ว" vs "ลงบัญชีแล้ว") and <code>voided</code> (neutral vs rejected color).</li>
+      <li><strong>Modal glass:</strong> keep as an "overlay material" exception or flatten to solid <code>--popover</code>?</li>
+      <li><strong>Dark mode:</strong> planned, or remove the token set to reduce surface?</li>
+      <li><strong>Where the design-system package lives:</strong> keep <code>design-system-extracted/</code> in-repo as the source of truth, or make the external DS project canonical and sync into the repo?</li>
+      <li>Whether any screen outside my read set (Reports charts, Members certificate modal, Login PIN pad) has patterns that should be classified.</li>
+    </ul>
+    <h3>Recommendations (summary)</h3>
+    <ul>
+      <li>Approve Phases 1–2 first (docs + CSS consolidation): zero JS change, highest leverage against future AI drift.</li>
+      <li>Decide the four uncertainties above before Phase 2 so the collapse writes the right values once.</li>
+      <li>Treat the offering migration (Phase 4) as its own reviewed milestone with a 390px walkthrough gate.</li>
+      <li>Do not extend the DS's React component library for production; extend <code>app.css</code> + <code>components/shared</code> instead.</li>
+    </ul>
+    <div style="margin-top: var(--space-6); padding: var(--space-4) var(--space-5); border: 1px solid var(--pending); background: var(--pending-muted); color: oklch(0.38 0.08 80); border-radius: 12px; font-size: var(--text-sm); font-weight: 600;">STOP. No repository files were modified. Awaiting explicit approval and answers to §12 before any implementation.</div>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

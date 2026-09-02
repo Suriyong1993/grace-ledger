@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/tokens/base.css">
+  <link rel="stylesheet" href="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/styles.css">
+  <script src="_ds/grace-ledger-design-system-b2d940e3-a3a3-45d3-80a3-fdc964e974ed/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+    code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; background: var(--secondary); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+    table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
+    th { text-align: left; font-size: var(--text-2xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-foreground); background: var(--secondary); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); }
+    td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    tr:last-child td { border-bottom: 0; }
+    h2 { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 var(--space-4); text-wrap: balance; }
+    h3 { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; letter-spacing: -0.015em; margin: var(--space-5) 0 var(--space-2); }
+    p, li { font-size: var(--text-base); line-height: 1.6; }
+    p { margin: 0 0 var(--space-3); }
+    ul { margin: 0 0 var(--space-3); padding-left: 1.2em; }
+    li { margin-bottom: 4px; }
+    pre { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--text-xs); line-height: 1.55; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: var(--space-4); overflow-x: auto; margin: 0 0 var(--space-3); white-space: pre; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; white-space: nowrap; }
+    .fact { background: var(--income-muted); color: oklch(0.36 0.09 155); }
+    .inf { background: var(--secondary); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .rec { background: var(--accent); color: var(--accent-foreground); }
+    .open { background: var(--pending-muted); color: oklch(0.38 0.08 80); }
+    .bad { background: var(--expense-muted); color: oklch(0.4 0.13 25); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: var(--space-5); }
+  </style>
+</helmet>
+
+<div style="max-width: 960px; margin: 0 auto; padding: 48px 32px 96px; display: flex; flex-direction: column; gap: 48px;">
+
+  <header style="display: flex; flex-direction: column; gap: var(--space-3); padding-bottom: var(--space-6); border-bottom: 1px solid var(--border);">
+    <div class="kicker">Grace Ledger · Report 4 · Consolidated strategy · Planning mode — no production code modified</div>
+    <h1 style="font-family: var(--font-display); font-size: var(--text-4xl); font-weight: 600; letter-spacing: -0.025em; margin: 0; text-wrap: balance;">Redesign Strategy &amp; Execution Bridge</h1>
+    <p style="color: var(--muted-foreground); margin: 0;">One document that ties together the <a href="Design System Discovery Report.dc.html">Discovery Report</a>, <a href="Strategic Review.dc.html">Strategic Review</a>, <a href="Redesign Master Plan.dc.html">Master Plan</a> and <a href="Redesign Concepts.dc.html">Concept mockups</a>, adds the external-pattern analysis and the design→code bridge. Every statement is tagged:
+      <span class="tag fact">VERIFIED FACT</span> <span class="tag inf">INFERENCE</span> <span class="tag rec">RECOMMENDATION</span> <span class="tag open">OPEN DECISION</span></p>
+    <nav style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+      <a href="#v" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">1 Verified state</a>
+      <a href="#ux" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">2 Product &amp; UX</a>
+      <a href="#ref" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">3 External patterns</a>
+      <a href="#dir" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">4 Direction · keep/evolve/replace/avoid</a>
+      <a href="#bridge" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">5 Execution bridge</a>
+      <a href="#phases" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">6 Phases</a>
+      <a href="#approve" style="font-size: 12px; border: 1px solid var(--border); border-radius: 9999px; padding: 3px 10px; background: var(--card);">7 Approval request</a>
+    </nav>
+  </header>
+
+  <section id="v">
+    <h2>1. Verified current state (Step 1)</h2>
+    <table>
+      <thead><tr><th style="width:110px;">Tag</th><th>Statement</th><th style="width:250px;">Evidence</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag fact">FACT</span></td><td>Repo <code>main</code> is at tree <code>bee600e8</code>; unchanged across all four reports today.</td><td><code>github_get_tree</code> ×3</td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>Vanilla TS + Vite, string-rendered HTML, full re-render, hash router; React was explicitly rejected in an ADR.</td><td><code>package.json</code>, <code>src/main.ts</code>, <code>docs/M2_PHASE_2_2_FRONTEND_ARCHITECTURE_DECISION.md</code></td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>The most recent approved visual decision is the "Modern UI layer" (<code>a2548ed</code>, QA'd in production 2026-08-28). Its values (card 16px, button 12px/46px, dialog 20px) are what users see.</td><td><code>docs/UI_REDESIGN_QA_NOTES.md</code>, <code>app.css</code> l.~1050+</td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>A prior audit (2026-08-20) already diagnosed "DS loaded but not used", prescribed the <code>.gl-*</code> layer, and its Waves 1–2 shipped. Open items from it: P1-8 dates, P1-10 approval detail not a sheet, P2-9 dark mode unreachable.</td><td><code>docs/PREMIUM_DESIGN_AUDIT.md</code>, <code>docs/screenshots/README.md</code></td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>Business workflows are locked: offering lifecycle draft → counting → counted → (variance_review) → confirmed → posted; dual counters; cash compared to expected cash only; Monday deposit is a transfer Cash Drawer → Bank.</td><td><code>docs/M3_PRODUCT_AUDIT_SUNDAY_OFFERING.md</code> Rules 1–7</td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>Financial core, AI boundary, idempotency, confirmations are implemented and tested (41 files / 316 tests at last baseline).</td><td><code>REAL_PROJECT_BASELINE.md</code>, <code>IMPLEMENTATION_PLAN.md</code> tasks 01–15</td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>Design plans in <code>design-plans/</code> are stylesheet-owner reconciliations for the login surface (no markup changes) — they are compatible with and independent of this redesign.</td><td><code>design-plans/01–03</code></td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>The attached design-system package and <code>mockups-extracted/</code> describe a React/TanStack app that does not exist on <code>main</code>. Their <em>tokens</em> are valid; their component/route maps are stale.</td><td>DS readme, both <code>github.md</code> files vs tree</td></tr>
+        <tr><td><span class="tag fact">FACT</span></td><td>Defects verified in source: 3 status maps disagree; Transactions "เดือนนี้" KPIs sum all loaded rows; Dashboard trend hard-codes 50,000 THB max scale; Funds/Members paint amounts in brand orange; Reports uses fully tinted KPI tiles.</td><td><code>TransactionsPage.ts</code> l.~200, <code>DashboardPage.ts</code> <code>maxVal</code>, <code>FundsPage.ts:172</code>, <code>MembersPage.ts:147</code>, <code>live/05</code></td></tr>
+        <tr><td><span class="tag inf">INFERENCE</span></td><td>Live screenshots (2026-08-28) still match production; no commits since.</td><td>Same tree hash; QA notes date</td></tr>
+        <tr><td><span class="tag inf">INFERENCE</span></td><td>Real churches will have balances far from the fixture data; fixed chart scales and 4-tile fund grids will not generalise.</td><td>Fixture-driven screenshots</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="ux">
+    <h2>2. Product &amp; UX analysis (Step 2)</h2>
+    <table>
+      <thead><tr><th style="width:170px;">Dimension</th><th>Finding</th></tr></thead>
+      <tbody>
+        <tr><td>Core users <span class="tag fact">FACT</span></td><td>Treasurer (เหรัญญิก) + two Sunday counters; approvers (pastor/finance committee); members-facing staff. Not accounting experts (<code>CLAUDE.md</code>).</td></tr>
+        <tr><td>High-frequency</td><td>Weekly: offering session (record → count → variance → confirm → post → deposit). Several/week: expense approval. Daily: lookup.</td></tr>
+        <tr><td>High-risk financial actions</td><td>Confirm session with variance; approve expense that drives a fund negative; post; void; transfer. All are guarded server-side; UI must make the consequence visible <em>before</em> the button.</td></tr>
+        <tr><td>Hierarchy problems <span class="tag fact">FACT</span></td><td>Balance hero appears on 3 routes; titles 26–40px compete with amounts; actions placed above context (Dashboard quick actions above attention list); approval decision buttons below the fold at 1280×900.</td></tr>
+        <tr><td>Friction</td><td>Offering: save draft → reopen → tab to count; separate review screen restates the form; native date input shows US format. Approvals: detail appears below the list with no focus change. Transactions: "บันทึกรายจ่าย" tile leads to a list with no create action.</td></tr>
+        <tr><td>Redundant UI</td><td>Duplicate txn-row markup; duplicated variance banner on Cash Count; church name in sidebar and topbar; hero balance ×3.</td></tr>
+        <tr><td>Missing guidance</td><td>No representation of "where is this week's round" on home; no Monday deposit step; no confirmation of "posted" outside the session tab; "ขั้นตอน 1/2" label vs 5-state lifecycle.</td></tr>
+        <tr><td>The four questions today</td><td><em>What is happening?</em> — a total, not a state. <em>What needs attention?</em> — pending count, but the live session is invisible. <em>What next?</em> — unanswered. <em>What action?</em> — four equal tiles.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="ref">
+    <h2>3. External patterns — principles, not visuals (Step 3 input)</h2>
+    <table>
+      <thead><tr><th style="width:90px;">Reference</th><th>Principle → user problem → relevance → adaptation → risk</th><th style="width:90px;">Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Linear</strong></td><td><strong>Principle:</strong> one dense, keyboard-navigable list per workspace with a right-hand detail that never leaves context. <strong>Problem:</strong> triage many items fast. <strong>Relevance:</strong> approvals queue and transactions lookup. <strong>Adaptation:</strong> row = target; detail as a URL-bound right sheet (<code>/approvals/:id</code>); ⌘K search on desktop only. <strong>Risk:</strong> density hurts non-experts on mobile — keep rows 15px/48px min and switch to full-screen sheet ≤768.</td><td><span class="tag rec">ADOPT</span></td></tr>
+        <tr><td><strong>Stripe</strong></td><td><strong>Principle:</strong> money is typeset as data (tabular, aligned, sign-explicit), and complex objects are shown as a summary block followed by structured facts. <strong>Problem:</strong> verify an amount at a glance. <strong>Relevance:</strong> already partly present (<code>.num-display</code>). <strong>Adaptation:</strong> right-align all amounts in tables, ฿ in its own span, summary → facts → timeline order in sheets. <strong>Risk:</strong> none material.</td><td><span class="tag rec">ADOPT</span></td></tr>
+        <tr><td><strong>Ramp</strong></td><td><strong>Principle:</strong> the home is an inbox of actions with the consequence inline (approve here, see policy impact here). <strong>Problem:</strong> approvers forget or approve blind. <strong>Relevance:</strong> two-person rule, projected fund balance. <strong>Adaptation:</strong> "รอคุณตัดสินใจ" rows carry fund balance-after and receipt flag; approve button in-row (foreground-filled, not orange) with confirm sheet. <strong>Risk:</strong> in-row approve invites accidents — keep the server guard and require the sheet for any deficit or missing-receipt case.</td><td><span class="tag rec">ADOPT (guarded)</span></td></tr>
+        <tr><td><strong>Mercury</strong></td><td><strong>Principle:</strong> trust through restraint — few surfaces, hairline borders, generous whitespace, one accent. <strong>Problem:</strong> finance UI that feels safe. <strong>Relevance:</strong> matches DESIGN vibe "Calm · Exact · Quiet". <strong>Adaptation:</strong> two backgrounds, border-joined KPI strips instead of card fields, tint only for state. <strong>Risk:</strong> too quiet → status invisible; mitigate with the stepper and badges.</td><td><span class="tag rec">ADOPT</span></td></tr>
+        <tr><td><strong>Vercel</strong></td><td><strong>Principle:</strong> top-level scope switcher + flat tab navigation. <strong>Problem:</strong> multi-project context. <strong>Relevance:</strong> low — one church per session; sidebar + bottom nav already approved and tested. <strong>Adaptation:</strong> none; Concept C's top nav was explored and rejected for mobile parity. <strong>Risk:</strong> rewriting a working shell for fashion.</td><td><span class="tag bad">AVOID</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="dir">
+    <h2>4. Recommended direction (Step 4)</h2>
+    <p><span class="tag rec">RECOMMENDATION</span> <strong>Concept B "งานสัปดาห์นี้" as the spine</strong> (<a href="Redesign Concepts.dc.html#1b">1b</a>), with A's density for lookup screens and C's fund-health table for Funds — reasoning in the <a href="Redesign Master Plan.dc.html">Master Plan</a>. The identity evolves; it is not replaced.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4);">
+      <div class="card"><div class="tag fact" style="margin-bottom:8px;">KEEP</div><ul style="margin:0;font-size:var(--text-sm);"><li>Palette, Sarabun + Inter, fixed finance colors, <code>.num-display</code></li><li>Sidebar + topbar + bottom-nav shell; hash routes</li><li>Shipped radius/height values (D1 → tokens)</li><li>Cash Count screen structure (stat strip, steppers)</li><li>Fund-impact-before-decision on approvals</li><li>Error/empty copy voice; AI drawer; login surface</li><li>All of <code>src/lib</code>, <code>supabase</code>, tests</li></ul></div>
+      <div class="card"><div class="tag open" style="margin-bottom:8px;">EVOLVE</div><ul style="margin:0;font-size:var(--text-sm);"><li>Home → this week's work (live round + decisions + quiet balance)</li><li>Offering session → one screen, 5-step stepper, one primary per step</li><li>Approval detail → URL-bound right sheet</li><li>Transactions → table ≥900 / rows &lt;900, honest KPI labels, create sheet</li><li>Funds → health table; Reports → white surfaces</li><li>Type scale: titles down (22px), hero amount 32px, one per screen</li><li>Nav grouping: งานประจำ · บัญชี · ภาพรวม (routes unchanged)</li></ul></div>
+      <div class="card"><div class="tag bad" style="margin-bottom:8px;">REPLACE</div><ul style="margin:0;font-size:var(--text-sm);"><li>Three status maps → one</li><li>Duplicate txn-row markup → <code>TxnRow</code></li><li>Centered modal for multi-field content → sheet</li><li>Native date display → Thai date trigger</li><li>Tinted KPI tiles / orange numerals / orange bars → white + foreground</li><li>Ad-hoc channel badges (green/blue/amber) → amount rows</li><li>Fixed chart scale → data-derived</li></ul></div>
+      <div class="card"><div class="tag inf" style="margin-bottom:8px;">AVOID</div><ul style="margin:0;font-size:var(--text-sm);"><li>Any framework, Tailwind, CSS-in-JS</li><li>Top-nav shell rewrite (Vercel-style)</li><li>Glass, gradients, springs, count-up numbers</li><li>Cards inside cards; four floating KPI cards</li><li>Decorative charts with thin data</li><li>New colors (blue leaves the UI except "posted")</li><li>Changing any business rule to fit a layout</li></ul></div>
+    </div>
+  </section>
+
+  <section id="bridge">
+    <h2>5. Execution bridge — design direction → working application (Step 5)</h2>
+    <pre>DESIGN DIRECTION   B spine · A density · C fund table · identity evolved
+      ↓
+DESIGN TOKENS      tokens/radius.css → 16/12/20 (D1) · shadows.css → shipped literals · colors.css += --on-*-muted
+                   motion.css −spring · DESIGN.md documents the contract · lint:design enforces it
+      ↓
+COMPONENT ARCH     src/styles/app.css (single generation of every .gl-* class)
+                   + new classes: .gl-sheet .gl-stepper .gl-rows .gl-kpi-strip .gl-amount-input .gl-date-trigger .gl-progress .gl-grid-{2,3,4}
+                   src/components/shared/{StatusBadge,TxnRow,EmptyState}.ts  (string helpers, no state)
+                   COMPONENTS.md = the catalogue
+      ↓
+APPLICATION SHELL  AppShell.ts: nav regrouped (labels only, hrefs unchanged) · private &lt;style&gt; moved to app.css · flat mark/avatar
+                   sheet mount point rendered by App.render() from route state (same pattern as aiDrawerHtml)
+      ↓
+SCREEN PATTERNS    Home "current round" card · decision row · session screen (header + stepper + body + sticky bar) · detail sheet (summary → facts → impact → actions)
+      ↓
+REAL SCREENS       Approvals → Home → Offering session (per step) → Transactions → Funds → Reports → Members
+      ↓
+WORKFLOW VALIDATION  J1 full lifecycle at 390px incl. variance and deposit hand-off · J2 approve / revise / reject incl. two-person guard and deficit · J3 create expense → appears in queue
+      ↓
+AUTOMATED TESTS    existing *-ui.test.ts updated deliberately · new tests for shared helpers and sheet a11y (role, aria-modal, focus) · npm test + tsc gate
+      ↓
+VISUAL QA          capture_premium_screenshots.mjs (1280 + 390, overflow assert) → baseline PNGs → pixel diff in CI · ui-reviewer checklist · thai-writer on new copy · financial-reviewer confirms no lib/ diff</pre>
+    <h3>Where each design decision lands in code</h3>
+    <table>
+      <thead><tr><th style="width:220px;">Decision</th><th>File(s)</th><th style="width:120px;">Owner doc</th></tr></thead>
+      <tbody>
+        <tr><td>Radius / height / shadow values</td><td><code>design-system-extracted/tokens/radius.css</code>, <code>shadows.css</code>; <code>app.css</code> gen-1 deleted</td><td>DECISIONS D1</td></tr>
+        <tr><td>Status labels + colors</td><td><code>src/components/shared/StatusBadge.ts</code> (single <code>STATUS</code>); consumers import</td><td>DECISIONS D2</td></tr>
+        <tr><td>Sheet vs modal</td><td><code>app.css</code> <code>.gl-sheet</code>; <code>ApprovalsPage.ts</code> renders sheet when <code>route.pattern === "/approvals/:id"</code>; focus in <code>attachEventListeners</code></td><td>COMPONENTS.md</td></tr>
+        <tr><td>Lifecycle stepper</td><td><code>app.css</code> <code>.gl-stepper</code>; <code>shared/Stepper.ts</code> maps <code>OfferingSession.status</code> → step index (read-only over <code>lib/offering/lifecycle.ts</code>)</td><td>COMPONENTS.md · UX.md</td></tr>
+        <tr><td>Home content</td><td><code>DashboardPage.ts</code> <code>loadData</code> adds latest-session read via existing <code>OfferingService.list</code>; render rewritten</td><td>UX.md</td></tr>
+        <tr><td>Thai date everywhere</td><td><code>lib/format.ts formatDateThai</code> (exists) + <code>.gl-date-trigger</code> wrapper around hidden native input</td><td>DESIGN.md</td></tr>
+        <tr><td>Orange = CTA only</td><td><code>FundsPage.ts:172,186</code>, <code>MembersPage.ts:147</code> → <code>--foreground</code>; lint rule flags <code>color: var(--primary)</code> on <code>.num-display</code></td><td>DESIGN.md</td></tr>
+        <tr><td>Monday deposit hand-off</td><td>Session step 5 link → Funds transfer sheet pre-filled (query params); executes only via existing <code>FundsService.proposeTransfer</code></td><td>UX.md · Q4</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="phases">
+    <h2>6. Implementation phases — outcome · components · risk · validation · rollback</h2>
+    <table>
+      <thead><tr><th style="width:70px;">Phase</th><th>User-visible outcome</th><th>Components affected</th><th>Business-logic risk</th><th>Validation</th><th>Rollback</th></tr></thead>
+      <tbody>
+        <tr><td><strong>R1</strong></td><td>None (invisible consolidation)</td><td><code>app.css</code>, tokens, docs, lint script, CI</td><td>None</td><td>Pixel diff = 0 on 9 routes × 2 viewports; tests green</td><td>Single-commit revert</td></tr>
+        <tr><td><strong>R2</strong></td><td>None yet (primitives unused)</td><td>New <code>.gl-*</code> classes; <code>shared/*</code> helpers; COMPONENTS.md</td><td>None</td><td>Helper unit tests; a11y test for <code>.gl-sheet</code> markup</td><td>Delete files</td></tr>
+        <tr><td><strong>R3</strong></td><td>Approvals: row → sheet with impact and actions in one view; status labels unified</td><td><code>ApprovalsPage</code>, <code>ApprovalsQueueView</code>, <code>ApprovalDecisionSheet</code>, <code>RejectionModal</code>, StatusBadge consumers</td><td><span class="tag inf">Low</span> — service calls unchanged; two-person guard UI must still disable approve</td><td><code>approvals-ui-components</code> updated; J2 walkthrough incl. deficit + self-approval; screenshots</td><td>Per-file revert; route pattern unchanged</td></tr>
+        <tr><td><strong>R4</strong></td><td>Home shows this week's round, decisions, balance</td><td><code>DashboardPage</code>, <code>AppShell</code> nav labels, TxnRow</td><td><span class="tag inf">Low–med</span> — one new read; totals logic untouched</td><td><code>dashboard-page-ui</code> rewritten; empty church state; financial-reviewer on the read</td><td>Revert page; nav labels independent</td></tr>
+        <tr><td><strong>R5</strong></td><td>Offering session as one guided screen; Thai dates; deposit hand-off</td><td>6 offering views, <code>OfferingPage</code>, <code>.gl-amount-input</code>, <code>.gl-stepper</code></td><td><span class="tag bad">Medium</span> — adjacent to variance guard; review-screen removal is a state-flow change (Q3)</td><td>4 offering test files; full J1 at 390px; financial-reviewer; thai-writer</td><td>Per-step PR; guard tests untouched act as tripwire</td></tr>
+        <tr><td><strong>R6</strong></td><td>Transactions table + create; Funds health table; Reports calm; Members rows</td><td>4 pages; <code>.gl-kpi-strip</code>, <code>.gl-fund-row</code>, <code>.gl-progress</code></td><td><span class="tag inf">Low–med</span> — create sheet uses existing submit path; KPI relabel vs filter (Q5)</td><td>Per-route tests; J3, J4, J5, J6 walkthroughs</td><td>Per-route revert</td></tr>
+        <tr><td><strong>R7</strong></td><td>None (quality infrastructure)</td><td>capture script, CI, UX.md, DS sync</td><td>None</td><td>CI diff gate live</td><td>n/a</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="approve">
+    <h2>7. What is being requested</h2>
+    <div class="card" style="border-color: var(--pending); background: var(--pending-muted); color: oklch(0.38 0.08 80);">
+      <p style="margin:0 0 8px;"><strong>Not yet requesting approval to modify production code.</strong> Requesting decisions so the strategy can be frozen:</p>
+      <ul style="margin:0;font-size:var(--text-sm);">
+        <li><span class="tag open">OPEN</span> <strong>Direction:</strong> B + A + C as above (or pure B).</li>
+        <li><span class="tag open">OPEN</span> <strong>D1</strong> radius: canonise shipped 16/12/20 (recommended) vs revert to DS 24/18/28.</li>
+        <li><span class="tag open">OPEN</span> <strong>D2</strong> labels: posted = "ลงบัญชีแล้ว"/info, voided = neutral, pending = "รออนุมัติ" (recommended).</li>
+        <li><span class="tag open">OPEN</span> <strong>D3</strong> flatten modal glass (recommended).</li>
+        <li><span class="tag open">OPEN</span> <strong>Q3</strong> fold Offering review screen into entry step; <strong>Q4</strong> Monday-deposit hand-off as step 5; <strong>Q5</strong> Transactions KPI relabel vs filter.</li>
+      </ul>
+      <p style="margin:12px 0 0;font-size:var(--text-sm);">Next planning deliverable once direction is confirmed: high-fidelity mockups of the <strong>Approvals sheet</strong> and the <strong>Offering session screen</strong> (they exercise every new primitive), then the request to start R1.</p>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

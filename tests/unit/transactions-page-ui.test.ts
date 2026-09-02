@@ -107,7 +107,7 @@ describe("TransactionsPage UI — Unit Tests", () => {
     },
   ];
 
-  const mockProfiles = [{ id: "user-1", full_name: "สมชาย ใจดี" }];
+  const mockProfiles = [{ id: "user-1", full_name: "อาจารย์สรรเสริญ ดวงจิตร" }];
 
   const mockSupabase = {
     from: (table: string) => {

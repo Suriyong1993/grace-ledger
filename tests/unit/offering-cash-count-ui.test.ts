@@ -11,9 +11,10 @@ import { VarianceEngine } from "../../src/lib/offering/variance-engine";
 
 describe("M3 UI Components — Slice 2", () => {
   const mockProfiles: ProfileOption[] = [
-    { id: "user-1", fullName: "คุณสมศรี เหรัญญิก", email: "somsri@grace.org" },
-    { id: "user-2", fullName: "คุณมานะ กรรมการ", email: "mana@grace.org" },
-    { id: "user-3", fullName: "ศจ.สมชาย ศิษยาภิบาล", email: "somchai@grace.org" },
+    { id: "user-1", fullName: "อาจารย์ ทัศนา ดวงจิตร", email: "tassana@grace.org" },
+    { id: "user-2", fullName: "สุดารัตน์ จิณเซ่ง", email: "sudarat@grace.org" },
+    { id: "user-3", fullName: "อาจารย์สรรเสริญ ดวงจิตร", email: "sansern@grace.org" },
+    { id: "user-4", fullName: "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร", email: "suriyong@grace.org" },
   ];
 
   const baseSession: OfferingSession = {

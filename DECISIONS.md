@@ -133,6 +133,17 @@ consumption path, and `app.css` reads the tokens directly via `var(--radius-card
 **Status:** APPROVED · already shipped. R1-c changed **no** token file; it only corrected `DESIGN.md` and
 this log to describe the shipped values.
 
+### D9 — Canonical Church Officers & Governance Roster (คริสตจักรพระคุณ กาฬสินธุ์)
+
+**Decision:** The canonical leadership roster for Grace Ledger is permanently established as:
+1. **ศิษยาภิบาล (Pastor):** อาจารย์สรรเสริญ ดวงจิตร (`pastor`)
+2. **ผู้นับเงิน (Counter 1):** อาจารย์ ทัศนา ดวงจิตร (`counter`)
+3. **ผู้นับเงิน (Counter 2):** สุดารัตน์ จิณเซ่ง (`counter`)
+4. **ผู้ตรวจสอบบัญชี / ผู้ดูแลระบบสูงสุด (Auditor & Super Admin):** พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร (`super_admin`)
+
+**Enforcement:** All fallback identities, mockups, seed data, and component defaults are unified to these 4 real church officers. Legacy test fixtures (such as "ศจ.สมชาย มีสุข" and "มนัส สุขใจ") from earlier milestones are completely superseded and harmonized across `fable5.1/`, `src/`, and test suites.
+**Status:** APPROVED & IMPLEMENTED (2026-09-03).
+
 ---
 
 ## Financial Review Items — recorded, not modified by design work

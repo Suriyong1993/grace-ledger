@@ -229,11 +229,11 @@ describe("M3 UI Components — Slice 1", () => {
       const html = renderOfferingReviewSheetHtml({
         funds: mockFunds,
         state,
-        creatorName: "ศจ.สมชาย มีสุข",
+        creatorName: "อาจารย์สรรเสริญ ดวงจิตร",
       });
 
       expect(html).toContain("ตรวจทานรายการเงินถวาย");
-      expect(html).toContain("ศจ.สมชาย มีสุข");
+      expect(html).toContain("อาจารย์สรรเสริญ ดวงจิตร");
       expect(html).toContain("10,000.00");
       expect(html).toContain("5,000.00");
       expect(html).toContain("3,450.00");
