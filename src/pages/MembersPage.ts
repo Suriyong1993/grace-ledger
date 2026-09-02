@@ -433,7 +433,7 @@ export class MembersPage {
             background: transparent;
             font-size: var(--text-sm);
             color: var(--foreground);
-            /* Keep the global :focus-visible ring — the one field users must
+            /* Keep the global :focus-visible ring — the one field users must type in. */
           " />
         </div>
       </section>

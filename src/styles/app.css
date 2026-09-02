@@ -10,13 +10,13 @@
 
 :root {
   /* App layout — page frame, not design tokens. One width for every route. */
-  --gl-page-max: 1080px;
-  --gl-page-pad-x: var(--space-8);
-  --gl-page-pad-top: var(--space-6);
-  --gl-page-pad-bottom: var(--space-12);
-  --gl-sidebar-w: 240px;
-  --gl-topbar-h: 56px;
-  --gl-mobilenav-h: 60px;
+  --gl-page-max: 1180px;
+  --gl-page-pad-x: clamp(16px, 3vw, 40px);
+  --gl-page-pad-top: clamp(20px, 3vw, 32px);
+  --gl-page-pad-bottom: clamp(32px, 5vw, 56px);
+  --gl-sidebar-w: 248px;
+  --gl-topbar-h: 64px;
+  --gl-mobilenav-h: 68px;
 
   /* Text on a *-muted surface. The DS --*-foreground tokens are for text on
      the solid colour; pairing them with -muted is a contrast bug. */
@@ -103,25 +103,34 @@ body {
 }
 
 .gl-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
   margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
 }
 
 .gl-page-header h1 {
   font-family: var(--font-display);
-  font-size: var(--text-3xl);
+  font-size: clamp(var(--text-xl), 2.4vw, var(--text-3xl));
   font-weight: var(--weight-bold);
+  letter-spacing: -0.025em;
   color: var(--foreground);
   margin: 0;
 }
 
 .gl-page-header p {
   font-size: var(--text-sm);
+  max-width: 60ch;
+  line-height: var(--leading-body);
   color: var(--muted-foreground);
   margin: var(--space-1) 0 0;
 }
 
 .gl-section {
-  margin-bottom: var(--space-8);
+  margin-bottom: clamp(var(--space-6), 3vw, var(--space-10));
 }
 
 .gl-section__head {
@@ -129,13 +138,14 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .gl-section__head h2 {
   font-family: var(--font-display);
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
+  letter-spacing: -0.015em;
   color: var(--foreground);
   margin: 0;
 }
@@ -231,7 +241,7 @@ button.gl-card:active {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: var(--touch-target-min);
+  min-height: 46px;
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-button);
   border: 1px solid transparent;
@@ -239,6 +249,7 @@ button.gl-card:active {
   font-family: inherit;
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
+  letter-spacing: -0.005em;
   line-height: 1.2;
   text-decoration: none;
   cursor: pointer;
@@ -251,7 +262,8 @@ button.gl-card:active {
 
 /* Press feedback fires on pointer-down (`:active`), not on release — the
    control should already be responding while the finger is still down. */
-.gl-btn:active:not(:disabled) {
+.gl-btn:active:not(:disabled),
+.gl-icon-btn:active:not(:disabled) {
   transform: scale(0.97);
 }
 
@@ -301,6 +313,12 @@ button.gl-card:active {
 .gl-btn--destructive:hover:not(:disabled) {
   background: var(--expense-muted);
   border-color: var(--destructive);
+}
+
+.gl-btn--secondary,
+.gl-btn--ghost,
+.gl-btn--destructive {
+  box-shadow: 0 1px 2px rgb(16 32 24 / 0.025);
 }
 
 /* Compact button. The touch target stays at the documented minimum by default;
@@ -454,7 +472,7 @@ button.gl-card:active {
 .gl-select,
 .gl-textarea {
   width: 100%;
-  min-height: var(--touch-target-min);
+  min-height: 46px;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--input);
   border-radius: var(--radius-input);
@@ -462,6 +480,10 @@ button.gl-card:active {
   color: var(--foreground);
   font-family: inherit;
   font-size: var(--text-base);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out),
+    background-color var(--duration-micro) var(--ease-out);
 }
 
 .gl-textarea {
@@ -473,7 +495,9 @@ button.gl-card:active {
 .gl-input:focus-visible,
 .gl-select:focus-visible,
 .gl-textarea:focus-visible {
+  outline: none;
   border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 16%, transparent);
 }
 
 .gl-hint {
@@ -506,16 +530,14 @@ button.gl-card:active {
   -webkit-backdrop-filter: blur(3px);
 }
 
-/* Transient overlay material — glass is reserved for layers that float
-   above content (modals, the AI drawer), never for base page surfaces. */
+/* Modal content — solid popover surface (D3 modal flattening).
+   Borders over heavy shadows; no blur or translucency on content. */
 .gl-modal-content {
   width: 100%;
   max-width: 480px;
   margin: auto;
   padding: var(--space-6);
-  background: color-mix(in srgb, var(--popover) 88%, transparent);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background: var(--popover);
   color: var(--popover-foreground);
   border: 1px solid color-mix(in srgb, var(--foreground) 10%, var(--border));
   border-radius: var(--radius-dialog);
@@ -1972,29 +1994,6 @@ a.gl-row:focus-visible {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Modern UI layer — shared visual language for every route.
-   Keep behavior and finance semantics unchanged; this layer improves hierarchy,
-   density, focus states, and responsive composition through existing tokens.
-   -------------------------------------------------------------------------- */
-:root {
-  --gl-page-max: 1180px;
-  --gl-page-pad-x: clamp(16px, 3vw, 40px);
-  --gl-page-pad-top: clamp(20px, 3vw, 32px);
-  --gl-page-pad-bottom: clamp(32px, 5vw, 56px);
-  --gl-sidebar-w: 248px;
-  --gl-topbar-h: 64px;
-  --gl-mobilenav-h: 68px;
-}
-
-body {
-  background: var(--background);
-}
-
-.gl-app-main {
-  background: var(--background);
-}
-
 .gl-page,
 .gl-approvals-page-container,
 .gl-dashboard-container,
@@ -2005,46 +2004,6 @@ body {
   width: min(100%, var(--gl-page-max));
   margin-inline: auto;
 }
-
-.gl-page-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-5);
-  padding-bottom: var(--space-5);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
-}
-
-.gl-page-header h1 {
-  font-size: clamp(var(--text-xl), 2.4vw, var(--text-3xl));
-  letter-spacing: -0.025em;
-}
-
-.gl-page-header p {
-  max-width: 60ch;
-  line-height: var(--leading-body);
-}
-
-.gl-section {
-  margin-bottom: clamp(var(--space-6), 3vw, var(--space-10));
-}
-
-.gl-section__head {
-  margin-bottom: var(--space-4);
-}
-
-.gl-section__head h2 {
-  letter-spacing: -0.015em;
-}
-
-/* .gl-card itself used to be redefined here too — wrong radius token
-   (--radius-lg, 16px) instead of --radius-card (24px, the token the design
-   system names specifically for cards), plus a hand-rolled box-shadow on
-   every card in the app. Both contradict the design system's own rules
-   ("cards 24px"; "border beats shadow... not every section is a card...
-   real shadow reserved for genuine overlap"). Removed: the base .gl-card
-   definition near the top of this file (background/border/--radius-card/
-   padding, no shadow) is now the single source of truth. */
 
 /* Single source of truth for .gl-card--elevated (was previously also defined
    near the top of this file with the correct token-driven shadow — that
@@ -2061,48 +2020,6 @@ body {
   background: var(--card);
 }
 
-.gl-btn {
-  min-height: 46px;
-  border-radius: var(--radius-button);
-  letter-spacing: -0.005em;
-}
-
-/* Press feedback lands on pointer-down, instantly — the button answers the
-   finger before release. Hover is a tint shift, never a lift or scale-up. */
-.gl-btn:active:not(:disabled),
-.gl-icon-btn:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-.gl-btn--primary:hover:not(:disabled) {
-  background: var(--primary-dark);
-}
-
-.gl-btn--secondary,
-.gl-btn--ghost,
-.gl-btn--destructive {
-  box-shadow: 0 1px 2px rgb(16 32 24 / 0.025);
-}
-
-.gl-input,
-.gl-select,
-.gl-textarea {
-  min-height: 46px;
-  border-radius: var(--radius-input);
-  transition:
-    border-color var(--duration-micro) var(--ease-out),
-    box-shadow var(--duration-micro) var(--ease-out),
-    background-color var(--duration-micro) var(--ease-out);
-}
-
-.gl-input:focus-visible,
-.gl-select:focus-visible,
-.gl-textarea:focus-visible {
-  outline: none;
-  border-color: var(--ring);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 16%, transparent);
-}
-
 .gl-table tbody tr:hover {
   background: color-mix(in srgb, var(--primary) 4%, var(--card));
 }
@@ -2112,23 +2029,15 @@ body {
   border-radius: var(--radius-lg);
 }
 
-.gl-modal-content {
-  border-radius: 20px;
-}
-
 .gl-sidebar {
   box-shadow: 1px 0 0 var(--sidebar-border);
-}
-
-.gl-nav-item {
-  min-height: 44px;
-  border-radius: 12px;
 }
 
 .gl-nav-item--active {
   box-shadow: inset 0 0 0 1px
     color-mix(in srgb, var(--sidebar-primary) 12%, transparent);
 }
+
 
 /* .gl-shell-mark / .gl-shell-avatar are owned by AppShell's own style block
    (solid --sidebar-primary on the vault chrome). The old orange-gradient

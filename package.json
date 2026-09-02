@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint:design": "node scripts/lint-design.mjs",
+    "lint": "tsc --noEmit && npm run lint:design"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

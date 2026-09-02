@@ -81,12 +81,10 @@ removed in the Emerald Vault revision and must not come back).
 on business UI. `--ease-spring` exists and is **in active use in the login surface only**
 (`src/components/login/loginStyles.ts`) — do not use it elsewhere without a documented reason.
 
-## Overlays (D3 — approved, not yet applied)
+## Overlays (D3 — implemented in R1-d)
 
-**Target state:** `.gl-modal-content` is a solid `--popover` surface with `--shadow-elevated`. Glass/blur is
-banned on modals. **Current state:** still glass — `background: color-mix(in srgb, var(--popover) 88%,
-transparent)` + `backdrop-filter: blur(20px) saturate(160%)` (`src/styles/app.css`). D3 lands in R1-d; until
-it does, this section documents the decision, not the shipped pixels.
+`.gl-modal-content` is a solid `--popover` surface with `--shadow-elevated` and `--radius-dialog` (24px).
+Glass/blur is banned on modal dialogs.
 The **one** sanctioned blur in the product is the sticky topbar (`background/88%` + `blur(10px)`). The modal
 backdrop keeps a light 3px blur (cheap, aids focus, not glassmorphism on content).
 

@@ -36,9 +36,9 @@ inline) — a ledger showing different labels for the same transaction on differ
 on modal content. The sticky topbar remains the one sanctioned blur in the product.
 **Why:** CLAUDE.md bans glass cards; the modal glass predates that rule; GPU cost on low-end devices during
 Sunday counting is a real concern.
-**Status:** APPROVED · **not yet implemented** — scheduled for R1-d. `.gl-modal-content` in
-`src/styles/app.css` is still `color-mix(… var(--popover) 88% …)` + `backdrop-filter: blur(20px)
-saturate(160%)` as of this entry.
+**Status:** IMPLEMENTED in R1-d (2026-09-03). `.gl-modal-content` in
+`src/styles/app.css` is flattened to solid `var(--popover)` + `var(--shadow-elevated)`,
+with `backdrop-filter` blur/saturate removed, and duplicate rules de-duplicated.
 
 ### D4 — Dark mode: deferred
 
