@@ -22,10 +22,16 @@ const execFileAsync = promisify(execFile);
 const LAB_USER = "gl_pg_lab_runner";
 const LAB_PASSWORD = "GLpg#Lab2026x";
 const LAB_SERVICE = "gl_pg_lab";
-const LAB_ROOT = path.join(process.env.ProgramData ?? "C:\\ProgramData", "gl_pg_lab");
+const LAB_ROOT = path.join(
+  process.env.ProgramData ?? "C:\\ProgramData",
+  "gl_pg_lab",
+);
 const NATIVE_SRC = path.join(
   path.dirname(fileURLToPath(new URL("../package.json", import.meta.url))),
-  "node_modules", "@embedded-postgres", "windows-x64", "native",
+  "node_modules",
+  "@embedded-postgres",
+  "windows-x64",
+  "native",
 );
 
 function run(file, args, opts = {}) {
@@ -68,14 +74,22 @@ async function waitForPort(port, timeoutMs) {
   while (Date.now() < deadline) {
     const open = await new Promise((resolve) => {
       const s = net.connect({ host: "127.0.0.1", port });
-      s.once("connect", () => { s.destroy(); resolve(true); });
+      s.once("connect", () => {
+        s.destroy();
+        resolve(true);
+      });
       s.once("error", () => resolve(false));
-      setTimeout(() => { s.destroy(); resolve(false); }, 1500);
+      setTimeout(() => {
+        s.destroy();
+        resolve(false);
+      }, 1500);
     });
     if (open) return;
     await new Promise((r) => setTimeout(r, 300));
   }
-  throw new Error(`Postgres did not accept connections on port ${port} within ${timeoutMs}ms`);
+  throw new Error(
+    `Postgres did not accept connections on port ${port} within ${timeoutMs}ms`,
+  );
 }
 
 async function cleanupLeftovers() {
@@ -89,15 +103,33 @@ async function cleanupLeftovers() {
 async function ensureLabUser() {
   const exists = await runOk("net", ["user", LAB_USER]);
   if (!exists) {
-    await run("net", ["user", LAB_USER, LAB_PASSWORD, "/add", "/passwordchg:no", "/active:yes"]);
+    await run("net", [
+      "user",
+      LAB_USER,
+      LAB_PASSWORD,
+      "/add",
+      "/passwordchg:no",
+      "/active:yes",
+    ]);
   } else {
     // Keep the known password in force so the service can always log on.
     await runOk("net", ["user", LAB_USER, LAB_PASSWORD]);
   }
   // Per-user services need the "Log on as a service" right; pg_ctl register
   // does not grant it, so grant it explicitly via the LSA API.
-  const grantScript = path.join(path.dirname(fileURLToPath(import.meta.url)), "grant-logon-as-service.ps1");
-  await run("powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", grantScript, "-AccountName", `.\\${LAB_USER}`]);
+  const grantScript = path.join(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "grant-logon-as-service.ps1",
+  );
+  await run("powershell.exe", [
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    grantScript,
+    "-AccountName",
+    `.\\${LAB_USER}`,
+  ]);
 }
 
 async function ensureBinaries() {
@@ -187,11 +219,16 @@ export class PgLab {
     fs.writeFileSync(pwfile, LAB_PASSWORD, "utf8");
     try {
       await run(path.join(nativeDir, "bin", "initdb.exe"), [
-        "-D", this.datadir,
-        "-U", "postgres",
-        "-A", "password",
-        "--pwfile", pwfile,
-        "-E", "UTF8",
+        "-D",
+        this.datadir,
+        "-U",
+        "postgres",
+        "-A",
+        "password",
+        "--pwfile",
+        pwfile,
+        "-E",
+        "UTF8",
         "--locale=C",
       ]);
     } finally {
@@ -201,19 +238,28 @@ export class PgLab {
     // The server process runs as the lab user: give it exclusive access to the
     // data directory (PostgreSQL also rejects world/group-accessible datadirs).
     await run("icacls", [
-      this.datadir, "/inheritance:r",
-      "/grant:r", `${LAB_USER}:(OI)(CI)F`,
-      "/grant:r", "SYSTEM:(OI)(CI)F",
-      "/grant:r", "Administrators:(OI)(CI)F",
+      this.datadir,
+      "/inheritance:r",
+      "/grant:r",
+      `${LAB_USER}:(OI)(CI)F`,
+      "/grant:r",
+      "SYSTEM:(OI)(CI)F",
+      "/grant:r",
+      "Administrators:(OI)(CI)F",
     ]);
 
     await run(path.join(nativeDir, "bin", "pg_ctl.exe"), [
       "register",
-      "-N", LAB_SERVICE,
-      "-D", this.datadir,
-      "-o", `-p ${this.port}`,
-      "-U", `.\\${LAB_USER}`,
-      "-P", LAB_PASSWORD,
+      "-N",
+      LAB_SERVICE,
+      "-D",
+      this.datadir,
+      "-o",
+      `-p ${this.port}`,
+      "-U",
+      `.\\${LAB_USER}`,
+      "-P",
+      LAB_PASSWORD,
     ]);
     await run("net", ["start", LAB_SERVICE]);
     await waitForPort(this.port, 30000);
@@ -231,7 +277,8 @@ export class PgLab {
     await this.client.query(SUPABASE_SHIM_SQL);
 
     if (migrationsDir) {
-      const files = fs.readdirSync(migrationsDir)
+      const files = fs
+        .readdirSync(migrationsDir)
         .filter((f) => f.endsWith(".sql"))
         .sort();
       for (const file of files) {
@@ -246,19 +293,50 @@ export class PgLab {
   /** Run a query as a simulated authenticated Supabase user. */
   async asUser(userId, role, fn) {
     const jwt = JSON.stringify({ sub: userId, role: role ?? "authenticated" });
-    await this.client.query("SELECT set_config('request.jwt.claims', $1, false)", [jwt]);
-    await this.client.query(`SET ROLE ${role === "service_role" ? "service_role" : "authenticated"}`);
+    await this.client.query(
+      "SELECT set_config('request.jwt.claims', $1, false)",
+      [jwt],
+    );
+    await this.client.query(
+      `SET ROLE ${role === "service_role" ? "service_role" : "authenticated"}`,
+    );
     try {
       return await fn();
     } finally {
       await this.client.query("RESET ROLE");
-      await this.client.query("SELECT set_config('request.jwt.claims', '', false)");
+      await this.client.query(
+        "SELECT set_config('request.jwt.claims', '', false)",
+      );
     }
+  }
+
+  /**
+   * Open an INDEPENDENT physical connection to the same lab instance (its own
+   * backend PID). Required for real concurrency tests: two sessions issuing
+   * overlapping statements on `this.client` alone would just serialize on a
+   * single libpq connection and could never observe genuine row-lock waits.
+   * Caller owns the returned client's lifecycle (call .end() when done).
+   */
+  async openSession() {
+    const client = new pg.Client({
+      host: "127.0.0.1",
+      port: this.port,
+      user: "postgres",
+      password: LAB_PASSWORD,
+      database: "postgres",
+    });
+    await client.connect();
+    const { rows } = await client.query("SELECT pg_backend_pid() AS pid");
+    return { client, pid: rows[0].pid };
   }
 
   async stop() {
     if (this.client) {
-      try { await this.client.end(); } catch { /* already closed */ }
+      try {
+        await this.client.end();
+      } catch {
+        /* already closed */
+      }
       this.client = null;
     }
     if (this.started) {

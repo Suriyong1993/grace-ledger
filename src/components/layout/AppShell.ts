@@ -28,13 +28,15 @@ const ICON_FUNDS = `<path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/><
 const ICON_APPROVALS = `<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>`;
 const ICON_MEMBERS = `<circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/>`;
 const ICON_REPORTS = `<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/>`;
+const ICON_PROFILE = `<circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/>`;
+const ICON_BELL = `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`;
 const ICON_LOGOUT = `<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>`;
 
 function icon(paths: string, size: number): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false">${paths}</svg>`;
 }
 
-function buildDestinations(pendingCount: number): NavDestination[] {
+function buildSidebarDestinations(pendingCount: number): NavDestination[] {
   return [
     {
       href: "#/",
@@ -93,6 +95,61 @@ function buildDestinations(pendingCount: number): NavDestination[] {
       icon: ICON_REPORTS,
       isActive: (route) => route.startsWith("/reports"),
     },
+    {
+      href: "#/profile",
+      label: "โปรไฟล์และระบบ",
+      shortLabel: "โปรไฟล์",
+      group: "บัญชีผู้ใช้",
+      icon: ICON_PROFILE,
+      isActive: (route) => route.startsWith("/profile"),
+    },
+  ];
+}
+
+/** 5 Primary Destinations for Mobile Bottom Navigation */
+function buildMobileBottomDestinations(pendingCount: number): NavDestination[] {
+  return [
+    {
+      href: "#/",
+      label: "แดชบอร์ด",
+      shortLabel: "หน้าหลัก",
+      group: "หลัก",
+      icon: ICON_DASHBOARD,
+      isActive: (route) => route === "/" || route === "",
+    },
+    {
+      href: "#/offerings",
+      label: "เงินถวาย",
+      shortLabel: "ถวายทรัพย์",
+      group: "หลัก",
+      icon: ICON_OFFERINGS,
+      isActive: (route) => route.startsWith("/offerings"),
+    },
+    {
+      href: "#/approvals",
+      label: "อนุมัติ",
+      shortLabel: "อนุมัติ",
+      group: "หลัก",
+      icon: ICON_APPROVALS,
+      isActive: (route) => route.startsWith("/approvals"),
+      badge: pendingCount > 0 ? pendingCount : undefined,
+    },
+    {
+      href: "#/reports",
+      label: "รายงาน",
+      shortLabel: "รายงาน",
+      group: "หลัก",
+      icon: ICON_REPORTS,
+      isActive: (route) => route.startsWith("/reports"),
+    },
+    {
+      href: "#/profile",
+      label: "โปรไฟล์",
+      shortLabel: "โปรไฟล์",
+      group: "หลัก",
+      icon: ICON_PROFILE,
+      isActive: (route) => route.startsWith("/profile"),
+    },
   ];
 }
 
@@ -100,8 +157,8 @@ function renderSidebarLink(dest: NavDestination, isActive: boolean): string {
   const badge = dest.badge
     ? `<span class="num-display" style="
         margin-left: auto;
-        background: var(--primary);
-        color: var(--primary-foreground);
+        background: var(--pending);
+        color: #ffffff;
         border-radius: var(--radius-full);
         padding: 1px 7px;
         font-size: var(--text-2xs);
@@ -123,7 +180,10 @@ function renderMobileNavLink(dest: NavDestination, isActive: boolean): string {
     : "";
   return `
     <a href="${dest.href}" class="gl-mobilenav__item" ${isActive ? 'aria-current="page"' : ""}>
-      ${icon(dest.icon, 20)}${badge}
+      <span style="position: relative; display: inline-flex;">
+        ${icon(dest.icon, 22)}
+        ${badge}
+      </span>
       <span>${dest.shortLabel}</span>
     </a>`;
 }
@@ -134,19 +194,22 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
   const displayRole = user?.role || "";
   const initials = user?.initials || "?";
   const churchName = user?.churchName || "";
+  const pendingCount = props.pendingCount || 0;
 
-  const destinations = buildDestinations(props.pendingCount || 0);
-  const active = destinations.find((d) => d.isActive(props.activeRoute));
+  const sidebarDestinations = buildSidebarDestinations(pendingCount);
+  const mobileDestinations = buildMobileBottomDestinations(pendingCount);
+  const activeSidebar = sidebarDestinations.find((d) => d.isActive(props.activeRoute));
+  const activePageLabel = activeSidebar ? activeSidebar.label : "Grace Ledger";
 
   const groups: string[] = [];
   let lastGroup = "";
-  for (const dest of destinations) {
-    const isActive = dest === active;
+  for (const dest of sidebarDestinations) {
+    const isActive = dest === activeSidebar;
     if (dest.group !== lastGroup) {
       if (lastGroup) groups.push(`</div>`);
       groups.push(`
         <div style="margin-bottom: var(--space-4);">
-          <div class="kicker" style="padding: var(--space-1) var(--space-3) var(--space-2);">${dest.group}</div>`);
+          <div class="kicker gl-sidebar__dim" style="padding: var(--space-1) var(--space-3) var(--space-2);">${dest.group}</div>`);
       lastGroup = dest.group;
     }
     groups.push(renderSidebarLink(dest, isActive));
@@ -192,38 +255,88 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       border-radius: var(--radius-full);
       background: var(--sidebar-primary);
     }
+    /* Dimmed text *inside the dark vault sidebar* must derive from
+       --sidebar-foreground — the light-theme --muted-foreground fails
+       contrast on --sidebar. */
+    .gl-sidebar .gl-sidebar__dim {
+      color: color-mix(in srgb, var(--sidebar-foreground) 62%, transparent);
+    }
+    .gl-sidebar .gl-logout-btn {
+      color: color-mix(in srgb, var(--sidebar-foreground) 72%, transparent);
+    }
+    .gl-sidebar .gl-logout-btn:hover {
+      background: var(--sidebar-accent);
+      color: var(--sidebar-accent-foreground);
+    }
     .gl-shell-mark {
       width: 36px;
       height: 36px;
       border-radius: var(--radius-sm);
-      background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
-      color: var(--primary-foreground);
+      background: var(--sidebar-primary);
+      color: var(--sidebar-primary-foreground);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px -4px oklch(0.65 0.19 45 / 55%);
       flex-shrink: 0;
     }
     .gl-shell-avatar {
       width: 32px;
       height: 32px;
       border-radius: var(--radius-full);
-      background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
-      color: #ffffff;
+      background: var(--sidebar-primary);
+      color: var(--sidebar-primary-foreground);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: var(--weight-bold);
       font-size: var(--text-xs);
       flex-shrink: 0;
+      text-decoration: none;
+    }
+    .gl-shell-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--touch-target-min);
+      height: var(--touch-target-min);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--foreground);
+      cursor: pointer;
+      position: relative;
+      text-decoration: none;
+      transition: background var(--duration-micro) var(--ease-out);
+    }
+    .gl-shell-icon-btn:hover {
+      background: var(--muted);
+    }
+    .gl-shell-bell-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--pending);
+      color: #ffffff;
+      border-radius: var(--radius-full);
+      padding: 0 4px;
+      min-width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: var(--weight-bold);
+      border: 2px solid var(--card);
     }
   </style>
+
   <div class="gl-app-container" style="
     display: flex;
     min-height: 100vh;
     background: var(--background);
     color: var(--foreground);
   ">
+    <!-- Desktop Sidebar -->
     <aside class="gl-sidebar" style="
       width: var(--gl-sidebar-w);
       flex-shrink: 0;
@@ -244,11 +357,11 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
             <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="currentColor"/>
           </svg>
         </div>
-        <div style="min-width: 0;">
+        <div style="min-width: 0; color: var(--sidebar-foreground);">
           <div style="font-weight: var(--weight-bold); font-size: var(--text-sm); letter-spacing: var(--tracking-heading);">
             Grace Ledger
           </div>
-          <div style="font-size: var(--text-2xs); color: var(--muted-foreground); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <div class="gl-sidebar__dim" style="font-size: var(--text-2xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
             ${churchName}
           </div>
         </div>
@@ -264,11 +377,14 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         display: flex;
         align-items: center;
         gap: var(--space-3);
+        color: var(--sidebar-foreground);
       ">
-        <div class="gl-shell-avatar" aria-hidden="true">${initials}</div>
+        <a href="#/profile" class="gl-shell-avatar" aria-hidden="true" title="ดูโปรไฟล์">${initials}</a>
         <div style="min-width: 0; flex: 1;">
-          <div style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayName}</div>
-          <div style="font-size: var(--text-2xs); color: var(--muted-foreground);">${displayRole}</div>
+          <a href="#/profile" style="text-decoration: none; color: inherit; display: block;">
+            <div style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayName}</div>
+            <div class="gl-sidebar__dim" style="font-size: var(--text-2xs);">${displayRole}</div>
+          </a>
         </div>
         <button type="button" class="gl-logout-btn" data-logout aria-label="ออกจากระบบ" title="ออกจากระบบ">
           ${icon(ICON_LOGOUT, 18)}
@@ -276,7 +392,9 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       </div>
     </aside>
 
+    <!-- Main Content Area -->
     <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+      <!-- Mobile/Desktop Top Header -->
       <header class="gl-shell-topbar" style="
         min-height: var(--gl-topbar-h);
         border-bottom: 1px solid var(--border);
@@ -285,8 +403,8 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: var(--space-4);
-        padding: 0 var(--space-5);
+        gap: var(--space-3);
+        padding: 0 var(--space-4);
         position: sticky;
         top: 0;
         z-index: 100;
@@ -297,13 +415,29 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
             font-weight: var(--weight-bold);
             font-size: var(--text-sm);
           ">Grace Ledger</span>
-          <span class="gl-shell-topbar__page" style="font-size: var(--text-sm); font-weight: var(--weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            ${active ? active.label : ""}
+          <span class="gl-shell-topbar__page" style="font-size: var(--text-base); font-weight: var(--weight-bold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${activePageLabel}
           </span>
         </div>
-        <div class="gl-shell-topbar__context" style="font-size: var(--text-xs); color: var(--muted-foreground); white-space: nowrap;">
-          <span class="gl-shell-status-dot" aria-hidden="true"></span>
-          <span>${churchName}</span>
+
+        <div class="gl-shell-topbar__context" style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--muted-foreground); white-space: nowrap;">
+          <span class="gl-shell-church-chip" style="display: inline-flex; align-items: center; gap: 4px; background: var(--muted); padding: 3px 8px; border-radius: var(--radius-full); font-size: var(--text-2xs); font-weight: var(--weight-medium); max-width: 140px; overflow: hidden; text-overflow: ellipsis;">
+            <span class="gl-shell-status-dot" aria-hidden="true"></span>
+            <span style="overflow: hidden; text-overflow: ellipsis;">${churchName}</span>
+          </span>
+
+          <!-- Notification Bell -->
+          <a href="#/approvals" class="gl-shell-icon-btn" aria-label="การแจ้งเตือนและการอนุมัติ" title="คิวอนุมัติ (${pendingCount} รายการ)">
+            ${icon(ICON_BELL, 18)}
+            ${pendingCount > 0 ? `<span class="gl-shell-bell-badge num-display">${pendingCount}</span>` : ""}
+          </a>
+
+          <!-- Profile Avatar Link -->
+          <a href="#/profile" class="gl-shell-avatar" style="width: var(--touch-target-min); height: var(--touch-target-min); font-size: var(--text-sm);" aria-label="โปรไฟล์ผู้ใช้" title="${displayName}">
+            ${initials}
+          </a>
+
+          <!-- Sign Out Button -->
           <button type="button" class="gl-logout-btn gl-logout-btn--topbar" data-logout aria-label="ออกจากระบบ" title="ออกจากระบบ">
             ${icon(ICON_LOGOUT, 18)}
           </button>
@@ -315,8 +449,9 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       </main>
     </div>
 
+    <!-- 5-Tab Mobile Bottom Navigation -->
     <nav class="gl-mobilenav" aria-label="เมนูหลัก">
-      ${destinations.map((d) => renderMobileNavLink(d, d === active)).join("")}
+      ${mobileDestinations.map((d) => renderMobileNavLink(d, d.isActive(props.activeRoute))).join("")}
     </nav>
   </div>
   `;

@@ -1,21 +1,31 @@
-/* Grace Ledger — Color tokens. Source of truth: src/styles.css in the
-   grace-ledger codebase (its :root/.dark values win over any older docs). */
+/* Grace Ledger — Color tokens. "Emerald Vault" identity (2026-09).
+   Source of truth: src/styles/app.css in the grace-ledger codebase.
+   Token NAMES are the public API and must not change; values define the
+   identity. Finance hues keep their fixed meaning: emerald = income,
+   red = expense, amber = pending/offering. */
 :root{
-  /* base */
+  /* base ramp — porcelain surfaces, ink-green text, evergreen brand, brass accent */
   --gl-white:#ffffff;
-  --gl-bg:#FFFCF8;
-  --gl-ink:#171717;
-  --gl-stone-50:#fafaf9;
-  --gl-stone-200:#e7e5e4;
-  --gl-stone-500:#737373;
-  --gl-orange-50:#fff7ed;
-  --gl-orange-600:#f97316;
-  --gl-orange-700:#ea580c;
-  --gl-orange-900:#9a3412;
-  --gl-emerald-600:#16a34a;
-  --gl-amber-500:#f59e0b;
-  --gl-red-600:#dc2626;
-  --gl-blue-600:#2563eb;
+  --gl-bg:#F4F5F2;
+  --gl-ink:#14201A;
+  --gl-stone-50:#f7f8f6;
+  --gl-stone-200:#e4e7e2;
+  --gl-stone-500:#6b7a6f;
+  --gl-evergreen-50:#eef5f0;
+  --gl-evergreen-100:#dcebe1;
+  --gl-evergreen-600:#1d7a4f;
+  --gl-evergreen-700:#16633f;
+  --gl-evergreen-800:#14532D;
+  --gl-evergreen-900:#10301F;
+  --gl-vault-950:#0B1F17;
+  --gl-brass-50:#faf3e8;
+  --gl-brass-100:#f4e8d4;
+  --gl-brass-500:#B45309;
+  --gl-brass-600:#92400E;
+  --gl-emerald-600:#0D9273;
+  --gl-amber-500:#d97706;
+  --gl-red-600:#D92D20;
+  --gl-blue-600:#175CD3;
 
   /* semantic — surfaces & text */
   --background: var(--gl-bg);
@@ -25,34 +35,36 @@
   --popover: var(--gl-white);
   --popover-foreground: var(--gl-ink);
   --secondary: var(--gl-stone-50);
-  --secondary-foreground:#404040;
+  --secondary-foreground:#33413a;
   --muted: var(--gl-stone-50);
   --muted-foreground: var(--gl-stone-500);
   --border: var(--gl-stone-200);
   --input: var(--gl-stone-200);
+  --surface-elevated: var(--gl-white);
+  --border-subtle: rgb(20 32 26 / 6%);
 
   /* semantic — brand */
-  --primary: var(--gl-orange-600);
+  --primary: var(--gl-evergreen-800);
   --primary-foreground:#ffffff;
-  --primary-dark: var(--gl-orange-700);
-  --primary-light: var(--gl-orange-50);
-  --accent: var(--gl-orange-50);
-  --accent-foreground: var(--gl-orange-900);
-  --ring: var(--gl-orange-600);
+  --primary-dark: var(--gl-evergreen-900);
+  --primary-light: var(--gl-evergreen-50);
+  --accent: var(--gl-brass-50);
+  --accent-foreground: var(--gl-brass-600);
+  --ring: var(--gl-evergreen-600);
 
   --destructive: var(--gl-red-600);
   --destructive-foreground:#ffffff;
 
   /* semantic — finance & workflow status (fixed meaning, never reused elsewhere) */
-  --income: oklch(0.5 0.13 155);
+  --income: var(--gl-emerald-600);
   --income-foreground: oklch(0.99 0 0);
-  --income-muted: oklch(0.95 0.035 155);
-  --expense: oklch(0.55 0.17 25);
+  --income-muted: oklch(0.95 0.04 165);
+  --expense: var(--gl-red-600);
   --expense-foreground: oklch(0.99 0 0);
-  --expense-muted: oklch(0.95 0.035 25);
-  --offering: oklch(0.7 0.13 80);
-  --offering-foreground: oklch(0.16 0.01 80);
-  --offering-muted: oklch(0.97 0.045 90);
+  --expense-muted: oklch(0.95 0.03 25);
+  --offering: #B54708;
+  --offering-foreground: oklch(0.99 0 0);
+  --offering-muted: oklch(0.96 0.045 80);
   --pending: var(--offering);
   --pending-foreground: var(--offering-foreground);
   --pending-muted: var(--offering-muted);
@@ -70,56 +82,59 @@
   --info: var(--gl-blue-600);
   --info-foreground:#ffffff;
 
-  --chart-1: var(--gl-orange-600);
+  --chart-1: var(--gl-evergreen-600);
   --chart-2: var(--gl-emerald-600);
   --chart-3: var(--gl-red-600);
   --chart-4: var(--gl-amber-500);
   --chart-5:#0d9488;
 
-  --sidebar: var(--gl-white);
-  --sidebar-foreground: var(--gl-ink);
-  --sidebar-primary: var(--gl-orange-600);
+  /* sidebar — the "vault": dark evergreen chrome over a porcelain workspace */
+  --sidebar: var(--gl-vault-950);
+  --sidebar-foreground:#E8EFEA;
+  --sidebar-primary:#2FA36B;
   --sidebar-primary-foreground:#ffffff;
-  --sidebar-accent: var(--gl-orange-50);
-  --sidebar-accent-foreground: var(--gl-orange-900);
-  --sidebar-border: var(--gl-stone-200);
-  --sidebar-icon: var(--gl-stone-500);
+  --sidebar-accent:#1A3A2C;
+  --sidebar-accent-foreground:#CDE3D5;
+  --sidebar-border: rgb(255 255 255 / 8%);
+  --sidebar-icon:#8FA89A;
 }
 
 .dark{
-  --background: oklch(0.155 0.012 45);
-  --foreground: oklch(0.96 0.006 80);
-  --card: oklch(0.19 0.012 45);
-  --card-foreground: oklch(0.96 0.006 80);
-  --popover: oklch(0.21 0.012 45);
-  --popover-foreground: oklch(0.96 0.006 80);
-  --secondary: oklch(0.23 0.012 45);
-  --secondary-foreground: oklch(0.9 0.006 80);
-  --muted: oklch(0.22 0.012 45);
-  --muted-foreground: oklch(0.68 0.01 60);
+  --background: oklch(0.16 0.012 160);
+  --foreground: oklch(0.95 0.008 160);
+  --card: oklch(0.2 0.014 160);
+  --card-foreground: oklch(0.95 0.008 160);
+  --popover: oklch(0.22 0.014 160);
+  --popover-foreground: oklch(0.95 0.008 160);
+  --secondary: oklch(0.24 0.014 160);
+  --secondary-foreground: oklch(0.9 0.008 160);
+  --muted: oklch(0.23 0.014 160);
+  --muted-foreground: oklch(0.68 0.012 160);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 10%);
+  --surface-elevated: oklch(0.24 0.014 160);
+  --border-subtle: oklch(1 0 0 / 6%);
 
-  --primary: var(--gl-orange-600);
+  --primary: #2FA36B;
   --primary-foreground:#ffffff;
-  --primary-dark: var(--gl-orange-700);
-  --primary-light: oklch(0.26 0.06 45);
-  --accent: oklch(0.25 0.04 50);
-  --accent-foreground: oklch(0.85 0.07 55);
-  --ring: var(--gl-orange-600);
+  --primary-dark: var(--gl-evergreen-700);
+  --primary-light: oklch(0.26 0.05 160);
+  --accent: oklch(0.25 0.03 70);
+  --accent-foreground: oklch(0.85 0.08 70);
+  --ring: #2FA36B;
 
   --destructive: oklch(0.64 0.16 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --income: oklch(0.65 0.14 155);
-  --income-foreground: oklch(0.12 0.02 155);
-  --income-muted: oklch(0.24 0.06 155);
+  --income: oklch(0.66 0.13 165);
+  --income-foreground: oklch(0.12 0.02 165);
+  --income-muted: oklch(0.25 0.05 165);
   --expense: oklch(0.64 0.16 25);
   --expense-foreground: oklch(0.12 0.02 25);
   --expense-muted: oklch(0.24 0.06 25);
-  --offering: oklch(0.76 0.12 80);
-  --offering-foreground: oklch(0.14 0.02 80);
-  --offering-muted: oklch(0.24 0.06 80);
+  --offering: oklch(0.72 0.13 70);
+  --offering-foreground: oklch(0.14 0.02 70);
+  --offering-muted: oklch(0.25 0.05 75);
   --pending: var(--offering);
   --pending-foreground: var(--offering-foreground);
   --pending-muted: var(--offering-muted);
@@ -130,27 +145,25 @@
   --rejected-foreground: var(--expense-foreground);
   --rejected-muted: var(--expense-muted);
 
-  --success: oklch(0.65 0.14 155);
-  --success-foreground: oklch(0.12 0.02 155);
+  --success: oklch(0.66 0.13 165);
+  --success-foreground: oklch(0.12 0.02 165);
   --warning: oklch(0.76 0.12 80);
   --warning-foreground: oklch(0.14 0.02 80);
   --info: oklch(0.66 0.11 222);
   --info-foreground: oklch(0.12 0.02 222);
 
-  --chart-1:#fb923c;
-  --chart-2: oklch(0.65 0.14 155);
+  --chart-1:#2FA36B;
+  --chart-2: oklch(0.66 0.13 165);
   --chart-3: oklch(0.64 0.16 25);
   --chart-4: oklch(0.76 0.12 80);
   --chart-5: oklch(0.66 0.1 195);
 
-  --sidebar: oklch(0.15 0.012 45);
-  --sidebar-foreground: oklch(0.94 0.006 80);
-  --sidebar-primary: var(--gl-orange-600);
+  --sidebar: oklch(0.13 0.016 165);
+  --sidebar-foreground: oklch(0.92 0.01 160);
+  --sidebar-primary:#2FA36B;
   --sidebar-primary-foreground:#ffffff;
-  --sidebar-accent: oklch(0.24 0.05 50);
-  --sidebar-accent-foreground: oklch(0.85 0.07 55);
+  --sidebar-accent: oklch(0.22 0.026 165);
+  --sidebar-accent-foreground: oklch(0.87 0.03 160);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-icon: oklch(0.66 0.01 60);
-  --surface-elevated: oklch(0.19 0.012 258);
-  --border-subtle: oklch(1 0 0 / 6%);
+  --sidebar-icon: oklch(0.66 0.015 160);
 }

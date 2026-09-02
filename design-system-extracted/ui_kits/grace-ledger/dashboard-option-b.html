@@ -1,0 +1,880 @@
+<!-- @dsCard group="Grace Ledger" viewport="1280x900" name="Dashboard — Option B" subtitle="Operational dashboard / asymmetric split, contextual actions" -->
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard — Option B</title>
+    <link rel="stylesheet" href="../../../src/styles/app.css" />
+    <style>
+      body {
+        background: var(--background);
+      }
+
+      .mock-tag {
+        position: fixed;
+        top: var(--space-3);
+        right: var(--space-3);
+        z-index: 999;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        background: var(--foreground);
+        color: var(--background);
+        font-size: var(--text-2xs);
+        font-weight: var(--weight-semibold);
+        letter-spacing: 0.06em;
+      }
+
+      /* ------------------------------------------------------------------
+     Option B — asymmetric operational split. The hero stays a card
+     (this composition is card-based by design), but its own footer is
+     an uneven action strip, and the second column is real content
+     (pending review), not an equal-weight twin of the first.
+     ------------------------------------------------------------------ */
+      .b-split {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: var(--space-4);
+        align-items: stretch;
+        margin-bottom: var(--space-8);
+      }
+
+      @media (max-width: 900px) {
+        .b-split {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .b-hero {
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow-sm-card);
+      }
+
+      .b-hero__value {
+        margin: var(--space-2) 0 0;
+        font-family: var(--font-display);
+        font-size: var(--text-5xl);
+        font-weight: var(--weight-bold);
+        letter-spacing: var(--tracking-heading);
+        line-height: 1.1;
+        color: var(--foreground);
+      }
+
+      .b-hero__foot {
+        margin: var(--space-2) 0 0;
+        font-size: var(--text-sm);
+        color: var(--muted-foreground);
+      }
+
+      .b-hero__figures {
+        display: flex;
+        gap: var(--space-6);
+        margin-top: var(--space-5);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border);
+      }
+
+      .b-hero__figure {
+        font-size: var(--text-xs);
+        color: var(--muted-foreground);
+      }
+
+      .b-hero__figure strong {
+        display: block;
+        margin-top: 2px;
+        font-size: var(--text-lg);
+        font-weight: var(--weight-bold);
+      }
+
+      /* Uneven action strip: one wide committing action, three compact
+     icon-only controls — never four identical rectangles. */
+      .b-hero__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        margin-top: var(--space-5);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border);
+      }
+
+      .b-hero__actions .gl-btn--primary {
+        flex: 1 1 auto;
+      }
+
+      .b-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: var(--radius-button);
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--foreground);
+        cursor: pointer;
+        transition:
+          background-color var(--duration-micro) var(--ease-out),
+          border-color var(--duration-micro) var(--ease-out);
+      }
+
+      .b-icon-btn:hover {
+        background: var(--secondary);
+        border-color: var(--primary);
+      }
+
+      .b-review {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .b-review__head {
+        padding: var(--space-4) var(--space-4) 0;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-2);
+      }
+
+      .b-review__head h2 {
+        font-size: var(--text-sm);
+        font-weight: var(--weight-semibold);
+        margin: 0;
+      }
+
+      .b-review .gl-row {
+        padding: var(--space-3) var(--space-4);
+      }
+    </style>
+  </head>
+  <body>
+    <span class="mock-tag">ตัวเลือก B</span>
+
+    <div class="gl-page gl-dashboard-container">
+      <div class="gl-page-header">
+        <h1>ภาพรวมการเงิน</h1>
+        <p>ข้อมูล ณ ส.ค. 2569</p>
+      </div>
+
+      <div class="b-split">
+        <div class="gl-card b-hero">
+          <div class="kicker">ยอดเงินคงเหลือทั้งหมด</div>
+          <p class="num-display b-hero__value" data-testid="total-balance">
+            ฿284,650.00
+          </p>
+          <p class="b-hero__foot">5 กองทุน · 3 บัญชีธนาคาร + เงินสดในมือ</p>
+
+          <div class="b-hero__figures">
+            <span class="b-hero__figure"
+              >รายรับเดือนนี้<strong
+                class="num-display"
+                style="color: var(--income)"
+                >+฿52,400.00</strong
+              ></span
+            >
+            <span class="b-hero__figure"
+              >รายจ่ายเดือนนี้<strong
+                class="num-display"
+                style="color: var(--expense)"
+                >−฿31,150.00</strong
+              ></span
+            >
+          </div>
+
+          <div class="b-hero__actions">
+            <a href="#" class="gl-btn gl-btn--primary">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>บันทึกเงินถวาย</span>
+            </a>
+            <a
+              href="#"
+              class="b-icon-btn"
+              aria-label="บันทึกรายจ่าย"
+              title="บันทึกรายจ่าย"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M6 3h9l4 4v14H6z" />
+                <path d="M9 12h7M9 16h5" />
+              </svg>
+            </a>
+            <a
+              href="#"
+              class="b-icon-btn"
+              aria-label="โอนเงินกองทุน"
+              title="โอนเงินกองทุน"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 9h13l-3-3M20 15H7l3 3" />
+              </svg>
+            </a>
+            <a
+              href="#"
+              class="b-icon-btn"
+              aria-label="รายการทั้งหมด"
+              title="รายการทั้งหมด"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 6h16M4 12h16M4 18h10" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="gl-card b-review">
+          <div class="b-review__head">
+            <h2>ต้องการให้คุณตรวจสอบ</h2>
+            <span
+              class="num-display"
+              style="
+                font-size: var(--text-xs);
+                font-weight: var(--weight-semibold);
+                color: var(--pending);
+              "
+              >3 เรื่อง</span
+            >
+          </div>
+          <a href="#" class="gl-row">
+            <span
+              class="gl-row__icon"
+              aria-hidden="true"
+              style="
+                background: var(--pending-muted);
+                color: var(--on-pending-muted);
+              "
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+            </span>
+            <span class="gl-row__body">
+              <span class="gl-row__title" style="display: block"
+                >3 รายการรออนุมัติ</span
+              >
+              <span class="gl-row__meta" style="display: block"
+                >คำขอเบิกจ่ายที่รอการพิจารณา</span
+              >
+            </span>
+            <span class="gl-row__chevron" aria-hidden="true">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </a>
+          <a href="#" class="gl-row">
+            <span
+              class="gl-row__icon"
+              aria-hidden="true"
+              style="
+                background: var(--pending-muted);
+                color: var(--on-pending-muted);
+              "
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="7" width="18" height="11" rx="2.5" />
+                <circle cx="12" cy="12.5" r="2.2" />
+              </svg>
+            </span>
+            <span class="gl-row__body">
+              <span class="gl-row__title" style="display: block"
+                >เงินถวายวันอาทิตย์</span
+              >
+              <span class="gl-row__meta" style="display: block"
+                >เปิดรอบนับเงินและตรวจยอด</span
+              >
+            </span>
+            <span class="gl-row__chevron" aria-hidden="true">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <section class="gl-section" style="margin-bottom: var(--space-8)">
+        <div class="gl-section__head">
+          <h2>รายรับและรายจ่ายรายเดือน</h2>
+          <a
+            href="#"
+            style="
+              font-size: var(--text-xs);
+              color: var(--primary);
+              font-weight: var(--weight-semibold);
+              text-decoration: none;
+            "
+            >ดูรายงานเต็ม</a
+          >
+        </div>
+        <p
+          style="
+            font-size: var(--text-sm);
+            color: var(--muted-foreground);
+            margin: 0 0 var(--space-4);
+          "
+        >
+          เดือนที่แท่งสีแดงสูงกว่าสีเขียว คือเดือนที่จ่ายมากกว่ารับ
+        </p>
+        <div class="gl-card">
+          <div class="gl-trend">
+            <div class="gl-trend__col">
+              <span class="gl-trend__bars" aria-hidden="true"
+                ><span
+                  class="gl-trend__bar gl-trend__bar--income"
+                  style="height: 52px"
+                ></span
+                ><span
+                  class="gl-trend__bar gl-trend__bar--expense"
+                  style="height: 30px"
+                ></span></span
+              ><span class="gl-trend__label">มี.ค.</span
+              ><span
+                class="gl-trend__net num-display"
+                style="
+                  font-size: var(--text-2xs);
+                  font-weight: var(--weight-bold);
+                  color: var(--income);
+                "
+                >+฿18,200</span
+              >
+            </div>
+            <div class="gl-trend__col">
+              <span class="gl-trend__bars" aria-hidden="true"
+                ><span
+                  class="gl-trend__bar gl-trend__bar--income"
+                  style="height: 40px"
+                ></span
+                ><span
+                  class="gl-trend__bar gl-trend__bar--expense"
+                  style="height: 44px"
+                ></span></span
+              ><span class="gl-trend__label">เม.ย.</span
+              ><span
+                class="gl-trend__net num-display"
+                style="
+                  font-size: var(--text-2xs);
+                  font-weight: var(--weight-bold);
+                  color: var(--expense);
+                "
+                >−฿2,100</span
+              >
+            </div>
+            <div class="gl-trend__col">
+              <span class="gl-trend__bars" aria-hidden="true"
+                ><span
+                  class="gl-trend__bar gl-trend__bar--income"
+                  style="height: 60px"
+                ></span
+                ><span
+                  class="gl-trend__bar gl-trend__bar--expense"
+                  style="height: 28px"
+                ></span></span
+              ><span class="gl-trend__label">พ.ค.</span
+              ><span
+                class="gl-trend__net num-display"
+                style="
+                  font-size: var(--text-2xs);
+                  font-weight: var(--weight-bold);
+                  color: var(--income);
+                "
+                >+฿24,600</span
+              >
+            </div>
+            <div class="gl-trend__col">
+              <span class="gl-trend__bars" aria-hidden="true"
+                ><span
+                  class="gl-trend__bar gl-trend__bar--income"
+                  style="height: 48px"
+                ></span
+                ><span
+                  class="gl-trend__bar gl-trend__bar--expense"
+                  style="height: 36px"
+                ></span></span
+              ><span class="gl-trend__label">มิ.ย.</span
+              ><span
+                class="gl-trend__net num-display"
+                style="
+                  font-size: var(--text-2xs);
+                  font-weight: var(--weight-bold);
+                  color: var(--income);
+                "
+                >+฿9,800</span
+              >
+            </div>
+            <div class="gl-trend__col">
+              <span class="gl-trend__bars" aria-hidden="true"
+                ><span
+                  class="gl-trend__bar gl-trend__bar--income"
+                  style="height: 44px"
+                ></span
+                ><span
+                  class="gl-trend__bar gl-trend__bar--expense"
+                  style="height: 40px"
+                ></span></span
+              ><span class="gl-trend__label">ก.ค.</span
+              ><span
+                class="gl-trend__net num-display"
+                style="
+                  font-size: var(--text-2xs);
+                  font-weight: var(--weight-bold);
+                  color: var(--income);
+                "
+                >+฿3,200</span
+              >
+            </div>
+            <div class="gl-trend__col">
+              <span class="gl-trend__bars" aria-hidden="true"
+                ><span
+                  class="gl-trend__bar gl-trend__bar--income"
+                  style="height: 96px"
+                ></span
+                ><span
+                  class="gl-trend__bar gl-trend__bar--expense"
+                  style="height: 58px"
+                ></span></span
+              ><span class="gl-trend__label">ส.ค.</span
+              ><span
+                class="gl-trend__net num-display"
+                style="
+                  font-size: var(--text-2xs);
+                  font-weight: var(--weight-bold);
+                  color: var(--income);
+                "
+                >+฿21,250</span
+              >
+            </div>
+          </div>
+          <hr class="gl-divider" />
+          <div class="gl-legend">
+            <span class="gl-legend__item"
+              ><span
+                class="gl-legend__swatch"
+                aria-hidden="true"
+                style="background: var(--income)"
+              ></span
+              ><span>รายรับ</span></span
+            >
+            <span class="gl-legend__item"
+              ><span
+                class="gl-legend__swatch"
+                aria-hidden="true"
+                style="background: var(--expense)"
+              ></span
+              ><span>รายจ่าย</span></span
+            >
+          </div>
+        </div>
+      </section>
+
+      <div class="gl-dash-split">
+        <div>
+          <section class="gl-section" style="margin-bottom: var(--space-8)">
+            <div class="gl-section__head">
+              <h2>ความเคลื่อนไหวล่าสุด</h2>
+              <a
+                href="#"
+                style="
+                  font-size: var(--text-xs);
+                  color: var(--primary);
+                  font-weight: var(--weight-semibold);
+                  text-decoration: none;
+                "
+                >ดูทั้งหมด</a
+              >
+            </div>
+            <div class="gl-card" style="padding: 0; overflow: hidden">
+              <div class="gl-row">
+                <span
+                  class="gl-row__icon"
+                  aria-hidden="true"
+                  style="
+                    background: var(--income-muted);
+                    color: var(--on-income-muted);
+                  "
+                  ><svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M12 19V5M6 11l6-6 6 6" /></svg
+                ></span>
+                <span class="gl-row__body"
+                  ><span class="gl-row__title" style="display: block"
+                    >ถวายทรัพย์ประจำสัปดาห์</span
+                  ><span class="gl-row__meta" style="display: block"
+                    >31 ส.ค. 2569</span
+                  ></span
+                >
+                <span class="gl-row__end"
+                  ><span
+                    class="num-display"
+                    style="
+                      display: block;
+                      font-size: var(--text-sm);
+                      font-weight: var(--weight-bold);
+                      color: var(--income);
+                    "
+                    >+฿18,400.00</span
+                  ><span
+                    class="gl-badge gl-badge--approved"
+                    style="font-size: var(--text-2xs); margin-top: 4px"
+                    >อนุมัติแล้ว</span
+                  ></span
+                >
+              </div>
+              <div class="gl-row">
+                <span
+                  class="gl-row__icon"
+                  aria-hidden="true"
+                  style="
+                    background: var(--expense-muted);
+                    color: var(--on-expense-muted);
+                  "
+                  ><svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M12 5v14M6 13l6 6 6-6" /></svg
+                ></span>
+                <span class="gl-row__body"
+                  ><span class="gl-row__title" style="display: block"
+                    >ค่าไฟฟ้าอาคารโบสถ์</span
+                  ><span class="gl-row__meta" style="display: block"
+                    >30 ส.ค. 2569</span
+                  ></span
+                >
+                <span class="gl-row__end"
+                  ><span
+                    class="num-display"
+                    style="
+                      display: block;
+                      font-size: var(--text-sm);
+                      font-weight: var(--weight-bold);
+                      color: var(--expense);
+                    "
+                    >−฿4,250.00</span
+                  ><span
+                    class="gl-badge gl-badge--approved"
+                    style="font-size: var(--text-2xs); margin-top: 4px"
+                    >อนุมัติแล้ว</span
+                  ></span
+                >
+              </div>
+              <div class="gl-row">
+                <span
+                  class="gl-row__icon"
+                  aria-hidden="true"
+                  style="
+                    background: var(--income-muted);
+                    color: var(--on-income-muted);
+                  "
+                  ><svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M12 19V5M6 11l6-6 6 6" /></svg
+                ></span>
+                <span class="gl-row__body"
+                  ><span class="gl-row__title" style="display: block"
+                    >ถวายพิเศษ (มิชชั่น)</span
+                  ><span class="gl-row__meta" style="display: block"
+                    >29 ส.ค. 2569</span
+                  ></span
+                >
+                <span class="gl-row__end"
+                  ><span
+                    class="num-display"
+                    style="
+                      display: block;
+                      font-size: var(--text-sm);
+                      font-weight: var(--weight-bold);
+                      color: var(--income);
+                    "
+                    >+฿12,000.00</span
+                  ><span
+                    class="gl-badge gl-badge--pending"
+                    style="font-size: var(--text-2xs); margin-top: 4px"
+                    >รอตรวจสอบ</span
+                  ></span
+                >
+              </div>
+              <div class="gl-row">
+                <span
+                  class="gl-row__icon"
+                  aria-hidden="true"
+                  style="
+                    background: var(--expense-muted);
+                    color: var(--on-expense-muted);
+                  "
+                  ><svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M12 5v14M6 13l6 6 6-6" /></svg
+                ></span>
+                <span class="gl-row__body"
+                  ><span class="gl-row__title" style="display: block"
+                    >ค่าจัดพิมพ์เอกสาร</span
+                  ><span class="gl-row__meta" style="display: block"
+                    >28 ส.ค. 2569</span
+                  ></span
+                >
+                <span class="gl-row__end"
+                  ><span
+                    class="num-display"
+                    style="
+                      display: block;
+                      font-size: var(--text-sm);
+                      font-weight: var(--weight-bold);
+                      color: var(--expense);
+                    "
+                    >−฿1,850.00</span
+                  ><span
+                    class="gl-badge gl-badge--approved"
+                    style="font-size: var(--text-2xs); margin-top: 4px"
+                    >อนุมัติแล้ว</span
+                  ></span
+                >
+              </div>
+              <div class="gl-row">
+                <span
+                  class="gl-row__icon"
+                  aria-hidden="true"
+                  style="
+                    background: var(--secondary);
+                    color: var(--muted-foreground);
+                  "
+                  ><svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                  >
+                    <path d="M4 9h13l-3-3M20 15H7l3 3" /></svg
+                ></span>
+                <span class="gl-row__body"
+                  ><span class="gl-row__title" style="display: block"
+                    >โอนเงิน: กองทุนอาคาร → กองทุนพันธกิจ</span
+                  ><span class="gl-row__meta" style="display: block"
+                    >27 ส.ค. 2569</span
+                  ></span
+                >
+                <span class="gl-row__end"
+                  ><span
+                    class="num-display"
+                    style="
+                      display: block;
+                      font-size: var(--text-sm);
+                      font-weight: var(--weight-bold);
+                      color: var(--foreground);
+                    "
+                    >฿5,000.00</span
+                  ><span
+                    class="gl-badge gl-badge--approved"
+                    style="font-size: var(--text-2xs); margin-top: 4px"
+                    >อนุมัติแล้ว</span
+                  ></span
+                >
+              </div>
+            </div>
+          </section>
+        </div>
+        <div>
+          <section class="gl-section" style="margin-bottom: var(--space-8)">
+            <div class="gl-section__head">
+              <h2>กองทุนและเป้าหมาย</h2>
+              <a
+                href="#"
+                style="
+                  font-size: var(--text-xs);
+                  color: var(--primary);
+                  font-weight: var(--weight-semibold);
+                  text-decoration: none;
+                "
+                >ดูทั้งหมด</a
+              >
+            </div>
+            <div class="gl-card">
+              <div class="gl-fundlist">
+                <div>
+                  <div class="gl-fundrow__head">
+                    <span class="gl-fundrow__name">กองทุนทั่วไป</span
+                    ><span
+                      class="num-display"
+                      style="
+                        font-size: var(--text-md);
+                        font-weight: var(--weight-bold);
+                      "
+                      >฿142,300.00</span
+                    >
+                  </div>
+                  <div class="gl-fundrow__foot">
+                    <span>ยังไม่ได้ตั้งเป้าหมายกองทุนนี้</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="gl-fundrow__head">
+                    <span class="gl-fundrow__name">กองทุนอาคาร</span
+                    ><span
+                      class="num-display"
+                      style="
+                        font-size: var(--text-md);
+                        font-weight: var(--weight-bold);
+                      "
+                      >฿98,750.00</span
+                    >
+                  </div>
+                  <div
+                    class="gl-progress"
+                    role="progressbar"
+                    aria-valuenow="66"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-label="ความคืบหน้าของ กองทุนอาคาร"
+                  >
+                    <div class="gl-progress__fill" style="width: 66%"></div>
+                  </div>
+                  <div class="gl-fundrow__foot">
+                    <span
+                      >เป้าหมาย
+                      <span class="num-display">฿150,000.00</span></span
+                    ><span class="num-display">66%</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="gl-fundrow__head">
+                    <span class="gl-fundrow__name">กองทุนพันธกิจ</span
+                    ><span
+                      class="num-display"
+                      style="
+                        font-size: var(--text-md);
+                        font-weight: var(--weight-bold);
+                      "
+                      >฿43,600.00</span
+                    >
+                  </div>
+                  <div
+                    class="gl-progress"
+                    role="progressbar"
+                    aria-valuenow="100"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-label="ความคืบหน้าของ กองทุนพันธกิจ"
+                  >
+                    <div class="gl-progress__fill" style="width: 100%"></div>
+                  </div>
+                  <div class="gl-fundrow__foot">
+                    <span
+                      >เป้าหมาย
+                      <span class="num-display">฿40,000.00</span></span
+                    ><span class="num-display">100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

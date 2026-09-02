@@ -1,15 +1,15 @@
 :root{
-  --radius:0.75rem;         /* 12px base */
-  --radius-sm:0.5rem;       /* 8px */
-  --radius-md:0.75rem;      /* 12px */
-  --radius-lg:1rem;         /* 16px */
-  --radius-xl:1.25rem;      /* 20px */
-  --radius-2xl:1.5rem;      /* 24px */
-  --radius-button:1.125rem; /* 18px */
-  --radius-input:0.875rem;  /* 14px */
-  --radius-card:1.5rem;     /* 24px */
-  --radius-dialog:1.75rem;  /* 28px */
-  --radius-sheet:2rem;      /* 32px */
+  --radius:0.625rem;        /* 10px base — crisper than the 24px-card era */
+  --radius-sm:0.375rem;     /* 6px */
+  --radius-md:0.625rem;     /* 10px */
+  --radius-lg:0.75rem;      /* 12px */
+  --radius-xl:0.875rem;     /* 14px */
+  --radius-2xl:1.125rem;    /* 18px */
+  --radius-button:0.75rem;  /* 12px */
+  --radius-input:0.625rem;  /* 10px */
+  --radius-card:1.25rem;    /* 20px */
+  --radius-dialog:1.5rem;   /* 24px */
+  --radius-sheet:1.75rem;   /* 28px */
   --radius-full:9999px;
   --radius-table:0px;       /* tables/cells never round — border is the depth cue */
 }

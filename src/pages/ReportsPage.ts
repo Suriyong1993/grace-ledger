@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
+import { CHURCH_NAME_TH } from "../lib/org";
 import {
   ReportsService,
   StatementOfFinancialPosition,
@@ -46,6 +47,7 @@ export class ReportsPage {
   constructor(
     public readonly supabase: SupabaseClient<Database>,
     public readonly churchId: string,
+    public readonly churchName: string = CHURCH_NAME_TH,
   ) {
     this.reportsService = new ReportsService(supabase);
     this.historicalService = new HistoricalService(supabase);
@@ -313,7 +315,7 @@ export class ReportsPage {
       <section class="gl-section gl-reports-hero">
         <div class="gl-card">
           <div class="kicker" style="margin: 0;">${opts.netLabel}</div>
-          <div class="num-display gl-reports-hero__value" style="color: ${netColor};">${opts.net.format()}</div>
+          <div class="num-display gl-reports-hero__value gl-total-rule" style="color: ${netColor}; display: inline-block; padding-right: var(--space-6);">${opts.net.format()}</div>
           <div class="gl-reports-hero__caption">${opts.netCaption}</div>
 
           <div class="gl-reports-hero__figures">
@@ -353,13 +355,13 @@ export class ReportsPage {
     ) {
       return `
       <section class="gl-section">
-        <div class="gl-card gl-empty-state gl-empty-center" style="padding: var(--space-8); border-style: dashed;">
-          <div class="gl-empty-center__msg">
+        <div class="gl-card gl-card--pad-lg gl-empty-center">
+          <p class="gl-empty-center__msg">
             ไม่มีข้อมูลธุรกรรมที่ลงบัญชีแล้วในงวดนี้
-          </div>
-          <div style="font-size: var(--text-sm); color: var(--muted-foreground);">
+          </p>
+          <p class="gl-empty-center__hint">
             ยังไม่มีรายการธุรกรรมสถานะ 'posted' สำหรับเดือนที่เลือก
-          </div>
+          </p>
         </div>
       </section>
       `;
@@ -485,10 +487,10 @@ export class ReportsPage {
 
     if (!m) {
       return `
-        <div class="gl-card gl-empty-state gl-reports-empty-icon" style="padding: var(--space-8);">
+        <div class="gl-card gl-card--pad-lg gl-empty-center gl-reports-empty-icon">
           ${ICON_NO_ARCHIVE}
           <div class="gl-reports-empty-icon__title">ไม่พบข้อมูลเอกสารย้อนหลัง</div>
-          <p style="margin: 0; font-size: var(--text-sm);">ยังไม่มีการนำเข้าไฟล์สรุปบัญชีสำหรับเดือนนี้</p>
+          <p class="gl-empty-center__hint">ยังไม่มีการนำเข้าไฟล์สรุปบัญชีสำหรับเดือนนี้</p>
         </div>
       `;
     }
@@ -681,7 +683,7 @@ export class ReportsPage {
     const rows: string[][] = [];
 
     if (isYearView) {
-      rows.push(["รายงานการเงินประจำปี 2569", "คริสตจักรเกรซแบ๊บติสต์"]);
+      rows.push(["รายงานการเงินประจำปี 2569", this.churchName]);
       rows.push([""]);
       rows.push([
         "เดือน",
@@ -725,7 +727,7 @@ export class ReportsPage {
       const m = this.historicalMonthly;
       rows.push([
         `รายงานการเงินย้อนหลัง เดือน ${m.monthName} 2569`,
-        "คริสตจักรเกรซแบ๊บติสต์",
+        this.churchName,
       ]);
       rows.push([""]);
       rows.push(["สรุปยอดรวม", "จำนวนเงิน (฿)"]);
@@ -757,7 +759,7 @@ export class ReportsPage {
       const s = this.statement;
       rows.push([
         `งบการเงินประจำเดือน ${this.selectedPeriod}`,
-        "คริสตจักรเกรซแบ๊บติสต์",
+        this.churchName,
       ]);
       rows.push([""]);
       rows.push(["สรุปภาพรวม", "จำนวนเงิน (฿)"]);

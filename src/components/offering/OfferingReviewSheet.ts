@@ -95,7 +95,7 @@ export function renderOfferingReviewSheetHtml(
     <!-- Header & Step Indicator -->
     <div class="gl-page-header">
       <div class="gl-offering-step">
-        <span class="gl-offering-step__badge" style="background: var(--income); color: var(--income-foreground);">✓</span>
+        <span class="gl-offering-step__badge" style="background: var(--income); color: var(--income-foreground);" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><polyline points="20 6 9 17 4 12"/></svg></span>
         <span class="gl-offering-step__label" style="color: var(--income);">ขั้นตอนที่ 2 / 2: ตรวจทานยอดและยืนยันบันทึกร่าง</span>
       </div>
       <h1>ตรวจทานรายการเงินถวาย</h1>

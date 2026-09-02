@@ -8,7 +8,8 @@ export type RoutePattern =
   | "/approvals/:id"
   | "/offerings"
   | "/offerings/new"
-  | "/offerings/:id";
+  | "/offerings/:id"
+  | "/profile";
 
 export interface MatchedRoute {
   path: string;
@@ -61,6 +62,10 @@ class ClientRouter {
 
     if (cleanPath === "/reports") {
       return { path: "/reports", pattern: "/reports", params: {} };
+    }
+
+    if (cleanPath === "/profile") {
+      return { path: "/profile", pattern: "/profile", params: {} };
     }
 
     if (cleanPath === "/approvals") {

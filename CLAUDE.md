@@ -38,14 +38,16 @@ If a UI or refactor task requires one of these, **stop and report**: problem, im
 
 ## Design
 
-`design-system-extracted/` is the visual source of truth. Upgrade the craft, do not replace the identity.
+`design-system-extracted/` is the visual source of truth. **Identity: "Emerald Vault" (2026-09)** — porcelain surfaces, deep-evergreen brand, dark vault sidebar, brass accents. Upgrade the craft, do not replace the identity.
 
 - Reuse existing tokens: color, typography, spacing, radius, shadow, motion. No new palette, no new framework, no new component library.
 - Color carries fixed meaning: neutral = structure, emerald/`--income` = positive, amber/`--pending` = attention, red/`--expense` = error. No accent color without a documented reason.
-- `--*-foreground` tokens are for text on the **solid** color, not on the `-muted` surface. Pairing them is a contrast bug.
-- Border and subtle elevation over heavy shadow. Not every section is a card.
+- `--*-foreground` tokens are for text on the **solid** color, not on the `-muted` surface. Pairing them is a contrast bug. Inside the dark vault sidebar, derive dimmed text from `--sidebar-foreground`, never `--muted-foreground`.
+- Fonts: Anuphan (Thai body/UI) + Space Grotesk (Latin/headline/numerals). `.num-display` is tabular; every money value uses it.
+- Signature: `.gl-total-rule` — the double ledger rule (2px over 1px) that closes a grand total. Use only on the figure a screen exists to answer.
+- Border and subtle elevation over heavy shadow. Not every section is a card. Empty states use the shared `gl-empty-center` family; icons are per-page `ICON_*` inline SVGs — never emoji or unicode glyphs.
 - One primary action per screen. Destructive actions never look like the primary.
-- Motion only for transition, confirmation, hierarchy, or state change. Short, subtle, respects `prefers-reduced-motion`.
+- Motion only for transition, confirmation, hierarchy, or state change. Short, subtle, respects `prefers-reduced-motion`. Press feedback lands instantly on `:active` (`scale(0.97)`).
 - Mobile target is 390px. No horizontal overflow in a core workflow. Touch targets ≥44px (`--touch-target-min`).
 - Accessibility: keyboard focus, visible focus ring, real `<label for>`, semantic buttons, contrast, error announcement, decorative SVG `aria-hidden`.
 

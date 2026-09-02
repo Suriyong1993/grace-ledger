@@ -675,4 +675,46 @@ describe("DashboardPage UI — Unit Tests", () => {
       ]);
     });
   });
+
+  describe("Profile-Centric Layout & 3-Column Metrics", () => {
+    it("renders profile-centric user and church card when user is provided", () => {
+      const html = page.renderHtml(
+        {
+          pendingApprovalsCount: 1,
+          totalFundsBalance: "฿150,000.00",
+          monthlyIncome: "฿25,000.00",
+          monthlyExpense: "฿10,000.00",
+        },
+        {
+          name: "ภราดา มานะ",
+          role: "เหรัญญิก",
+          initials: "ภม",
+          churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+        }
+      );
+
+      expect(html).toContain('class="gl-card gl-dash-user-card"');
+      expect(html).toContain("ภราดา มานะ");
+      expect(html).toContain("เหรัญญิก");
+      expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
+      expect(html).toContain("ภม");
+      expect(html).toContain('href="#/profile"');
+    });
+
+    it("calculates and displays 3-column financial metrics including net change", () => {
+      const html = page.renderHtml({
+        pendingApprovalsCount: 0,
+        totalFundsBalance: "฿150,000.00",
+        monthlyIncome: "฿30,000.00",
+        monthlyExpense: "฿12,000.00",
+      });
+
+      expect(html).toContain("รายรับเดือนนี้");
+      expect(html).toContain("+฿30,000.00");
+      expect(html).toContain("รายจ่ายเดือนนี้");
+      expect(html).toContain("−฿12,000.00");
+      expect(html).toContain("ส่วนต่างสุทธิ");
+      expect(html).toContain("+฿18,000.00");
+    });
+  });
 });

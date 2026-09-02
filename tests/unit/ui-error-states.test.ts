@@ -51,7 +51,7 @@ describe("UI Error & Empty States (Fail-Closed Architecture)", () => {
       const html = page.renderHtml();
 
       expect(html).not.toContain("gl-notice--error");
-      expect(html).toContain("gl-empty-state");
+      expect(html).toContain("gl-empty-center");
       expect(html).toContain("ยังไม่มีรายการธุรกรรม");
     });
   });
@@ -74,7 +74,7 @@ describe("UI Error & Empty States (Fail-Closed Architecture)", () => {
       const html = page.renderHtml();
 
       expect(html).not.toContain("gl-notice--error");
-      expect(html).toContain("gl-empty-state");
+      expect(html).toContain("gl-empty-center");
       expect(html).toContain("ยังไม่มีกองทุนในระบบ");
     });
   });
@@ -97,7 +97,7 @@ describe("UI Error & Empty States (Fail-Closed Architecture)", () => {
       const html = page.renderHtml();
 
       expect(html).not.toContain("gl-notice--error");
-      expect(html).toContain("gl-empty-state");
+      expect(html).toContain("gl-empty-center");
       expect(html).toContain("ยังไม่มีรายชื่อสมาชิก");
     });
   });
@@ -132,7 +132,7 @@ describe("UI Error & Empty States (Fail-Closed Architecture)", () => {
       const html = page.renderHtml();
 
       expect(html).not.toContain("gl-notice--error");
-      expect(html).toContain("gl-empty-state");
+      expect(html).toContain("gl-empty-center");
       expect(html).toContain("ไม่มีข้อมูลธุรกรรมที่ลงบัญชีแล้วในงวดนี้");
     });
   });

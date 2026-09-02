@@ -72,6 +72,27 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   Double ledger rule — the identity's signature. A real ledger closes a
+   grand total with a heavy rule over a hairline. Figures the screen exists
+   to answer get this; nothing else does. Use sparingly: hero balance, fund
+   totals, report net figures.
+   -------------------------------------------------------------------------- */
+.gl-total-rule {
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.gl-total-rule::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 4px;
+  border-top: 2px solid color-mix(in srgb, var(--foreground) 75%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 75%, transparent);
+}
+
+/* --------------------------------------------------------------------------
    Page frame
    -------------------------------------------------------------------------- */
 .gl-page {
@@ -85,6 +106,7 @@ body {
 }
 
 .gl-page-header h1 {
+  font-family: var(--font-display);
   font-size: var(--text-3xl);
   font-weight: var(--weight-bold);
   color: var(--foreground);
@@ -110,6 +132,7 @@ body {
 }
 
 .gl-section__head h2 {
+  font-family: var(--font-display);
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   color: var(--foreground);
@@ -473,6 +496,10 @@ button.gl-card:active {
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+  /* Long modals (certificates, forms) must scroll instead of being
+     clipped top and bottom on a 390px phone; margin:auto on the content
+     keeps short modals centered. */
+  overflow-y: auto;
   background: rgb(0 0 0 / 0.4);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
@@ -483,6 +510,7 @@ button.gl-card:active {
 .gl-modal-content {
   width: 100%;
   max-width: 480px;
+  margin: auto;
   padding: var(--space-6);
   background: color-mix(in srgb, var(--popover) 88%, transparent);
   backdrop-filter: blur(20px) saturate(160%);
@@ -1356,6 +1384,108 @@ button.gl-card:active {
    side, unequal width — the balance is the operational core, review is real
    content beside it, not a twin stat card. Figures inside the balance card
    are typography (label + value), never boxed into a third equal card. */
+/* Dashboard — user identity card. Owns what the renderer used to restate
+   inline. Flat card: the Emerald Vault swap removed the decorative gradient
+   and the avatar glow; the avatar is solid --primary. */
+.gl-dash-user-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.gl-dash-user-card__avatar-link {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.gl-dash-user-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+}
+
+.gl-dash-user-card__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.gl-dash-user-card__idrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.gl-dash-user-card__name {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+.gl-dash-user-card__role {
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: var(--text-2xs);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-semibold);
+}
+
+.gl-dash-user-card__church {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Row-icon variants shared by the dashboard lists — semantic colors only. */
+.gl-row__icon--income {
+  background: var(--income-muted);
+  color: var(--on-income-muted);
+}
+
+.gl-row__icon--expense {
+  background: var(--expense-muted);
+  color: var(--on-expense-muted);
+}
+
+.gl-row__icon--transfer {
+  background: var(--secondary);
+  color: var(--muted-foreground);
+}
+
+/* Attention-state icon/row (pending queue) — amber family only. */
+.gl-row__icon--attention {
+  background: var(--pending-muted);
+  color: var(--on-pending-muted);
+}
+
+.gl-dash-review__row--attention {
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--pending-muted) 45%, transparent);
+  border: 1px solid var(--pending);
+}
+
+/* "ดูทั้งหมด / ดูรายงานเต็ม" links in section heads. */
+.gl-section__link {
+  font-size: var(--text-xs);
+  color: var(--primary);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
 .gl-dash-hero-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -1811,6 +1941,24 @@ a.gl-row:focus-visible {
   strong {
     color: #000000 !important;
   }
+
+  /* Print-isolation mode (certificate): the modal sits above the page, so
+     everything outside #printable-certificate must stay off the paper. */
+  body.print-certificate * {
+    visibility: hidden !important;
+  }
+
+  body.print-certificate #printable-certificate,
+  body.print-certificate #printable-certificate * {
+    visibility: visible !important;
+  }
+
+  body.print-certificate #printable-certificate {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -1893,46 +2041,43 @@ body {
    which set its own non-token box-shadow at equal specificity but later in
    source order). Consolidated here, after where that duplicate was, so it
    resolves to the design system's own faint --shadow-card rule instead of a
-   heavy hand-rolled one. */
+   heavy hand-rolled one. Emerald Vault: flat card + faint shadow — the old
+   decorative radial tint is gone. */
 .gl-card--elevated {
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  background:
-    radial-gradient(
-      420px 220px at 88% -20%,
-      color-mix(in srgb, var(--primary) 14%, transparent),
-      transparent 70%
-    ),
-    var(--card);
+  background: var(--card);
 }
 
 .gl-btn {
   min-height: 46px;
-  border-radius: 12px;
+  border-radius: var(--radius-button);
   letter-spacing: -0.005em;
 }
 
-.gl-btn--primary {
-  box-shadow: 0 6px 14px color-mix(in srgb, var(--primary) 20%, transparent);
+/* Press feedback lands on pointer-down, instantly — the button answers the
+   finger before release. Hover is a tint shift, never a lift or scale-up. */
+.gl-btn:active:not(:disabled),
+.gl-icon-btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .gl-btn--primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 9px 20px color-mix(in srgb, var(--primary) 25%, transparent);
+  background: var(--primary-dark);
 }
 
 .gl-btn--secondary,
 .gl-btn--ghost,
 .gl-btn--destructive {
-  box-shadow: 0 1px 2px rgb(23 23 23 / 0.025);
+  box-shadow: 0 1px 2px rgb(16 32 24 / 0.025);
 }
 
 .gl-input,
 .gl-select,
 .gl-textarea {
   min-height: 46px;
-  border-radius: 12px;
+  border-radius: var(--radius-input);
   transition:
     border-color var(--duration-micro) var(--ease-out),
     box-shadow var(--duration-micro) var(--ease-out),
@@ -1961,9 +2106,7 @@ body {
 }
 
 .gl-sidebar {
-  box-shadow:
-    1px 0 0 var(--sidebar-border),
-    10px 0 32px rgb(23 23 23 / 0.025);
+  box-shadow: 1px 0 0 var(--sidebar-border);
 }
 
 .gl-nav-item {
@@ -1976,11 +2119,9 @@ body {
     color-mix(in srgb, var(--sidebar-primary) 12%, transparent);
 }
 
-.gl-shell-mark,
-.gl-shell-avatar {
-  background: var(--primary) !important;
-  box-shadow: 0 6px 14px color-mix(in srgb, var(--primary) 18%, transparent) !important;
-}
+/* .gl-shell-mark / .gl-shell-avatar are owned by AppShell's own style block
+   (solid --sidebar-primary on the vault chrome). The old orange-gradient
+   override that used to sit here is gone — no !important hacks. */
 
 .gl-mobilenav {
   box-shadow: 0 -8px 24px rgb(23 23 23 / 0.06);
@@ -2009,7 +2150,7 @@ body {
   }
 
   .gl-card {
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .gl-table {
@@ -2079,8 +2220,9 @@ body {
 .gl-proposal-card:hover,
 .gl-member-card:hover,
 .gl-fund-card:hover {
+  /* Design contract: interactive cards shift border color on hover —
+     never a lift or scale-up (design-system-extracted/readme.md Cards). */
   border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
-  box-shadow: 0 12px 28px rgb(23 23 23 / 0.06);
 }
 
 .gl-approval-item {
@@ -2091,7 +2233,6 @@ body {
 
 .gl-approval-item:hover {
   border-color: color-mix(in srgb, var(--primary) 36%, var(--border));
-  box-shadow: 0 10px 24px rgb(23 23 23 / 0.05);
 }
 
 .gl-offering-row {
@@ -2202,7 +2343,7 @@ body {
 }
 
 .gl-logout-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.96);
 }
 
 .gl-logout-btn:focus-visible {
@@ -2244,6 +2385,13 @@ body {
     transparent;
 }
 
+/* The vault sidebar is dark chrome — its scrollbar derives from
+   --sidebar-foreground, not the light-theme ink. */
+.gl-sidebar nav {
+  scrollbar-color: color-mix(in srgb, var(--sidebar-foreground) 25%, transparent)
+    transparent;
+}
+
 .gl-app-main::-webkit-scrollbar,
 .gl-sidebar nav::-webkit-scrollbar {
   width: 8px;
@@ -2279,13 +2427,20 @@ a {
   text-decoration-thickness: 1px;
 }
 
-/* Table figures align on columns; Sarabun fallback for ฿ inherits this too. */
+/* Table figures align on columns; Anuphan fallback for ฿ inherits this too. */
 .gl-table td.num-display,
 .gl-trend__net {
   font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 640px) {
+  /* The church chip gets squeezed to a single glyph next to bell + avatar +
+     logout on narrow topbars; the church name already lives in the
+     dashboard's user card, so drop the chip rather than truncate it. */
+  .gl-shell-church-chip {
+    display: none !important;
+  }
+
   .gl-shell-topbar__context {
     max-width: 48%;
     font-size: var(--text-2xs) !important;
@@ -2491,4 +2646,463 @@ a {
 .gl-reports-leadership-row__value {
   font-weight: var(--weight-semibold);
   text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   Approvals — queue cards, profile strip, summary stats, decision sheet.
+   Consolidates what the page used to restate inline (Emerald Vault pass).
+   -------------------------------------------------------------------------- */
+.gl-approval-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.gl-approval-card--selected {
+  border: 2px solid var(--primary);
+}
+
+.gl-appr-card__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.gl-appr-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--secondary);
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-appr-card__icon--income {
+  background: var(--income-muted);
+  color: var(--on-income-muted);
+}
+
+.gl-appr-card__icon--expense {
+  background: var(--expense-muted);
+  color: var(--on-expense-muted);
+}
+
+.gl-appr-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gl-appr-card__desc {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gl-appr-card__meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.gl-appr-card__byline {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+
+.gl-appr-card__amount {
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.gl-appr-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.gl-appr-card__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.gl-appr-card__actions .gl-btn {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.gl-appr-receipt {
+  margin-left: var(--space-2);
+  color: var(--income);
+}
+
+/* Profile strip at the top of the queue. */
+.gl-appr-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.gl-appr-profile__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  flex-shrink: 0;
+}
+
+.gl-appr-profile__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gl-appr-profile__name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gl-appr-profile__idrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.gl-appr-profile__meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-appr-profile__count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--secondary);
+  border-radius: var(--radius);
+  min-width: 56px;
+  text-align: center;
+}
+
+.gl-appr-profile__count--attention {
+  background: var(--pending-muted);
+}
+
+.gl-appr-profile__count-value {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--muted-foreground);
+}
+
+.gl-appr-profile__count--attention .gl-appr-profile__count-value {
+  color: var(--on-pending-muted);
+}
+
+.gl-appr-profile__count-label {
+  font-size: var(--text-2xs);
+  color: var(--muted-foreground);
+}
+
+/* Summary stats: รายรับ / รายจ่าย / รวมมูลค่า. */
+.gl-appr-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.gl-appr-stat {
+  text-align: center;
+}
+
+.gl-appr-stat--mid {
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.gl-appr-stat__value {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.gl-appr-stat__label {
+  font-size: var(--text-2xs);
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+
+/* Expanded decision panel inside a selected card. */
+.gl-appr-detail {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.gl-appr-detail__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-xs);
+}
+
+.gl-appr-detail__label {
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gl-appr-detail__section {
+  margin-bottom: var(--space-4);
+}
+
+.gl-appr-detail__head {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-2);
+}
+
+.gl-appr-detail__split {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  padding: var(--space-1) 0;
+}
+
+.gl-appr-detail__actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.gl-appr-detail__actions .gl-btn {
+  min-height: 48px;
+  flex: 1;
+}
+
+.gl-appr-detail__close {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  padding: var(--space-2);
+}
+
+/* Bottom-sheet modal variant (mobile-first decisions). */
+.gl-modal-backdrop--sheet {
+  align-items: flex-end;
+}
+
+.gl-modal-content--sheet {
+  /* Reset the base margin:auto so the sheet stays bottom-anchored. */
+  margin: 0 auto;
+  border-radius: var(--radius-dialog) var(--radius-dialog) 0 0;
+  padding: var(--space-5) var(--space-4);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.2);
+}
+
+/* Shared empty/loading icon slot. */
+.gl-empty-center__icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+  color: var(--muted-foreground);
+}
+
+.gl-empty-center__hint {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.gl-card--pad-lg {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Profile — identity card, quick access links, security. The page now rides
+   the shared .gl-page frame (it used to roll its own container), the avatar
+   is solid --primary (no gradient/glow), and motion matches sibling pages.
+   -------------------------------------------------------------------------- */
+.gl-profile {
+  max-width: 720px;
+}
+
+.gl-profile__card {
+  padding: var(--space-6);
+  margin-bottom: var(--space-5);
+}
+
+.gl-profile__card--tight {
+  padding: var(--space-5);
+}
+
+.gl-profile__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.gl-profile__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xl);
+  flex-shrink: 0;
+}
+
+.gl-profile__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.gl-profile__name {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+}
+
+.gl-profile__idrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.gl-profile__role {
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-semibold);
+}
+
+.gl-profile__meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-profile__uuid {
+  padding: var(--space-3);
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gl-profile__uuid-value {
+  font-size: var(--text-2xs);
+}
+
+.gl-profile__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gl-profile__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--foreground);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+  min-height: var(--touch-target-min);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-profile__link:hover {
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+  background: var(--secondary);
+}
+
+.gl-profile__link:active {
+  transform: scale(0.98);
+}
+
+.gl-profile__link-icon {
+  display: flex;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.gl-profile__chevron {
+  display: flex;
+  margin-left: auto;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-profile__logout {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  color: var(--expense);
+  font-weight: var(--weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
 }

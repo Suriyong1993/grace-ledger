@@ -219,10 +219,11 @@ export class FundsPage {
     const fundsGridHtml = this.errorMessage
       ? ""
       : this.funds.length === 0
-        ? `<div class="gl-card gl-empty-state gl-empty-center">
-          <div class="gl-empty-center__msg">ยังไม่มีกองทุนในระบบ</div>
-          <p style="margin: 0 0 var(--space-3); font-size: var(--text-sm); color: var(--muted-foreground);">สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท</p>
-          <button id="empty-create-fund-btn" class="gl-btn gl-btn--primary gl-btn--sm">+ สร้างกองทุนแรก</button>
+        ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
+          <div class="gl-empty-center__icon" aria-hidden="true">${ICON_TRANSFER}</div>
+          <p class="gl-empty-center__msg">ยังไม่มีกองทุนในระบบ</p>
+          <p class="gl-empty-center__hint">สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท</p>
+          <button id="empty-create-fund-btn" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-3);">สร้างกองทุนแรก</button>
         </div>`
         : `
         <div class="gl-funds-grid">

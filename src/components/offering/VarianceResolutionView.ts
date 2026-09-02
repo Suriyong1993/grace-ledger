@@ -284,7 +284,7 @@ export function renderVarianceResolutionViewHtml(
           ${varianceAmount.format({ showSign: true })}
         </div>
         <div style="font-size: var(--text-xs); color: ${isMatch ? "var(--on-income-muted)" : isShortage ? "var(--on-expense-muted)" : "var(--on-pending-muted)"}; margin-top: var(--space-1); font-weight: var(--weight-semibold);">
-          ${isMatch ? "✓ ยอดตรวจนับตรงกันสมบูรณ์" : isShortage ? " เงินสดขาดจากยอดบันทึก" : " เงินสดเกินจากยอดบันทึก"}
+          ${isMatch ? "ยอดตรวจนับตรงกันสมบูรณ์" : isShortage ? "เงินสดขาดจากยอดบันทึก" : "เงินสดเกินจากยอดบันทึก"}
         </div>
       </div>
       `
@@ -331,7 +331,7 @@ export function renderVarianceResolutionViewHtml(
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-2); font-size: var(--text-xs);">
             <div id="label-char-counter" style="color: ${explanationLength < 5 ? "var(--expense)" : "var(--income)"}; font-weight: var(--weight-semibold);">
-              ${explanationLength < 5 ? ` กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${explanationLength}/5)` : `✓ ความยาวคำชี้แจงถูกต้อง (${explanationLength} ตัวอักษร)`}
+              ${explanationLength < 5 ? `กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${explanationLength}/5)` : `ความยาวคำชี้แจงถูกต้อง (${explanationLength} ตัวอักษร)`}
             </div>
 
             ${

@@ -6,6 +6,7 @@ import { ReportsService } from "../lib/reports/reports-service";
 import { Money } from "../lib/money";
 import { escapeHtml, formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
+import type { AppShellUser } from "../components/layout/AppShell";
 
 export interface DashboardFund {
   id?: string;
@@ -47,6 +48,7 @@ export interface DashboardData {
   historicalTrend?: HistoricalTrendBar[];
   loadFailed?: boolean;
   errorMessage?: string;
+  user?: AppShellUser;
 }
 
 const ICON_CLOCK = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
@@ -161,10 +163,7 @@ export class DashboardPage {
 
       // The month's income and expense come from the posted ledger for the
       // current calendar month, through the same service that produces the
-      // Reports screen. They are deliberately NOT derived from the list below:
-      // that list is capped at five rows and spans whatever months those rows
-      // happen to fall in, so summing it produced a figure that could never
-      // match the label "this month".
+      // Reports screen.
       const bounds = monthBounds(new Date());
       const stmtRes = await this.reportsService.getStatementOfFinancialPosition(
         churchId,
@@ -184,23 +183,10 @@ export class DashboardPage {
 
       if (txnsData && Array.isArray(txnsData) && txnsData.length > 0) {
         for (const t of txnsData) {
-          // `transactions.amount` is the transaction's value. transaction_splits
-          // records how that value is allocated across funds, and the split-sum
-          // parity invariant (post_transaction / submit_for_approval) is written
-          // as sum(splits) = transactions.amount — the header is the side being
-          // validated against, so it is the authoritative figure.
-          //
-          // The two can legitimately differ: this feed shows drafts as well as
-          // posted rows, and parity is only enforced on submit and on post, so a
-          // half-allocated draft would have displayed less than it is worth.
           const amount = t.amount
             ? Money.from(t.amount as string)
             : Money.zero();
 
-          // Ledger column, not a reading of the Thai description. `direction` is
-          // NOT NULL in the schema; the fallback only fires if that contract is
-          // broken, and it picks the neutral presentation rather than guessing a
-          // sign onto an amount.
           const direction: "income" | "expense" | "transfer" =
             t.direction === "income" ||
             t.direction === "expense" ||
@@ -215,8 +201,6 @@ export class DashboardPage {
           recentTransactions.push({
             id: t.id,
             title: t.description || "รายการทั่วไป",
-            // The fund is not joined in this query, so naming one here would be a
-            // guess printed as fact. The date is what this row actually knows.
             subtitle: formattedDate,
             amount,
             direction,
@@ -232,9 +216,6 @@ export class DashboardPage {
       }
 
       // Query historical monthly summaries for dashboard trend preview
-      // Buddhist Era year so the label reads the same way the Thai reports
-      // do; derived from the clock, never hardcoded — a stale year here would
-      // quietly scope the trend to the wrong 12 months.
       const currentBeYear = new Date().getFullYear() + 543;
       const histRes = await this.historicalService.getMonthlySummaries(
         churchId,
@@ -282,9 +263,6 @@ export class DashboardPage {
 
   /**
    * Bar height in pixels for one trend value.
-   * Scaled against the largest value actually present in the period so a tall
-   * month is never clipped into looking average. The 3px floor keeps a real but
-   * small month visible instead of rendering nothing.
    */
   private static trendBarHeight(
     satang: number,
@@ -295,18 +273,35 @@ export class DashboardPage {
     return Math.max(3, Math.round((satang / maxSatang) * trackPx));
   }
 
-  public renderHtml(data: DashboardData): string {
+  public renderHtml(data: DashboardData, user?: AppShellUser): string {
+    const activeUser = user || data.user;
     const hasPending = data.pendingApprovalsCount > 0;
     const funds = data.funds || [];
     const recent = data.recentTransactions || [];
     const trend = data.historicalTrend || [];
 
-    // Period the figures below describe. Same locale and month style as
-    // formatDateThai, so the app keeps one date language.
+    // Period the figures describe
     const period = new Date().toLocaleDateString("th-TH", {
       month: "short",
       year: "numeric",
     });
+
+    // Compute Net Change for 3-column metric display with Decimal precision
+    const parseMoneySafe = (val?: string): Money => {
+      if (!val) return Money.zero();
+      const clean = val.replace(/[^\d.-]/g, "");
+      return clean ? Money.from(clean) : Money.zero();
+    };
+
+    const incomeMoney = parseMoneySafe(data.monthlyIncome);
+    const expenseMoney = parseMoneySafe(data.monthlyExpense);
+    const netMoney = incomeMoney.subtract(expenseMoney);
+    const netIsPositive = netMoney.isPositive();
+    const netColor = netIsPositive
+      ? "var(--income)"
+      : netMoney.isNegative()
+        ? "var(--expense)"
+        : "var(--foreground)";
 
     const loadFailedHtml = data.loadFailed
       ? `<div class="gl-notice gl-notice--error" role="alert" style="margin-bottom: var(--space-5);">
@@ -314,8 +309,29 @@ export class DashboardPage {
         </div>`
       : "";
 
-    // Funds. A target turns a balance into progress; without one the balance is
-    // reported plainly rather than measured against an invented goal.
+    // 1. User & Church Header Identity (Mobile-first Profile Centric Card)
+    const userCardHtml = activeUser
+      ? `
+      <div class="gl-card gl-dash-user-card">
+        <a href="#/profile" class="gl-dash-user-card__avatar-link" aria-label="ดูโปรไฟล์ ${escapeHtml(activeUser.name)}">
+          <span class="gl-dash-user-card__avatar">${escapeHtml(activeUser.initials || "?")}</span>
+        </a>
+        <div class="gl-dash-user-card__body">
+          <div class="gl-dash-user-card__idrow">
+            <span class="gl-dash-user-card__name">${escapeHtml(activeUser.name)}</span>
+            ${
+              activeUser.role
+                ? `<span class="gl-dash-user-card__role">${escapeHtml(activeUser.role)}</span>`
+                : ""
+            }
+          </div>
+          <div class="gl-dash-user-card__church">${escapeHtml(activeUser.churchName || "คริสตจักร")}</div>
+        </div>
+      </div>
+      `
+      : "";
+
+    // 2. Funds List
     const fundsHtml =
       funds.length === 0
         ? `<p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0;">
@@ -363,6 +379,7 @@ export class DashboardPage {
               .join("")}
           </div>`;
 
+    // 3. Recent Transactions Feed
     const recentHtml =
       recent.length === 0
         ? `<p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0;">
@@ -378,16 +395,11 @@ export class DashboardPage {
                   : isExpense
                     ? ICON_EXPENSE
                     : ICON_TRANSFER;
-                const iconBg = isIncome
-                  ? "var(--income-muted)"
+                const iconClass = isIncome
+                  ? "gl-row__icon--income"
                   : isExpense
-                    ? "var(--expense-muted)"
-                    : "var(--secondary)";
-                const iconColor = isIncome
-                  ? "var(--on-income-muted)"
-                  : isExpense
-                    ? "var(--on-expense-muted)"
-                    : "var(--muted-foreground)";
+                    ? "gl-row__icon--expense"
+                    : "gl-row__icon--transfer";
                 const amountColor = isIncome
                   ? "var(--income)"
                   : isExpense
@@ -402,8 +414,8 @@ export class DashboardPage {
                       : "รอตรวจสอบ";
 
                 return `
-                <div class="gl-row">
-                  <span class="gl-row__icon" aria-hidden="true" style="background: ${iconBg}; color: ${iconColor};">${iconSvg}</span>
+                <a href="#/transactions" class="gl-row">
+                  <span class="gl-row__icon ${iconClass}" aria-hidden="true">${iconSvg}</span>
                   <span class="gl-row__body">
                     <span class="gl-row__title" style="display: block;">${escapeHtml(item.title)}</span>
                     <span class="gl-row__meta" style="display: block;">${escapeHtml(item.subtitle)}</span>
@@ -412,11 +424,12 @@ export class DashboardPage {
                     <span class="num-display" style="display: block; font-size: var(--text-sm); font-weight: var(--weight-bold); color: ${amountColor};">${sign}${item.amount.format()}</span>
                     <span class="gl-badge gl-badge--${item.status}" style="font-size: var(--text-2xs); margin-top: 4px;">${statusLabel}</span>
                   </span>
-                </div>`;
+                </a>`;
               })
               .join("")}
           </div>`;
 
+    // 4. Trend Chart
     const trendMaxSatang = trend.reduce(
       (max, t) => Math.max(max, t.incomeSatang, t.expenseSatang),
       0,
@@ -426,10 +439,10 @@ export class DashboardPage {
       trend.length === 0
         ? ""
         : `
-      <section class="gl-section" style="margin-bottom: var(--space-8);">
+      <section class="gl-section">
         <div class="gl-section__head">
           <h2>รายรับและรายจ่ายรายเดือน</h2>
-          <a href="#/reports" style="font-size: var(--text-xs); color: var(--primary); font-weight: var(--weight-semibold); text-decoration: none;">ดูรายงานเต็ม</a>
+          <a href="#/reports" class="gl-section__link">ดูรายงานเต็ม</a>
         </div>
         <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0 0 var(--space-4);">
           เดือนที่แท่งสีแดงสูงกว่าสีเขียว คือเดือนที่จ่ายมากกว่ารับ
@@ -448,9 +461,6 @@ export class DashboardPage {
                   trendMaxSatang,
                   96,
                 );
-                // Columns reveal left to right, so the eye reads the year in the
-                // order the months happened. Capped at twelve steps: a longer
-                // series must still finish inside one page transition.
                 const delay = Math.min(i, 11) * 40;
                 return `
                 <div class="gl-trend__col" style="--gl-bar-delay: ${delay}ms;">
@@ -485,27 +495,27 @@ export class DashboardPage {
     <div class="gl-page gl-dashboard-container gl-fade-in">
       ${loadFailedHtml}
 
+      ${userCardHtml}
+
       <div class="gl-page-header">
         <h1>ภาพรวมการเงิน</h1>
         <p>ข้อมูล ณ ${period}</p>
       </div>
 
       <!-- Financial position + what needs review. The balance card is the
-           operational core; review sits beside it as real content, not a
-           twin stat card. Quick actions live inside the balance card as an
-           uneven strip: one committing action, three compact icon controls —
-           never four identical rectangles. -->
-      <section class="gl-section" style="margin-bottom: var(--space-8);">
+           operational core; review sits beside it as real content. -->
+      <section class="gl-section">
         <h2 class="gl-visually-hidden">สรุปยอดและรายการที่ต้องตรวจสอบ</h2>
         <div class="gl-dash-hero-row">
           <div class="gl-card gl-dash-hero gl-rise">
             <div class="kicker" style="margin: 0;">ยอดเงินคงเหลือทั้งหมด</div>
-            <div class="num-display gl-dash-hero__value" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
+            <div class="num-display gl-dash-hero__value gl-total-rule" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 
             <div class="gl-dash-hero__figures">
               <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display" style="color: var(--income);">+${data.monthlyIncome || "฿0.00"}</strong></span>
               <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display" style="color: var(--expense);">−${data.monthlyExpense || "฿0.00"}</strong></span>
+              <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display" style="color: ${netColor};">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
             </div>
 
             <div class="gl-dash-hero__actions">
@@ -519,8 +529,7 @@ export class DashboardPage {
             </div>
           </div>
 
-          <!-- What to do next. Both rows describe either real loaded state or
-               a plain action; neither claims a status the page has not loaded. -->
+          <!-- Action Alert Section / Attention Queue -->
           <div class="gl-card gl-dash-review gl-rise" style="--gl-rise-delay: 60ms;">
             <div class="gl-dash-review__head">
               <h2>ต้องการให้คุณตรวจสอบ</h2>
@@ -529,11 +538,8 @@ export class DashboardPage {
               };">${data.pendingApprovalsCount} เรื่อง</span>
             </div>
 
-            <a href="#/approvals" class="gl-row">
-              <span class="gl-row__icon" aria-hidden="true" style="
-                background: ${hasPending ? "var(--pending-muted)" : "var(--secondary)"};
-                color: ${hasPending ? "var(--on-pending-muted)" : "var(--muted-foreground)"};
-              ">${ICON_CLOCK}</span>
+            <a href="#/approvals" class="gl-row${hasPending ? " gl-dash-review__row--attention" : ""}">
+              <span class="gl-row__icon${hasPending ? " gl-row__icon--attention" : ""}" aria-hidden="true">${ICON_CLOCK}</span>
               <span class="gl-row__body">
                 <span class="gl-row__title" style="display: block;">
                   ${hasPending ? `${data.pendingApprovalsCount} รายการรออนุมัติจากคุณ` : "ไม่มีรายการค้างอนุมัติ"}
@@ -546,7 +552,7 @@ export class DashboardPage {
             </a>
 
             <a href="#/offerings" class="gl-row">
-              <span class="gl-row__icon" aria-hidden="true" style="background: var(--pending-muted); color: var(--on-pending-muted);">${ICON_OFFERING}</span>
+              <span class="gl-row__icon gl-row__icon--attention" aria-hidden="true">${ICON_OFFERING}</span>
               <span class="gl-row__body">
                 <span class="gl-row__title" style="display: block;">เงินถวายวันอาทิตย์</span>
                 <span class="gl-row__meta" style="display: block;">เปิดรอบนับเงินและตรวจยอด</span>
@@ -561,20 +567,20 @@ export class DashboardPage {
 
       <div class="gl-dash-split">
         <div>
-          <section class="gl-section" style="margin-bottom: var(--space-8);">
+          <section class="gl-section">
             <div class="gl-section__head">
               <h2>ความเคลื่อนไหวล่าสุด</h2>
-              <a href="#/transactions" style="font-size: var(--text-xs); color: var(--primary); font-weight: var(--weight-semibold); text-decoration: none;">ดูทั้งหมด</a>
+              <a href="#/transactions" class="gl-section__link">ดูทั้งหมด</a>
             </div>
             ${recentHtml}
           </section>
         </div>
 
         <div>
-          <section class="gl-section" style="margin-bottom: var(--space-8);">
+          <section class="gl-section">
             <div class="gl-section__head">
               <h2>กองทุนและเป้าหมาย</h2>
-              <a href="#/funds" style="font-size: var(--text-xs); color: var(--primary); font-weight: var(--weight-semibold); text-decoration: none;">ดูทั้งหมด</a>
+              <a href="#/funds" class="gl-section__link">ดูทั้งหมด</a>
             </div>
             <div class="gl-card">
               ${fundsHtml}

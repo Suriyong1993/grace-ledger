@@ -264,4 +264,71 @@ describe("TransactionsPage UI — Unit Tests", () => {
       expect(html).toContain('class="gl-modal-content gl-rise"');
     });
   });
+
+  describe("Transactions Page — Mobile-First & Profile-Centric Enhancements", () => {
+    it("renders church badge and export CSV button", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      const html = page.renderHtml({
+        name: "ศรัณย์ สถิต",
+        role: "เหรัญญิก",
+        churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+        initials: "ศส",
+      });
+
+      expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
+      expect(html).toContain('id="export-csv-btn"');
+      expect(html).toContain("ส่งออก CSV");
+    });
+
+    it("displays 3-column summary metrics (income, expense, net total) with Decimal precision", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      const html = page.renderHtml();
+
+      expect(html).toContain("รายรับเดือนนี้");
+      expect(html).toContain("+฿18,450.00");
+      expect(html).toContain("รายจ่ายเดือนนี้");
+      expect(html).toContain("−฿12,780.00"); // 8500 + 4280
+      expect(html).toContain("ส่วนต่างสุทธิเดือนนี้");
+      expect(html).toContain("+฿5,670.00"); // 18450 - 12780
+    });
+
+    it("renders sort selector and results counter", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+      const html = page.renderHtml();
+
+      expect(html).toContain('id="txn-sort-select"');
+      expect(html).toContain("ใหม่สุด");
+      expect(html).toContain("เก่าสุด");
+      expect(html).toContain("ยอดเงิน: มากไปน้อย");
+      expect(html).toContain("ยอดเงิน: น้อยไปมาก");
+      expect(html).toContain("แสดง <strong class=\"num-display\" style=\"color: var(--foreground);\">3</strong> รายการจากทั้งหมด <strong class=\"num-display\" style=\"color: var(--foreground);\">4</strong> รายการ");
+    });
+
+    it("supports sorting by amount descending and ascending", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+
+      (page as any).activeSort = "amount_desc";
+      const htmlDesc = page.renderHtml();
+      expect(htmlDesc).toContain("value=\"amount_desc\" selected");
+
+      (page as any).activeSort = "amount_asc";
+      const htmlAsc = page.renderHtml();
+      expect(htmlAsc).toContain("value=\"amount_asc\" selected");
+    });
+
+    it("supports 3-month period filter", async () => {
+      const page = new TransactionsPage(mockSupabase, "church-1");
+      await page.loadData();
+
+      (page as any).activePeriod = "last_3_months";
+      const html = page.renderHtml();
+
+      expect(html).toContain('data-period="last_3_months"');
+      expect(html).toContain("3 เดือนล่าสุด");
+    });
+  });
 });

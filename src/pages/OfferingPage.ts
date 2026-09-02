@@ -3,6 +3,7 @@ import { Database } from "../lib/supabase/types";
 import { OfferingService } from "../lib/offering/offering-service";
 import { OfferingSession, OfferingPaymentChannel, CashDenominations } from "../lib/offering/types";
 import { Money } from "../lib/money";
+import { restoreFocusAfterRender } from "../lib/ui/focus";
 import { router } from "../router";
 import {
   FundOption,
@@ -74,6 +75,11 @@ export class OfferingPage {
         transfer: Money.zero(),
         qr: Money.zero(),
       },
+      rawAmounts: {
+        cash: "",
+        transfer: "",
+        qr: "",
+      },
       allocations: [
         {
           id: "row-" + Math.random().toString(36).substring(2, 9),
@@ -81,6 +87,7 @@ export class OfferingPage {
           channel: "cash",
           sourceType: "envelopes",
           amount: Money.zero(),
+          rawAmount: "",
           donorName: "",
           notes: "",
         },
@@ -309,7 +316,7 @@ export class OfferingPage {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           <span>${this.successMessage}</span>
         </div>
-        <button id="btn-dismiss-toast" class="gl-toast__close">✕</button>
+        <button id="btn-dismiss-toast" class="gl-toast__close" aria-label="ปิดการแจ้งเตือน"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
     ` : "";
 
@@ -465,27 +472,30 @@ export class OfferingPage {
     const cashInput = rootElement.querySelector("#input-expected-cash") as HTMLInputElement;
     if (cashInput) {
       cashInput.addEventListener("input", (e) => {
-        const val = (e.target as HTMLInputElement).value;
-        this.formState.channels.cash = val ? Money.from(val) : Money.zero();
-        onStateChange();
+        const target = e.target as HTMLInputElement;
+        this.formState.rawAmounts.cash = target.value;
+        this.formState.channels.cash = this.parseAmountSafe(target.value);
+        restoreFocusAfterRender(target, onStateChange);
       });
     }
 
     const transferInput = rootElement.querySelector("#input-expected-transfer") as HTMLInputElement;
     if (transferInput) {
       transferInput.addEventListener("input", (e) => {
-        const val = (e.target as HTMLInputElement).value;
-        this.formState.channels.transfer = val ? Money.from(val) : Money.zero();
-        onStateChange();
+        const target = e.target as HTMLInputElement;
+        this.formState.rawAmounts.transfer = target.value;
+        this.formState.channels.transfer = this.parseAmountSafe(target.value);
+        restoreFocusAfterRender(target, onStateChange);
       });
     }
 
     const qrInput = rootElement.querySelector("#input-expected-qr") as HTMLInputElement;
     if (qrInput) {
       qrInput.addEventListener("input", (e) => {
-        const val = (e.target as HTMLInputElement).value;
-        this.formState.channels.qr = val ? Money.from(val) : Money.zero();
-        onStateChange();
+        const target = e.target as HTMLInputElement;
+        this.formState.rawAmounts.qr = target.value;
+        this.formState.channels.qr = this.parseAmountSafe(target.value);
+        restoreFocusAfterRender(target, onStateChange);
       });
     }
 
@@ -507,6 +517,7 @@ export class OfferingPage {
           channel: "cash",
           sourceType: "envelopes",
           amount: Money.zero(),
+          rawAmount: "",
           donorName: "",
           notes: "",
         });
@@ -544,8 +555,9 @@ export class OfferingPage {
         const rowId = target.dataset.rowId;
         const row = this.formState.allocations.find((r) => r.id === rowId);
         if (row) {
-          row.amount = target.value ? Money.from(target.value) : Money.zero();
-          onStateChange();
+          row.rawAmount = target.value;
+          row.amount = this.parseAmountSafe(target.value);
+          restoreFocusAfterRender(target, onStateChange, `.input-row-amount[data-row-id="${rowId}"]`);
         }
       });
     });
@@ -746,7 +758,7 @@ export class OfferingPage {
         const len = this.varianceExplanation.trim().length;
         const counterEl = rootElement.querySelector("#label-char-counter");
         if (counterEl) {
-          counterEl.textContent = len < 5 ? ` กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${len}/5)` : `✓ ความยาวคำชี้แจงถูกต้อง (${len} ตัวอักษร)`;
+          counterEl.textContent = len < 5 ? `กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${len}/5)` : `ความยาวคำชี้แจงถูกต้อง (${len} ตัวอักษร)`;
           (counterEl as HTMLElement).style.color = len < 5 ? 'var(--expense)' : 'var(--income)';
         }
         const explainBtn = rootElement.querySelector("#btn-variance-explain") as HTMLButtonElement;
@@ -1105,5 +1117,18 @@ export class OfferingPage {
       onStateChange();
     }
   }
-}
 
+
+  /**
+   * Amount inputs hold free-typed text; partial values like "5." or "5e"
+   * must not crash the render. Invalid text parses to zero — the raw text
+   * stays bound in the field so the user can keep typing.
+   */
+  private parseAmountSafe(val: string): Money {
+    try {
+      return val ? Money.from(val) : Money.zero();
+    } catch {
+      return Money.zero();
+    }
+  }
+}

@@ -24,6 +24,8 @@ export interface AllocationItemState {
   channel: OfferingPaymentChannel;
   sourceType: OfferingSourceType;
   amount: Money;
+  /** The amount exactly as typed — Money round-trips eat partial input like "5.". */
+  rawAmount?: string;
   donorName?: string;
   notes?: string;
 }
@@ -32,6 +34,8 @@ export interface OfferingEntryFormState {
   serviceDate: string;
   serviceName: string;
   channels: ChannelAmountsState;
+  /** Typed text for the channel amount inputs, bound back verbatim on re-render. */
+  rawAmounts: { cash: string; transfer: string; qr: string };
   allocations: AllocationItemState[];
   notes?: string;
 }
@@ -171,7 +175,7 @@ export function renderOfferingEntryFormHtml(
               <span style="position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%); font-weight: var(--weight-bold); color: var(--muted-foreground);">฿</span>
               <input
                 type="number" step="0.01" min="0" id="input-expected-cash" name="expectedCash"
-                value="${state.channels.cash.toNumber() > 0 ? state.channels.cash.toNumber() : ""}"
+                value="${state.rawAmounts?.cash ?? (state.channels.cash.toNumber() > 0 ? state.channels.cash.toNumber() : "")}"
                 placeholder="0.00" class="num-display gl-input"
                 style="padding-left: 28px; font-weight: var(--weight-bold); text-align: right;"
               />
@@ -196,7 +200,7 @@ export function renderOfferingEntryFormHtml(
               <span style="position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%); font-weight: var(--weight-bold); color: var(--muted-foreground);">฿</span>
               <input
                 type="number" step="0.01" min="0" id="input-expected-transfer" name="expectedTransfer"
-                value="${state.channels.transfer.toNumber() > 0 ? state.channels.transfer.toNumber() : ""}"
+                value="${state.rawAmounts?.transfer ?? (state.channels.transfer.toNumber() > 0 ? state.channels.transfer.toNumber() : "")}"
                 placeholder="0.00" class="num-display gl-input"
                 style="padding-left: 28px; font-weight: var(--weight-bold); text-align: right;"
               />
@@ -221,7 +225,7 @@ export function renderOfferingEntryFormHtml(
               <span style="position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%); font-weight: var(--weight-bold); color: var(--muted-foreground);">฿</span>
               <input
                 type="number" step="0.01" min="0" id="input-expected-qr" name="expectedQr"
-                value="${state.channels.qr.toNumber() > 0 ? state.channels.qr.toNumber() : ""}"
+                value="${state.rawAmounts?.qr ?? (state.channels.qr.toNumber() > 0 ? state.channels.qr.toNumber() : "")}"
                 placeholder="0.00" class="num-display gl-input"
                 style="padding-left: 28px; font-weight: var(--weight-bold); text-align: right;"
               />
@@ -291,7 +295,7 @@ export function renderOfferingEntryFormHtml(
                 <input
                   type="number" step="0.01" min="0" class="input-row-amount num-display gl-input"
                   data-row-id="${item.id}"
-                  value="${item.amount.toNumber() > 0 ? item.amount.toNumber() : ""}"
+                  value="${item.rawAmount ?? (item.amount.toNumber() > 0 ? item.amount.toNumber() : "")}"
                   placeholder="0.00" style="font-weight: var(--weight-bold); text-align: right;"
                 />
               </div>

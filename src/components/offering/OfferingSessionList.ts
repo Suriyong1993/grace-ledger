@@ -20,7 +20,7 @@ const STATUS_BADGE: Record<
   draft: { label: "ร่าง", variant: "neutral", dot: "var(--muted-foreground)" },
   counting: { label: "กำลังนับเงิน", variant: "pending", dot: "var(--primary)" },
   counted: { label: "นับเงินแล้ว", variant: "info", dot: "var(--info)" },
-  variance_review: { label: "ตรวจสอบผลต่าง", variant: "rejected", dot: "var(--expense)" },
+  variance_review: { label: "ตรวจสอบผลต่าง", variant: "pending", dot: "var(--pending)" },
   confirmed: { label: "ยืนยันแล้ว", variant: "approved", dot: "var(--income)" },
   posted: { label: "ลงบัญชีแล้ว", variant: "approved", dot: "" },
   voided: { label: "ยกเลิก", variant: "neutral", dot: "" },

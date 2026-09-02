@@ -5,6 +5,7 @@ import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
 import { TransactionsService } from "../lib/transactions/transactions-service";
+import type { AppShellUser } from "../components/layout/AppShell";
 
 export interface TransactionItem {
   id: string;
@@ -45,8 +46,10 @@ const ICON_INCOME = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 const ICON_EXPENSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
 const ICON_TRANSFER = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>`;
 const ICON_CLOSE = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+const ICON_DOWNLOAD = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const ICON_FILTER = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>`;
 
-// Real transaction lifecycle status -> Thai label + badge class. No guessing.
+// Real transaction lifecycle status -> Thai label + badge class.
 const TXN_STATUS: Record<
   TransactionItem["status"],
   {
@@ -62,11 +65,13 @@ const TXN_STATUS: Record<
   voided: { label: "ยกเลิก", badge: "rejected" },
 };
 
-type TxnPeriod = "this_month" | "last_month" | "all";
+export type TxnPeriod = "this_month" | "last_month" | "last_3_months" | "all";
+export type TxnSort = "newest" | "oldest" | "amount_desc" | "amount_asc";
 
 const PERIOD_LABEL: Record<TxnPeriod, string> = {
   this_month: "เดือนนี้",
   last_month: "เดือนก่อนหน้า",
+  last_3_months: "3 เดือนล่าสุด",
   all: "ทั้งหมด",
 };
 
@@ -92,6 +97,7 @@ export class TransactionsPage {
   private activeFilter: "all" | "income" | "expense" | "transfer" | "pending" =
     "all";
   private activePeriod: TxnPeriod = "this_month";
+  private activeSort: TxnSort = "newest";
   private searchQuery = "";
   private selectedTransactionId: string | null = null;
   private isCreateModalOpen = false;
@@ -244,7 +250,51 @@ export class TransactionsPage {
     }
   }
 
-  public renderHtml(): string {
+  public exportCsv(): void {
+    if (this.transactions.length === 0) return;
+    const headers = [
+      "ID",
+      "Code",
+      "Date",
+      "Description",
+      "Fund",
+      "Category",
+      "Account",
+      "Direction",
+      "Amount",
+      "Status",
+      "RecordedBy",
+    ];
+    const rows = this.transactions.map((t) => [
+      t.id,
+      t.code,
+      t.date || "",
+      `"${(t.description || "").replace(/"/g, '""')}"`,
+      `"${(t.fundName || "").replace(/"/g, '""')}"`,
+      `"${(t.categoryName || "").replace(/"/g, '""')}"`,
+      `"${(t.accountName || "").replace(/"/g, '""')}"`,
+      t.direction,
+      t.amount.toFixed(2),
+      t.status,
+      `"${(t.recordedBy || "").replace(/"/g, '""')}"`,
+    ]);
+    const csvContent =
+      "\uFEFF" +
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `grace_ledger_transactions_${new Date().toISOString().slice(0, 10)}.csv`,
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  public renderHtml(user?: AppShellUser): string {
     const errorNoticeHtml = this.errorMessage
       ? `<div class="gl-notice gl-notice--error" role="alert" style="margin-bottom: var(--space-4);">
           <div class="gl-notice__body" style="display: flex; justify-content: space-between; align-items: center;">
@@ -274,12 +324,17 @@ export class TransactionsPage {
     }
 
     const now = new Date();
-    const periodBounds =
-      this.activePeriod === "all"
-        ? null
-        : this.activePeriod === "this_month"
-          ? monthBounds(now)
-          : monthBounds(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+    let periodBounds: { start: string; end: string } | null = null;
+    if (this.activePeriod === "this_month") {
+      periodBounds = monthBounds(now);
+    } else if (this.activePeriod === "last_month") {
+      periodBounds = monthBounds(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+    } else if (this.activePeriod === "last_3_months") {
+      const start3Months = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      const currentMonth = monthBounds(now);
+      const startBounds = monthBounds(start3Months);
+      periodBounds = { start: startBounds.start, end: currentMonth.end };
+    }
 
     const periodScoped = periodBounds
       ? this.transactions.filter(
@@ -309,27 +364,50 @@ export class TransactionsPage {
         const match =
           item.description.toLowerCase().includes(q) ||
           item.fundName.toLowerCase().includes(q) ||
-          item.categoryName.toLowerCase().includes(q);
+          item.categoryName.toLowerCase().includes(q) ||
+          item.code.toLowerCase().includes(q);
         if (!match) return false;
       }
       return true;
     });
 
+    // Sorting
+    const sorted = [...filtered];
+    if (this.activeSort === "oldest") {
+      sorted.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    } else if (this.activeSort === "amount_desc") {
+      sorted.sort((a, b) => b.amount.toNumber() - a.amount.toNumber());
+    } else if (this.activeSort === "amount_asc") {
+      sorted.sort((a, b) => a.amount.toNumber() - b.amount.toNumber());
+    } else {
+      // newest
+      sorted.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    }
+
     const selectedTxn = this.selectedTransactionId
       ? this.transactions.find((t) => t.id === this.selectedTransactionId)
       : null;
 
+    // Calculate Summary Stats from periodScoped
     let incomeSum = Money.zero();
     let expenseSum = Money.zero();
     for (const t of periodScoped) {
       if (t.direction === "income") incomeSum = incomeSum.add(t.amount);
       if (t.direction === "expense") expenseSum = expenseSum.add(t.amount);
     }
+    const netSum = incomeSum.subtract(expenseSum);
+    const netIsPositive = netSum.isPositive();
+    const netSign = netIsPositive ? "+" : "";
+    const netColor = netIsPositive
+      ? "var(--income)"
+      : netSum.isNegative()
+        ? "var(--expense)"
+        : "var(--foreground)";
 
-    const todayItems = filtered.filter((t) => t.dateGroup === "today");
-    const yesterdayItems = filtered.filter((t) => t.dateGroup === "yesterday");
-    const earlierItems = filtered.filter((t) => t.dateGroup === "earlier");
-    const undatedItems = filtered.filter((t) => t.dateGroup === "undated");
+    const todayItems = sorted.filter((t) => t.dateGroup === "today");
+    const yesterdayItems = sorted.filter((t) => t.dateGroup === "yesterday");
+    const earlierItems = sorted.filter((t) => t.dateGroup === "earlier");
+    const undatedItems = sorted.filter((t) => t.dateGroup === "undated");
 
     const renderGroup = (title: string, items: TransactionItem[]) => {
       if (items.length === 0) return "";
@@ -389,6 +467,7 @@ export class TransactionsPage {
                     <div style="display: flex; align-items: center; gap: var(--space-1); margin-top: 4px; flex-wrap: wrap;">
                       <span class="gl-tag">${escapeHtml(item.fundName)}</span>
                       <span class="gl-tag">${escapeHtml(item.categoryName)}</span>
+                      ${item.date ? `<span style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-left: 2px;">${formatDateThai(item.date)}</span>` : ""}
                     </div>
                   </div>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -601,15 +680,25 @@ export class TransactionsPage {
 
     return `
     <div class="gl-page gl-fade-in">
+      <!-- Header Section -->
       <div style="display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;">
         <div class="gl-page-header" style="margin-bottom: 0;">
-          <h1>รายการเงิน</h1>
+          <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+            <h1>รายการเงิน</h1>
+            ${user?.churchName ? `<span class="gl-badge" style="font-size: var(--text-2xs); background: var(--muted); color: var(--foreground);">${escapeHtml(user.churchName)}</span>` : ""}
+          </div>
           <p>บันทึกรายรับ รายจ่าย และประวัติธุรกรรมทั้งหมดของคริสตจักร</p>
         </div>
-        <button id="open-create-txn-btn" class="gl-btn gl-btn--primary">
-          ${ICON_PLUS}
-          <span>บันทึกรายการใหม่</span>
-        </button>
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <button id="export-csv-btn" class="gl-btn gl-btn--secondary gl-btn--sm" title="ส่งออก CSV">
+            ${ICON_DOWNLOAD}
+            <span>ส่งออก CSV</span>
+          </button>
+          <button id="open-create-txn-btn" class="gl-btn gl-btn--primary">
+            ${ICON_PLUS}
+            <span>บันทึกรายการใหม่</span>
+          </button>
+        </div>
       </div>
 
       ${errorNoticeHtml}
@@ -620,13 +709,14 @@ export class TransactionsPage {
         <div class="gl-tablist" role="tablist" aria-label="ช่วงเวลา">
           <button class="gl-tab${this.activePeriod === "this_month" ? " is-active" : ""}" data-period="this_month">เดือนนี้</button>
           <button class="gl-tab${this.activePeriod === "last_month" ? " is-active" : ""}" data-period="last_month">เดือนก่อนหน้า</button>
+          <button class="gl-tab${this.activePeriod === "last_3_months" ? " is-active" : ""}" data-period="last_3_months">3 เดือนล่าสุด</button>
           <button class="gl-tab${this.activePeriod === "all" ? " is-active" : ""}" data-period="all">ทั้งหมด</button>
         </div>
       </section>
 
-      <!-- Period overview strip -->
+      <!-- 3-Column Summary Stats Bar -->
       <section class="gl-section" style="margin-bottom: var(--space-4);">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: var(--space-3);">
           <div class="gl-card gl-card--tight">
             <div style="font-size: var(--text-xs); color: var(--muted-foreground);">รายรับ${PERIOD_LABEL[this.activePeriod]}</div>
             <div class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--income); margin-top: 2px;">
@@ -639,10 +729,16 @@ export class TransactionsPage {
               −${expenseSum.format()}
             </div>
           </div>
+          <div class="gl-card gl-card--tight">
+            <div style="font-size: var(--text-xs); color: var(--muted-foreground);">ส่วนต่างสุทธิ${PERIOD_LABEL[this.activePeriod]}</div>
+            <div class="num-display" style="font-size: var(--text-lg); font-weight: var(--weight-bold); color: ${netColor}; margin-top: 2px;">
+              ${netSign}${netSum.format()}
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Search and Filters -->
+      <!-- Search, Filters and Sort Toolbar -->
       <section class="gl-section" style="margin-bottom: var(--space-4);">
         <div style="
           display: flex;
@@ -666,12 +762,32 @@ export class TransactionsPage {
           " />
         </div>
 
-        <div style="display: flex; gap: var(--space-2); overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
-          <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "all" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="all" style="border-radius: var(--radius-full);">ทั้งหมด</button>
-          <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "income" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="income" style="border-radius: var(--radius-full);">รายรับ</button>
-          <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "expense" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="expense" style="border-radius: var(--radius-full);">รายจ่าย</button>
-          <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "transfer" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="transfer" style="border-radius: var(--radius-full);">โอน</button>
-          <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "pending" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="pending" style="border-radius: var(--radius-full);">รออนุมัติ</button>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap;">
+          <div style="display: flex; gap: var(--space-2); overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+            <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "all" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="all">ทั้งหมด</button>
+            <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "income" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="income">รายรับ</button>
+            <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "expense" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="expense">รายจ่าย</button>
+            <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "transfer" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="transfer">โอน</button>
+            <button class="filter-pill gl-btn gl-btn--sm ${this.activeFilter === "pending" ? "gl-btn--primary" : "gl-btn--secondary"}" data-filter="pending">รออนุมัติ</button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--muted-foreground);">
+            <span style="display: flex; align-items: center; gap: 4px;">
+              ${ICON_FILTER}
+              <span>เรียงตาม:</span>
+            </span>
+            <select id="txn-sort-select" class="gl-select" style="font-size: var(--text-xs); padding: 2px 24px 2px 8px; height: 32px; width: auto;">
+              <option value="newest" ${this.activeSort === "newest" ? "selected" : ""}>ใหม่สุด</option>
+              <option value="oldest" ${this.activeSort === "oldest" ? "selected" : ""}>เก่าสุด</option>
+              <option value="amount_desc" ${this.activeSort === "amount_desc" ? "selected" : ""}>ยอดเงิน: มากไปน้อย</option>
+              <option value="amount_asc" ${this.activeSort === "amount_asc" ? "selected" : ""}>ยอดเงิน: น้อยไปมาก</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filter Count Indicator -->
+        <div style="margin-top: var(--space-3); font-size: var(--text-xs); color: var(--muted-foreground); display: flex; justify-content: space-between; align-items: center;">
+          <span>แสดง <strong class="num-display" style="color: var(--foreground);">${filtered.length}</strong> รายการจากทั้งหมด <strong class="num-display" style="color: var(--foreground);">${this.transactions.length}</strong> รายการ</span>
         </div>
       </section>
 
@@ -683,10 +799,11 @@ export class TransactionsPage {
         ${renderGroup("ไม่ระบุวันที่", undatedItems)}
         ${
           filtered.length === 0 && !this.errorMessage
-            ? `<div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
-                <div style="font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--foreground); margin-bottom: 4px;">ยังไม่มีรายการธุรกรรม</div>
-                <p style="margin: 0 0 var(--space-3); font-size: var(--text-sm);">เมื่อมีการบันทึกรายรับ รายจ่าย หรือเงินถวาย รายการจะปรากฏที่นี่</p>
-                <button id="empty-create-txn-btn" class="gl-btn gl-btn--primary gl-btn--sm">+ บันทึกรายการแรก</button>
+            ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
+                <div class="gl-empty-center__icon" aria-hidden="true">${ICON_PLUS}</div>
+                <p class="gl-empty-center__msg">ยังไม่มีรายการธุรกรรม</p>
+                <p class="gl-empty-center__hint">เมื่อมีการบันทึกรายรับ รายจ่าย หรือเงินถวาย รายการจะปรากฏที่นี่</p>
+                <button id="empty-create-txn-btn" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-3);">บันทึกรายการแรก</button>
                </div>`
             : ""
         }
@@ -709,11 +826,25 @@ export class TransactionsPage {
       onStateChange();
     });
 
+    // Export CSV button
+    const exportBtn = root.querySelector<HTMLButtonElement>("#export-csv-btn");
+    exportBtn?.addEventListener("click", () => {
+      this.exportCsv();
+    });
+
     // Search input
     const searchInput =
       root.querySelector<HTMLInputElement>("#txn-search-input");
     searchInput?.addEventListener("input", (e) => {
       this.searchQuery = (e.target as HTMLInputElement).value;
+      onStateChange();
+    });
+
+    // Sort select
+    const sortSelect =
+      root.querySelector<HTMLSelectElement>("#txn-sort-select");
+    sortSelect?.addEventListener("change", (e) => {
+      this.activeSort = (e.target as HTMLSelectElement).value as TxnSort;
       onStateChange();
     });
 

@@ -110,7 +110,8 @@ describe("M3 UI Components — Slice 1", () => {
       const state: OfferingEntryFormState = {
         serviceDate: "2026-08-23",
         serviceName: "รอบนมัสการวันอาทิตย์ (เช้า)",
-        channels: {
+        rawAmounts: { cash: "", transfer: "", qr: "" },
+      channels: {
           cash: Money.from("10000.00"),
           transfer: Money.from("5000.00"),
           qr: Money.from("3450.00"),
@@ -160,7 +161,8 @@ describe("M3 UI Components — Slice 1", () => {
       const state: OfferingEntryFormState = {
         serviceDate: "2026-08-23",
         serviceName: "รอบนมัสการวันอาทิตย์ (เช้า)",
-        channels: {
+        rawAmounts: { cash: "", transfer: "", qr: "" },
+      channels: {
           cash: Money.from("10000.00"),
           transfer: Money.zero(),
           qr: Money.zero(),
@@ -191,7 +193,8 @@ describe("M3 UI Components — Slice 1", () => {
       const state: OfferingEntryFormState = {
         serviceDate: "2026-08-23",
         serviceName: "รอบนมัสการวันอาทิตย์ (เช้า)",
-        channels: {
+        rawAmounts: { cash: "", transfer: "", qr: "" },
+      channels: {
           cash: Money.from("10000.00"),
           transfer: Money.from("5000.00"),
           qr: Money.from("3450.00"),
@@ -240,5 +243,36 @@ describe("M3 UI Components — Slice 1", () => {
       expect(html).toContain("btn-confirm-save-draft");
       expect(html).toContain("ยืนยันและบันทึกร่าง");
     });
+  });
+});
+
+describe("Offering entry form — amount typing (raw-text binding)", () => {
+  const state: OfferingEntryFormState = {
+    serviceDate: "2026-09-02",
+    serviceName: "รอบเช้า",
+    channels: { cash: Money.from("5"), transfer: Money.zero(), qr: Money.zero() },
+    rawAmounts: { cash: "5.", transfer: "", qr: "" },
+    allocations: [
+      { id: "r1", fundId: "fund-1", channel: "cash", sourceType: "envelopes", amount: Money.from("5"), rawAmount: "5.", donorName: "" },
+    ],
+  };
+
+  it("binds the raw typed text back into the amount inputs — a trailing decimal dot survives re-render", () => {
+    const html = renderOfferingEntryFormHtml({ funds: [], state });
+    expect(html).toContain('id="input-expected-cash"');
+    expect(html).toContain('value="5."');
+    expect(html).toMatch(/input-row-amount[^>]*value="5."/);
+  });
+
+  it("falls back to the parsed Money value when no raw text exists yet", () => {
+    const html = renderOfferingEntryFormHtml({
+      funds: [],
+      state: {
+        ...state,
+        rawAmounts: { cash: "", transfer: "", qr: "" },
+        allocations: [{ ...state.allocations[0], rawAmount: undefined }],
+      },
+    });
+    expect(html).toContain('value="5"');
   });
 });

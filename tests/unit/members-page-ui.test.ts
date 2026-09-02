@@ -66,11 +66,60 @@ describe("MembersPage UI — Unit Tests", () => {
 
     expect(html).toContain('id="cert-modal"');
     expect(html).toContain("หนังสือรับรองการถวายทรัพย์");
-    expect(html).toContain("คริสตจักรเกรซแบ๊บติสต์");
+    // Certificate header comes from the church identity constant, never a hardcoded name
+    expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");
+    expect(html).not.toContain("Grace Baptist Church Thailand");
     expect(html).toContain("หนังสือรับรองการบริจาค/การถวายทรัพย์");
     expect(html).toContain("วนิดา เกียรติสกุล");
     // Giving data loaded via RPC; mock doesn't provide it → loading state
     expect(html).toContain("กำลังโหลดประวัติการถวาย...");
     expect(html).toContain("พิมพ์เอกสาร / ดาวน์โหลด PDF");
+  });
+});
+
+describe("MembersPage — interaction honesty fixes", () => {
+  const mockMembers = [
+    { id: "mem-1", full_name: "วนิดา เกียรติสกุล", email: "w@x.org", phone: "", is_active: true, created_at: "2026-08-14T00:00:00Z" },
+  ];
+  const baseSupabase = {
+    from: () => ({ select: () => ({ eq: () => ({ eq: () => ({ order: () => Promise.resolve({ data: mockMembers, error: null }) }) }) }) }),
+  } as any;
+
+  it("search with no match says ไม่พบสมาชิกที่ค้นหา — never claims the registry is empty", async () => {
+    const page = new MembersPage(baseSupabase, "church-1");
+    await page.loadData();
+    (page as any).searchQuery = "zzz ไม่มีจริง";
+    const html = page.renderHtml();
+    expect(html).toContain("ไม่พบสมาชิกที่ค้นหา");
+    expect(html).toContain('id="clear-member-search-btn"');
+    expect(html).not.toContain("เพิ่มสมาชิกคนแรก");
+    expect(html).not.toContain("ยังไม่มีรายชื่อสมาชิก");
+  });
+
+  it("transport failure is a retryable failed state — not a permission denial", async () => {
+    const throwingSupabase = {
+      ...baseSupabase,
+      rpc: () => Promise.reject(new Error("network down")),
+    } as any;
+    const page = new MembersPage(throwingSupabase, "church-1");
+    await page.loadData();
+    await page.loadGivingForMember("mem-1", () => {});
+    (page as any).selectedMemberId = "mem-1";
+    expect((page as any).givingById["mem-1"].status).toBe("failed");
+    expect(page.renderHtml()).toContain("ดูข้อมูลไม่สำเร็จ");
+    expect(page.renderHtml()).not.toContain("ไม่มีสิทธิ์ดูข้อมูลการถวาย");
+  });
+
+  it("an RPC rejection is a genuine permission denial", async () => {
+    const deniedSupabase = {
+      ...baseSupabase,
+      rpc: () => Promise.resolve({ data: null, error: { message: "Access Denied: Only Pastors or designated Finance Leaders may view confidential member giving records." } }),
+    } as any;
+    const page = new MembersPage(deniedSupabase, "church-1");
+    await page.loadData();
+    await page.loadGivingForMember("mem-1", () => {});
+    (page as any).selectedMemberId = "mem-1";
+    expect((page as any).givingById["mem-1"].status).toBe("denied");
+    expect(page.renderHtml()).toContain("ไม่มีสิทธิ์ดูข้อมูลการถวาย");
   });
 });

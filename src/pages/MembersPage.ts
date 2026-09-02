@@ -2,7 +2,9 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
-import { formatDateThai } from "../lib/format";
+import { formatDateThai, toUserMessage } from "../lib/format";
+import { restoreFocusAfterRender } from "../lib/ui/focus";
+import { CHURCH_NAME_TH } from "../lib/org";
 import { MembersService } from "../lib/members/members-service";
 
 export interface MemberRecord {
@@ -15,7 +17,7 @@ export interface MemberRecord {
 }
 
 type GivingState = {
-  status: "loading" | "loaded" | "denied" | "none";
+  status: "loading" | "loaded" | "denied" | "none" | "failed";
   total: Money;
   titheCount: number;
   lastGivenDate: string | null;
@@ -44,6 +46,7 @@ export class MembersPage {
   constructor(
     private supabase: SupabaseClient<Database>,
     private churchId: string,
+    private churchName: string = CHURCH_NAME_TH,
   ) {
     this.membersService = new MembersService(supabase);
   }
@@ -97,7 +100,9 @@ export class MembersPage {
     onStateChange: () => void,
   ): Promise<void> {
     const existing = this.givingById[memberId];
-    if (existing && existing.status !== "none") return;
+    // Only skip when the cached state is still authoritative: a successful
+    // load or an in-flight request. "failed" and "denied" are retryable.
+    if (existing && (existing.status === "loaded" || existing.status === "loading" || existing.status === "denied")) return;
 
     this.givingById[memberId] = {
       status: "loading",
@@ -107,6 +112,7 @@ export class MembersPage {
     };
     onStateChange();
 
+    let records: any[];
     try {
       const { data, error } = await this.supabase.rpc(
         "get_member_giving_history",
@@ -116,9 +122,21 @@ export class MembersPage {
         } as any,
       );
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        // The RPC itself rejected the call (role gate / justification) — a
+        // genuine permission state, not a network problem.
+        this.givingById[memberId] = {
+          status: "denied",
+          total: Money.zero(),
+          titheCount: 0,
+          lastGivenDate: null,
+        };
+        onStateChange();
+        return;
+      }
+      records = (data as any[]) || [];
 
-      const records = (data as any[]) || [];
+      // records already extracted above
       const currentYear = new Date().getFullYear();
       const thisYear = records.filter((r) => {
         const d = r.given_at ? new Date(r.given_at) : null;
@@ -152,9 +170,10 @@ export class MembersPage {
         };
       }
     } catch {
-      // Access Denied (role-gated) or other failure -> never surface raw error.
+      // Transport/network failure — the RPC never answered, so this is not a
+      // permission state. Say so honestly and let the user retry.
       this.givingById[memberId] = {
-        status: "denied",
+        status: "failed",
         total: Money.zero(),
         titheCount: 0,
         lastGivenDate: null,
@@ -172,6 +191,11 @@ export class MembersPage {
       body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground);">กำลังโหลดประวัติการถวาย...</div>`;
     } else if (g.status === "denied") {
       body = `<div style="font-size: var(--text-xs); color: var(--expense);">ไม่มีสิทธิ์ดูข้อมูลการถวาย</div>`;
+    } else if (g.status === "failed") {
+      body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+        ดูข้อมูลไม่สำเร็จ
+        <button type="button" class="btn-retry-giving gl-btn gl-btn--secondary gl-btn--sm" data-member-id="${escapeHtml(member.id)}">ลองใหม่</button>
+      </div>`;
     } else if (g.status === "none") {
       body = `<div style="font-size: var(--text-xs); color: var(--muted-foreground);">ไม่มีข้อมูลการถวายในปีนี้</div>`;
     } else {
@@ -180,7 +204,7 @@ export class MembersPage {
         <div style="margin-bottom: var(--space-2);"><strong>สถิติการถวายสิบลด:</strong> ${g.titheCount} ครั้ง</div>
         <div style="margin-bottom: var(--space-2);"><strong>ยอดถวายสะสมรวม:</strong> <span class="num-display" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--primary);">${g.total.format()}</span></div>
         <div style="margin-bottom: var(--space-2);"><strong>ถวายล่าสุด:</strong> ${g.lastGivenDate ?? "—"}</div>
-        <div style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: var(--space-3);">ประวัติการเข้าดูถูกบันทึกในบันทึกการตรวจสอบ (audit log)</div>`;
+        <div class="no-print" style="font-size: var(--text-2xs); color: var(--muted-foreground); margin-top: var(--space-3);">ประวัติการเข้าดูถูกบันทึกในบันทึกการตรวจสอบ</div>`;
     }
     return body;
   }
@@ -243,8 +267,7 @@ export class MembersPage {
 
           <div id="printable-certificate" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: var(--space-6); margin-bottom: var(--space-4);">
             <div style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: var(--space-3); margin-bottom: var(--space-4);">
-              <div style="font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--primary);">คริสตจักรเกรซแบ๊บติสต์</div>
-              <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 2px;">Grace Baptist Church Thailand</div>
+              <div style="font-size: var(--text-lg); font-weight: var(--weight-bold); color: var(--primary);">${escapeHtml(this.churchName)}</div>
               <div style="font-size: var(--text-base); font-weight: var(--weight-semibold); margin-top: var(--space-2);">หนังสือรับรองการบริจาค/การถวายทรัพย์</div>
               <div style="font-size: var(--text-xs); color: var(--muted-foreground);">ประจำปีภาษี ${new Date().getFullYear() + 543} / ${new Date().getFullYear()}</div>
             </div>
@@ -321,11 +344,18 @@ export class MembersPage {
 
     const membersGridHtml = this.errorMessage
       ? ""
-      : filtered.length === 0
-        ? `<div class="gl-card gl-empty-state" style="text-align: center; padding: var(--space-8); color: var(--muted-foreground);">
-          <div style="font-size: var(--text-base); font-weight: var(--weight-medium); color: var(--foreground); margin-bottom: 4px;">ยังไม่มีรายชื่อสมาชิก</div>
-          <p style="margin: 0 0 var(--space-3); font-size: var(--text-sm);">เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี</p>
-          <button id="empty-add-member-btn" class="gl-btn gl-btn--primary gl-btn--sm">+ เพิ่มสมาชิกคนแรก</button>
+      : this.members.length === 0
+        ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
+          <div class="gl-empty-center__icon" aria-hidden="true">${ICON_CERT}</div>
+          <p class="gl-empty-center__msg">ยังไม่มีรายชื่อสมาชิก</p>
+          <p class="gl-empty-center__hint">เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี</p>
+          <button id="empty-add-member-btn" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-3);">เพิ่มสมาชิกคนแรก</button>
+        </div>`
+        : filtered.length === 0
+          ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
+          <p class="gl-empty-center__msg">ไม่พบสมาชิกที่ค้นหา</p>
+          <p class="gl-empty-center__hint">ลองเปลี่ยนคำค้น หรือค้นหาด้วยชื่อ รหัส หรือกลุ่มแคร์</p>
+          <button id="clear-member-search-btn" class="gl-btn gl-btn--secondary gl-btn--sm" style="margin-top: var(--space-3);">ล้างคำค้นหา</button>
         </div>`
         : `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-3);">
@@ -397,13 +427,13 @@ export class MembersPage {
           background: var(--card);
         ">
           <span style="color: var(--muted-foreground);">${ICON_SEARCH}</span>
-          <input id="member-search-input" type="text" value="${this.searchQuery}" placeholder="ค้นหาชื่อสมาชิก รหัส หรือกลุ่มแคร์..." style="
+          <input id="member-search-input" type="text" aria-label="ค้นหาสมาชิก" value="${this.searchQuery}" placeholder="ค้นหาชื่อสมาชิก รหัส หรือกลุ่มแคร์..." style="
             flex: 1;
             border: none;
             background: transparent;
             font-size: var(--text-sm);
             color: var(--foreground);
-            outline: none;
+            /* Keep the global :focus-visible ring — the one field users must
           " />
         </div>
       </section>
@@ -423,6 +453,14 @@ export class MembersPage {
     root: HTMLElement,
     onStateChange: () => void,
   ): void {
+    root.querySelectorAll<HTMLButtonElement>(".btn-retry-giving").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-member-id");
+        if (id) void this.loadGivingForMember(id, onStateChange);
+      });
+    });
+
     const retryBtn =
       root.querySelector<HTMLButtonElement>("#retry-members-btn");
     retryBtn?.addEventListener("click", async () => {
@@ -434,7 +472,14 @@ export class MembersPage {
       "#member-search-input",
     );
     searchInput?.addEventListener("input", (e) => {
-      this.searchQuery = (e.target as HTMLInputElement).value;
+      const target = e.target as HTMLInputElement;
+      this.searchQuery = target.value;
+      restoreFocusAfterRender(target, onStateChange);
+    });
+
+    const clearSearchBtn = root.querySelector<HTMLButtonElement>("#clear-member-search-btn");
+    clearSearchBtn?.addEventListener("click", () => {
+      this.searchQuery = "";
       onStateChange();
     });
 
@@ -520,7 +565,7 @@ export class MembersPage {
         await this.loadData();
         onStateChange();
       } catch (err: any) {
-        this.formErrorMessage = err.message || "เกิดข้อผิดพลาด";
+        this.formErrorMessage = toUserMessage(err, "เพิ่มสมาชิกไม่สำเร็จ ลองใหม่อีกครั้ง");
         this.isSubmitting = false;
         onStateChange();
       }
@@ -554,7 +599,14 @@ export class MembersPage {
 
     const printBtn = root.querySelector<HTMLButtonElement>("#print-cert-btn");
     printBtn?.addEventListener("click", () => {
+      // Print-isolation mode: only the certificate reaches the paper —
+      // the member grid and page chrome behind the modal are hidden
+      // by the `body.print-certificate` rules in app.css.
+      document.body.classList.add("print-certificate");
+      const cleanup = () => document.body.classList.remove("print-certificate");
+      window.addEventListener("afterprint", cleanup, { once: true });
       window.print();
+      window.setTimeout(cleanup, 1000);
     });
   }
 }

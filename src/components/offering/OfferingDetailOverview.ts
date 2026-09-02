@@ -125,7 +125,7 @@ function renderTimelineHtml(session: OfferingSession): string {
   for (const rev of session.revisions || []) {
     entries.push({
       label: `แก้ไขยอดครั้งที่ ${rev.revisionNumber}`,
-      detail: `${rev.previousTotalAmount.format()} → ${rev.newTotalAmount.format()} · ${rev.revisionReason}`,
+      detail: `${rev.previousTotalAmount.format()} เป็น ${rev.newTotalAmount.format()} · ${rev.revisionReason}`,
       at: rev.createdAt,
     });
   }

@@ -15,7 +15,12 @@ export class PgLab {
   client: Client | null;
   migrationsApplied: string[];
   start(options?: PgLabOptions): Promise<this>;
-  asUser<T>(userId: string, role: string | "authenticated" | "service_role", fn: () => Promise<T>): Promise<T>;
+  asUser<T>(
+    userId: string,
+    role: string | "authenticated" | "service_role",
+    fn: () => Promise<T>,
+  ): Promise<T>;
+  openSession(): Promise<{ client: Client; pid: number }>;
   stop(): Promise<void>;
 }
 

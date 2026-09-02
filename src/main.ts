@@ -10,9 +10,11 @@ import { MembersPage } from "./pages/MembersPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PinSetupPage } from "./pages/PinSetupPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { GraceAiDrawer } from "./components/ai-drawer/GraceAiDrawer";
 import type { AiDrawerCallbacks } from "./components/ai-drawer/types";
 import { UserRole } from "./lib/rbac";
+import { CHURCH_NAME_TH } from "./lib/org";
 
 interface ActiveSession {
   userId: string;
@@ -33,6 +35,7 @@ export class App {
   private fundsPage: FundsPage | null = null;
   private membersPage: MembersPage | null = null;
   private reportsPage: ReportsPage | null = null;
+  private profilePage: ProfilePage | null = null;
   private aiDrawer: GraceAiDrawer | null = null;
   /** Drawer hooks: draft cards hand the user over to the Transactions page. */
   private readonly aiDrawerCallbacks: AiDrawerCallbacks = {
@@ -181,8 +184,21 @@ export class App {
     );
     this.transactionsPage = new TransactionsPage(this.supabase, churchId);
     this.fundsPage = new FundsPage(this.supabase, churchId);
-    this.membersPage = new MembersPage(this.supabase, churchId);
-    this.reportsPage = new ReportsPage(this.supabase, churchId);
+    this.membersPage = new MembersPage(
+      this.supabase,
+      churchId,
+      this.session.user.churchName ?? CHURCH_NAME_TH,
+    );
+    this.reportsPage = new ReportsPage(
+      this.supabase,
+      churchId,
+      this.session.user.churchName ?? CHURCH_NAME_TH,
+    );
+    this.profilePage = new ProfilePage(this.supabase, {
+      user: this.session.user,
+      userId,
+      churchId,
+    });
     this.aiDrawer = new GraceAiDrawer(
       this.supabase,
       churchId,
@@ -243,11 +259,11 @@ export class App {
     ) {
       const data = await this.dashboardPage.loadData(this.session.churchId);
       this.pendingCount = data.pendingApprovalsCount;
-      contentHtml = this.dashboardPage.renderHtml(data);
+      contentHtml = this.dashboardPage.renderHtml(data, this.session.user);
     } else if (this.currentRoute.pattern === "/transactions") {
       if (this.transactionsPage) {
         await this.transactionsPage.loadData();
-        contentHtml = this.transactionsPage.renderHtml();
+        contentHtml = this.transactionsPage.renderHtml(this.session.user);
       }
     } else if (this.currentRoute.pattern === "/funds") {
       if (this.fundsPage) {
@@ -263,6 +279,15 @@ export class App {
       if (this.reportsPage) {
         await this.reportsPage.loadData();
         contentHtml = this.reportsPage.renderHtml();
+      }
+    } else if (this.currentRoute.pattern === "/profile") {
+      if (this.profilePage) {
+        this.profilePage.updateProps({
+          user: this.session.user,
+          userId: this.session.userId,
+          churchId: this.session.churchId,
+        });
+        contentHtml = this.profilePage.renderHtml();
       }
     } else if (
       this.currentRoute.pattern === "/approvals" ||
@@ -336,6 +361,10 @@ export class App {
       );
     } else if (this.currentRoute.pattern === "/reports") {
       this.reportsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
+    } else if (this.currentRoute.pattern === "/profile") {
+      this.profilePage?.attachEventListeners(this.rootElement, () =>
         this.render(),
       );
     }

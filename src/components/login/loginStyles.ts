@@ -142,7 +142,7 @@ export function renderLoginStylesHtml(): string {
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
       background:
-        linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, var(--primary)), var(--card));
+        color-mix(in srgb, var(--primary) 4%, var(--card));
       box-shadow: var(--shadow-card);
       transition: transform var(--duration-micro) var(--ease-spring),
                   border-color var(--duration-micro) var(--ease-out),
@@ -461,7 +461,7 @@ export function renderLoginStylesHtml(): string {
       border-radius: var(--radius-full);
       border: 1px solid var(--border);
       background:
-        linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, var(--accent)), var(--card));
+        color-mix(in srgb, var(--accent) 45%, var(--card));
       color: var(--foreground);
       font-family: var(--font-display);
       font-size: var(--text-2xl);
@@ -596,7 +596,7 @@ export function renderLoginStylesHtml(): string {
         flex-direction: column;
         justify-content: space-between;
         gap: var(--space-8);
-        padding: var(--space-8) var(--space-8) var(--space-8) var(--space-9);
+        padding: var(--space-10) var(--space-8) var(--space-10) var(--space-10);
         background: var(--primary-dark);
         color: var(--primary-foreground);
       }
@@ -611,6 +611,7 @@ export function renderLoginStylesHtml(): string {
       .gl-login-panel .gl-login-wordmark {
         font-size: var(--text-lg);
         letter-spacing: 0.16em;
+        color: var(--primary-foreground);
       }
       .gl-login-panel .gl-login-tagline {
         color: color-mix(in srgb, var(--primary-foreground) 72%, transparent);
