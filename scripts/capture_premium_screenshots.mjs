@@ -47,7 +47,7 @@ async function installHarness(page) {
       name: "อาจารย์สรรเสริญ ดวงจิตร",
       role: "ศิษยาภิบาล",
       initials: "สด",
-      churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+      churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
     };
 
     const funds = [
@@ -120,7 +120,7 @@ async function installHarness(page) {
     const mkTx = (id, ref, desc, amt, hasReceipt, isCreator, status) => ({
       id, churchId: "c1", accountId: "a1", accountName: "ธนาคารกรุงเทพ กระแสรายวัน",
       amount: M.from(amt), direction: "expense", status, description: desc,
-      referenceNumber: ref, createdBy: "u1", creatorName: "มนัส สุขใจ", creatorInitials: "มส",
+      referenceNumber: ref, createdBy: "u1", creatorName: "สุดารัตน์ จิณเซ่ง", creatorInitials: "สด",
       createdAt: "2026-08-18", hasReceipt, isCreator,
       splits: [{ fundId: "f1", fundName: "กองทุนพันธกิจพิเศษ", amount: M.from(amt), fundBalance: M.from("9510") }],
     });
@@ -186,7 +186,7 @@ async function installHarness(page) {
       "06_offering_entry": () =>
         entry.renderOfferingEntryFormHtml({ funds, state: formState, validationErrors: [] }),
       "07_offering_review": () =>
-        review.renderOfferingReviewSheetHtml({ funds, state: formState, creatorName: "มนัส สุขใจ", isSubmitting: false, errorMessage: null }),
+        review.renderOfferingReviewSheetHtml({ funds, state: formState, creatorName: "อาจารย์ ทัศนา ดวงจิตร", isSubmitting: false, errorMessage: null }),
       "08_detail_overview": () => detailFor("posted", {
         financialTransactionId: "tx-fin-777888-9999-aaaa", postedAt: "2026-08-24",
       }).renderHtml(),

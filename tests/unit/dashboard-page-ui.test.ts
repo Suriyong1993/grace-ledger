@@ -848,7 +848,7 @@ describe("DashboardPage UI — Unit Tests", () => {
           name: "ภราดา มานะ",
           role: "treasurer",
           initials: "ภม",
-          churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+          churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
         }
       );
 
@@ -856,7 +856,7 @@ describe("DashboardPage UI — Unit Tests", () => {
       // supporting line and the shell topbar/sidebar own the identity.
       expect(html).not.toContain('class="gl-card gl-dash-user-card"');
       expect(html).toContain(
-        "คริสตจักรพระคุณ กาฬสินธุ์ · ข้อมูล ณ",
+        "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์ · ข้อมูล ณ",
       );
       expect(html).toContain("<h1>ภาพรวมการเงิน</h1>");
     });
@@ -875,6 +875,51 @@ describe("DashboardPage UI — Unit Tests", () => {
       expect(html).toContain("−฿12,000.00");
       expect(html).toContain("ส่วนต่างสุทธิ");
       expect(html).toContain("+฿18,000.00");
+    });
+
+    it("renders 2026 AI Personalized Greeting card with user title, role and pending task alert", () => {
+      const html = page.renderHtml(
+        {
+          pendingApprovalsCount: 3,
+          totalFundsBalance: "฿150,000.00",
+          monthlyIncome: "฿30,000.00",
+          monthlyExpense: "฿12,000.00",
+        },
+        {
+          name: "อาจารย์สรรเสริญ ดวงจิตร",
+          role: "pastor",
+          initials: "สด",
+          churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
+        },
+      );
+
+      expect(html).toContain('class="gl-ai-greeting"');
+      expect(html).toContain("สวัสดีครับ อาจารย์สรรเสริญ ดวงจิตร · ศิษยาภิบาล");
+      expect(html).toContain("3 รายการ");
+      expect(html).toContain('class="gl-btn gl-btn--sm gl-btn--cta-2026 gl-ai-greeting__action"');
+      expect(html).toContain("ดูงานค้าง →");
+    });
+
+    it("renders calm 2026 AI greeting when all tasks are clear", () => {
+      const html = page.renderHtml(
+        {
+          pendingApprovalsCount: 0,
+          totalFundsBalance: "฿150,000.00",
+          monthlyIncome: "฿30,000.00",
+          monthlyExpense: "฿12,000.00",
+        },
+        {
+          name: "สุดารัตน์ จิณเซ่ง",
+          role: "counter",
+          initials: "สด",
+          churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
+        },
+      );
+
+      expect(html).toContain('class="gl-ai-greeting"');
+      expect(html).toContain("สวัสดีครับ สุดารัตน์ จิณเซ่ง · ผู้นับเงิน");
+      expect(html).toContain("ระบบการเงินเป็นระเบียบเรียบร้อย");
+      expect(html).not.toContain("ดูงานค้าง →");
     });
   });
 });

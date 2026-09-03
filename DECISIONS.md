@@ -133,7 +133,7 @@ consumption path, and `app.css` reads the tokens directly via `var(--radius-card
 **Status:** APPROVED · already shipped. R1-c changed **no** token file; it only corrected `DESIGN.md` and
 this log to describe the shipped values.
 
-### D9 — Canonical Church Officers & Governance Roster (คริสตจักรพระคุณ กาฬสินธุ์)
+### D9 — Canonical Church Officers & Governance Roster (คริสตจักรชีวิตสุขสันต์กาฬสินธุ์)
 
 **Decision:** The canonical leadership roster for Grace Ledger is permanently established as:
 1. **ศิษยาภิบาล (Pastor):** อาจารย์สรรเสริญ ดวงจิตร (`pastor`)

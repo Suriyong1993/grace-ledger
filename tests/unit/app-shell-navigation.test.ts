@@ -63,7 +63,7 @@ describe("Authenticated App Shell & Navigation", () => {
       name: "อาจารย์สรรเสริญ ดวงจิตร",
       role: "treasurer",
       initials: "สด",
-      churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+      churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
     },
     attention: attentionFixture(),
   };
@@ -192,7 +192,7 @@ describe("Authenticated App Shell & Navigation", () => {
   it("renders church name and user avatar in top header and sidebar", () => {
     const html = renderAppShellHtml(treasurerProps, "<div>Content</div>");
 
-    expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
+    expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");
     expect(html).toContain("อาจารย์สรรเสริญ ดวงจิตร");
     expect(html).toContain("สด");
   });
@@ -207,7 +207,7 @@ describe("Authenticated App Shell & Navigation", () => {
     const html = profilePage.renderHtml();
 
     expect(html).toContain("อาจารย์สรรเสริญ ดวงจิตร");
-    expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
+    expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");
     expect(html).toContain("11111111...555555");
     expect(html).toContain('href="#/transactions"');
     expect(html).toContain('href="#/funds"');

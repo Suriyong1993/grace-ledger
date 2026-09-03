@@ -64,7 +64,7 @@ async function installHarness(page) {
       name: "อาจารย์สรรเสริญ ดวงจิตร",
       role: "ศิษยาภิบาล",
       initials: "สด",
-      churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+      churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
     };
 
     const approvalItem = {
@@ -107,7 +107,7 @@ async function installHarness(page) {
         countedCashAmount: M.from("9950"),
         cashVarianceAmount: M.from("-50"),
         varianceStatus: "variance_detected",
-        creatorName: "มนัส สุขใจ",
+        creatorName: "อาจารย์ ทัศนา ดวงจิตร",
         createdAt: "2026-08-30",
       },
     ];

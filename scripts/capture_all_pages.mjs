@@ -63,7 +63,7 @@ async function installScreensHarness(page) {
       name: "อาจารย์สรรเสริญ ดวงจิตร",
       role: "ศิษยาภิบาล",
       initials: "สด",
-      churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+      churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
     };
 
     const dummyFunds = [
@@ -114,8 +114,8 @@ async function installScreensHarness(page) {
         description: "ค่าไฟฟ้าและสาธารณูปโภคประจำเดือน",
         referenceNumber: "EXP-0247",
         createdBy: "u-creator2",
-        creatorName: "มนัส สุขใจ",
-        creatorInitials: "มส",
+        creatorName: "สุดารัตน์ จิณเซ่ง",
+        creatorInitials: "สด",
         createdAt: "2026-08-20T11:30:00Z",
         hasReceipt: true,
         splits: [{ fundId: "f-1", fundName: "กองทุนทั่วไป", amount: M.from("4280.00"), fundBalance: M.from("128450.00") }],
@@ -137,7 +137,7 @@ async function installScreensHarness(page) {
         countedCashAmount: M.from("9950"),
         cashVarianceAmount: M.from("-50"),
         varianceStatus: "variance_detected",
-        creatorName: "มนัส สุขใจ",
+        creatorName: "อาจารย์ ทัศนา ดวงจิตร",
         createdAt: "2026-08-23",
       },
       {
@@ -153,7 +153,7 @@ async function installScreensHarness(page) {
         countedCashAmount: M.from("12000"),
         cashVarianceAmount: M.from("0"),
         varianceStatus: "balanced",
-        creatorName: "มนัส สุขใจ",
+        creatorName: "อาจารย์ ทัศนา ดวงจิตร",
         createdAt: "2026-08-16",
       },
     ];

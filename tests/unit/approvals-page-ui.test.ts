@@ -39,7 +39,7 @@ const dummyUser = {
   name: "ทดสอบ มี่",
   role: "เหรัญญิก",
   initials: "ทม",
-  churchName: "คริสตจักรพระคุณ",
+  churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
 };
 
 describe("ApprovalsPage", () => {
@@ -93,7 +93,7 @@ describe("ApprovalsPage", () => {
     const html = page.renderHtml(dummyUser);
     expect(html).toContain("ทดสอบ มี่");
     expect(html).toContain("เหรัญญิก");
-    expect(html).toContain("คริสตจักรพระคุณ");
+    expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");
     expect(html).toContain("ทม");
   });
 

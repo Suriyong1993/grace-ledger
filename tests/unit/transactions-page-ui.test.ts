@@ -272,11 +272,11 @@ describe("TransactionsPage UI — Unit Tests", () => {
       const html = page.renderHtml({
         name: "ศรัณย์ สถิต",
         role: "เหรัญญิก",
-        churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
+        churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
         initials: "ศส",
       });
 
-      expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
+      expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");
       expect(html).toContain('id="export-csv-btn"');
       expect(html).toContain("ส่งออก CSV");
     });

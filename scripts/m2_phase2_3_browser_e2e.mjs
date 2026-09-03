@@ -121,7 +121,7 @@ async function runBrowserE2E() {
       DELETE FROM churches WHERE id = '${CHURCH_ID}';
 
       -- Create Church
-      INSERT INTO churches (id, name, currency) VALUES ('${CHURCH_ID}', 'คริสตจักรพระคุณ กาฬสินธุ์', 'THB');
+      INSERT INTO churches (id, name, currency) VALUES ('${CHURCH_ID}', 'คริสตจักรชีวิตสุขสันต์กาฬสินธุ์', 'THB');
 
       -- Profiles
       INSERT INTO profiles (id, church_id, email, full_name, is_active) VALUES

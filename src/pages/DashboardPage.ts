@@ -638,9 +638,43 @@ export class DashboardPage {
       .filter(Boolean)
       .join("");
 
+    const displayName = activeUser?.name || "";
+    const userRoleLabel = activeUser?.role === "pastor"
+      ? "ศิษยาภิบาล"
+      : activeUser?.role === "treasurer"
+        ? "เหรัญญิก"
+        : activeUser?.role === "counter"
+          ? "ผู้นับเงิน"
+          : activeUser?.role === "super_admin"
+            ? "ผู้ตรวจสอบบัญชี"
+            : "";
+
+    const greetingTitle = displayName
+      ? `สวัสดีครับ ${escapeHtml(displayName)}${userRoleLabel ? ` · ${escapeHtml(userRoleLabel)}` : ""}`
+      : "ระบบบันทึกบัญชีคริสตจักร Grace Ledger";
+
+    const aiGreetingMessage = attentionTotal > 0
+      ? `สัปดาห์นี้มีงานสำคัญ <strong>${attentionTotal} รายการ</strong> ที่รอการดำเนินการของคุณ`
+      : `ระบบการเงินเป็นระเบียบเรียบร้อย ไม่มีรายการค้างที่ต้องดำเนินการ`;
+
+    const aiGreetingHtml = `
+      <div class="gl-ai-greeting" role="region" aria-label="ข้อความจาก Grace AI">
+        <div class="gl-ai-greeting__content">
+          <span class="gl-ai-greeting__sparkle" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          </span>
+          <div>
+            <div class="gl-ai-greeting__title">${greetingTitle}</div>
+            <div class="gl-ai-greeting__subtitle">${aiGreetingMessage}</div>
+          </div>
+        </div>
+        ${attentionTotal > 0 ? `<a href="#/approvals" class="gl-btn gl-btn--sm gl-btn--cta-2026 gl-ai-greeting__action">ดูงานค้าง →</a>` : ""}
+      </div>`;
+
     return `
     <div class="gl-page gl-dashboard-container gl-fade-in">
       ${loadFailedHtml}
+      ${aiGreetingHtml}
 
       <div class="gl-page-header">
         <h1>ภาพรวมการเงิน</h1>
