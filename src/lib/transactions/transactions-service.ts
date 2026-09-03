@@ -22,6 +22,7 @@ export const TransactionSplitSchema = z.object({
 
 export const CreateDraftTransactionSchema = z.object({
   church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
+  created_by: z.string().uuid("รหัสผู้สร้างรายการต้องเป็น UUID"),
   description: z.string().min(1, "กรุณาระบุรายละเอียดรายการ"),
   direction: z.enum(["income", "expense"], {
     errorMap: () => ({ message: "กรุณาระบุประเภทรายการ (รายรับ/รายจ่าย)" }),
@@ -165,6 +166,7 @@ export class TransactionsService {
       )
         .insert({
           church_id: parsed.church_id,
+          created_by: parsed.created_by,
           description: parsed.description,
           direction: parsed.direction,
           transaction_date: parsed.transaction_date,
@@ -182,6 +184,7 @@ export class TransactionsService {
       // Insert transaction splits — category_id applied per split, matching the real schema
       const splitsToInsert = parsed.splits.map((s) => ({
         transaction_id: txn.id,
+        church_id: parsed.church_id,
         fund_id: s.fund_id,
         category_id: parsed.category_id,
         amount: Money.from(s.amount).toFixed(2),
@@ -224,7 +227,7 @@ export class TransactionsService {
       const { data: existing, error: fetchError } = await (
         this.supabase.from("transactions") as any
       )
-        .select("id, status, amount")
+        .select("id, status, amount, church_id")
         .eq("id", transactionId)
         .single();
 
@@ -309,6 +312,7 @@ export class TransactionsService {
         // Insert new splits
         const splitsToInsert = parsed.splits.map((s) => ({
           transaction_id: transactionId,
+          church_id: existing.church_id,
           fund_id: s.fund_id,
           category_id: categoryForSplits || null,
           amount: Money.from(s.amount).toFixed(2),

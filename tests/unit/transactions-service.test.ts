@@ -7,6 +7,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
   const dummyFund2Id = "00000000-0000-0000-0000-000000000003";
   const dummyAccountId = "00000000-0000-0000-0000-000000000004";
   const dummyCategoryId = "00000000-0000-0000-0000-000000000005";
+  const dummyUserId = "00000000-0000-0000-0000-000000000006";
 
   describe("1. createDraftTransaction", () => {
     it("creates draft transaction and splits when payload and split parity are valid", async () => {
@@ -47,6 +48,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
+        created_by: dummyUserId,
         description: "ซื้ออุปกรณ์สำนักงาน",
         direction: "expense",
         transaction_date: "2026-08-21",
@@ -67,7 +69,9 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(insertedTxn.transaction_date).toBe("2026-08-21");
       expect(insertedSplits).toHaveLength(2);
       expect(insertedSplits[0].amount).toBe("1000.00");
+      expect(insertedSplits[0].church_id).toBe(dummyChurchId);
       expect(insertedSplits[1].amount).toBe("500.00");
+      expect(insertedSplits[1].church_id).toBe(dummyChurchId);
     });
 
     it("stores category_id on transaction_splits, never on the transactions header row (regression)", async () => {
@@ -108,6 +112,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
+        created_by: dummyUserId,
         description: "เงินถวายทั่วไป",
         direction: "income",
         transaction_date: "2026-08-23",
@@ -122,6 +127,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(result.success).toBe(true);
       expect(insertedTxn).not.toHaveProperty("category_id");
       expect(insertedSplits[0].category_id).toBe(dummyCategoryId);
+      expect(insertedSplits[0].church_id).toBe(dummyChurchId);
       // Regression: DB column is "note" (singular) — the public split input field
       // stays "notes" but must be written to the real column.
       expect(insertedSplits[0].note).toBe("หมายเหตุทดสอบ");
@@ -134,6 +140,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
+        created_by: dummyUserId,
         description: "ค่าอาหารค่าย",
         direction: "expense",
         transaction_date: "2026-08-21",
@@ -156,6 +163,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const resZero = await service.createDraftTransaction({
         church_id: dummyChurchId,
+        created_by: dummyUserId,
         description: "ยอดศูนย์",
         direction: "expense",
         transaction_date: "2026-08-21",
@@ -167,6 +175,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const resNeg = await service.createDraftTransaction({
         church_id: dummyChurchId,
+        created_by: dummyUserId,
         description: "ยอดติดลบ",
         direction: "expense",
         transaction_date: "2026-08-21",
@@ -186,6 +195,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const result = await service.createDraftTransaction({
         church_id: "invalid-church-id",
+        created_by: dummyUserId,
         description: "ทดสอบ UUID",
         direction: "expense",
         transaction_date: "2026-08-21",
@@ -205,6 +215,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
 
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
+        created_by: dummyUserId,
         description: "สร้างโดยสมาชิก",
         direction: "expense",
         transaction_date: "2026-08-21",
@@ -233,7 +244,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
                 eq: () => ({
                   single: () =>
                     Promise.resolve({
-                      data: { id: "txn-1", status: "draft", amount: "1000.00" },
+                      data: { id: "txn-1", status: "draft", amount: "1000.00", church_id: dummyChurchId },
                       error: null,
                     }),
                 }),
@@ -286,6 +297,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       expect(updatedPayload.amount).toBe("1200.00");
       expect(deletedSplitsTxnId).toBe("txn-1");
       expect(insertedNewSplits[0].amount).toBe("1200.00");
+      expect(insertedNewSplits[0].church_id).toBe(dummyChurchId);
       // Regression: updateDraftTransaction must also write "note" (singular), not "notes".
       expect(insertedNewSplits[0].note).toBe("แก้ไขยอด");
       expect(insertedNewSplits[0]).not.toHaveProperty("notes");

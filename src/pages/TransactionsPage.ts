@@ -140,6 +140,7 @@ export class TransactionsPage {
   constructor(
     private supabase: SupabaseClient<Database>,
     private churchId: string,
+    private currentUserId?: string,
   ) {
     this.transactionsService = new TransactionsService(supabase);
   }
@@ -941,7 +942,8 @@ export class TransactionsPage {
         !accountVal ||
         !fundVal ||
         !catVal ||
-        !directionVal
+        !directionVal ||
+        !this.currentUserId
       ) {
         this.formErrorMessage = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
         onStateChange();
@@ -955,6 +957,7 @@ export class TransactionsPage {
       try {
         const draftRes = await this.transactionsService.createDraftTransaction({
           church_id: this.churchId,
+          created_by: this.currentUserId,
           description: descVal,
           direction: directionVal,
           transaction_date: dateVal,

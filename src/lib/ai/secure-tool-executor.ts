@@ -271,7 +271,7 @@ export class SecureAiToolExecutor {
       if (tool.capability === "READ") {
         rawResult = await this.handleReadTool(tool.name, validatedInput, authenticatedUserId);
       } else if (tool.capability === "DRAFT") {
-        rawResult = await this.handleDraftTool(tool.name, validatedInput, authenticatedUserId);
+        rawResult = await this.handleDraftTool(tool.name, validatedInput, authenticatedUserId, churchId);
       } else if (tool.capability === "ACTION_PROPOSAL") {
         rawResult = await this.handleProposalTool(tool.name, validatedInput, authenticatedUserId, churchId);
       }
@@ -497,17 +497,22 @@ export class SecureAiToolExecutor {
   /**
    * DRAFT Handlers (Creates uncommitted draft records in draft status)
    */
-  private async handleDraftTool(toolName: string, input: any, _userId: string): Promise<any> {
+  private async handleDraftTool(
+    toolName: string,
+    input: any,
+    _userId: string,
+    churchId: string,
+  ): Promise<any> {
     if (toolName === "create_draft_transaction") {
       const totalAmount = Money.from(input.amount);
+      const effectiveChurchId = input.church_id || churchId;
 
       const { data: txn, error: txnError } = await (this.supabase
         .from("transactions") as any)
         .insert({
-          church_id: input.church_id,
+          church_id: effectiveChurchId,
           description: input.description,
           transaction_date: input.transaction_date,
-          category_id: input.category_id,
           account_id: input.account_id,
           amount: totalAmount.toFixed(2),
           status: "draft",
@@ -519,7 +524,9 @@ export class SecureAiToolExecutor {
 
       const splitsToInsert = input.splits.map((s: any) => ({
         transaction_id: txn.id,
+        church_id: effectiveChurchId,
         fund_id: s.fund_id,
+        category_id: input.category_id || null,
         amount: Money.from(s.amount).toFixed(2),
         note: s.notes || null,
       }));

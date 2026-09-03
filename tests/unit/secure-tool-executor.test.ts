@@ -236,6 +236,7 @@ describe("SecureAiToolExecutor — Comprehensive Security & Boundary Tests", () 
 
       expect(result.success).toBe(true);
       expect(mockSupabase.insertedSplits[0].note).toBe("หมายเหตุจาก AI");
+      expect(mockSupabase.insertedSplits[0].church_id).toBe(dummyChurchId);
       expect(mockSupabase.insertedSplits[0]).not.toHaveProperty("notes");
     });
   });

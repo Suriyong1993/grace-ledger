@@ -15,7 +15,10 @@ import { GraceAiDrawer } from "./components/ai-drawer/GraceAiDrawer";
 import type { AiDrawerCallbacks } from "./components/ai-drawer/types";
 import { UserRole } from "./lib/rbac";
 import { CHURCH_NAME_TH } from "./lib/org";
-import { AttentionService, type AttentionSummary } from "./services/attention-service";
+import {
+  AttentionService,
+  type AttentionSummary,
+} from "./services/attention-service";
 
 interface ActiveSession {
   userId: string;
@@ -187,7 +190,11 @@ export class App {
       userId,
       fullName,
     );
-    this.transactionsPage = new TransactionsPage(this.supabase, churchId);
+    this.transactionsPage = new TransactionsPage(
+      this.supabase,
+      churchId,
+      userId,
+    );
     this.fundsPage = new FundsPage(this.supabase, churchId);
     this.membersPage = new MembersPage(
       this.supabase,
@@ -248,9 +255,8 @@ export class App {
         button: root.querySelector<HTMLElement>("#gl-more-btn"),
         panel: root.querySelector<HTMLElement>("#gl-more-panel"),
       },
-    ].filter(
-      (entry): entry is { button: HTMLElement; panel: HTMLElement } =>
-        Boolean(entry.button && entry.panel),
+    ].filter((entry): entry is { button: HTMLElement; panel: HTMLElement } =>
+      Boolean(entry.button && entry.panel),
     );
     if (popovers.length === 0) return;
 
@@ -295,12 +301,16 @@ export class App {
 
     // Attention panel + dashboard retry both re-render (refetching the
     // summary) instead of partially patching.
-    root.querySelector<HTMLButtonElement>("[data-attention-retry]")?.addEventListener("click", () => {
-      void this.render();
-    });
-    root.querySelector<HTMLButtonElement>("#dash-attention-retry")?.addEventListener("click", () => {
-      void this.render();
-    });
+    root
+      .querySelector<HTMLButtonElement>("[data-attention-retry]")
+      ?.addEventListener("click", () => {
+        void this.render();
+      });
+    root
+      .querySelector<HTMLButtonElement>("#dash-attention-retry")
+      ?.addEventListener("click", () => {
+        void this.render();
+      });
   }
 
   public async render(): Promise<void> {
@@ -406,6 +416,11 @@ export class App {
       this.currentRoute.pattern === "/approvals/:id"
     ) {
       await attentionPromise;
+      const approvalId =
+        this.currentRoute.pattern === "/approvals/:id"
+          ? this.currentRoute.params.id
+          : null;
+      this.approvalsPage?.setSelectedItem(approvalId);
       contentHtml = this.approvalsPage?.renderHtml() ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       if (this.offeringPage) {
@@ -450,11 +465,13 @@ export class App {
     // Sign-out affordance: available on every authenticated screen, in both
     // the desktop sidebar and the mobile topbar. Supabase's auth listener
     // clears the session and re-renders back to the login screen.
-    this.rootElement.querySelectorAll<HTMLButtonElement>("[data-logout]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        void this.supabase.auth.signOut();
+    this.rootElement
+      .querySelectorAll<HTMLButtonElement>("[data-logout]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          void this.supabase.auth.signOut();
+        });
       });
-    });
 
     this.attachShellPanels(this.rootElement);
 

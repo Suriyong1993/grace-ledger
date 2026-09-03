@@ -22,6 +22,7 @@ import { Money } from "../../src/lib/money";
 describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
   const CUTOVER_DATE = "2026-08-01";
   const CHURCH_ID = "00000000-0000-4000-8000-000000000001";
+  const USER_ID = "00000000-0000-4000-8000-000000000002";
 
   describe("1. Cutover Date Boundary Evaluation", () => {
     it("classifies all dates prior to 2026-08-01 as historical", () => {
@@ -153,6 +154,7 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
       // 1. Create a Live transaction dated 2026-08-01
       const createRes = await txnService.createDraftTransaction({
         church_id: CHURCH_ID,
+        created_by: USER_ID,
         description: "เงินถวายสิบลด ประจำวันอาทิตย์แรกของสิงหาคม 2569 (Live)",
         direction: "income",
         transaction_date: CUTOVER_DATE,
