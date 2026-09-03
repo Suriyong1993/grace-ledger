@@ -113,11 +113,15 @@ Every consumer imports `BRAND`; no consumer retypes `#16a34a`. Do not add a seco
 
 No fake data, no placeholder identity in a production path, no hardcoded financial numbers, no duplicate components, no skipped loading/error states, no `TODO` shipped as behavior, no disabling functionality to make a test pass.
 
-## Workflow
+## Workflow (JoejaBrain Standard)
 
-### วิธีทำงานที่แนะนำ (ใช้ commands ที่สร้างไว้)
-
-สำหรับ feature ให่ม ใช้ workflow นี้:
+ทุก Agent ทำงานร่วมกันผ่าน `.brain/` (Universal Workflows & State):
+1. **Brief & State Check**: อ่าน `.brain/WORKING_CONTEXT.md` และ `.brain/MEMORY.md` เสมอ (`.brain/workflows/01_brief.md`)
+2. **Feature Planning & Focus**: ใช้ `/gl-spec` และ `/gl-plan` แบ่งงานตาม P0-P3 (`.brain/workflows/02_focus.md`)
+3. **Execution & Build**: ใช้ `/gl-build` หรือเขียนโค้ดทีละ task พร้อม tests
+4. **Digest & Quality Gates**: ตรวจ 5 Quality Gates ผ่าน `/gl-review` (`.brain/workflows/03_digest.md`)
+5. **Wrap & Verification**: ตรวจสอบ `npm test` และ `npm run build` ผ่าน `/gl-test` (`.brain/workflows/04_wrap.md`)
+6. **Handoff & Ship**: อัปเดต `.brain/WORKING_CONTEXT.md` และบันทึก `.brain/HANDOFF.md` ผ่าน `/gl-ship` (`.brain/workflows/05_handoff.md`)
 
 ```
 1. /gl-spec     → ถามว่าจะสร้างอะไร → เขียน spec
@@ -125,7 +129,7 @@ No fake data, no placeholder identity in a production path, no hardcoded financi
 3. /gl-build    → เขียนโค้ดทีละ task พร้อม test
 4. /gl-test     → รัน npm test + build + ตรวจ financial/UI
 5. /gl-review   → ตรวจ 5 Quality Gates
-6. /gl-ship     → commit + push + PR
+6. /gl-ship     → commit + push + PR + อัปเดต .brain/HANDOFF.md
 ```
 
 ### Agents ที่ใช้ร่วม

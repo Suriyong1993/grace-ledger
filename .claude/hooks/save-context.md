@@ -4,7 +4,7 @@
 
 ## ทำอะไร
 - เขียนสรุปสั้นๆ ว่ากำลังทำอะไร ถึงไหนแล้ว ต้องทำอะไรต่อ
-- บันทึกลง `.claude/CONTEXT_BACKUP.md`
+- บันทึกลง `.brain/WORKING_CONTEXT.md` และ `.brain/HANDOFF.md`
 
 ## เมื่อไหร่
 - PreCompact — ก่อน context window เต็ม
@@ -16,7 +16,7 @@
   "hooks": {
     "PreCompact": [
       {
-        "command": "echo '⚠️ Context compacting soon. Summarize current work to .claude/CONTEXT_BACKUP.md'"
+        "command": "echo '⚠️ Context compacting soon. Summarize current work to .brain/WORKING_CONTEXT.md and .brain/HANDOFF.md'"
       }
     ]
   }

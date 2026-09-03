@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '⚠️ Context compacting soon. Summarize current work to .claude/CONTEXT_BACKUP.md'"
+            "command": "echo '⚠️ Context compacting soon. Summarize current work to .brain/WORKING_CONTEXT.md and .brain/HANDOFF.md'"
           }
         ]
       }

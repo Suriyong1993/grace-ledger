@@ -2,6 +2,22 @@
 
 Church financial OS (Thai UI). **Read `CLAUDE.md` first** — it is the full working agreement (quality gates, financial safety rules, Thai copy style, single-source-of-truth policy). This file is the quick orientation.
 
+## 🧠 JoejaBrain Operating Protocol (Mandatory for ALL AI Agents)
+
+Every AI Agent (Claude Code, Gemini, Codex, Antigravity, etc.) **must** follow this lifecycle:
+
+1. **Before writing any code (Brief & Focus)**:
+   - Read `.brain/WORKING_CONTEXT.md` for active tasks and system state.
+   - Read `.brain/MEMORY.md` for known gotchas, schema pitfalls, and safety invariants.
+   - Follow workflows in `.brain/workflows/` (`01_brief.md` → `02_focus.md`).
+2. **Before declaring work done (Digest & Wrap)**:
+   - Verify against the 5 Quality Gates (`.brain/workflows/03_digest.md`).
+   - Run verification (`.brain/workflows/04_wrap.md`): `npm run typecheck`, `npm test`, `npm run build`.
+3. **At the end of your session (Handoff)**:
+   - Update `.brain/WORKING_CONTEXT.md` with current progress.
+   - Append a handoff entry to `.brain/HANDOFF.md` (`.brain/workflows/05_handoff.md`).
+   - If a new technical gotcha or bug was resolved, document it in `.brain/MEMORY.md`.
+
 ## Stack & hard constraints
 
 - Vanilla TypeScript + Vite. **No React, no framework, no component library.** Pages are `render*Html(props): string` functions + `attachEventListeners(root)`; full re-render on state change.

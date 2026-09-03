@@ -1,0 +1,53 @@
+# HANDOFF.md — บันทึกการส่งมอบงานระหว่าง AI (Agent Handoff Log)
+
+> **หลักการส่งมอบงาน (Agent Handoff Protocol):**
+> 1. ก่อนเปลี่ยนให้ Agent ตัวอื่นทำ หรือก่อนจบ turn การทำงาน ให้เพิ่มบันทึก Handoff ที่ด้านบนสุดของไฟล์นี้เสมอ (Append to Top)
+> 2. บันทึกเฉพาะข้อเท็จจริงที่มีหลักฐาน (Evidence over assumptions) เช่น ผลการรัน `npm test`, commit hash, ไฟล์ที่แก้
+> 3. ระบุสิ่งที่ทำเสร็จแล้ว และสิ่งที่ "ต้องระวัง" หรือ "ต้องทำต่อ" ให้ชัดเจน
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-03 (ติดตั้งระบบ JoejaBrain & แก้ไข RLS transaction_splits)
+
+- **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity)
+- **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
+- **บริบทงาน (Context):** 
+  1. พบข้อผิดพลาด `new row violates row-level security policy for table "transaction_splits"` เมื่อพยายามสร้างธุรกรรม Draft ในหน้า Transactions
+  2. ทำการ Audit โครงสร้างเอกสารทั้งโปรเจกต์ และเริ่มติดตั้ง Personal Agent Operating System "JoejaBrain"
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  - แก้ไข `src/lib/transactions/transactions-service.ts`: ใส่ `church_id: parsed.church_id` และ `church_id: existing.church_id` บน `splitsToInsert`
+  - แก้ไข `src/lib/ai/secure-tool-executor.ts`: ใส่ `church_id: effectiveChurchId` บน splits และนำ `category_id` ออกจากแถวหัว `transactions`
+  - เพิ่มการตรวจสอบใน Unit Tests: `tests/unit/transactions-service.test.ts` และ `tests/unit/secure-tool-executor.test.ts` เพื่อป้องกัน Regression
+  - วางโครงสร้าง `.brain/` (WORKING_CONTEXT, HANDOFF, MEMORY, workflows)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck` (`tsc --noEmit`): **ผ่าน 100% (0 errors)**
+  - `npm test` (vitest run): **ผ่าน 63/64 test suites (582 passed, 15 skipped for unprivileged embedded-pg)**
+  - `npm run build`: **ผ่าน 100% (Production bundle built cleanly in ~3.2s)**
+- **สิ่งที่ต้องทำต่อ (Pending / Next Steps):**
+  - ตรวจสอบการใช้งาน JoejaBrain ในการทำงานร่วมกับ Claude Code และ Agents อื่น
+  - หากเริ่มฟีเจอร์ใหม่ ให้อัปเดตสถานะใน `.brain/WORKING_CONTEXT.md` ก่อนลงมือเสมอ
+- **ข้อควรระวังสำคัญ (Important Gotchas):**
+  - ดูรายละเอียดใน `.brain/MEMORY.md` โดยเฉพาะเรื่อง schema ของ `transaction_splits` และการห้ามแตะกฎการเงินโดยพลการ
+
+---
+
+### Template สำหรับการบันทึกครั้งต่อไป (Copy-Paste Template)
+
+```markdown
+## 📋 บันทึกส่งมอบ: [YYYY-MM-DD HH:MM] — [ชื่องานสั้นๆ]
+
+- **ผู้ส่งมอบ (Handed off by):** [Claude Code / Gemini / Codex / อื่นๆ]
+- **ผู้รับมอบ (Next Agent):** [AI หรือ มนุษย์]
+- **บริบทงาน (Context):** [ทำอะไร ทำไมถึงทำ]
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  - [รายการงานที่ทำเสร็จ]
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `[file path]`
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - Tests: `npm test` output summary
+  - Build: `npm run build` output summary
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - [สิ่งที่ Agent ถัดไปต้องทำ]
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  - [สิ่งที่ห้ามลืม]
+```
