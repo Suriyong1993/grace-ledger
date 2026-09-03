@@ -36,9 +36,9 @@ const makeItem = (overrides: Partial<any> = {}) => ({
 });
 
 const dummyUser = {
-  name: "ทดสอบ มี่",
-  role: "เหรัญญิก",
-  initials: "ทม",
+  name: "อาจารย์สรรเสริญ ดวงจิตร",
+  role: "ศิษยาภิบาล",
+  initials: "สด",
   churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
 };
 
@@ -91,10 +91,10 @@ describe("ApprovalsPage", () => {
     (page as any).isLoading = false;
     (page as any).items = [];
     const html = page.renderHtml(dummyUser);
-    expect(html).toContain("ทดสอบ มี่");
-    expect(html).toContain("เหรัญญิก");
+    expect(html).toContain("อาจารย์สรรเสริญ ดวงจิตร");
+    expect(html).toContain("ศิษยาภิบาล");
     expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");
-    expect(html).toContain("ทม");
+    expect(html).toContain("สด");
   });
 
   it("renders profile header with fallback when no user", () => {

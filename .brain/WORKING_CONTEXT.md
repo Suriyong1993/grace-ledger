@@ -64,7 +64,7 @@
 
 ## 4. สถานะการทดสอบล่าสุด (System Health Baseline)
 
-- **Vitest**: 64 passed (597 tests passing 100%)
+- **Vitest**: 64 passed (599 tests passing 100%)
 - **TypeScript**: `tsc --noEmit` ผ่าน 0 error / 0 warning
 - **Vite Build**: Production bundle สำเร็จเรียบร้อย (dist/)
 
@@ -72,5 +72,6 @@
 
 ## 5. ขั้นตอนถัดไป (Next Steps)
 
-- พร้อมรับคำสั่งพัฒนา Feature ถัดไปจากผู้ใช้
-- เมื่อเริ่ม Feature ใหม่ ให้ Agent ตัวที่รับงานเปลี่ยนสถานะในไฟล์นี้เป็น `IN_PROGRESS` และระบุรายละเอียดของ Task ที่จะทำ
+- ดำเนินการ Commit การปรับปรุงชื่อคริสตจักรและผลการทดสอบ
+- ดำเนินการ Push ขึ้น GitHub (`origin/main`)
+- ดำเนินการ Deploy ขึ้น Vercel Production

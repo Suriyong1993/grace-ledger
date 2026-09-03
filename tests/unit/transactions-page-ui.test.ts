@@ -270,10 +270,10 @@ describe("TransactionsPage UI — Unit Tests", () => {
       const page = new TransactionsPage(mockSupabase, "church-1");
       await page.loadData();
       const html = page.renderHtml({
-        name: "ศรัณย์ สถิต",
-        role: "เหรัญญิก",
+        name: "สุดารัตน์ จิณเซ่ง",
+        role: "ผู้นับเงิน",
         churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
-        initials: "ศส",
+        initials: "สด",
       });
 
       expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์");

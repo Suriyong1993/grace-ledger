@@ -7,6 +7,32 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-04 00:29 (ปรับแก้ชื่อคริสตจักรที่ถูกต้อง: คริสตจักรชีวิตสุขสันต์กาฬสินธุ์)
+
+- **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)
+- **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
+- **บริบทงาน (Context):** ปรับแก้ชื่อคริสตจักรตามข้อกำหนดของผู้ใช้ จากชื่อเก่า "คริสตจักรพระคุณ กาฬสินธุ์" เป็นชื่อทางการที่ถูกต้องคือ **"คริสตจักรชีวิตสุขสันต์กาฬสินธุ์"**
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  - ค้นหาและเปลี่ยนชื่อ "คริสตจักรพระคุณ กาฬสินธุ์" และ "คริสตจักรพระคุณ" ทั้งหมดในระบบให้เป็น **"คริสตจักรชีวิตสุขสันต์กาฬสินธุ์"**:
+    - `fable5.1/Decision Record.dc.html`
+    - `DECISIONS.md` (ข้อกำหนด D9)
+    - `tests/unit/transactions-page-ui.test.ts`
+    - `tests/unit/dashboard-page-ui.test.ts`
+    - `tests/unit/app-shell-navigation.test.ts`
+    - `tests/unit/approvals-page-ui.test.ts`
+    - `scripts/capture_all_pages.mjs`
+    - `scripts/capture_premium_screenshots.mjs`
+    - `scripts/capture_emerald_vault.mjs`
+    - `scripts/m2_phase2_3_browser_e2e.mjs`
+  - บันทึกลงใน `.brain/MEMORY.md` เป็นกฎเหล็กของระบบ (หมวด 4: Canonical Identity)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน 100% (0 errors)**
+  - `npm test`: **ผ่านครบทั้ง 64 test files (599 tests passed, 0 failures)**
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - ระบบเสถียรและ Green 100% พร้อมใช้งาน
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-04 00:22 (ยกระดับ UX/UI สู่มาตรฐานปี 2026)
 
 - **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)

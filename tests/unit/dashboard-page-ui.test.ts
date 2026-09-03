@@ -845,9 +845,9 @@ describe("DashboardPage UI — Unit Tests", () => {
           monthlyExpense: "฿10,000.00",
         },
         {
-          name: "ภราดา มานะ",
-          role: "treasurer",
-          initials: "ภม",
+          name: "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร",
+          role: "super_admin",
+          initials: "สบ",
           churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
         }
       );
