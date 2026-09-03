@@ -1,0 +1,21 @@
+-- Grace Ledger — Drop the ambiguous legacy transfer_funds overload
+-- (Phase 2B Finding #2, MEDIUM — dormant schema drift)
+--
+-- 20260817000003_financial_rpcs_and_triggers.sql introduced transfer_funds
+-- with 5 parameters. 20260821000014_idempotency_and_action_confirmations.sql
+-- and 20260828121608_transfer_funds_lock_order_and_grants.sql superseded it
+-- with a 6-parameter version (p_idempotency_key) via CREATE OR REPLACE —
+-- but since the signature differs, PostgreSQL kept BOTH overloads alive.
+-- Any future 5-positional-argument call now resolves to "function is not
+-- unique" and fails.
+--
+-- Caller audit (Phase 2B report §Finding #2, re-verified 2026-09-03):
+--   - src/lib/funds/funds-service.ts calls with 6 NAMED arguments
+--     (including p_idempotency_key) → binds the 6-arg overload only.
+--   - tests/integration/phase2b-real-pg-concurrency.test.ts calls 6
+--     positional arguments.
+--   - supabase/functions/**: no callers.
+-- The 5-arg form has zero callers. PHASE_2B_REPORT.md's recommended fix:
+-- drop it once confirmed.
+
+DROP FUNCTION IF EXISTS transfer_funds(UUID, UUID, UUID, NUMERIC(14,2), TEXT);

@@ -1,0 +1,17 @@
+:root{
+  --radius:0.75rem;         /* 12px base */
+  --radius-sm:0.5rem;       /* 8px */
+  --radius-md:0.75rem;      /* 12px */
+  --radius-lg:1rem;         /* 16px */
+  --radius-xl:1.25rem;      /* 20px */
+  --radius-2xl:1.5rem;      /* 24px */
+  --radius-button:0.75rem;  /* 12px — D1 2026-09-02, was 18px */
+  --radius-input:0.75rem;   /* 12px — D1 2026-09-02, was 14px */
+  --radius-card:1rem;       /* 16px — D1 2026-09-02, was 24px */
+  --radius-dialog:1.25rem;  /* 20px — D1 2026-09-02, was 28px */
+  --radius-sheet:1.25rem;   /* 20px — D1 2026-09-02, was 32px. Unused until the R2 .gl-sheet primitive exists. */
+  --radius-full:9999px;
+  --radius-table:0px;       /* tables/cells never round — border is the depth cue.
+                                NOTE: .gl-table's current live CSS does not honor this (see DESIGN.md
+                                "Open findings"). Not corrected here — R1 preserves current behavior. */
+}

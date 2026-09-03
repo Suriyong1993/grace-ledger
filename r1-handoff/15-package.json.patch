@@ -1,0 +1,28 @@
+Target: package.json
+Type: patch — add one script, fold it into the existing "lint" script. No dependency added (uses only
+      Node's built-in fs/path, per the design lint script's own imports). No other key changes.
+
+--- Before ---
+  "scripts": {
+    "dev": "vite --port 5500 --strictPort --host",
+    "dev:staging": "vite --port 5510 --strictPort --host --mode staging",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 5500 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+
+--- After ---
+  "scripts": {
+    "dev": "vite --port 5500 --strictPort --host",
+    "dev:staging": "vite --port 5510 --strictPort --host --mode staging",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 5500 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint:design": "node scripts/lint-design.mjs",
+    "lint": "tsc --noEmit && npm run lint:design"
+  },

@@ -101,6 +101,29 @@ export class TransactionsPage {
   private searchQuery = "";
   private selectedTransactionId: string | null = null;
   private isCreateModalOpen = false;
+
+  /**
+   * One-shot deep-link actions, consumed before render:
+   * `#/transactions?create=1` (shell "บันทึกรายการ" action) opens the
+   * existing create form. The query is cleaned from the URL afterwards so a
+   * later back/refresh does not replay the action.
+   */
+  public consumeDeepLinkActions(): void {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash || "";
+    const queryIndex = hash.indexOf("?");
+    if (queryIndex === -1) return;
+    const params = new URLSearchParams(hash.slice(queryIndex + 1));
+    if (params.get("create") === "1") {
+      this.isCreateModalOpen = true;
+    }
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + window.location.search + hash.slice(0, queryIndex),
+    );
+  }
+
   private transactions: TransactionItem[] = [];
   private accounts: SelectOption[] = [];
   private funds: SelectOption[] = [];

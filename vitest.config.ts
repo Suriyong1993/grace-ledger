@@ -6,6 +6,11 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    // Test files must not run in parallel: phase2b-real-pg-concurrency and
+    // execute-confirmed-financial-action.real-pg each boot a PgLab embedded
+    // PostgreSQL on a fixed Windows service name, and one lab's
+    // cleanupLeftovers() would stop the other lab's service mid-run.
+    fileParallelism: false,
   },
   resolve: {
     alias: {

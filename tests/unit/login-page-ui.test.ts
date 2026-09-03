@@ -11,10 +11,30 @@ import {
 import { LoginProfile } from "../../src/components/login/types";
 
 const TEST_PROFILES: LoginProfile[] = [
-  { id: "11111111-1111-1111-1111-111111111111", name: "อาจารย์สรรเสริญ ดวงจิตร", role: "ศิษยาภิบาล", initials: "สด" },
-  { id: "22222222-2222-2222-2222-222222222222", name: "อาจารย์ ทัศนา ดวงจิตร", role: "ผู้นับเงิน", initials: "ทด" },
-  { id: "33333333-3333-3333-3333-333333333333", name: "สุดารัตน์ จิณเซ่ง", role: "ผู้นับเงิน", initials: "สจ" },
-  { id: "44444444-4444-4444-4444-444444444444", name: "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร", role: "ผู้ตรวจสอบบัญชี", initials: "สบ" },
+  {
+    id: "11111111-1111-1111-1111-111111111111",
+    name: "อาจารย์สรรเสริญ ดวงจิตร",
+    role: "ศิษยาภิบาล",
+    initials: "สด",
+  },
+  {
+    id: "22222222-2222-2222-2222-222222222222",
+    name: "อาจารย์ ทัศนา ดวงจิตร",
+    role: "ผู้นับเงิน",
+    initials: "ทด",
+  },
+  {
+    id: "33333333-3333-3333-3333-333333333333",
+    name: "สุดารัตน์ จิณเซ่ง",
+    role: "ผู้นับเงิน",
+    initials: "สจ",
+  },
+  {
+    id: "44444444-4444-4444-4444-444444444444",
+    name: "พณ.ท่านหม่อมราชวงศ์สุริยงค์ บาลเพ็ชร",
+    role: "ผู้ตรวจสอบบัญชี",
+    initials: "สบ",
+  },
 ];
 
 /** LoginPage never calls a Supabase method in these tests (no DOM root is attached), so an unresolved stub is enough. */
@@ -48,12 +68,20 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
     });
 
     it("marks the selected profile so the state is visible and accessible", () => {
-      const selected = renderProfileSelectHtml(TEST_PROFILES, TEST_PROFILES[1].id, "ready");
-      expect(selected).toMatch(
-        new RegExp(`data-profile-id="${TEST_PROFILES[1].id}"\\s+data-selected="true"`)
+      const selected = renderProfileSelectHtml(
+        TEST_PROFILES,
+        TEST_PROFILES[1].id,
+        "ready",
       );
       expect(selected).toMatch(
-        new RegExp(`data-profile-id="${TEST_PROFILES[0].id}"\\s+data-selected="false"`)
+        new RegExp(
+          `data-profile-id="${TEST_PROFILES[1].id}"\\s+data-selected="true"`,
+        ),
+      );
+      expect(selected).toMatch(
+        new RegExp(
+          `data-profile-id="${TEST_PROFILES[0].id}"\\s+data-selected="false"`,
+        ),
       );
     });
 
@@ -68,6 +96,16 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
       const html = renderProfileSelectHtml([], null, "empty");
       expect(html).toContain("ยังไม่มีผู้ใช้งานในระบบ");
       expect(html).not.toContain('id="login-profile-list"');
+    });
+
+    it("renders the trust badge with an aria-hidden icon and no emoji", () => {
+      const html = new LoginPage(stubSupabase()).renderHtml();
+      expect(html).toContain("gl-login-trust-badge");
+      expect(html).toMatch(
+        /<span aria-hidden="true"><svg[^>]*viewBox="0 0 24 24"/,
+      );
+      // eslint-disable-next-line no-misleading-character-class
+      expect(html).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u);
     });
   });
 
@@ -93,7 +131,9 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
       expect(renderDots(0).match(/gl-pin-dot/g)?.length).toBe(PIN_LENGTH);
       expect(renderDots(0).match(/is-filled/g) ?? []).toHaveLength(0);
       expect(renderDots(3).match(/is-filled/g)?.length).toBe(3);
-      expect(renderDots(PIN_LENGTH).match(/is-filled/g)?.length).toBe(PIN_LENGTH);
+      expect(renderDots(PIN_LENGTH).match(/is-filled/g)?.length).toBe(
+        PIN_LENGTH,
+      );
     });
 
     it("shows the checking spinner while the PIN is being verified", () => {
@@ -106,18 +146,28 @@ describe("LoginPage UI — strict PIN-only authentication", () => {
     it("states incomplete, invalid, locked, requires_reset, and unavailable outcomes in plain Thai", () => {
       expect(renderStatusText("idle")).toBe("");
       expect(renderStatusText("checking")).toBe("กำลังตรวจสอบรหัส PIN…");
-      expect(renderStatusText("incomplete")).toBe("กรุณาระบุ PIN ให้ครบ 6 หลัก");
+      expect(renderStatusText("incomplete")).toBe(
+        "กรุณาระบุ PIN ให้ครบ 6 หลัก",
+      );
       expect(renderStatusText("invalid")).toBe("รหัส PIN ไม่ถูกต้อง");
       expect(renderStatusText("locked", null)).toContain("ล็อก");
-      expect(renderStatusText("requires_reset")).toBe("ต้องตั้งรหัส PIN ใหม่ก่อนเข้าใช้งาน");
-      expect(renderStatusText("unavailable")).toContain("ไม่สามารถเชื่อมต่อระบบได้");
-      expect(renderPinEntryHtml(profile, 2, "incomplete")).toContain("gl-pin-status--error");
+      expect(renderStatusText("requires_reset")).toBe(
+        "ต้องตั้งรหัส PIN ใหม่ก่อนเข้าใช้งาน",
+      );
+      expect(renderStatusText("unavailable")).toContain(
+        "ไม่สามารถเชื่อมต่อระบบได้",
+      );
+      expect(renderPinEntryHtml(profile, 2, "incomplete")).toContain(
+        "gl-pin-status--error",
+      );
     });
 
     it("disables the keypad and actions while locked", () => {
       const html = renderPinEntryHtml(profile, 0, "locked", null);
       expect(html).toMatch(/data-pin-key="1"\s+aria-label="เลข 1"\s+disabled/);
-      expect(html).toMatch(/data-pin-action="clear"\s+aria-label="ล้างรหัส PIN ทั้งหมด"\s+disabled/);
+      expect(html).toMatch(
+        /data-pin-action="clear"\s+aria-label="ล้างรหัส PIN ทั้งหมด"\s+disabled/,
+      );
     });
 
     it("announces progress for screen readers", () => {

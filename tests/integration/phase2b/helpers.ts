@@ -61,18 +61,25 @@ export async function withSessions<T>(
 /** Begin an explicit transaction impersonating one Supabase user, with the
  * mandatory lock/statement timeouts from the Phase 2B spec. SET LOCAL / a
  * transaction-scoped set_config both auto-revert on COMMIT or ROLLBACK, so
- * no manual RESET is required. */
+ * no manual RESET is required.
+ *
+ * role="owner" runs the transaction in the lab's own server/owner context
+ * (no SET ROLE) — the sanctioned out-of-band writer used by the
+ * defense-in-depth scenarios (C2/C3/E2) once trg_enforce_split_immutability
+ * correctly blocks direct `authenticated` writes to non-draft splits. The
+ * JWT claims are still set so auth.uid() defaults keep resolving. */
 export async function beginAsUser(
   session: Session,
   userId: string,
-  role: "authenticated" | "service_role" = "authenticated",
+  role: "authenticated" | "service_role" | "owner" = "authenticated",
 ): Promise<void> {
   const c = session.client;
   await c.query("BEGIN");
   await c.query("SET lock_timeout = '5s'");
   await c.query("SET statement_timeout = '10s'");
-  const jwt = JSON.stringify({ sub: userId, role });
+  const jwt = JSON.stringify({ sub: userId, role: role === "owner" ? "service_role" : role });
   await c.query("SELECT set_config('request.jwt.claims', $1, true)", [jwt]);
+  if (role === "owner") return;
   await c.query(
     `SET LOCAL ROLE ${role === "service_role" ? "service_role" : "authenticated"}`,
   );
@@ -122,8 +129,9 @@ export async function runRpc<T = any>(
   userId: string,
   sql: string,
   params: unknown[] = [],
+  role: "authenticated" | "service_role" | "owner" = "authenticated",
 ): Promise<{ ok: true; rows: T[] } | { ok: false; error: PgErrorLike }> {
-  await beginAsUser(session, userId);
+  await beginAsUser(session, userId, role);
   const result = await tryQuery<T>(session, sql, params);
   if (result.ok) {
     await commit(session);
@@ -217,6 +225,8 @@ export interface RaceLeg {
   userId: string;
   sql: string;
   params?: unknown[];
+  /** Execution context; "owner" = lab server/owner (out-of-band writer). */
+  role?: "authenticated" | "service_role" | "owner";
 }
 
 export interface RaceOutcome {
@@ -246,14 +256,14 @@ export async function raceOnLock(
   second: RaceLeg,
   blockTimeoutMs = 4000,
 ): Promise<RaceResult> {
-  await beginAsUser(first.session, first.userId);
+  await beginAsUser(first.session, first.userId, first.role);
   const firstResult = await tryQuery(
     first.session,
     first.sql,
     first.params ?? [],
   );
 
-  await beginAsUser(second.session, second.userId);
+  await beginAsUser(second.session, second.userId, second.role);
   const secondPromise = tryQuery(
     second.session,
     second.sql,

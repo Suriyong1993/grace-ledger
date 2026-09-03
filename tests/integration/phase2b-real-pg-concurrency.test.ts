@@ -270,11 +270,11 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
         },
         blocking: r.blocking,
         lockEvidence:
-          "Plain UPDATE of a non-FK column on transaction_splits does not touch the parent transactions row lock at all — no shared resource to block on.",
+          "trg_enforce_split_immutability locks the parent transactions row FOR KEY SHARE (via fn_lock_transaction_status_for_split_guard) before re-reading its committed status — B waits on A's FOR UPDATE, then the re-read rejects the UPDATE.",
         finalState: after,
         invariant: overall === "PASS" ? "PASS" : "FAIL",
         mechanism:
-          "RLS (p_splits_update does not consult parent transaction status) — no BEFORE trigger on transaction_splits",
+          "Guard trigger serializes the split write against post_transaction on the parent row lock and rejects once the parent is no longer draft",
         overall,
       });
 
@@ -286,10 +286,12 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
           : "Split UPDATE rejected as required.",
       );
 
-      // Layer A: no shared lock resource -> B is not expected to block.
-      expect(r.blocking.observed).toBe(false);
-      // Layer B (STATED POLICY): once posted, splits must be immutable. A
-      // FAIL here is the intended, honest signal of a real gap — see report.
+      // Under trg_enforce_split_immutability the split write blocks on the
+      // parent row lock before its status re-read — blocking IS the guard's
+      // atomicity mechanism (previously this asserted the defect-era
+      // "no shared lock resource" behavior).
+      expect(r.blocking.observed).toBe(true);
+      // STATED POLICY: once posted, splits must be immutable.
       expect(
         r.second.ok,
         "split UPDATE on a posted transaction must be rejected by RLS/trigger",
@@ -338,7 +340,7 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
         finalState: after,
         invariant: after.status === "posted" ? "PASS" : "FAIL",
         mechanism:
-          "FK Row Lock (FOR KEY SHARE vs FOR UPDATE) blocks B; RLS then permits the INSERT once unblocked — no post-hoc integrity re-check on transaction_splits writes",
+          "FK Row Lock (FOR KEY SHARE vs FOR UPDATE) blocks B; once unblocked, trg_enforce_split_immutability re-reads the parent status under the held KEY SHARE and rejects the INSERT",
         overall: r.first.ok && r.blocking.observed ? "PASS" : "FAIL",
       });
 
@@ -367,11 +369,18 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
       const txnId = await driveToState(setup, "approved");
 
       // B (INSERT) goes first and is held open; A (post) starts afterward.
+      // The extra split must appear out-of-band: since the split-immutability
+      // guard landed (Phase 2B Finding #1 fixed), a direct `authenticated`
+      // INSERT on a non-draft parent is rejected upstream. This scenario
+      // verifies the SECOND line of defense — post_transaction's own
+      // split-sum integrity check — so the out-of-band INSERT runs in the
+      // lab's server/owner context instead of asserting the old defect.
       const r = await raceOnLock(
         monitor,
         {
           session: sessB,
           userId: CREATOR,
+          role: "owner",
           sql: `INSERT INTO transaction_splits (transaction_id, church_id, fund_id, amount) VALUES ($1,$2,$3,10.00) RETURNING id`,
           params: [txnId, CHURCH, FUND_MAIN],
         },
@@ -438,11 +447,13 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
       const txnId = await driveToState(setup, "approved");
 
       const insertSess = await lab.openSession();
+      // Out-of-band INSERT in the server/owner context — see the C2 comment.
       const ins = await runRpc(
         insertSess,
         CREATOR,
         `INSERT INTO transaction_splits (transaction_id, church_id, fund_id, amount) VALUES ($1,$2,$3,10.00) RETURNING id`,
         [txnId, CHURCH, FUND_MAIN],
+        "owner",
       );
       await insertSess.client.end();
 
@@ -546,12 +557,12 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
         },
         blocking: r.blocking,
         lockEvidence:
-          "Plain UPDATE of transaction_splits does not lock the parent transactions row.",
+          "trg_enforce_split_immutability locks the parent transactions row FOR KEY SHARE (via fn_lock_transaction_status_for_split_guard) before re-reading its committed status — B waits on A's FOR UPDATE, then the re-read rejects the UPDATE.",
         finalState: after,
         invariant: splitsStillMatch ? "PASS" : "FAIL",
         mechanism:
-          "RLS (p_splits_update ignores parent status) — same class of gap as scenario B, one lifecycle stage earlier",
-        overall: r.first.ok && !r.blocking.observed ? "PASS" : "FAIL",
+          "Guard trigger serializes the split write against approve_transaction on the parent row lock and rejects once the parent is no longer draft",
+        overall: r.first.ok && r.blocking.observed ? "PASS" : "FAIL",
       });
 
       recordResult(
@@ -563,7 +574,11 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
       );
 
       expect(r.first.ok).toBe(true);
-      expect(r.blocking.observed).toBe(false);
+      // Under trg_enforce_split_immutability the split write blocks on the
+      // parent row lock before its status re-read — blocking IS the guard's
+      // atomicity mechanism (previously this asserted the defect-era
+      // "no shared lock resource" behavior).
+      expect(r.blocking.observed).toBe(true);
       expect(
         r.second.ok,
         "split UPDATE on an approved transaction must be rejected",
@@ -612,7 +627,7 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
         finalState: after,
         invariant: after.status === "approved" ? "PASS" : "FAIL",
         mechanism:
-          "FK Row Lock blocks B until A commits; no post-hoc parity re-check on transaction_splits writes",
+          "FK Row Lock blocks B until A commits; trg_enforce_split_immutability then rejects the INSERT (parent no longer draft)",
         overall: r.first.ok && r.blocking.observed ? "PASS" : "FAIL",
       });
 
@@ -637,11 +652,15 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
     await withSessions(lab, async (sessA, sessB, monitor, setup) => {
       const txnId = await driveToState(setup, "pending_approval");
 
+      // Out-of-band INSERT in the server/owner context — see the C2 comment.
+      // The scenario verifies approve_transaction's split-sum safety net,
+      // which requires an extra split to actually exist pre-approve.
       const r = await raceOnLock(
         monitor,
         {
           session: sessB,
           userId: CREATOR,
+          role: "owner",
           sql: `INSERT INTO transaction_splits (transaction_id, church_id, fund_id, amount) VALUES ($1,$2,$3,5.00) RETURNING id`,
           params: [txnId, CHURCH, FUND_MISSION],
         },
@@ -1025,11 +1044,17 @@ describe.runIf(booted)("Phase 2B — Real PostgreSQL Concurrency Matrix", () => 
               message: ins.error.message,
             };
 
+        // The DELETE leg must attempt to delete a split that actually exists.
+        // It previously targeted the row only the INSERT leg creates — with
+        // immutability enforced that row never exists, so the DELETE became
+        // a vacuous no-op "success". Target the fixture's original FUND_MAIN
+        // split instead, so a non-draft parent makes this a real, rejected
+        // delete attempt.
         const del = await runRpc(
           setup,
           CREATOR,
-          `DELETE FROM transaction_splits WHERE transaction_id=$1 AND fund_id=$2 AND amount=1.00 RETURNING id`,
-          [txnId, FUND_MISSION],
+          `DELETE FROM transaction_splits WHERE transaction_id=$1 AND fund_id=$2 RETURNING id`,
+          [txnId, FUND_MAIN],
         );
         row.DELETE = del.ok
           ? { ok: true, sqlstate: null }

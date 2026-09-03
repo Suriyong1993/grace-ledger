@@ -78,8 +78,8 @@ removed in the Emerald Vault revision and must not come back).
 ## Motion
 
 `--ease-out` + `--duration-micro`/`--duration-component` everywhere. 400ms is a hard ceiling. No bounce/spring
-on business UI. `--ease-spring` exists and is **in active use in the login surface only**
-(`src/components/login/loginStyles.ts`) — do not use it elsewhere without a documented reason.
+on business UI. `--ease-spring` was removed from `motion.css` (2026-09-03): its last consumers in the old
+login stylesheet were replaced by the Emerald Vault login, and grep confirmed zero remaining consumers.
 
 ## Overlays (D3 — implemented in R1-d)
 

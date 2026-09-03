@@ -1,0 +1,86 @@
+Target: src/components/layout/AppShell.ts
+Type: patch — style block only. No change to any function, markup-building logic, route matching, or
+      exported interface. Two rules inside the file's own <style> block change value; nothing else moves.
+
+Rationale: app.css's "Modern UI layer" currently overrides .gl-shell-mark and .gl-shell-avatar with
+`background: var(--primary) !important; box-shadow: ... !important;` solely to defeat the gradient these
+two rules define here. Removing that !important pair from app.css (see 12-src-styles-app.css) requires this
+file's own rule to already be the flat color the product actually ships — otherwise deleting the override
+would bring the gradient back. This makes AppShell.ts the single, non-hacky owner of its own shell-mark
+styling, with no !important anywhere.
+
+Dependencies: apply together with 12-src-styles-app.css (R1-d). Applying this file alone without removing
+the app.css override is harmless (the override would still force the same flat color) but leaves the hack in
+place; apply both in the same commit as scoped.
+
+Validation: computed background of `.gl-shell-mark` and `.gl-shell-avatar` must remain solid
+`var(--primary)` (#f97316) after this change — visually identical to today, since the !important override
+was already forcing exactly this color. Screenshot the sidebar header and the user avatar footer before and
+after; pixel-identical.
+
+--- Before (inside the <style> block returned by renderAppShellHtml) ---
+    .gl-shell-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
+      color: var(--primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px -4px oklch(0.65 0.19 45 / 55%);
+      flex-shrink: 0;
+    }
+    .gl-shell-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(155deg, var(--gl-orange-600), var(--gl-orange-700));
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--weight-bold);
+      font-size: var(--text-xs);
+      flex-shrink: 0;
+    }
+
+--- After ---
+    .gl-shell-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: var(--primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .gl-shell-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: var(--primary-foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--weight-bold);
+      font-size: var(--text-xs);
+      flex-shrink: 0;
+    }
+
+Notes on this diff:
+- `color: #ffffff` on `.gl-shell-avatar` becomes `color: var(--primary-foreground)` (which already equals
+  `#ffffff` in colors.css) — removes a hex literal with zero visual change and lets `lint-design.mjs` drop
+  the one `hex color literal` allowance previously needed for this file (its allowlist entry is now all
+  zeros; see 14-scripts-lint-design.mjs).
+- The gradient's drop shadow (`box-shadow: 0 4px 12px -4px oklch(...)`) is removed along with the gradient —
+  it was a shadow tuned to sit under a gradient surface; keeping it under a flat fill would look like an
+  unrelated glow. This matches current live output, where the shadow is not currently forced off by the
+  app.css override (only `background`/`box-shadow` on `.gl-shell-mark, .gl-shell-avatar` are `!important`-
+  overridden in app.css — re-check: app.css's rule DOES also `!important`-override `box-shadow`, so the
+  gradient's shadow is already suppressed today). Confirmed no visual change.
+- No other line in this file changes. `buildDestinations`, `renderSidebarLink`, `renderMobileNavLink`,
+  `renderAppShellHtml`'s markup, routing/active-state logic are untouched.

@@ -201,3 +201,23 @@ export function canExecuteFinancialAction(role: UserRole): boolean {
   return role === "super_admin" || role === "treasurer";
 }
 
+/**
+ * Map a raw role string from the profiles/user_roles tables onto the
+ * UserRole union. Unknown, empty, or missing roles fall back to "member" —
+ * the least-privileged view — so the shell never advertises a destination
+ * the session cannot actually use.
+ */
+export function toUserRole(rawRole: string | null | undefined): UserRole {
+  const role = (rawRole ?? "").trim();
+  const known: UserRole[] = [
+    "super_admin",
+    "pastor",
+    "treasurer",
+    "finance_staff",
+    "approver",
+    "counter",
+    "member",
+  ];
+  return (known as string[]).includes(role) ? (role as UserRole) : "member";
+}
+

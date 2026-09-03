@@ -6,7 +6,9 @@ import { ReportsService } from "../lib/reports/reports-service";
 import { Money } from "../lib/money";
 import { escapeHtml, formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
+import { can, toUserRole, type UserRole } from "../lib/rbac";
 import type { AppShellUser } from "../components/layout/AppShell";
+import type { AttentionSummary } from "../services/attention-service";
 
 export interface DashboardFund {
   id?: string;
@@ -60,6 +62,10 @@ const ICON_PLUS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" s
 const ICON_RECEIPT = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>`;
 const ICON_LIST = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h10"/></svg>`;
 const ICON_OFFERING = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><rect x="3" y="7" width="18" height="11" rx="2.5"/><circle cx="12" cy="12.5" r="2.2"/></svg>`;
+const ICON_DOC = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>`;
+const ICON_CHECK = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>`;
+const ICON_TREND_UP = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg>`;
+const ICON_TREND_DOWN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
 
 export class DashboardPage {
   private approvalsService: ApprovalsService;
@@ -72,12 +78,21 @@ export class DashboardPage {
     this.reportsService = new ReportsService(supabase);
   }
 
-  public async loadData(churchId: string): Promise<DashboardData> {
+  /**
+   * @param attention optional preloaded pending-work summary (from
+   * AttentionService) — when provided, the approvals query is skipped and the
+   * count comes from the shared aggregation, so the shell badge and this page
+   * always agree.
+   */
+  public async loadData(churchId: string, attention?: AttentionSummary): Promise<DashboardData> {
     try {
-      const pendingRes =
-        await this.approvalsService.getPendingApprovals(churchId);
-      const pendingCount =
-        pendingRes.success && pendingRes.data ? pendingRes.data.length : 0;
+      const approvalsGroup = attention?.groups.find((g) => g.key === "approvals");
+      const pendingCount = approvalsGroup
+        ? approvalsGroup.count
+        : await (async () => {
+            const pendingRes = await this.approvalsService.getPendingApprovals(churchId);
+            return pendingRes.success && pendingRes.data ? pendingRes.data.length : 0;
+          })();
 
       const { data: fundsData, error: fundsError } = await (
         this.supabase.from("funds") as any
@@ -273,7 +288,16 @@ export class DashboardPage {
     return Math.max(3, Math.round((satang / maxSatang) * trackPx));
   }
 
-  public renderHtml(data: DashboardData, user?: AppShellUser): string {
+  /**
+   * @param attention optional shared pending-work summary (null = loading).
+   * When omitted, the section falls back to the legacy pending-approvals
+   * count so lightweight callers still render a meaningful section.
+   */
+  public renderHtml(
+    data: DashboardData,
+    user?: AppShellUser,
+    attention?: AttentionSummary | null,
+  ): string {
     const activeUser = user || data.user;
     const hasPending = data.pendingApprovalsCount > 0;
     const funds = data.funds || [];
@@ -309,27 +333,127 @@ export class DashboardPage {
         </div>`
       : "";
 
-    // 1. User & Church Header Identity (Mobile-first Profile Centric Card)
-    const userCardHtml = activeUser
-      ? `
-      <div class="gl-card gl-dash-user-card">
-        <a href="#/profile" class="gl-dash-user-card__avatar-link" aria-label="ดูโปรไฟล์ ${escapeHtml(activeUser.name)}">
-          <span class="gl-dash-user-card__avatar">${escapeHtml(activeUser.initials || "?")}</span>
-        </a>
-        <div class="gl-dash-user-card__body">
-          <div class="gl-dash-user-card__idrow">
-            <span class="gl-dash-user-card__name">${escapeHtml(activeUser.name)}</span>
-            ${
-              activeUser.role
-                ? `<span class="gl-dash-user-card__role">${escapeHtml(activeUser.role)}</span>`
-                : ""
-            }
-          </div>
-          <div class="gl-dash-user-card__church">${escapeHtml(activeUser.churchName || "คริสตจักร")}</div>
+    // 1. "งานสัปดาห์นี้" — the user's pending work, aggregated from the same
+    // AttentionService the shell bell uses. Group-level rows answer WHAT,
+    // WHY, and WHERE in one line; items live one click behind each row.
+    const userRole: UserRole = toUserRole(activeUser?.role);
+
+    const ATTENTION_ROW_ICONS: Record<string, string> = {
+      approvals: ICON_CLOCK,
+      offerings: ICON_OFFERING,
+      drafts: ICON_DOC,
+    };
+
+    const renderAttentionRow = (
+      key: string,
+      title: string,
+      meta: string,
+      href: string,
+      requiresAction: boolean,
+    ): string => `
+      <a href="${href}" class="gl-attention-row${requiresAction ? " gl-attention-row--attention" : ""}">
+        <span class="gl-attention-row__icon${requiresAction ? " gl-attention-row__icon--attention" : ""}" aria-hidden="true">${ATTENTION_ROW_ICONS[key] ?? ICON_LIST}</span>
+        <span class="gl-attention-row__body">
+          <span class="gl-attention-row__title">${escapeHtml(title)}</span>
+          <span class="gl-attention-row__meta">${escapeHtml(meta)}</span>
+        </span>
+        <span class="gl-attention-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
+      </a>`;
+
+    let attentionBodyHtml: string;
+    if (attention === undefined) {
+      // Fallback for callers/tests without a loaded summary: derive the one
+      // group this page has always known about from pendingApprovalsCount.
+      attentionBodyHtml =
+        hasPending
+          ? renderAttentionRow(
+              "approvals",
+              `คิวอนุมัติรอพิจารณา · ${data.pendingApprovalsCount} รายการ`,
+              "คำขอเบิกจ่ายรอการตรวจสอบ",
+              "#/approvals",
+              true,
+            )
+          : `<div class="gl-attention-empty" role="status">
+              <span class="gl-attention-empty__icon" aria-hidden="true">${ICON_CHECK}</span>
+              <span>งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง</span>
+            </div>`;
+    } else if (attention === null) {
+      attentionBodyHtml = `
+      <div class="gl-attention-loading" role="status" aria-live="polite">
+        <span class="gl-skeleton" style="height: 52px; display: block;"></span>
+        <span class="gl-skeleton" style="height: 52px; display: block;"></span>
+      </div>`;
+    } else if (attention.loadFailed && attention.totalCount === 0) {
+      attentionBodyHtml = `
+      <div class="gl-attention-empty" role="alert">
+        <span>โหลดข้อมูลงานค้างไม่สำเร็จ</span>
+        <button type="button" class="gl-btn gl-btn--secondary gl-btn--sm" id="dash-attention-retry">ลองใหม่</button>
+      </div>`;
+    } else if (attention.totalCount === 0) {
+      const weeklyOffering = can(userRole, "create", "offering_sessions")
+        ? `<a href="#/offerings/new" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-2);">${ICON_PLUS}<span>บันทึกเงินถวายสัปดาห์นี้</span></a>`
+        : "";
+      attentionBodyHtml = `
+      <div class="gl-attention-empty" role="status">
+        <span class="gl-attention-empty__icon" aria-hidden="true">${ICON_CHECK}</span>
+        <span>งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง</span>
+        ${weeklyOffering}
+      </div>`;
+    } else {
+      attentionBodyHtml = attention.groups
+        .filter((group) => group.count > 0)
+        .map((group) =>
+          renderAttentionRow(
+            group.key,
+            `${group.label} · ${group.count} ${group.key === "offerings" ? "รอบ" : "รายการ"}`,
+            group.summary,
+            group.href,
+            group.requiresAction,
+          ),
+        )
+        .join("");
+    }
+
+    // 2. Month-over-month net context, derived from the already-loaded
+    // historical series — presentation math on existing figures only.
+    const prevBar = trend.length >= 2 ? trend[trend.length - 2] : null;
+    const prevNetMoney = prevBar ? parseMoneySafe(prevBar.net) : null;
+    const netDelta = prevNetMoney ? netMoney.subtract(prevNetMoney) : null;
+    const deltaIsPositive = netDelta ? netDelta.isPositive() : false;
+    const deltaIsNegative = netDelta ? netDelta.isNegative() : false;
+    const deltaColor = !netDelta
+      ? "var(--muted-foreground)"
+      : deltaIsPositive
+        ? "var(--income)"
+        : deltaIsNegative
+          ? "var(--expense)"
+          : "var(--foreground)";
+    const deltaLabel = !netDelta
+      ? ""
+      : deltaIsPositive
+        ? `+${netDelta.format()}`
+        : netDelta.format();
+    const contextCardHtml = `
+      <div class="gl-card gl-dash-context gl-rise" style="--gl-rise-delay: 60ms;">
+        <div class="gl-dash-context__head">
+          <h2>สุทธิเทียบเดือนก่อน</h2>
         </div>
-      </div>
-      `
-      : "";
+        ${
+          netDelta && prevBar
+            ? `<div class="gl-dash-context__delta">
+                <span class="gl-dash-context__direction" style="color: ${deltaColor};" aria-hidden="true">${
+                  deltaIsPositive ? ICON_TREND_UP : deltaIsNegative ? ICON_TREND_DOWN : ICON_TREND_UP
+                }</span>
+                <span class="num-display gl-dash-context__value" style="color: ${deltaColor};">${deltaLabel}</span>
+              </div>
+              <p class="gl-dash-context__note">
+                ${escapeHtml(period)} สุทธิ <span class="num-display">${netIsPositive ? "+" : ""}${netMoney.format()}</span>
+                · ${escapeHtml(prevBar!.monthName)} สุทธิ <span class="num-display">${prevNetMoney!.isPositive() ? "+" : ""}${prevNetMoney!.format()}</span>
+              </p>`
+            : `<p class="gl-dash-context__note">ยังไม่มีข้อมูลเดือนก่อนสำหรับเปรียบเทียบ — สุทธิเดือนนี้ <span class="num-display">${netIsPositive ? "+" : ""}${netMoney.format()}</span></p>`
+        }
+        <a href="#/reports" class="gl-dash-context__link">ดูรายงานเต็ม →</a>
+      </div>`;
 
     // 2. Funds List
     const fundsHtml =
@@ -491,57 +615,56 @@ export class DashboardPage {
         </div>
       </section>`;
 
+    const attentionTotal = attention ? attention.totalCount : data.pendingApprovalsCount;
+
+    // Role-gated hero quick actions — each opens the existing workflow.
+    const heroActionsHtml = [
+      can(userRole, "create", "offering_sessions")
+        ? `<a href="#/offerings/new" class="gl-btn gl-btn--primary">
+            ${ICON_PLUS}
+            <span>บันทึกเงินถวาย</span>
+          </a>`
+        : "",
+      can(userRole, "create", "transactions")
+        ? `<a href="#/transactions?create=1" class="gl-icon-btn" aria-label="บันทึกรายจ่าย" title="บันทึกรายจ่าย">${ICON_RECEIPT}</a>`
+        : "",
+      can(userRole, "create", "fund_transfers")
+        ? `<a href="#/funds" class="gl-icon-btn" aria-label="โอนเงินกองทุน" title="โอนเงินกองทุน">${ICON_TRANSFER}</a>`
+        : "",
+      can(userRole, "read", "transactions")
+        ? `<a href="#/transactions" class="gl-icon-btn" aria-label="รายการทั้งหมด" title="รายการทั้งหมด">${ICON_LIST}</a>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("");
+
     return `
     <div class="gl-page gl-dashboard-container gl-fade-in">
       ${loadFailedHtml}
 
-      ${userCardHtml}
-
       <div class="gl-page-header">
         <h1>ภาพรวมการเงิน</h1>
-        <p>ข้อมูล ณ ${period}</p>
+        <p>${escapeHtml(activeUser?.churchName || "คริสตจักร")} · ข้อมูล ณ ${period}</p>
       </div>
 
-      <!-- Concept B: Operational Command Center ("งานสัปดาห์นี้") -->
+      <!-- งานสัปดาห์นี้: attention → action. Aggregated from the same source
+           as the shell bell, deep-linked to each workflow. -->
       <section class="gl-command-center" aria-label="งานสัปดาห์นี้">
         <div class="gl-command-center__head">
           <h2 class="gl-command-center__title">
-            <span>ภารกิจประจำสัปดาห์</span>
+            <span>งานสัปดาห์นี้</span>
           </h2>
-          <span class="gl-badge gl-badge--neutral" style="font-size: var(--text-2xs);">รอบสัปดาห์ปัจจุบัน</span>
+          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}" style="font-size: var(--text-2xs);">
+            ${attentionTotal > 0 ? `ต้องดำเนินการ ${attentionTotal} รายการ` : "ไม่มีงานค้าง"}
+          </span>
         </div>
-        <div class="gl-command-center__grid">
-          <a href="#/offerings/new" class="gl-command-card">
-            <span class="gl-command-card__icon">${ICON_OFFERING}</span>
-            <span class="gl-command-card__body">
-              <span class="gl-command-card__title">บันทึกเงินถวายวันอาทิตย์</span>
-              <span class="gl-command-card__desc">เปิดรอบนับธนบัตรและเหรียญ พร้อมพยาน 2 ท่าน</span>
-              <span class="gl-command-card__action">เปิดรอบนับ →</span>
-            </span>
-          </a>
-          <a href="#/approvals" class="gl-command-card${hasPending ? " gl-command-card--attention" : ""}">
-            <span class="gl-command-card__icon">${ICON_CLOCK}</span>
-            <span class="gl-command-card__body">
-              <span class="gl-command-card__title">คิวอนุมัติคำขอเบิกจ่าย</span>
-              <span class="gl-command-card__desc">${hasPending ? `มี ${data.pendingApprovalsCount} รายการรอการพิจารณาอนุมัติ` : "ไม่มีคำขอเบิกจ่ายค้างตรวจสอบ"}</span>
-              <span class="gl-command-card__action">${hasPending ? "ตรวจสอบรายการ →" : "ดูประวัติอนุมัติ →"}</span>
-            </span>
-          </a>
-          <a href="#/funds" class="gl-command-card">
-            <span class="gl-command-card__icon">${ICON_TRANSFER}</span>
-            <span class="gl-command-card__body">
-              <span class="gl-command-card__title">สภาพคล่องและกองทุน</span>
-              <span class="gl-command-card__desc">ติดตาม ${funds.length} กองทุน และตรวจสอบงบประมาณ</span>
-              <span class="gl-command-card__action">ตรวจสอบกองทุน →</span>
-            </span>
-          </a>
-        </div>
+        ${attentionBodyHtml}
       </section>
 
-      <!-- Financial position + what needs review. The balance card is the
-           operational core; review sits beside it as real content. -->
+      <!-- Financial health: total balance + month figures + month-over-month
+           net context. The balance card is the operational core. -->
       <section class="gl-section">
-        <h2 class="gl-visually-hidden">สรุปยอดและรายการที่ต้องตรวจสอบ</h2>
+        <h2 class="gl-visually-hidden">สุขภาพการเงิน</h2>
         <div class="gl-dash-hero-row">
           <div class="gl-card gl-dash-hero gl-rise">
             <div class="kicker" style="margin: 0;">ยอดเงินคงเหลือทั้งหมด</div>
@@ -554,48 +677,10 @@ export class DashboardPage {
               <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display" style="color: ${netColor};">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
             </div>
 
-            <div class="gl-dash-hero__actions">
-              <a href="#/offerings/new" class="gl-btn gl-btn--primary">
-                ${ICON_PLUS}
-                <span>บันทึกเงินถวาย</span>
-              </a>
-              <a href="#/transactions" class="gl-icon-btn" aria-label="บันทึกรายจ่าย" title="บันทึกรายจ่าย">${ICON_RECEIPT}</a>
-              <a href="#/funds" class="gl-icon-btn" aria-label="โอนเงินกองทุน" title="โอนเงินกองทุน">${ICON_TRANSFER}</a>
-              <a href="#/transactions" class="gl-icon-btn" aria-label="รายการทั้งหมด" title="รายการทั้งหมด">${ICON_LIST}</a>
-            </div>
+            ${heroActionsHtml ? `<div class="gl-dash-hero__actions">${heroActionsHtml}</div>` : ""}
           </div>
 
-          <!-- Action Alert Section / Attention Queue -->
-          <div class="gl-card gl-dash-review gl-rise" style="--gl-rise-delay: 60ms;">
-            <div class="gl-dash-review__head">
-              <h2>ต้องการให้คุณตรวจสอบ</h2>
-              <span class="num-display" style="font-size: var(--text-xs); font-weight: var(--weight-semibold); color: ${
-                hasPending ? "var(--pending)" : "var(--muted-foreground)"
-              };">${data.pendingApprovalsCount} เรื่อง</span>
-            </div>
-
-            <a href="#/approvals" class="gl-row${hasPending ? " gl-dash-review__row--attention" : ""}">
-              <span class="gl-row__icon${hasPending ? " gl-row__icon--attention" : ""}" aria-hidden="true">${ICON_CLOCK}</span>
-              <span class="gl-row__body">
-                <span class="gl-row__title" style="display: block;">
-                  ${hasPending ? `${data.pendingApprovalsCount} รายการรออนุมัติจากคุณ` : "ไม่มีรายการค้างอนุมัติ"}
-                </span>
-                <span class="gl-row__meta" style="display: block;">
-                  ${hasPending ? "คำขอเบิกจ่ายที่รอการพิจารณา" : "ตรวจทานครบถ้วนทุกรายการแล้ว"}
-                </span>
-              </span>
-              <span class="gl-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
-            </a>
-
-            <a href="#/offerings" class="gl-row">
-              <span class="gl-row__icon gl-row__icon--attention" aria-hidden="true">${ICON_OFFERING}</span>
-              <span class="gl-row__body">
-                <span class="gl-row__title" style="display: block;">เงินถวายวันอาทิตย์</span>
-                <span class="gl-row__meta" style="display: block;">เปิดรอบนับเงินและตรวจยอด</span>
-              </span>
-              <span class="gl-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
-            </a>
-          </div>
+          ${contextCardHtml}
         </div>
       </section>
 

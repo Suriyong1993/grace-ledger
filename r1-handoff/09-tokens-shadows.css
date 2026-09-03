@@ -1,0 +1,13 @@
+:root{
+  /* Border beats shadow — these are intentionally faint; used only where
+     real overlap happens (dialogs, popovers, elevated hero surfaces).
+     Values below are D1 2026-09-02: canonicalized to what is already shipped
+     in production (previously only expressed as literals in app.css's
+     "Modern UI layer"). --shadow-xs, --shadow-sm-card and --shadow-hover-card
+     are unchanged. */
+  --shadow-xs:0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-sm-card:0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.03);
+  --shadow-card:0 1px 2px 0 rgb(23 23 23 / 0.03), 0 10px 30px rgb(23 23 23 / 0.035);
+  --shadow-elevated:0 1px 2px 0 rgb(23 23 23 / 0.04), 0 18px 44px rgb(23 23 23 / 0.07);
+  --shadow-hover-card:0 4px 12px -2px rgb(0 0 0 / 0.06), 0 8px 24px -4px rgb(0 0 0 / 0.05);
+}

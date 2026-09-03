@@ -771,6 +771,176 @@ button.gl-card:active {
 }
 
 /* --------------------------------------------------------------------------
+   Phase A — "งานสัปดาห์นี้" attention rows + month-over-month context card.
+   The attention section carries the user's pending work; the context card
+   interprets the net trend beside the balance hero.
+   -------------------------------------------------------------------------- */
+.gl-attention-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  text-decoration: none;
+  color: var(--foreground);
+  transition: background var(--duration-micro) var(--ease-out),
+    border-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-attention-row + .gl-attention-row {
+  margin-top: var(--space-2);
+}
+
+.gl-attention-row:hover {
+  background: var(--muted);
+  border-color: var(--ring);
+}
+
+.gl-attention-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.gl-attention-row__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-attention-row__icon--attention {
+  background: var(--pending-muted);
+  color: var(--pending);
+}
+
+.gl-attention-row__body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.gl-attention-row__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-attention-row__meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-attention-row__chevron {
+  display: flex;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-attention-empty,
+.gl-attention-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.gl-attention-loading {
+  display: grid;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.gl-attention-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--income);
+  color: var(--income-foreground);
+}
+
+/* Month-over-month net context (beside the balance hero). */
+.gl-dash-context {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gl-dash-context__head h2 {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.gl-dash-context__delta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gl-dash-context__direction {
+  display: flex;
+}
+
+.gl-dash-context__value {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+}
+
+.gl-dash-context__note {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  line-height: var(--leading-body);
+}
+
+.gl-dash-context__link {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--primary);
+  text-decoration: none;
+  margin-top: var(--space-1);
+}
+
+.gl-dash-context__link:hover {
+  text-decoration: underline;
+}
+
+.gl-dash-context__link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-attention-row,
+  .gl-dash-context {
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Tabs — underline, not pills. The panel below is the surface; the tab row
    is navigation, so it stays quiet.
    -------------------------------------------------------------------------- */

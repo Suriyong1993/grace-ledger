@@ -1,0 +1,31 @@
+Target: CLAUDE.md
+Type: patch — insert a new subsection immediately after the existing "## Design" section's bullet list
+      (right before the "## Writing (Thai UI copy)" heading), and add one line inside the existing
+      "## QUALITY GATES" numbered list. Nothing else in CLAUDE.md changes.
+
+--- Insert this new subsection right before "## Writing (Thai UI copy)" ---
+
+## Design source of truth
+
+Read `DESIGN.md` and `COMPONENTS.md` before writing or changing any CSS, inline style, or render markup.
+
+```
+1. design-system-extracted/tokens/*.css   VALUES
+2. src/styles/app.css                      CLASSES (.gl-*)
+3. src/components/shared/*.ts              HELPERS (status, row, empty-state — once created)
+4. loginStyles.ts / aiDrawerStyles.ts      Feature-local stylesheets — only for surfaces with their own shell
+5. inline style=""                         LAYOUT ONLY — flex/grid/gap/min-width. Never color, radius, shadow, font-size.
+```
+
+Never re-declare an existing `.gl-*` selector a second time in `app.css` — edit the one declaration that
+exists. A literal color/radius/shadow/font-size value appearing in `src/**` outside `DESIGN.md`'s documented
+exceptions is either a bug or an undocumented decision — fix the bug, or add a `DECISIONS.md` entry, never
+both silently. `npm run lint:design` enforces this mechanically; it must pass.
+
+Status labels and colors for `TransactionStatus` come from exactly one place (see `DESIGN.md` → Status
+semantics). Do not add a second status→label map anywhere.
+
+--- Insert this line into the existing "## QUALITY GATES" section, as an addition to gate 4 (UX review) ---
+
+   (UX review, cont'd) `npm run lint:design` passes — no undocumented literal color/radius/shadow/font-size
+   values were introduced.

@@ -92,17 +92,3 @@ function renderProfileItem(
     </button>
   `;
 }
-
-export function renderBrandHtml(): string {
-  return `
-    <div class="gl-login-brand">
-      <span class="gl-login-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-          <path d="M6 5.5C6 4.67157 6.67157 4 7.5 4H16.5C17.3284 4 18 4.67157 18 5.5V19.5L12 16.5L6 19.5V5.5Z" fill="currentColor"/>
-        </svg>
-      </span>
-      <p class="gl-login-wordmark" translate="no">Grace Ledger</p>
-      <p class="gl-login-tagline">ระบบการเงินคริสตจักร</p>
-    </div>
-  `;
-}

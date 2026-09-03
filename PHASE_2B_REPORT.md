@@ -161,6 +161,13 @@ underlying root cause (Finding #1).
 
 ### Finding #1 — CRITICAL: `transaction_splits` has no immutability enforcement at all
 
+> **RESOLVED 2026-09-03.** `supabase/migrations/20260903000000_split_immutability_guard.sql` implements
+> this fix: a `BEFORE INSERT OR UPDATE OR DELETE` guard trigger plus a SECURITY DEFINER locking lookup
+> (the definer is mandatory — see `DECISIONS.md` → D10 for the RLS-vs-locking-clause behavior that makes
+> an invoker-side `FOR KEY SHARE` read silently return 0 rows for finance_staff). Scenarios B/C/D/E/I
+> now assert the policy and pass; C2/C3/E2 run their out-of-band INSERT in the lab owner context so the
+> second-line integrity nets stay verified. 15/15 green.
+
 **Scenarios:** B, C, D, E, I (5 of 15).
 **Observed:** Direct `UPDATE` / `INSERT` / `DELETE` on `transaction_splits` succeeds in _every_
 lifecycle state, including `posted`, `rejected`, and `voided` — the states the schema's own code
@@ -189,6 +196,10 @@ pattern already used correctly on `transactions` itself), and/or extend `p_split
 require `status = 'draft'`.
 
 ### Finding #2 — MEDIUM: duplicate, ambiguous `transfer_funds` overload (schema drift)
+
+> **RESOLVED 2026-09-03.** The 5-arg overload is dropped by
+> `supabase/migrations/20260903000001_drop_ambiguous_transfer_funds_overload.sql` after re-verifying every
+> caller uses the 6-arg form (`DECISIONS.md` → D10).
 
 **Not one of the lettered scenarios** — surfaced while building G/H's raw-SQL test calls, and
 independently confirmed by reading the migrations.

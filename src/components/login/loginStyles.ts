@@ -1,10 +1,14 @@
 /**
- * Login-screen layout & styling.
- * Architectural Vault Terminal design — sleek, calm, secure, and authoritative.
- * Uses strict design-system tokens throughout.
+ * Login-screen layout & styling — "Vault Terminal".
+ *
+ * Emerald Vault identity: the left/top panel is the same dark vault chrome as
+ * the app sidebar (—sidebar), the workspace is porcelain (—background). Strict
+ * design-system tokens throughout; color-mix() derives tints from tokens so no
+ * raw literals enter this file.
  */
 export function renderLoginStylesHtml(): string {
   return `<style>
+    /* --- Screen (base: shared with PinSetup) --- */
     .gl-login-screen {
       min-height: 100vh;
       display: flex;
@@ -18,14 +22,200 @@ export function renderLoginStylesHtml(): string {
       position: relative;
     }
 
+    /* --- Split-screen vault terminal (LoginPage only) --- */
+    .gl-login-screen--vault {
+      padding: 0;
+    }
+
+    .gl-login-vault {
+      display: grid;
+      grid-template-columns: minmax(380px, 500px) minmax(0, 1fr);
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .gl-vault-panel {
+      background: var(--sidebar);
+      color: var(--sidebar-foreground);
+      border-right: 1px solid color-mix(in srgb, var(--sidebar-primary) 22%, transparent);
+      padding: var(--space-7) var(--space-6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gl-vault-panel__inner {
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gl-vault-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .gl-vault-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      background: var(--sidebar-accent);
+      color: var(--sidebar-primary);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border: 1px solid color-mix(in srgb, var(--sidebar-primary) 30%, transparent);
+    }
+
+    .gl-vault-brandtext {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .gl-vault-wordmark {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: var(--weight-bold);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--sidebar-foreground);
+    }
+
+    .gl-vault-church {
+      font-size: var(--text-xs);
+      color: color-mix(in srgb, var(--sidebar-foreground) 72%, transparent);
+      letter-spacing: 0.01em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .gl-vault-hero {
+      margin-top: auto;
+      padding-top: var(--space-7);
+    }
+
+    .gl-vault-hero::before {
+      content: "";
+      display: block;
+      width: 36px;
+      height: 2px;
+      background: var(--gl-brass-500);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-4);
+    }
+
+    .gl-vault-eyebrow {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--sidebar-primary) 80%, var(--sidebar-foreground));
+      margin: 0 0 var(--space-2);
+    }
+
+    .gl-vault-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-bold);
+      letter-spacing: var(--tracking-heading);
+      line-height: var(--leading-heading);
+      color: var(--sidebar-foreground);
+      margin: 0 0 var(--space-3);
+    }
+
+    .gl-vault-sub {
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
+      color: color-mix(in srgb, var(--sidebar-foreground) 72%, transparent);
+      margin: 0;
+    }
+
+    .gl-vault-facts {
+      list-style: none;
+      margin: var(--space-6) 0 0;
+      padding: var(--space-5) 0 0;
+      border-top: 1px solid color-mix(in srgb, var(--sidebar-primary) 18%, transparent);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .gl-vault-facts li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: var(--text-sm);
+      color: color-mix(in srgb, var(--sidebar-foreground) 86%, transparent);
+    }
+
+    .gl-vault-facts svg {
+      color: var(--sidebar-primary);
+      flex-shrink: 0;
+    }
+
+    .gl-vault-foot {
+      margin-top: auto;
+      padding-top: var(--space-7);
+      font-size: var(--text-2xs);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--sidebar-foreground) 55%, transparent);
+    }
+
+    .gl-login-workspace {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-7) var(--space-5);
+    }
+
+    @media (max-width: 959px) {
+      .gl-login-vault {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .gl-vault-panel {
+        border-right: none;
+        border-bottom: 1px solid color-mix(in srgb, var(--sidebar-primary) 22%, transparent);
+        padding: var(--space-3) var(--space-4);
+      }
+
+      .gl-vault-panel__inner {
+        max-width: none;
+      }
+
+      .gl-vault-hero,
+      .gl-vault-facts,
+      .gl-vault-foot {
+        display: none;
+      }
+
+      .gl-vault-mark {
+        width: 40px;
+        height: 40px;
+      }
+
+      .gl-login-workspace {
+        align-items: flex-start;
+        padding: var(--space-5) var(--space-4);
+      }
+    }
+
+    /* --- Card --- */
     .gl-login-card {
       width: 100%;
-      max-width: 520px;
+      max-width: 480px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-elevated);
-      padding: var(--space-8) var(--space-6);
+      padding: var(--space-7) var(--space-6);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -35,7 +225,13 @@ export function renderLoginStylesHtml(): string {
 
     .gl-login-card--narrow {
       max-width: 420px;
-      padding: var(--space-7) var(--space-5);
+      padding: var(--space-6) var(--space-5);
+    }
+
+    @media (max-width: 400px) {
+      .gl-login-card {
+        padding: var(--space-6) var(--space-4);
+      }
     }
 
     @keyframes gl-login-card-in {
@@ -49,51 +245,20 @@ export function renderLoginStylesHtml(): string {
       }
     }
 
-    /* --- Institutional Brand Header --- */
-    .gl-login-brand {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      margin-bottom: var(--space-6);
-    }
+    @media (prefers-reduced-motion: reduce) {
+      .gl-login-card {
+        animation: none;
+      }
 
-    .gl-login-mark {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
-      background: var(--primary);
-      color: var(--primary-foreground);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: var(--space-3);
-      box-shadow: var(--shadow-sm);
-    }
+      .gl-pin-status--error {
+        animation: none;
+      }
 
-    .gl-login-wordmark {
-      font-family: var(--font-display);
-      font-size: var(--text-base);
-      font-weight: var(--weight-bold);
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--foreground);
-      margin: 0;
-    }
-
-    .gl-login-tagline {
-      font-size: var(--text-xs);
-      color: var(--muted-foreground);
-      margin: var(--space-1) 0 0;
-      letter-spacing: 0.02em;
-    }
-
-    .gl-login-divider {
-      width: 100%;
-      height: 1px;
-      background: var(--border);
-      margin: 0 0 var(--space-6);
-      border: none;
+      .gl-profile-item,
+      .gl-pin-key,
+      .gl-profile-chevron {
+        transition: none;
+      }
     }
 
     /* --- Stage & Hero Typography --- */
@@ -150,6 +315,7 @@ export function renderLoginStylesHtml(): string {
       align-items: center;
       gap: var(--space-3);
       width: 100%;
+      min-height: var(--touch-target-min);
       padding: var(--space-3) var(--space-4);
       background: var(--card);
       border: 1px solid var(--border);
@@ -169,6 +335,11 @@ export function renderLoginStylesHtml(): string {
 
     .gl-profile-item:active {
       transform: scale(0.99);
+    }
+
+    .gl-profile-item:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
     }
 
     .gl-profile-item[data-selected="true"] {
@@ -233,12 +404,21 @@ export function renderLoginStylesHtml(): string {
       font-size: var(--text-xs);
       font-weight: var(--weight-medium);
       color: var(--muted-foreground);
-      padding: var(--space-1) var(--space-2);
+      padding: var(--space-2) var(--space-2);
       border-radius: var(--radius-sm);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
     }
 
     .gl-pin-back:hover {
       color: var(--foreground);
+    }
+
+    .gl-pin-back:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
     }
 
     .gl-pin-identity {
@@ -312,6 +492,12 @@ export function renderLoginStylesHtml(): string {
       padding: var(--space-2) 0;
       margin-bottom: var(--space-2);
       outline: none;
+      border-radius: var(--radius-sm);
+    }
+
+    .gl-pin-group:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: var(--space-2);
     }
 
     .gl-pin-dot {
@@ -378,7 +564,7 @@ export function renderLoginStylesHtml(): string {
     }
 
     .gl-pin-key {
-      min-height: 54px;
+      min-height: 56px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       background: var(--card);
@@ -399,6 +585,11 @@ export function renderLoginStylesHtml(): string {
       background: var(--muted);
       border-color: var(--ring);
       transform: translateY(-1px);
+    }
+
+    .gl-pin-key:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
     }
 
     .gl-pin-key:active:not(:disabled) {
@@ -455,16 +646,23 @@ export function renderLoginStylesHtml(): string {
     .gl-login-text-btn {
       background: none;
       border: none;
-      padding: 0;
+      padding: var(--space-1);
       color: var(--primary);
       font-size: var(--text-xs);
       font-weight: var(--weight-medium);
+      font-family: inherit;
       cursor: pointer;
       text-decoration: underline;
+      border-radius: var(--radius-sm);
     }
 
     .gl-login-text-btn:hover {
       color: var(--foreground);
+    }
+
+    .gl-login-text-btn:focus-visible {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
     }
 
     /* --- Status Helpers --- */

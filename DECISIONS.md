@@ -144,6 +144,61 @@ this log to describe the shipped values.
 **Enforcement:** All fallback identities, mockups, seed data, and component defaults are unified to these 4 real church officers. Legacy test fixtures (such as "ศจ.สมชาย มีสุข" and "มนัส สุขใจ") from earlier milestones are completely superseded and harmonized across `fable5.1/`, `src/`, and test suites.
 **Status:** APPROVED & IMPLEMENTED (2026-09-03).
 
+### D10 — `transaction_splits` immutability is DB-enforced (resolves Phase 2B Finding #1)
+
+**Decision:** `transaction_splits` rows are immutable once their parent transaction leaves `draft`.
+Enforcement lives in migration `20260903000000_split_immutability_guard.sql`:
+
+1. `trg_enforce_split_immutability` — `BEFORE INSERT OR UPDATE OR DELETE` row trigger on
+   `transaction_splits` (SECURITY INVOKER) rejecting direct end-user writes unless the parent status is
+   `draft`. The exemption check uses `current_user`: SECURITY DEFINER RPCs (e.g. `void_transaction`'s
+   reversal-entry split copy) and `service_role` run as a non-end-user current_user and keep working,
+   mirroring how the RLS policies are written `TO authenticated`.
+2. `fn_lock_transaction_status_for_split_guard` — SECURITY DEFINER helper that locks the parent row
+   (`FOR KEY SHARE`, the same lock strength the FK check takes) and returns its status, scoped by
+   `current_user_church_id()` and failing closed (NULL parent ⇒ reject). The definer is **required**:
+   as `authenticated`, a locking-clause read on `transactions` additionally applies the UPDATE policy's
+   `USING` clause, which excludes non-draft rows for finance_staff — the check would silently read NULL
+   and allow the write (observed directly in the Phase 2B lab). The lock makes the status check atomic
+   against a concurrent submit/approve/post (Phase 2B scenarios C/E).
+
+Also in `20260903000001_drop_ambiguous_transfer_funds_overload.sql`: the dormant legacy 5-argument
+`transfer_funds` overload (Phase 2B Finding #2) is dropped; all callers use the 6-argument form.
+
+`vitest.config.ts` sets `fileParallelism: false` — two test files boot PgLab embedded PostgreSQL on one
+fixed Windows service name; concurrent files would stop each other's lab mid-run (Phase 2B J/K/L flakes).
+
+Phase 2B scenarios B/C/D/E/I now assert the policy and pass; C2/C3/E2 run their out-of-band split INSERT
+in the lab owner context so the second-line integrity nets (post/approve split-sum checks) stay verified.
+**Status:** APPROVED & IMPLEMENTED (2026-09-03). Full suite 587/587 green.
+
+### D11 — Shell & Dashboard operate as an attention-driven command center (Phase A)
+
+**Decision (product/workflow, no financial semantics touched):**
+
+1. **Role-gated navigation.** Sidebar and mobile bottom-bar destinations are filtered by the existing
+   RBAC matrix (`can(role, "read", resource)`) via `AppShell`'s destination resources and
+   `rbac.toUserRole` (unknown roles fall back to `member`, the least-privileged view). Authorization
+   rules themselves are untouched — this only stops the UI advertising destinations a session cannot use.
+2. **One attention source.** `src/services/attention-service.ts` aggregates pending approvals, offering
+   sessions in `variance_review`/`counted`/`draft`, and draft transactions from the existing services,
+   role-filtered before querying. The shell bell ("งานที่ต้องดำเนินการ" panel) and the Dashboard
+   "งานสัปดาห์นี้" section render the same truth; the summary reloads on every navigation so badges are
+   never stale. No notification backend was invented; groups a role cannot read are never fetched.
+3. **Global primary action.** The topbar carries "บันทึกรายการ" for roles with
+   `create` on `transactions`, deep-linking `#/transactions?create=1` into the existing create form
+   (`TransactionsPage.consumeDeepLinkActions`, one-shot; the router strips query strings when matching).
+   No second transaction workflow was created.
+4. **Mobile composition.** Bottom bar = หน้าหลัก + up to three workflow tabs (ถวาย → อนุมัติ → การเงิน,
+   role-gated) + "เพิ่มเติม" sheet carrying every other reachable destination + destinations are never
+   hidden behind Profile. Profile stays in the topbar avatar on all widths.
+5. **Dashboard order = ATTENTION → ACTION → CONTEXT.** The identity card is removed (identity lives in
+   the shell); "งานสัปดาห์นี้" leads with actionable rows; the balance hero keeps its approved
+   structure; a "สุทธิเทียบเดือนก่อน" context card (derived from the already-loaded historical series —
+   display math only) replaces the static review card.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-03).
+
 ---
 
 ## Financial Review Items — recorded, not modified by design work
@@ -177,6 +232,12 @@ rejected, and voided rows, with no date filter, under a "this month" label.
 `financial-reviewer` can confirm no other consumer depends on the current (incorrect) sum before it's removed.
 
 ### FRI-4 — Hard-coded dashboard trend chart scale
+
+> **RESOLVED (verified during Phase A, 2026-09-03).** The dashboard trend no
+> longer clamps to a fixed 5,000,000-satang ceiling — `DashboardPage` derives
+> the bar scale from the tallest month in the loaded series, and
+> `dashboard-page-ui.test.ts` pins "never a fixed ceiling". This entry is
+> retained as history; no `financial-reviewer` action remains.
 
 `src/pages/DashboardPage.ts` clamps its monthly trend bars to a `maxVal` of 5,000,000 satang (฿50,000); any
 month above that renders identical to exactly ฿50,000.

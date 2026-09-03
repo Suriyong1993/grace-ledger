@@ -1,6 +1,45 @@
 import { describe, it, expect } from "vitest";
 import { DashboardPage, DashboardData } from "../../src/pages/DashboardPage";
 import { Money } from "../../src/lib/money";
+import type { AttentionSummary } from "../../src/services/attention-service";
+
+/** Minimal pending-work fixture matching AttentionService's shape. */
+function attentionFixture(overrides: Partial<AttentionSummary> = {}): AttentionSummary {
+  return {
+    groups: [
+      {
+        key: "approvals",
+        label: "คิวอนุมัติ",
+        href: "#/approvals",
+        summary: "3 รายการ · รวม ฿9,000.00 · ล่าสุด เบิกจ่ายค่าใช้จ่ายภารกิจ",
+        count: 3,
+        requiresAction: true,
+        items: [],
+      },
+      {
+        key: "offerings",
+        label: "เงินถวาย",
+        href: "#/offerings",
+        summary: "ผลต่างรอดำเนินการ 1",
+        count: 1,
+        requiresAction: true,
+        items: [],
+      },
+      {
+        key: "drafts",
+        label: "ฉบับร่าง",
+        href: "#/transactions",
+        summary: "2 รายการยังไม่ส่งอนุมัติ",
+        count: 2,
+        requiresAction: false,
+        items: [],
+      },
+    ],
+    totalCount: 6,
+    loadFailed: false,
+    ...overrides,
+  };
+}
 
 describe("DashboardPage UI — Unit Tests", () => {
   const dummySupabase = {} as any;
@@ -47,12 +86,14 @@ describe("DashboardPage UI — Unit Tests", () => {
       monthlyExpense: "฿12,820.00",
     });
 
-    // Balance card and review card, unequal weight, side by side — not a
+    // Balance card and context card, unequal weight, side by side — not a
     // grid of equal-looking cards.
     expect(html).toContain('class="gl-dash-hero-row"');
     expect(html).toContain('class="gl-card gl-dash-hero gl-rise"');
-    expect(html).toContain('class="gl-card gl-dash-review gl-rise"');
+    expect(html).toContain('class="gl-card gl-dash-context gl-rise"');
     expect(html).toContain('data-testid="total-balance"');
+    // The static review card is gone — pending work lives in งานสัปดาห์นี้.
+    expect(html).not.toContain('class="gl-card gl-dash-review');
 
     // Income/expense are typography inside the hero card, never their own
     // bordered card.
@@ -125,12 +166,19 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).toContain(`ข้อมูล ณ ${period}`);
   });
 
-  it("renders the hero action strip as one labeled primary button plus three labeled icon-only controls", () => {
-    const html = page.renderHtml({ pendingApprovalsCount: 0 });
+  it("renders the hero action strip as one labeled primary button plus labeled icon-only controls, gated by role", () => {
+    const treasurer = {
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "treasurer",
+      initials: "สด",
+    };
+    const html = page.renderHtml({ pendingApprovalsCount: 0 }, treasurer);
 
     expect(html).toContain('href="#/offerings/new"');
-    expect(html).toContain('href="#/transactions"');
+    // The receipt icon deep-links into the existing create form.
+    expect(html).toContain('href="#/transactions?create=1"');
     expect(html).toContain('href="#/funds"');
+    expect(html).toContain('href="#/transactions"');
 
     // One real button carries a visible label.
     expect(html).toContain('class="gl-btn gl-btn--primary"');
@@ -138,12 +186,27 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     // The rest are icon-only — never four identical rectangles — but each
     // still carries an accessible name for a screen reader.
-    expect(html).toContain('class="gl-icon-btn" aria-label="บันทึกรายจ่าย"');
-    expect(html).toContain('class="gl-icon-btn" aria-label="โอนเงินกองทุน"');
-    expect(html).toContain('class="gl-icon-btn" aria-label="รายการทั้งหมด"');
+    expect(html).toContain('aria-label="บันทึกรายจ่าย"');
+    expect(html).toContain('aria-label="โอนเงินกองทุน"');
+    expect(html).toContain('aria-label="รายการทั้งหมด"');
 
     // Labels wrap naturally; a hard <br> inside a label breaks at 390px.
     expect(html).not.toContain("<br>");
+  });
+
+  it("hides the hero quick actions for roles that may not create financial records", () => {
+    const viewer = {
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "approver",
+      initials: "สด",
+    };
+    const html = page.renderHtml({ pendingApprovalsCount: 0 }, viewer);
+
+    expect(html).not.toContain('href="#/offerings/new"');
+    expect(html).not.toContain('aria-label="บันทึกรายจ่าย"');
+    expect(html).not.toContain('aria-label="โอนเงินกองทุน"');
+    // Read-only navigation stays available.
+    expect(html).toContain('aria-label="รายการทั้งหมด"');
   });
 
   it("shows fund progress only for funds that actually have a target", () => {
@@ -196,14 +259,109 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).toContain("฿90,000.00");
   });
 
-  it("renders attention queue with pending count when pending approvals exist", () => {
-    const html = page.renderHtml({ pendingApprovalsCount: 3 });
+  it("renders attention queue from the shared pending-work summary", () => {
+    const treasurer = {
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "treasurer",
+      initials: "สด",
+    };
+    const html = page.renderHtml(
+      { pendingApprovalsCount: 3 },
+      treasurer,
+      attentionFixture(),
+    );
 
-    expect(html).toContain("ต้องการให้คุณตรวจสอบ");
-    expect(html).toContain("3 เรื่อง");
-    expect(html).toContain("3 รายการรออนุมัติจากคุณ");
+    // The section leads the page and answers WHAT / WHY / WHERE per group.
+    expect(html).toContain("งานสัปดาห์นี้");
+    expect(html).toContain("ต้องดำเนินการ 6 รายการ");
+    expect(html).toContain("คิวอนุมัติ · 3 รายการ");
+    expect(html).toContain("รวม ฿9,000.00");
+    expect(html).toContain("เงินถวาย · 1 รอบ");
+    expect(html).toContain("ฉบับร่าง · 2 รายการ");
     expect(html).toContain('href="#/approvals"');
     expect(html).toContain('href="#/offerings"');
+    expect(html).toContain('href="#/transactions"');
+  });
+
+  it("renders a loading skeleton for the attention section while the summary loads", () => {
+    const treasurer = {
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "treasurer",
+      initials: "สด",
+    };
+    const html = page.renderHtml({ pendingApprovalsCount: 0 }, treasurer, null);
+
+    expect(html).toContain("gl-attention-loading");
+    expect(html).toContain("gl-skeleton");
+  });
+
+  it("renders the all-clear attention state with the weekly offering action", () => {
+    const treasurer = {
+      name: "อาจารย์สรรเสริญ ดวงจิตร",
+      role: "treasurer",
+      initials: "สด",
+    };
+    const html = page.renderHtml(
+      { pendingApprovalsCount: 0 },
+      treasurer,
+      attentionFixture({ groups: [], totalCount: 0 }),
+    );
+
+    expect(html).toContain("งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง");
+    expect(html).toContain("บันทึกเงินถวายสัปดาห์นี้");
+    // The attention badge stays silent when nothing is pending.
+    expect(html).not.toMatch(/ต้องดำเนินการ \d/);
+  });
+
+  it("falls back to the legacy pending-approvals row when no summary was passed", () => {
+    const html = page.renderHtml({ pendingApprovalsCount: 3 });
+
+    expect(html).toContain("คิวอนุมัติรอพิจารณา · 3 รายการ");
+    expect(html).toContain('href="#/approvals"');
+  });
+
+  it("shows the month-over-month net context beside the hero", () => {
+    const html = page.renderHtml({
+      pendingApprovalsCount: 0,
+      monthlyIncome: "฿90,000.00",
+      monthlyExpense: "฿10,000.00",
+      historicalTrend: [
+        {
+          monthName: "ก.ค.",
+          income: "฿80,000.00",
+          expense: "฿20,000.00",
+          net: "฿60,000.00",
+          isPositive: true,
+          incomeSatang: 8000000,
+          expenseSatang: 2000000,
+        },
+        {
+          monthName: "ส.ค.",
+          income: "฿90,000.00",
+          expense: "฿10,000.00",
+          net: "฿80,000.00",
+          isPositive: true,
+          incomeSatang: 9000000,
+          expenseSatang: 1000000,
+        },
+      ],
+    });
+
+    expect(html).toContain("สุทธิเทียบเดือนก่อน");
+    // 80,000 − 60,000 = +20,000 month-over-month.
+    expect(html).toContain("+฿20,000.00");
+    expect(html).toContain('ก.ค. สุทธิ <span class="num-display">+฿60,000.00</span>');
+  });
+
+  it("states plainly when there is no previous month to compare against", () => {
+    const html = page.renderHtml({
+      pendingApprovalsCount: 0,
+      monthlyIncome: "฿18,450.00",
+      monthlyExpense: "฿12,820.00",
+    });
+
+    expect(html).toContain("ยังไม่มีข้อมูลเดือนก่อนสำหรับเปรียบเทียบ");
+    expect(html).not.toContain('class="gl-card gl-dash-review');
   });
 
   it("renders empty states gracefully for funds and recent transactions", () => {
@@ -215,7 +373,8 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     expect(html).toContain("ยังไม่มีกองทุน");
     expect(html).toContain("ยังไม่มีรายการล่าสุด");
-    expect(html).toContain("ไม่มีรายการค้างอนุมัติ");
+    // Fallback attention section (no summary passed) states the all-clear.
+    expect(html).toContain("งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง");
   });
 
   it("renders error notice if loadFailed is true", () => {
@@ -677,7 +836,7 @@ describe("DashboardPage UI — Unit Tests", () => {
   });
 
   describe("Profile-Centric Layout & 3-Column Metrics", () => {
-    it("renders profile-centric user and church card when user is provided", () => {
+    it("keeps identity in the shell header — the dashboard leads with work, not a user card", () => {
       const html = page.renderHtml(
         {
           pendingApprovalsCount: 1,
@@ -687,18 +846,19 @@ describe("DashboardPage UI — Unit Tests", () => {
         },
         {
           name: "ภราดา มานะ",
-          role: "เหรัญญิก",
+          role: "treasurer",
           initials: "ภม",
           churchName: "คริสตจักรพระคุณ กาฬสินธุ์",
         }
       );
 
-      expect(html).toContain('class="gl-card gl-dash-user-card"');
-      expect(html).toContain("ภราดา มานะ");
-      expect(html).toContain("เหรัญญิก");
-      expect(html).toContain("คริสตจักรพระคุณ กาฬสินธุ์");
-      expect(html).toContain("ภม");
-      expect(html).toContain('href="#/profile"');
+      // The identity card is gone; church context survives as the header's
+      // supporting line and the shell topbar/sidebar own the identity.
+      expect(html).not.toContain('class="gl-card gl-dash-user-card"');
+      expect(html).toContain(
+        "คริสตจักรพระคุณ กาฬสินธุ์ · ข้อมูล ณ",
+      );
+      expect(html).toContain("<h1>ภาพรวมการเงิน</h1>");
     });
 
     it("calculates and displays 3-column financial metrics including net change", () => {

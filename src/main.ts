@@ -15,6 +15,7 @@ import { GraceAiDrawer } from "./components/ai-drawer/GraceAiDrawer";
 import type { AiDrawerCallbacks } from "./components/ai-drawer/types";
 import { UserRole } from "./lib/rbac";
 import { CHURCH_NAME_TH } from "./lib/org";
+import { AttentionService, type AttentionSummary } from "./services/attention-service";
 
 interface ActiveSession {
   userId: string;
@@ -48,6 +49,8 @@ export class App {
   private rootElement: HTMLElement | null = null;
   private pendingCount = 0;
   private session: ActiveSession | null = null;
+  private attentionService: AttentionService | null = null;
+  private attention: AttentionSummary | null = null;
 
   constructor() {
     this.dashboardPage = new DashboardPage(this.supabase);
@@ -176,6 +179,8 @@ export class App {
     }
 
     this.approvalsPage = new ApprovalsPage(this.supabase, churchId, userId);
+    this.attentionService = new AttentionService(this.supabase);
+    this.attention = null;
     this.offeringPage = new OfferingPage(
       this.supabase,
       churchId,
@@ -218,6 +223,86 @@ export class App {
     }
   }
 
+  /** Shell popovers (attention panel, mobile "เพิ่มเติม" sheet) render hidden
+   * with the shell; these listeners only toggle visibility. Document-level
+   * close handlers are swapped out each render to avoid accumulating. */
+  private shellDocumentClick: ((event: MouseEvent) => void) | null = null;
+  private shellDocumentKeydown: ((event: KeyboardEvent) => void) | null = null;
+
+  private attachShellPanels(root: HTMLElement): void {
+    if (this.shellDocumentClick) {
+      document.removeEventListener("click", this.shellDocumentClick);
+      this.shellDocumentClick = null;
+    }
+    if (this.shellDocumentKeydown) {
+      document.removeEventListener("keydown", this.shellDocumentKeydown);
+      this.shellDocumentKeydown = null;
+    }
+
+    const popovers = [
+      {
+        button: root.querySelector<HTMLElement>("#gl-attention-btn"),
+        panel: root.querySelector<HTMLElement>("#gl-attention-panel"),
+      },
+      {
+        button: root.querySelector<HTMLElement>("#gl-more-btn"),
+        panel: root.querySelector<HTMLElement>("#gl-more-panel"),
+      },
+    ].filter(
+      (entry): entry is { button: HTMLElement; panel: HTMLElement } =>
+        Boolean(entry.button && entry.panel),
+    );
+    if (popovers.length === 0) return;
+
+    const openPopovers = () => popovers.filter(({ panel }) => !panel.hidden);
+    const closeAll = () => {
+      for (const { button, panel } of popovers) {
+        panel.hidden = true;
+        button.setAttribute("aria-expanded", "false");
+      }
+    };
+
+    for (const { button, panel } of popovers) {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const willOpen = panel.hidden;
+        closeAll();
+        panel.hidden = !willOpen;
+        button.setAttribute("aria-expanded", String(willOpen));
+      });
+      // Following any link inside a popover is a navigation — close first.
+      panel.addEventListener("click", (event) => {
+        if ((event.target as HTMLElement).closest("a")) closeAll();
+      });
+    }
+
+    this.shellDocumentClick = (event) => {
+      if (openPopovers().length === 0) return;
+      const target = event.target as Node;
+      if (popovers.some(({ panel }) => panel.contains(target))) return;
+      closeAll();
+    };
+    document.addEventListener("click", this.shellDocumentClick);
+
+    this.shellDocumentKeydown = (event) => {
+      if (event.key !== "Escape") return;
+      const open = openPopovers();
+      if (open.length === 0) return;
+      closeAll();
+      open[0].button.focus();
+    };
+    document.addEventListener("keydown", this.shellDocumentKeydown);
+
+    // Attention panel + dashboard retry both re-render (refetching the
+    // summary) instead of partially patching.
+    root.querySelector<HTMLButtonElement>("[data-attention-retry]")?.addEventListener("click", () => {
+      void this.render();
+    });
+    root.querySelector<HTMLButtonElement>("#dash-attention-retry")?.addEventListener("click", () => {
+      void this.render();
+    });
+  }
+
   public async render(): Promise<void> {
     if (!this.rootElement) return;
 
@@ -253,35 +338,62 @@ export class App {
     // 3. Authenticated App Shell & Dashboard
     let contentHtml = "";
 
+    // Refresh the pending-work summary in parallel with the page's own data
+    // load, so the shell badge/panel and the page agree on every navigation.
+    const attentionPromise: Promise<void> =
+      this.attentionService && this.session
+        ? this.attentionService
+            .load(this.session.churchId, this.session.user.role)
+            .then((summary) => {
+              this.attention = summary;
+            })
+            .catch(() => {
+              this.attention = null;
+            })
+        : Promise.resolve();
+
     if (
       this.currentRoute.pattern === "/" ||
       this.currentRoute.pattern === "not_found"
     ) {
       const data = await this.dashboardPage.loadData(this.session.churchId);
-      this.pendingCount = data.pendingApprovalsCount;
-      contentHtml = this.dashboardPage.renderHtml(data, this.session.user);
+      await attentionPromise;
+      this.pendingCount =
+        this.attention?.groups.find((g) => g.key === "approvals")?.count ??
+        data.pendingApprovalsCount;
+      contentHtml = this.dashboardPage.renderHtml(
+        data,
+        this.session.user,
+        this.attention,
+      );
     } else if (this.currentRoute.pattern === "/transactions") {
       if (this.transactionsPage) {
+        this.transactionsPage.consumeDeepLinkActions();
         await this.transactionsPage.loadData();
+        await attentionPromise;
         contentHtml = this.transactionsPage.renderHtml(this.session.user);
       }
     } else if (this.currentRoute.pattern === "/funds") {
       if (this.fundsPage) {
         await this.fundsPage.loadData();
+        await attentionPromise;
         contentHtml = this.fundsPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/members") {
       if (this.membersPage) {
         await this.membersPage.loadData();
+        await attentionPromise;
         contentHtml = this.membersPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/reports") {
       if (this.reportsPage) {
         await this.reportsPage.loadData();
+        await attentionPromise;
         contentHtml = this.reportsPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/profile") {
       if (this.profilePage) {
+        await attentionPromise;
         this.profilePage.updateProps({
           user: this.session.user,
           userId: this.session.userId,
@@ -293,6 +405,7 @@ export class App {
       this.currentRoute.pattern === "/approvals" ||
       this.currentRoute.pattern === "/approvals/:id"
     ) {
+      await attentionPromise;
       contentHtml = this.approvalsPage?.renderHtml() ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       if (this.offeringPage) {
@@ -313,8 +426,11 @@ export class App {
         if (shouldLoadOfferingData) {
           await this.offeringPage.loadInitialData(offeringSessionId);
         }
+        await attentionPromise;
         contentHtml = this.offeringPage.renderHtml();
       }
+    } else {
+      await attentionPromise;
     }
 
     const appShellHtml = renderAppShellHtml(
@@ -322,6 +438,7 @@ export class App {
         activeRoute: this.currentRoute.path,
         pendingCount: this.pendingCount,
         user: this.session.user,
+        attention: this.attention,
       },
       contentHtml,
     );
@@ -338,6 +455,8 @@ export class App {
         void this.supabase.auth.signOut();
       });
     });
+
+    this.attachShellPanels(this.rootElement);
 
     if (this.currentRoute.pattern.startsWith("/approvals")) {
       this.approvalsPage?.attachEventListeners(this.rootElement, () =>

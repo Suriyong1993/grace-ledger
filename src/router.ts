@@ -39,6 +39,9 @@ class ClientRouter {
     if (!cleanPath.startsWith("/")) {
       cleanPath = "/" + cleanPath;
     }
+    // Deep-link actions (e.g. #/transactions?create=1) still match their
+    // route; the query part is consumed by the destination page itself.
+    cleanPath = cleanPath.split("?")[0];
     // Remove trailing slash if not root
     if (cleanPath.length > 1 && cleanPath.endsWith("/")) {
       cleanPath = cleanPath.substring(0, cleanPath.length - 1);
