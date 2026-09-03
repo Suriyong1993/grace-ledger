@@ -1,0 +1,30 @@
+﻿# Root test and dev directories
+/tests
+/scripts
+/supabase
+
+# Agent and IDE artifacts
+/.agents
+/.aidesigner
+/.brain
+/.claude
+/.freebuff
+/.github
+/.impeccable
+/.screenshots
+/.zcode
+/graphify-out
+
+# Reference archives and docs
+/design-plans
+/mockups-extracted
+/r1-handoff
+/fable5.1
+*.zip
+*.md
+
+# Stray lockfiles
+pnpm-lock.yaml
+pnpm-workspace.yaml
+yarn.lock
+bun.lockb
