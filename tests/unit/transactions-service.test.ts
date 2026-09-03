@@ -21,7 +21,11 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
                 insertedTxn = payload;
                 return {
                   select: () => ({
-                    single: () => Promise.resolve({ data: { id: "txn-created-123" }, error: null }),
+                    single: () =>
+                      Promise.resolve({
+                        data: { id: "txn-created-123" },
+                        error: null,
+                      }),
                   }),
                 };
               },
@@ -44,6 +48,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
         description: "ซื้ออุปกรณ์สำนักงาน",
+        direction: "expense",
         transaction_date: "2026-08-21",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
@@ -77,7 +82,11 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
                 insertedTxn = payload;
                 return {
                   select: () => ({
-                    single: () => Promise.resolve({ data: { id: "txn-created-456" }, error: null }),
+                    single: () =>
+                      Promise.resolve({
+                        data: { id: "txn-created-456" },
+                        error: null,
+                      }),
                   }),
                 };
               },
@@ -100,11 +109,14 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
         description: "เงินถวายทั่วไป",
+        direction: "income",
         transaction_date: "2026-08-23",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
         amount: "1000.00",
-        splits: [{ fund_id: dummyFundId, amount: "1000.00", notes: "หมายเหตุทดสอบ" }],
+        splits: [
+          { fund_id: dummyFundId, amount: "1000.00", notes: "หมายเหตุทดสอบ" },
+        ],
       });
 
       expect(result.success).toBe(true);
@@ -123,6 +135,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
         description: "ค่าอาหารค่าย",
+        direction: "expense",
         transaction_date: "2026-08-21",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
@@ -144,6 +157,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const resZero = await service.createDraftTransaction({
         church_id: dummyChurchId,
         description: "ยอดศูนย์",
+        direction: "expense",
         transaction_date: "2026-08-21",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
@@ -154,6 +168,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const resNeg = await service.createDraftTransaction({
         church_id: dummyChurchId,
         description: "ยอดติดลบ",
+        direction: "expense",
         transaction_date: "2026-08-21",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
@@ -172,6 +187,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const result = await service.createDraftTransaction({
         church_id: "invalid-church-id",
         description: "ทดสอบ UUID",
+        direction: "expense",
         transaction_date: "2026-08-21",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
@@ -190,6 +206,7 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const result = await service.createDraftTransaction({
         church_id: dummyChurchId,
         description: "สร้างโดยสมาชิก",
+        direction: "expense",
         transaction_date: "2026-08-21",
         category_id: dummyCategoryId,
         account_id: dummyAccountId,
@@ -214,7 +231,11 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
             return {
               select: () => ({
                 eq: () => ({
-                  single: () => Promise.resolve({ data: { id: "txn-1", status: "draft", amount: "1000.00" }, error: null }),
+                  single: () =>
+                    Promise.resolve({
+                      data: { id: "txn-1", status: "draft", amount: "1000.00" },
+                      error: null,
+                    }),
                 }),
               }),
               update: (payload: any) => {
@@ -228,7 +249,8 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
               select: () => ({
                 eq: () => ({
                   limit: () => ({
-                    maybeSingle: () => Promise.resolve({ data: null, error: null }),
+                    maybeSingle: () =>
+                      Promise.resolve({ data: null, error: null }),
                   }),
                 }),
               }),
@@ -253,7 +275,9 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       const result = await service.updateDraftTransaction("txn-1", {
         description: "แก้ไขรายละเอียดค่าเดินทาง",
         amount: "1200.00",
-        splits: [{ fund_id: dummyFundId, amount: "1200.00", notes: "แก้ไขยอด" }],
+        splits: [
+          { fund_id: dummyFundId, amount: "1200.00", notes: "แก้ไขยอด" },
+        ],
       });
 
       expect(result.success).toBe(true);
@@ -275,7 +299,11 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
             return {
               select: () => ({
                 eq: () => ({
-                  single: () => Promise.resolve({ data: { id: "txn-2", status: "draft", amount: "1000.00" }, error: null }),
+                  single: () =>
+                    Promise.resolve({
+                      data: { id: "txn-2", status: "draft", amount: "1000.00" },
+                      error: null,
+                    }),
                 }),
               }),
               update: (payload: any) => {
@@ -288,8 +316,13 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         },
       } as any;
 
-      const serviceWithDate = new TransactionsService(mockSupabaseWithDate, "finance_staff");
-      await serviceWithDate.updateDraftTransaction("txn-2", { transaction_date: "2026-07-31" });
+      const serviceWithDate = new TransactionsService(
+        mockSupabaseWithDate,
+        "finance_staff",
+      );
+      await serviceWithDate.updateDraftTransaction("txn-2", {
+        transaction_date: "2026-07-31",
+      });
       expect(updatedPayloadWithDate.transaction_date).toBe("2026-07-31");
 
       let updatedPayloadNoDate: any = null;
@@ -299,7 +332,11 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
             return {
               select: () => ({
                 eq: () => ({
-                  single: () => Promise.resolve({ data: { id: "txn-3", status: "draft", amount: "1000.00" }, error: null }),
+                  single: () =>
+                    Promise.resolve({
+                      data: { id: "txn-3", status: "draft", amount: "1000.00" },
+                      error: null,
+                    }),
                 }),
               }),
               update: (payload: any) => {
@@ -312,8 +349,13 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         },
       } as any;
 
-      const serviceNoDate = new TransactionsService(mockSupabaseNoDate, "finance_staff");
-      await serviceNoDate.updateDraftTransaction("txn-3", { description: "แก้ไขคำอธิบายเท่านั้น" });
+      const serviceNoDate = new TransactionsService(
+        mockSupabaseNoDate,
+        "finance_staff",
+      );
+      await serviceNoDate.updateDraftTransaction("txn-3", {
+        description: "แก้ไขคำอธิบายเท่านั้น",
+      });
       expect(updatedPayloadNoDate).not.toHaveProperty("transaction_date");
     });
 
@@ -322,7 +364,15 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         from: () => ({
           select: () => ({
             eq: () => ({
-              single: () => Promise.resolve({ data: { id: "txn-posted", status: "posted", amount: "5000.00" }, error: null }),
+              single: () =>
+                Promise.resolve({
+                  data: {
+                    id: "txn-posted",
+                    status: "posted",
+                    amount: "5000.00",
+                  },
+                  error: null,
+                }),
             }),
           }),
         }),
@@ -349,7 +399,10 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         rpc: (fn: string, args: any) => {
           rpcName = fn;
           rpcArgs = args;
-          return Promise.resolve({ data: { status: "pending_approval" }, error: null });
+          return Promise.resolve({
+            data: { status: "pending_approval" },
+            error: null,
+          });
         },
       } as any;
 
@@ -374,7 +427,10 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       } as any;
 
       const service = new TransactionsService(mockSupabase, "approver");
-      const result = await service.approveTransaction("txn-100", "อนุมัติตามระเบียบข้อ 4.2");
+      const result = await service.approveTransaction(
+        "txn-100",
+        "อนุมัติตามระเบียบข้อ 4.2",
+      );
 
       expect(result.success).toBe(true);
       expect(rpcName).toBe("approve_transaction");
@@ -395,7 +451,10 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
       } as any;
 
       const service = new TransactionsService(mockSupabase, "approver");
-      const result = await service.requestRevision("txn-100", "กรุณาแนบใบเสร็จฉบับจริง");
+      const result = await service.requestRevision(
+        "txn-100",
+        "กรุณาแนบใบเสร็จฉบับจริง",
+      );
 
       expect(result.success).toBe(true);
       expect(rpcArgs.p_revision_note).toBe("กรุณาแนบใบเสร็จฉบับจริง");
@@ -417,17 +476,25 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         rpc: (fn: string, args: any) => {
           if (fn === "reject_transaction_terminal") {
             rpcArgs = args;
-            return Promise.resolve({ data: { status: "rejected" }, error: null });
+            return Promise.resolve({
+              data: { status: "rejected" },
+              error: null,
+            });
           }
           return Promise.resolve({ data: null, error: null });
         },
       } as any;
 
       const service = new TransactionsService(mockSupabase, "approver");
-      const result = await service.rejectTransactionTerminal("txn-100", "รายการไม่ถูกต้องและไม่ได้รับอนุมัติจากคณะกรรมการ");
+      const result = await service.rejectTransactionTerminal(
+        "txn-100",
+        "รายการไม่ถูกต้องและไม่ได้รับอนุมัติจากคณะกรรมการ",
+      );
 
       expect(result.success).toBe(true);
-      expect(rpcArgs.p_rejection_reason).toBe("รายการไม่ถูกต้องและไม่ได้รับอนุมัติจากคณะกรรมการ");
+      expect(rpcArgs.p_rejection_reason).toBe(
+        "รายการไม่ถูกต้องและไม่ได้รับอนุมัติจากคณะกรรมการ",
+      );
     });
 
     it("posts approved transaction to general ledger via post_transaction RPC", async () => {
@@ -452,17 +519,25 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         rpc: (fn: string, args: any) => {
           if (fn === "void_transaction") {
             rpcArgs = args;
-            return Promise.resolve({ data: { status: "voided", reversal_id: "txn-rev-999" }, error: null });
+            return Promise.resolve({
+              data: { status: "voided", reversal_id: "txn-rev-999" },
+              error: null,
+            });
           }
           return Promise.resolve({ data: null, error: null });
         },
       } as any;
 
       const service = new TransactionsService(mockSupabase, "treasurer");
-      const result = await service.voidTransaction("txn-100", "บันทึกยอดเงินผิดพลาด ซ้ำซ้อนกับรายการเมื่อวาน");
+      const result = await service.voidTransaction(
+        "txn-100",
+        "บันทึกยอดเงินผิดพลาด ซ้ำซ้อนกับรายการเมื่อวาน",
+      );
 
       expect(result.success).toBe(true);
-      expect(rpcArgs.p_reason).toBe("บันทึกยอดเงินผิดพลาด ซ้ำซ้อนกับรายการเมื่อวาน");
+      expect(rpcArgs.p_reason).toBe(
+        "บันทึกยอดเงินผิดพลาด ซ้ำซ้อนกับรายการเมื่อวาน",
+      );
     });
   });
 
@@ -472,7 +547,11 @@ describe("TransactionsService — Comprehensive Unit Tests", () => {
         from: () => ({
           select: () => ({
             eq: () => ({
-              order: () => Promise.resolve({ data: null, error: { message: "Database connection failed", code: "500" } }),
+              order: () =>
+                Promise.resolve({
+                  data: null,
+                  error: { message: "Database connection failed", code: "500" },
+                }),
             }),
           }),
         }),

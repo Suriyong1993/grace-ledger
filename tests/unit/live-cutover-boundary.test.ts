@@ -55,7 +55,8 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
               eq: () => ({
                 eq: () => ({
                   order: () => Promise.resolve({ data: [], error: null }),
-                  maybeSingle: () => Promise.resolve({ data: null, error: null }),
+                  maybeSingle: () =>
+                    Promise.resolve({ data: null, error: null }),
                 }),
                 order: () => Promise.resolve({ data: [], error: null }),
               }),
@@ -71,7 +72,9 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
       await service.getGrandTotals(CHURCH_ID);
 
       // Verify accessed tables
-      expect(accessedTables.every((t) => t.startsWith("historical_"))).toBe(true);
+      expect(accessedTables.every((t) => t.startsWith("historical_"))).toBe(
+        true,
+      );
       expect(accessedTables).not.toContain("transactions");
       expect(accessedTables).not.toContain("transaction_splits");
       expect(accessedTables).not.toContain("funds");
@@ -97,7 +100,10 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
                       ...record,
                       status: "draft",
                     };
-                    return Promise.resolve({ data: insertedTransaction, error: null });
+                    return Promise.resolve({
+                      data: insertedTransaction,
+                      error: null,
+                    });
                   },
                 }),
               }),
@@ -106,8 +112,14 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
                   eq: () => ({
                     select: () => ({
                       single: () => {
-                        insertedTransaction = { ...insertedTransaction, ...updateData };
-                        return Promise.resolve({ data: insertedTransaction, error: null });
+                        insertedTransaction = {
+                          ...insertedTransaction,
+                          ...updateData,
+                        };
+                        return Promise.resolve({
+                          data: insertedTransaction,
+                          error: null,
+                        });
                       },
                     }),
                   }),
@@ -142,6 +154,7 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
       const createRes = await txnService.createDraftTransaction({
         church_id: CHURCH_ID,
         description: "เงินถวายสิบลด ประจำวันอาทิตย์แรกของสิงหาคม 2569 (Live)",
+        direction: "income",
         transaction_date: CUTOVER_DATE,
         category_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         account_id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22",
@@ -161,18 +174,27 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
       expect(insertedTransaction.amount).toBe("50000.00");
       expect(insertedSplits.length).toBe(1);
       expect(insertedSplits[0].amount).toBe("50000.00");
-      expect(insertedSplits[0].fund_id).toBe("c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33");
+      expect(insertedSplits[0].fund_id).toBe(
+        "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33",
+      );
 
       // Verify SplitEngine parity validation
       const splitValidation = SplitEngine.validateParity(
         Money.from(insertedTransaction.amount),
-        insertedSplits.map((s) => ({ fundId: s.fund_id, amount: Money.from(s.amount) }))
+        insertedSplits.map((s) => ({
+          fundId: s.fund_id,
+          amount: Money.from(s.amount),
+        })),
       );
       expect(splitValidation.isValid).toBe(true);
       expect(splitValidation.difference.isZero()).toBe(true);
 
       // Verify transaction date is >= cutover
-      expect(HistoricalService.isHistoricalPeriod(insertedTransaction.transaction_date)).toBe(false);
+      expect(
+        HistoricalService.isHistoricalPeriod(
+          insertedTransaction.transaction_date,
+        ),
+      ).toBe(false);
     });
 
     it("verifies live transaction submission triggers approval workflow and posts to GL via RPC", async () => {
@@ -184,14 +206,22 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
           if (funcName === "submit_transaction") {
             currentStatus = "pending_approval";
             return Promise.resolve({
-              data: { success: true, status: "pending_approval", transaction_id: params.p_transaction_id },
+              data: {
+                success: true,
+                status: "pending_approval",
+                transaction_id: params.p_transaction_id,
+              },
               error: null,
             });
           }
           if (funcName === "approve_transaction") {
             currentStatus = "approved";
             return Promise.resolve({
-              data: { success: true, status: "approved", transaction_id: params.p_transaction_id },
+              data: {
+                success: true,
+                status: "approved",
+                transaction_id: params.p_transaction_id,
+              },
               error: null,
             });
           }
@@ -199,7 +229,11 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
             currentStatus = "posted";
             postedToGL = true;
             return Promise.resolve({
-              data: { success: true, status: "posted", transaction_id: params.p_transaction_id },
+              data: {
+                success: true,
+                status: "posted",
+                transaction_id: params.p_transaction_id,
+              },
               error: null,
             });
           }
@@ -215,7 +249,10 @@ describe("Live Cutover Boundary & Accounting Isolation (2026-08-01)", () => {
       expect(currentStatus).toBe("pending_approval");
 
       // 2. Approve transaction
-      const approveRes = await txnService.approveTransaction("txn-live-002", "อนุมัติรายการเรียบร้อย");
+      const approveRes = await txnService.approveTransaction(
+        "txn-live-002",
+        "อนุมัติรายการเรียบร้อย",
+      );
       expect(approveRes.success).toBe(true);
       expect(currentStatus).toBe("approved");
 

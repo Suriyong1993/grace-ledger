@@ -120,7 +120,9 @@ export class TransactionsPage {
     window.history.replaceState(
       null,
       "",
-      window.location.pathname + window.location.search + hash.slice(0, queryIndex),
+      window.location.pathname +
+        window.location.search +
+        hash.slice(0, queryIndex),
     );
   }
 
@@ -351,7 +353,9 @@ export class TransactionsPage {
     if (this.activePeriod === "this_month") {
       periodBounds = monthBounds(now);
     } else if (this.activePeriod === "last_month") {
-      periodBounds = monthBounds(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+      periodBounds = monthBounds(
+        new Date(now.getFullYear(), now.getMonth() - 1, 1),
+      );
     } else if (this.activePeriod === "last_3_months") {
       const start3Months = new Date(now.getFullYear(), now.getMonth() - 2, 1);
       const currentMonth = monthBounds(now);
@@ -918,6 +922,9 @@ export class TransactionsPage {
         root.querySelector<HTMLSelectElement>("#txn-fund-select");
       const catSelect =
         root.querySelector<HTMLSelectElement>("#txn-cat-select");
+      const directionInput = root.querySelector<HTMLInputElement>(
+        'input[name="txn-direction"]:checked',
+      );
 
       const descVal = descInput?.value?.trim() || "";
       const amountVal = amountInput?.value || "0";
@@ -925,8 +932,17 @@ export class TransactionsPage {
       const accountVal = accountSelect?.value || "";
       const fundVal = fundSelect?.value || "";
       const catVal = catSelect?.value || "";
+      const directionVal = directionInput?.value as
+        "income" | "expense" | undefined;
 
-      if (!descVal || !amountVal || !accountVal || !fundVal || !catVal) {
+      if (
+        !descVal ||
+        !amountVal ||
+        !accountVal ||
+        !fundVal ||
+        !catVal ||
+        !directionVal
+      ) {
         this.formErrorMessage = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
         onStateChange();
         return;
@@ -940,6 +956,7 @@ export class TransactionsPage {
         const draftRes = await this.transactionsService.createDraftTransaction({
           church_id: this.churchId,
           description: descVal,
+          direction: directionVal,
           transaction_date: dateVal,
           account_id: accountVal,
           category_id: catVal,
