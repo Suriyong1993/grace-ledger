@@ -504,7 +504,7 @@ export function renderLoginStylesHtml(): string {
 
     .gl-pin-banner--warning {
       background: var(--pending-muted);
-      color: var(--pending-foreground);
+      color: var(--on-pending-muted);
       border: 1px solid var(--pending);
     }
   </style>`;
