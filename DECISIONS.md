@@ -136,6 +136,7 @@ this log to describe the shipped values.
 ### D9 — Canonical Church Officers & Governance Roster (คริสตจักรชีวิตสุขสันต์กาฬสินธุ์)
 
 **Decision:** The canonical leadership roster for Grace Ledger is permanently established as:
+
 1. **ศิษยาภิบาล (Pastor):** อาจารย์สรรเสริญ ดวงจิตร (`pastor`)
 2. **ผู้นับเงิน (Counter 1):** อาจารย์ ทัศนา ดวงจิตร (`counter`)
 3. **ผู้นับเงิน (Counter 2):** สุดารัตน์ จิณเซ่ง (`counter`)
@@ -258,3 +259,48 @@ instead of `<= YYYY-MM-31`. Add a unit test for February before Q5 ships.
 - `.gl-table`'s live appearance (rounded corners via `border-collapse: separate` + `--radius-lg`) contradicts
   the documented `--radius-table: 0px` rule. Preserved as-is in R1 (current behavior); needs its own decision
   before either direction is changed. See `DESIGN.md` → Open findings.
+
+---
+
+## 2026-09-05 — Premium UI/UX refinement (user-directed Master Engineering Directive)
+
+### D12 — Dashboard order is financial-position-first (supersedes D11 §5 only)
+
+**Decision:** D11 §5 ("Dashboard order = ATTENTION → ACTION → CONTEXT") is superseded for ordering only. The
+Dashboard now renders **FINANCIAL POSITION → MOVEMENT (income/expense inside the hero) → CONTEXT (net vs.
+last month) → ACTION (งานสัปดาห์นี้ command center) → EXPLANATION (trend chart) → DETAIL (recent activity /
+funds split)**. The balance hero (`.gl-dash-hero-row`) is now the first section after the page header;
+`.gl-command-center` renders immediately after it, still full width and fully visible — not hidden, not
+shrunk, not merged into a sidebar — just one section lower than before.
+
+**What did NOT change (D11 §1-4 remain in force):** role-gated navigation, `AttentionService` as the single
+source for the shell bell and this section, the global primary action in the topbar, and mobile composition
+(hero/greeting still lead on mobile too, per the same order).
+
+**Also fixed in this pass — duplicate attention messaging (was two competing surfaces):** a
+"Grace AI Personalized Greeting" card (`.gl-ai-greeting`, added 2026-09-04 00:22, _after_ D11 shipped) had
+drifted into repeating the same pending-count message and a second call-to-action (`.gl-btn--cta-2026`)
+already shown in the command center below it. Consolidated to one attention source: the greeting is now a
+plain text line (`.gl-dash-greeting`, no card/gradient/icon/button) carrying only name + role; the count and
+the action to address it live solely in `.gl-command-center`.
+
+**Also removed — the orange "2026 Sunset Orange" CTA system:** `.gl-btn--cta-2026`, `--gl-cta-accent`,
+`--gl-cta-accent-hover`, `--gl-cta-on-accent`, `--gl-spring-easing`, and the now-orphaned
+`@keyframes gl-fade-slide-in` — this was a second, un-approved accent/CTA system layered on top of the
+Emerald Vault button hierarchy (`gl-btn--primary`/`--secondary`), introduced in the same 2026-09-04 00:22
+session. Its only consumer was the greeting button removed above. `gl-btn--primary`/`--secondary` remain the
+only button hierarchy.
+
+**Which test assertions are no longer authoritative:** `dashboard-page-ui.test.ts`'s two "2026 AI ... greeting"
+tests (asserted `.gl-ai-greeting`, the duplicate count, and `.gl-btn--cta-2026`) — replaced with tests
+asserting the plain `.gl-dash-greeting` line and the _absence_ of the removed classes, plus a new test
+pinning hero-before-command-center ordering.
+
+**Not touched in this pass (deferred, separate report before proceeding):** sidebar, topbar grouping, mobile
+bottom-nav overflow (a real "no destination should silently disappear" gap exists for high-privilege roles;
+fixing it means partially reversing the 2026-09-04 removal of the "เมนูเพิ่มเติม" affordance — user confirmed
+reintroducing a minimal overflow entry point is wanted, scheduled for the next pass), login, tables, charts.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (596/596), `npm run
+lint:design`, `npm run build` all green; verified `.gl-ai-greeting`/`cta-2026`/`gl-fade-slide-in` are absent
+from the built `dist/` bundle.

@@ -4,7 +4,9 @@ import { Money } from "../../src/lib/money";
 import type { AttentionSummary } from "../../src/services/attention-service";
 
 /** Minimal pending-work fixture matching AttentionService's shape. */
-function attentionFixture(overrides: Partial<AttentionSummary> = {}): AttentionSummary {
+function attentionFixture(
+  overrides: Partial<AttentionSummary> = {},
+): AttentionSummary {
   return {
     groups: [
       {
@@ -271,7 +273,8 @@ describe("DashboardPage UI — Unit Tests", () => {
       attentionFixture(),
     );
 
-    // The section leads the page and answers WHAT / WHY / WHERE per group.
+    // The section answers WHAT / WHY / WHERE per group; it sits below the
+    // financial position hero (see "orders the page financial-position-first").
     expect(html).toContain("งานสัปดาห์นี้");
     expect(html).toContain("ต้องดำเนินการ 6 รายการ");
     expect(html).toContain("คิวอนุมัติ · 3 รายการ");
@@ -307,7 +310,9 @@ describe("DashboardPage UI — Unit Tests", () => {
       attentionFixture({ groups: [], totalCount: 0 }),
     );
 
-    expect(html).toContain("งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง");
+    expect(html).toContain(
+      "งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง",
+    );
     expect(html).toContain("บันทึกเงินถวายสัปดาห์นี้");
     // The attention badge stays silent when nothing is pending.
     expect(html).not.toMatch(/ต้องดำเนินการ \d/);
@@ -350,7 +355,9 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).toContain("สุทธิเทียบเดือนก่อน");
     // 80,000 − 60,000 = +20,000 month-over-month.
     expect(html).toContain("+฿20,000.00");
-    expect(html).toContain('ก.ค. สุทธิ <span class="num-display">+฿60,000.00</span>');
+    expect(html).toContain(
+      'ก.ค. สุทธิ <span class="num-display">+฿60,000.00</span>',
+    );
   });
 
   it("states plainly when there is no previous month to compare against", () => {
@@ -374,7 +381,9 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).toContain("ยังไม่มีกองทุน");
     expect(html).toContain("ยังไม่มีรายการล่าสุด");
     // Fallback attention section (no summary passed) states the all-clear.
-    expect(html).toContain("งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง");
+    expect(html).toContain(
+      "งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง",
+    );
   });
 
   it("renders error notice if loadFailed is true", () => {
@@ -849,15 +858,13 @@ describe("DashboardPage UI — Unit Tests", () => {
           role: "super_admin",
           initials: "สบ",
           churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
-        }
+        },
       );
 
       // The identity card is gone; church context survives as the header's
       // supporting line and the shell topbar/sidebar own the identity.
       expect(html).not.toContain('class="gl-card gl-dash-user-card"');
-      expect(html).toContain(
-        "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์ · ข้อมูล ณ",
-      );
+      expect(html).toContain("คริสตจักรชีวิตสุขสันต์กาฬสินธุ์ · ข้อมูล ณ");
       expect(html).toContain("<h1>ภาพรวมการเงิน</h1>");
     });
 
@@ -877,7 +884,7 @@ describe("DashboardPage UI — Unit Tests", () => {
       expect(html).toContain("+฿18,000.00");
     });
 
-    it("renders 2026 AI Personalized Greeting card with user title, role and pending task alert", () => {
+    it("renders the greeting as a plain page-context line, not a competing surface", () => {
       const html = page.renderHtml(
         {
           pendingApprovalsCount: 3,
@@ -893,14 +900,16 @@ describe("DashboardPage UI — Unit Tests", () => {
         },
       );
 
-      expect(html).toContain('class="gl-ai-greeting"');
+      expect(html).toContain('class="gl-dash-greeting"');
       expect(html).toContain("สวัสดีครับ อาจารย์สรรเสริญ ดวงจิตร · ศิษยาภิบาล");
-      expect(html).toContain("3 รายการ");
-      expect(html).toContain('class="gl-btn gl-btn--sm gl-btn--cta-2026 gl-ai-greeting__action"');
-      expect(html).toContain("ดูงานค้าง →");
+      // The pending count and its action live only in the command center —
+      // the greeting must never repeat them (D12: one attention source).
+      expect(html).not.toContain("gl-ai-greeting");
+      expect(html).not.toContain("cta-2026");
+      expect(html).not.toContain("ดูงานค้าง →");
     });
 
-    it("renders calm 2026 AI greeting when all tasks are clear", () => {
+    it("renders the same plain greeting line when all tasks are clear", () => {
       const html = page.renderHtml(
         {
           pendingApprovalsCount: 0,
@@ -916,10 +925,23 @@ describe("DashboardPage UI — Unit Tests", () => {
         },
       );
 
-      expect(html).toContain('class="gl-ai-greeting"');
+      expect(html).toContain('class="gl-dash-greeting"');
       expect(html).toContain("สวัสดีครับ สุดารัตน์ จิณเซ่ง · ผู้นับเงิน");
-      expect(html).toContain("ระบบการเงินเป็นระเบียบเรียบร้อย");
       expect(html).not.toContain("ดูงานค้าง →");
+    });
+
+    it("orders the page financial-position-first: hero row before the command center (D12, supersedes D11 §5)", () => {
+      const html = page.renderHtml(
+        { pendingApprovalsCount: 3 },
+        { name: "ทดสอบ", role: "treasurer", initials: "ท" },
+        attentionFixture(),
+      );
+
+      const heroAt = html.indexOf('class="gl-dash-hero-row"');
+      const commandCenterAt = html.indexOf('class="gl-command-center"');
+      expect(heroAt).toBeGreaterThan(-1);
+      expect(commandCenterAt).toBeGreaterThan(-1);
+      expect(heroAt).toBeLessThan(commandCenterAt);
     });
   });
 });

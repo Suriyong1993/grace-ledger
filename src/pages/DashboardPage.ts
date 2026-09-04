@@ -697,24 +697,10 @@ export class DashboardPage {
       ? `สวัสดีครับ ${escapeHtml(displayName)}${userRoleLabel ? ` · ${escapeHtml(userRoleLabel)}` : ""}`
       : "ระบบบันทึกบัญชีคริสตจักร Grace Ledger";
 
-    const aiGreetingMessage =
-      attentionTotal > 0
-        ? `สัปดาห์นี้มีงานสำคัญ <strong>${attentionTotal} รายการ</strong> ที่รอการดำเนินการของคุณ`
-        : `ระบบการเงินเป็นระเบียบเรียบร้อย ไม่มีรายการค้างที่ต้องดำเนินการ`;
-
-    const aiGreetingHtml = `
-      <div class="gl-ai-greeting" role="region" aria-label="ข้อความจาก Grace AI">
-        <div class="gl-ai-greeting__content">
-          <span class="gl-ai-greeting__sparkle" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          </span>
-          <div>
-            <div class="gl-ai-greeting__title">${greetingTitle}</div>
-            <div class="gl-ai-greeting__subtitle">${aiGreetingMessage}</div>
-          </div>
-        </div>
-        ${attentionTotal > 0 ? `<a href="#/approvals" class="gl-btn gl-btn--sm gl-btn--cta-2026 gl-ai-greeting__action">ดูงานค้าง →</a>` : ""}
-      </div>`;
+    // Plain text page-context line. The count of pending items and the
+    // action to address them live in one place — the command center below —
+    // so this never repeats them.
+    const aiGreetingHtml = `<p class="gl-dash-greeting">${greetingTitle}</p>`;
 
     return `
     <div class="gl-page gl-dashboard-container gl-fade-in">
@@ -726,22 +712,9 @@ export class DashboardPage {
         <p>${escapeHtml(activeUser?.churchName || "คริสตจักร")} · ข้อมูล ณ ${period}</p>
       </div>
 
-      <!-- งานสัปดาห์นี้: attention → action. Aggregated from the same source
-           as the shell bell, deep-linked to each workflow. -->
-      <section class="gl-command-center" aria-label="งานสัปดาห์นี้">
-        <div class="gl-command-center__head">
-          <h2 class="gl-command-center__title">
-            <span>งานสัปดาห์นี้</span>
-          </h2>
-          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}">
-            ${attentionTotal > 0 ? `ต้องดำเนินการ ${attentionTotal} รายการ` : "ไม่มีงานค้าง"}
-          </span>
-        </div>
-        ${attentionBodyHtml}
-      </section>
-
-      <!-- Financial health: total balance + month figures + month-over-month
-           net context. The balance card is the operational core. -->
+      <!-- Financial position: total balance + month figures + month-over-
+           month net context. This is the page's primary orientation — it
+           leads. The balance card is the operational core. -->
       <section class="gl-section">
         <h2 class="gl-visually-hidden">สุขภาพการเงิน</h2>
         <div class="gl-dash-hero-row">
@@ -761,6 +734,22 @@ export class DashboardPage {
 
           ${contextCardHtml}
         </div>
+      </section>
+
+      <!-- งานสัปดาห์นี้: required action, one step down from financial
+           position — still fully visible, not the page's dominant surface.
+           Aggregated from the same source as the shell bell, deep-linked to
+           each workflow. -->
+      <section class="gl-command-center" aria-label="งานสัปดาห์นี้">
+        <div class="gl-command-center__head">
+          <h2 class="gl-command-center__title">
+            <span>งานสัปดาห์นี้</span>
+          </h2>
+          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}">
+            ${attentionTotal > 0 ? `ต้องดำเนินการ ${attentionTotal} รายการ` : "ไม่มีงานค้าง"}
+          </span>
+        </div>
+        ${attentionBodyHtml}
       </section>
 
       ${trendHtml}

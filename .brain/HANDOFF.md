@@ -1,9 +1,120 @@
 # HANDOFF.md — บันทึกการส่งมอบงานระหว่าง AI (Agent Handoff Log)
 
 > **หลักการส่งมอบงาน (Agent Handoff Protocol):**
+>
 > 1. ก่อนเปลี่ยนให้ Agent ตัวอื่นทำ หรือก่อนจบ turn การทำงาน ให้เพิ่มบันทึก Handoff ที่ด้านบนสุดของไฟล์นี้เสมอ (Append to Top)
 > 2. บันทึกเฉพาะข้อเท็จจริงที่มีหลักฐาน (Evidence over assumptions) เช่น ผลการรัน `npm test`, commit hash, ไฟล์ที่แก้
 > 3. ระบุสิ่งที่ทำเสร็จแล้ว และสิ่งที่ "ต้องระวัง" หรือ "ต้องทำต่อ" ให้ชัดเจน
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-05 01:20 (Premium UI/UX Refinement P0+P1 — Financial-Position-First Dashboard)
+
+- **ผู้ส่งมอบ (Handed off by):** Claude Code
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้ออก "Master Engineering Directive" ให้ยกระดับ UI/UX เป็น premium financial product ภายใต้ identity เดิม (Emerald Vault) — งานนี้ทำเฉพาะ **P0 + P1** ตามที่ผู้ใช้ยืนยัน (CTA cleanup + dedup attention + reorder dashboard) แล้วหยุดรายงานก่อนทำ P2
+- **การแก้ conflict กับ DECISIONS.md (สำคัญ):** ผู้ใช้สั่งชัดเจนให้ **supersede D11 §5** (ATTENTION → ACTION → CONTEXT) ด้วยลำดับใหม่ FINANCIAL POSITION → MOVEMENT → CONTEXT → ACTION — บันทึกเป็น **D12** ใน `DECISIONS.md` แล้ว โดย D11 §1-4 (role-gated nav, one attention source, global primary action, mobile composition) **ยังมีผลบังคับใช้ทั้งหมด**
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. **ลบระบบ CTA สีส้มทิ้งทั้งชุด** — `.gl-btn--cta-2026`, `--gl-cta-accent`, `--gl-cta-accent-hover`, `--gl-cta-on-accent`, `--gl-spring-easing` และ `@keyframes gl-fade-slide-in` (orphan หลังลบ consumer) — เป็น CTA system ที่ 2 ซ้อนทับ `gl-btn--primary/--secondary` ของ Emerald Vault
+  2. **แก้ข้อความงานค้างซ้ำ 2 ที่** — `.gl-ai-greeting` (การ์ด gradient + จำนวนงานค้าง + ปุ่ม CTA ซ้ำกับ command center ที่อยู่ใต้มัน) → เหลือ `.gl-dash-greeting` เป็นบรรทัดข้อความธรรมดา (ชื่อ + บทบาท เท่านั้น) — จำนวนงานค้างและปุ่มดำเนินการอยู่ที่ `.gl-command-center` ที่เดียว
+  3. **สลับลำดับ Dashboard** — `.gl-dash-hero-row` (ยอดคงเหลือ + รายรับ/รายจ่าย + สุทธิเทียบเดือนก่อน) ขึ้นนำหน้า `.gl-command-center` (งานสัปดาห์นี้) — command center ยังเต็มความกว้าง ไม่ถูกย่อ ไม่ถูกซ่อน แค่ลงมา 1 section
+  4. อัปเดต test ที่คุ้มครองพฤติกรรมเดิม (ไม่ได้ลบทิ้ง) + เพิ่ม test ใหม่ล็อกลำดับ hero-before-command-center
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `src/pages/DashboardPage.ts` (MODIFY — greeting + section order)
+  - `src/styles/app.css` (MODIFY — ลบ CTA system/greeting card, เพิ่ม `.gl-dash-greeting`)
+  - `tests/unit/dashboard-page-ui.test.ts` (MODIFY — แทน assertion เดิมด้วย assertion ของพฤติกรรมใหม่ + test ลำดับใหม่)
+  - `DECISIONS.md` (MODIFY — D12)
+  - `DESIGN.md` (MODIFY — เพิ่มแถว `.gl-dash-greeting`)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน (0 errors)**
+  - `npm test`: **ผ่าน 64 test files / 596 tests (เดิม 595 + test ลำดับใหม่ 1)**
+  - `npm run lint:design`: **ผ่าน**
+  - `npm run build`: **ผ่าน**
+  - `grep` บน `dist/`: `cta-2026`, `gl-cta-accent`, `gl-ai-greeting`, `gl-fade-slide-in` = **0 occurrences** ใน bundle จริง
+- **สิ่งที่ต้องทำต่อ (Next Actions) — P2 ที่ผู้ใช้อนุมัติแล้วแต่ยังไม่ได้ทำ:**
+  1. **Mobile bottom-nav ซ่อน destination จริง** — role สิทธิ์สูง (เช่น `super_admin`) เห็น sidebar 8 ปลายทาง แต่ bottom nav แสดงแค่ 3 content tabs (`buildMobileComposition` ใน `AppShell.ts` `.slice(0, 3)`) ที่เหลือ **เข้าไม่ถึงจาก bottom bar เลย** — ผู้ใช้ยืนยันแล้วให้ใส่ overflow แบบเบาๆ กลับมา (ไม่จำเป็นต้องเป็น sheet ตัวเดิมที่เคยถอดออกวันที่ 2026-09-04) — **ต้องอัปเดต `tests/unit/app-shell-navigation.test.ts` ที่ปัจจุบัน assert ว่าไม่มีปุ่ม more**
+  2. Topbar grouping (page context → primary action → utility → identity) — ตอนนี้เป็น flex row เดียวเรียงติดกันหมด
+  3. P3 ที่ยังไม่แตะ: sidebar polish, login, tables, charts, recent-activity empty state ที่ยังไม่ใช้ `renderEmptyStateHtml` (`DashboardPage.ts` ~บรรทัด 543)
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  1. **`.gl-glass-surface` + `--gl-glass-blur`/`--gl-glass-border` ยังอยู่ใน `app.css` แต่ `.gl-glass-surface` ไม่มี consumer เลย** — เป็น dead code ที่มีมาก่อน ไม่ได้ลบเพราะอยู่นอก scope ที่อนุมัติ (CLAUDE.md: mention, don't delete) — ถ้าจะลบให้ทำเป็นงานแยก
+  2. gotcha git remote/Vercel จากเซสชันก่อนยังใช้ได้: **ต้อง `git push old-origin main` ถึงจะ deploy**
+  3. `resize_window` (claude-in-chrome) ยังใช้ไม่ได้บนเครื่องนี้ — 390px ต้องให้ผู้ใช้ตรวจจากมือถือจริง
+  4. มีงานค้างของคนอื่นใน working tree ที่ **ไม่ได้** รวมใน commit นี้: `package.json`/`package-lock.json` (เพิ่ม `@e2b/code-interpreter`) + `scripts/test-e2b.mjs` (untracked)
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-04 23:15 (Dashboard Direction 1 Surgical Fixes — Deployed to Production)
+
+- **ผู้ส่งมอบ (Handed off by):** Claude Code
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้ขอ review Dashboard UI ด้วย `21st-ui-review` (screenshots จริงจาก production + source code), ตามด้วย `21st-ui-explore` เสนอ 3 แนวทางปรับปรุง (Conservative refinement / Financial workspace / Executive dashboard) — ผู้ใช้เลือก **Direction 1 (Conservative refinement)** เท่านั้น และสั่งชัดเจนว่าเป็น surgical polish ไม่ใช่ redesign: ห้ามแตะ hero+context structure, ห้ามใช้ `.gl-kpi-grid`, ห้ามสร้าง UI primitive ใหม่ถ้าไม่จำเป็นจริงๆ
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. **`.gl-attention-row__title`/`__meta` ellipsis ไม่ทำงาน** — เพิ่ม `display: block;` ให้ทั้งคู่ (ตรงตาม gotcha เดียวกับที่เคยแก้ `.gl-row__title`/`__meta` ไปแล้วในเซสชันก่อน แต่ยังไม่ได้แก้ sibling ตัวนี้) — verify ด้วย computed style จริงบน production หลัง deploy: `display:block`, `overflow:hidden`, `text-overflow:ellipsis` ทำงานจริง
+  2. **Fund list บน Dashboard ไม่มี card wrapper** ต่างจาก recent-activity list ที่เป็น `.gl-card` — ตรวจ `.gl-fundrow` (ตัวที่มี border/padding เต็ม) ก่อนแล้วพบว่า**ไม่มี consumer ที่ไหนในโปรเจกต์เลย** (แม้แต่ `FundsPage.ts` เองก็ใช้ pattern อื่น `gl-card gl-stack` + `gl-funds-card__*`) — เปลี่ยนไปห่อ `.gl-fundlist` ด้วย `.gl-card` แทน (reuse primitive เดิม ไม่สร้างใหม่) — verify บน production: `classList` = `gl-card gl-fundlist`, มี border/background/radius จริง
+  3. **Hero delta chip โชว์ลูกศรแดงข้าง ฿0.00** — เดิม delta chip render ตาม `prevBar` เพียงอย่างเดียว ทำให้เดือนที่ยังไม่มีธุรกรรม (current = ฿0.00) โชว์ "↓ -฿14,120.00" ข้าง "+฿0.00" ดูเหมือนระบบพัง — เพิ่มเงื่อนไข `!incomeMoney.isZero()` / `!expenseMoney.isZero()` (เช็คค่าปัจจุบัน ไม่ใช่เช็คว่า delta เป็นศูนย์) เพื่อไม่ซ่อนกรณีเดือนราบเรียบ (current ≠ 0 แต่ delta = 0 ยังโชว์ตามปกติ) — verify บน production: ฿0.00 ไม่มี chip แล้ว, context card ("สุทธิเทียบเดือนก่อน") ยังโชว์ปกติ
+  - **ไม่ทำ** (review แล้วตัดสินใจไม่แตะ ตามคำสั่งผู้ใช้ "ห้ามลบข้อมูลมั่วๆ"):
+    - "9 รายการ" ซ้ำ 3 จุด (greeting banner / command-center badge / attention rows) — `tests/unit/dashboard-page-ui.test.ts:880-901` คุ้มครอง count ใน greeting เป็นฟีเจอร์ "pending task alert" อยู่แล้ว การลบต้องเป็น product decision แยก ไม่ใช่ surgical fix
+    - Trend chart net-figure สี income/expense ซ้ำความหมายกับ legend — ตรวจแล้วพบว่าเป็น convention เดียวกับที่ใช้ทั่วทั้งแอป (fund balance, hero net) ไม่ใช่ ambiguity เฉพาะจุด ไม่มีเหตุผลพอจะแก้
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `src/pages/DashboardPage.ts` (MODIFY — fund-list class + delta suppression logic)
+  - `src/styles/app.css` (MODIFY — `display: block` x2 selector)
+- **Commit:**
+  - `b13202e` fix(dashboard): attention-row ellipsis, fund-list card parity, zero-value delta chips
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run lint:design`: **ผ่าน**
+  - `npm test`: **ผ่านครบ 64 test files / 595 tests (0 failures)** — ไม่ต้องแก้ test เลยแม้แต่ตัวเดียว
+  - `npm run build`: **ผ่าน 100%**
+  - Local render preview (`vite-node` เรียก `DashboardPage.renderHtml()` จริงด้วย fixture ที่จำลอง production scenario ทุกประการ — ฿0 เดือนนี้ + ประวัติจริง + ข้อความ attention ยาว) ผ่าน desktop + 390px container — ยืนยันทั้ง 3 fix ทำงานตามที่ตั้งใจ, ไม่มี console error
+  - **Production verification (หลัง deploy จริง):** เปิด `https://grace-ledger-mu.vercel.app/#/dashboard` จริง + ใช้ `getComputedStyle`/`classList` เช็คตรง DOM จริงบน production — ยืนยันทั้ง 3 fix live ครบ, ไม่มี console error, ไม่มี horizontal overflow ที่ desktop width
+  - **มือถือ 390px จริง: ยังตรวจไม่ได้** — ไม่ใช่ auth block, เป็นข้อจำกัดเครื่องมือ (`resize_window` รายงานสำเร็จแต่ `window.innerWidth` ไม่เปลี่ยนจริงตลอดทั้งเซสชัน แม้เปิด tab ใหม่/tab group ใหม่ก็ตาม) และไม่มีมือถือ/เครื่องอื่นต่อ session อยู่ (`list_connected_browsers` มีแค่ 1 browser, Windows, local) — รอผู้ใช้ตรวจจากมือถือจริงเอง
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - รอผู้ใช้ยืนยันผลตรวจ 390px จากมือถือจริง
+  - Direction 2 (Financial workspace) และ Direction 3 (Executive dashboard) ยังเป็นแค่ proposal — ไม่ได้ implement ตามคำสั่งผู้ใช้ ("Do not proceed to Direction 2 or Direction 3")
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas — สำคัญมากสำหรับ Agent ถัดไป):**
+  1. **ยืนยันซ้ำ gotcha เรื่อง git remote/Vercel จากเซสชันก่อน — เกิดจริงในเซสชันนี้:** push ไป `origin` (`tlcchruchkalasin/my-org-grace-ledger`) อย่างเดียวไม่ deploy เลย เพราะ Vercel project ยัง git-linked กับ `old-origin` (`Suriyong1993/grace-ledger`) จริง — ยืนยันด้วย `list_deployments`: `githubOrg` ของทุก READY deployment ล่าสุดคือ `Suriyong1993` ไม่ใช่ `tlcchruchkalasin` — **ต้อง push `old-origin main` เสมอถึงจะเห็นผลบน production**
+  2. **`resize_window` (claude-in-chrome) ใช้ไม่ได้จริงบนเครื่องนี้** ทดสอบซ้ำหลายรอบ (tab เดิม, tab ใหม่, tab group ใหม่) — เครื่องมือ report สำเร็จเสมอแต่ `window.innerWidth` ไม่เปลี่ยนจากค่า desktop จริงเลย ถ้าต้องตรวจ 390px ให้ใช้วิธี render `renderHtml()` จริงใส่ container CSS `max-width:390px` แทน (ใช้ได้กับ element ที่ไม่ผูก media query) หรือขอผู้ใช้ตรวจจากมือถือจริง — **ห้าม** ใช้ media-query-dependent behavior (เช่น `.gl-dash-split` breakpoint 900px) เป็นหลักฐานจาก container trick นี้ เพราะ media query อ่าน viewport จริงไม่ใช่ความกว้าง container
+  3. `.gl-fundrow` (ตัวมี border/padding เต็ม ใน `app.css` ~5054-5098) **ยังไม่มี consumer ในโปรเจกต์เลย** แม้จะดูเหมือนเป็น "pattern ที่ควรใช้" — อย่าสมมติว่ามันคือ source of truth โดยไม่ grep เช็คก่อนเสมอ
+  4. gotcha #1-5 จากเซสชันก่อนหน้า (21:35) ยังใช้ได้ทั้งหมด โดยเฉพาะข้อ 5 (git remote) ที่เพิ่งยืนยันซ้ำข้างบน
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-04 21:35 (Dashboard KPI Delta + Trend Empty State — Deployed to Production)
+
+- **ผู้ส่งมอบ (Handed off by):** Claude Code
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้ขอวิเคราะห์ UI ของ Dashboard ด้วย 21st-ui-explore/21st-ui-review (read-only, ไม่ใช้ 21st CLI จริงเพราะติดตั้งไม่ได้ — ใช้ local design references แทน `design-system-extracted/ui_kits/grace-ledger/dashboard-option-a.html` / `-b.html`) แล้วเลือกแนวทาง "Direction C" (hybrid) เพื่อทำ Dashboard ให้ดูเป็น financial SaaS ระดับ production โดยห้ามแตะ React/Tailwind/component library และห้ามสร้าง component ซ้ำ
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  - เพิ่ม month-over-month delta chip ให้ figure รายรับ/รายจ่ายใน hero card (เดิมมีแค่สุทธิที่มี delta ใน context card) — ลูกศรสะท้อนทิศทางจริงเสมอ, สีสะท้อนความหมายทางการเงิน (รายรับขึ้น=เขียว, รายจ่ายขึ้น=แดง/แย่ลง)
+  - เพิ่ม trend chart empty state (ใช้ `renderEmptyStateHtml` เดิม) แทนการซ่อน section เปล่าๆเมื่อไม่มี `historicalTrend`
+  - เพิ่ม class ใหม่ 1 ตัว: `.gl-dash-hero__figure-delta` (บันทึกใน `DESIGN.md` แล้ว)
+  - **ไม่ทำ** (ตามคำสั่งผู้ใช้หลังพบ conflict กับ design decision เดิม): ไม่แตะ `.gl-dash-hero-row`/`.gl-dash-context` (มี test คุ้มครองอยู่), ไม่เปิดใช้ `.gl-stat-card`/`.gl-kpi-grid`, ไม่นำ `.gl-statgrid`/`.gl-stat` กลับมา, ไม่ย้าย attention section (ทีมเคยตั้งใจให้ "เป็น section ที่นำหน้าเสมอ" — attention-driven shell Phase A)
+  - Guard `src/hmr-indicator.ts` (ไฟล์ untracked เดิมที่ไม่มี dev-only check) ด้วย `import.meta.env.DEV` — ยืนยันด้วย `grep` ว่า string "HMR DEMO" ไม่หลุดไปใน production bundle
+  - ลบ `docs/screenshots/drift-fix-2026-09-04/` (untracked, regeneratable ผ่าน `scripts/capture_drift_fix.mjs`, ไม่มีอะไรอ้างอิงเป็น broken link)
+  - Push ขึ้น Vercel Production สำเร็จ — ยืนยันด้วย browser จริงที่ `https://grace-ledger-mu.vercel.app` (console สะอาด, delta chip แสดงข้อมูลจริง)
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `src/pages/DashboardPage.ts` (MODIFY — +36/-3)
+  - `src/styles/app.css` (MODIFY — +13)
+  - `DESIGN.md` (MODIFY — +1 แถวใน Dashboard component table)
+  - `.brain/MEMORY.md` (MODIFY — +5, บันทึกแยกเรื่อง ellipsis gotcha)
+  - `index.html`, `src/hmr-indicator.ts` (NEW/MODIFY — dev-only HMR badge)
+- **Commits (3 แยกตามเนื้อหา):**
+  - `65c3f50` feat(dashboard): add income/expense month-over-month deltas, trend empty state
+  - `0a38509` docs(brain): document text-truncation ellipsis gotcha on inline elements
+  - `ce27bb4` chore(dev): add dev-only HMR visual indicator
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run lint:design`: **ผ่าน**
+  - `npm test`: **ผ่านครบ 64 test files / 595 tests (0 failures)** — รวมทั้ง 32 tests ใน `dashboard-page-ui.test.ts` ที่คุ้มครองโครงสร้าง hero/context เดิม
+  - `npm run build`: **ผ่าน 100%** (verify ด้วย `grep` ว่า HMR indicator string ไม่อยู่ใน `dist/`)
+  - Browser: render `DashboardPage.renderHtml()` จริงผ่าน temp harness (ไม่ใช่ mockup) ตรวจ desktop + 390px (ผ่าน iframe เพราะ `resize_window` ใช้ไม่ได้บนเครื่องนี้) + trend-empty-state + all-clear attention state — ผ่านหมด
+  - Production: เปิด `https://grace-ledger-mu.vercel.app` จริง — โหลดสำเร็จ, console ไม่มี error, เห็น delta chip แสดงข้อมูลจริง (รายรับ ↓−฿14,120.00, รายจ่าย ↓−฿23,177.00)
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - ไม่มีงานค้าง ระบบ deploy สำเร็จและ verify แล้ว
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas — สำคัญมากสำหรับ Agent ถัดไป):**
+  1. **PostToolUse hook รัน `prettier --write` แบบไม่มีเงื่อนไขทุกครั้งที่ Edit/Write แตะไฟล์ใดก็ตาม** (ดู `.claude/settings.json`) — ถ้าไฟล์นั้นไม่เคยผ่าน prettier มาก่อน (เช่น `DESIGN.md`, markdown tables แบบ compact) จะเกิด diff ก้อนใหญ่ทั้งไฟล์ทันทีที่แก้แค่บรรทัดเดียว ถ้าต้องการ diff เล็กจริงๆ ให้ patch ผ่าน Bash/Node โดยตรง (ไม่ผ่าน Edit/Write tool) แล้ว `cp` ทับไฟล์จริง
+  2. **`.gl-statgrid`/`.gl-stat` ถูกลบไปแล้วโดยตั้งใจ** (ดู comment ใน `app.css` ราวบรรทัด 2958) — ทีมเคยใช้ "3 equal stat cards" บน Dashboard และ Cash Count แล้ว revert เป็น hero+supporting-figures เพราะ net คือตัวเลขที่หน้าจอมีไว้ตอบ อย่าเอากลับมา
+  3. **`.gl-stat-card`/`.gl-kpi-grid` มีอยู่ใน `app.css` แต่ไม่มี consumer เลยในโปรเจกต์** — อย่าเปิดใช้โดยไม่มีเหตุผลชัดเจนและ consumer จริง
+  4. **`tests/unit/dashboard-page-ui.test.ts` คุ้มครอง design decision จริง** ไม่ใช่แค่ markup — เช่น test ชื่อ "not three equal stat cards" และ exact copy ของประโยค month-over-month — ห้ามแก้ test เพื่อให้ implementation ผ่าน ต้องแก้ implementation ให้เข้ากับ decision เดิมแทน
+  5. **โปรเจกต์มี git remote 2 ตัว และ Vercel เชื่อมกับตัวเก่า:** `origin` = `tlcchruchkalasin/my-org-grace-ledger` (repo หลักที่ทำงานอยู่ปัจจุบัน) แต่ Vercel project `grace-ledger` ยัง git-linked กับ `old-origin` = `Suriyong1993/grace-ledger` (เช็คได้ด้วย `mcp__plugin_vercel_vercel__get_git_deployment_context`) — **push แค่ `origin` จะไม่ deploy อัตโนมัติ** ต้อง `git push old-origin main` ด้วยเสมอ จนกว่าจะมีการย้าย Vercel ไปผูกกับ repo ใหม่อย่างเป็นทางการ
 
 ---
 
@@ -244,7 +355,7 @@
 
 - **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity)
 - **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
-- **บริบทงาน (Context):** 
+- **บริบทงาน (Context):**
   1. พบข้อผิดพลาด `new row violates row-level security policy for table "transaction_splits"` เมื่อพยายามสร้างธุรกรรม Draft ในหน้า Transactions
   2. ทำการ Audit โครงสร้างเอกสารทั้งโปรเจกต์ และเริ่มติดตั้ง Personal Agent Operating System "JoejaBrain"
 - **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
