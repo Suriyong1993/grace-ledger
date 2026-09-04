@@ -1,5 +1,6 @@
 import { ActionProposalUiCard } from "../../lib/ai/grace-ai-proposals";
 import { UserRole } from "../../lib/rbac";
+import { escapeHtml } from "../../lib/format";
 
 export interface ProposalConfirmationModalProps {
   proposal: ActionProposalUiCard | null;
@@ -21,13 +22,16 @@ const ICON_ALERT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" 
 const ICON_SHIELD = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 const ICON_ARROW = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
 
-export function renderProposalConfirmationModalHtml(props: ProposalConfirmationModalProps): string {
+export function renderProposalConfirmationModalHtml(
+  props: ProposalConfirmationModalProps,
+): string {
   if (!props.isOpen || !props.proposal) {
     return "";
   }
 
   const { proposal, isLoading = false, error = null, currentUserRole } = props;
-  const isUnauthorized = currentUserRole && !["super_admin", "treasurer"].includes(currentUserRole);
+  const isUnauthorized =
+    currentUserRole && !["super_admin", "treasurer"].includes(currentUserRole);
 
   const expiresAt = new Date(proposal.expires_at).getTime();
   const now = Date.now();
@@ -95,10 +99,10 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
         </div>
 
         <h3 style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin: var(--space-1) 0; color: var(--foreground);">
-          ${proposal.title}
+          ${escapeHtml(proposal.title)}
         </h3>
         <p style="font-size: var(--text-xs); color: var(--muted-foreground); margin-bottom: var(--space-3);">
-          ${proposal.summary}
+          ${escapeHtml(proposal.summary)}
         </p>
 
         <!-- Financial Effect -->
@@ -107,7 +111,7 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
             ${ICON_ALERT} <span>ผลกระทบทางการเงิน:</span>
           </div>
           <div style="padding-left: var(--space-4); line-height: 1.5;">
-            ${proposal.financial_effect}
+            ${escapeHtml(proposal.financial_effect)}
           </div>
         </div>
 
@@ -119,14 +123,14 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
           <div style="font-weight: var(--weight-medium); margin-bottom: var(--space-2);">การเปลี่ยนแปลงยอดกองทุน:</div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
             <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-2);">
-              <div style="color: var(--muted-foreground);">ต้นทาง (${proposal.source}):</div>
+              <div style="color: var(--muted-foreground);">ต้นทาง (${escapeHtml(proposal.source ?? "")}):</div>
               <div class="num-display" style="color: var(--foreground);">ก่อน: ${proposal.current_state.from_fund_balance}</div>
               <div class="num-display" style="color: var(--destructive); font-weight: var(--weight-bold); display: flex; align-items: center; gap: 2px;">
                 ${ICON_ARROW} หลัง: ${proposal.current_state.projected_from_balance}
               </div>
             </div>
             <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-2);">
-              <div style="color: var(--muted-foreground);">ปลายทาง (${proposal.destination}):</div>
+              <div style="color: var(--muted-foreground);">ปลายทาง (${escapeHtml(proposal.destination ?? "")}):</div>
               <div class="num-display" style="color: var(--foreground);">ก่อน: ${proposal.current_state.to_fund_balance}</div>
               <div class="num-display" style="color: var(--success); font-weight: var(--weight-bold); display: flex; align-items: center; gap: 2px;">
                 ${ICON_ARROW} หลัง: ${proposal.current_state.projected_to_balance}
@@ -156,7 +160,7 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
 
         ${
           proposal.reason
-            ? `<div style="font-size: var(--text-xs); color: var(--muted-foreground);"><strong style="color: var(--foreground);">เหตุผลประกอบ:</strong> ${proposal.reason}</div>`
+            ? `<div style="font-size: var(--text-xs); color: var(--muted-foreground);"><strong style="color: var(--foreground);">เหตุผลประกอบ:</strong> ${escapeHtml(proposal.reason)}</div>`
             : ""
         }
       </div>
@@ -166,7 +170,7 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
         error
           ? `
       <div class="gl-error-banner" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--destructive); border-radius: var(--radius-md); padding: var(--space-3); font-size: var(--text-xs); color: var(--destructive); margin-bottom: var(--space-4);" role="alert">
-        <strong>เกิดข้อผิดพลาดในการดำเนินการ:</strong> ${error}
+        <strong>เกิดข้อผิดพลาดในการดำเนินการ:</strong> ${escapeHtml(error)}
       </div>
       `
           : ""
@@ -197,8 +201,8 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
             isLoading
               ? "กำลังประมวลผล..."
               : isExpired
-              ? "ข้อเสนอหมดอายุแล้ว"
-              : actionTitle
+                ? "ข้อเสนอหมดอายุแล้ว"
+                : actionTitle
           }
         </button>
       </div>
@@ -209,11 +213,14 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
 
 export function attachProposalConfirmationModalHandlers(
   container: HTMLElement,
-  props: ProposalConfirmationModalProps
+  props: ProposalConfirmationModalProps,
 ): { destroy: () => void } {
-  const closeBtn = container.querySelector<HTMLButtonElement>(".gl-modal-close");
-  const cancelBtn = container.querySelector<HTMLButtonElement>(".gl-btn-cancel");
-  const confirmBtn = container.querySelector<HTMLButtonElement>(".gl-btn-confirm");
+  const closeBtn =
+    container.querySelector<HTMLButtonElement>(".gl-modal-close");
+  const cancelBtn =
+    container.querySelector<HTMLButtonElement>(".gl-btn-cancel");
+  const confirmBtn =
+    container.querySelector<HTMLButtonElement>(".gl-btn-confirm");
 
   const handleClose = () => {
     if (props.onClose) props.onClose();
