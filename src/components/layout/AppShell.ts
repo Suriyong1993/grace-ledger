@@ -597,6 +597,9 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     background: var(--background);
     color: var(--foreground);
   ">
+    <!-- Accessible Skip Link for Keyboard & Assistive Technology -->
+    <a href="#main-content" class="gl-skip-link">ข้ามไปเนื้อหาหลัก</a>
+
     <!-- Desktop Sidebar -->
     <aside class="gl-sidebar" style="
       width: var(--gl-sidebar-w);

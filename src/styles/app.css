@@ -66,6 +66,31 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   Accessibility Skip Link (Keyboard & Assistive Technology)
+   -------------------------------------------------------------------------- */
+.gl-skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-4);
+  z-index: 9999;
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  box-shadow: var(--shadow-elevated);
+  transition: top var(--duration-micro) var(--ease-out);
+}
+
+.gl-skip-link:focus {
+  top: var(--space-3);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
    Numerals
    The design system owns .num-display. The only thing added here is spacing
    after the currency mark: Inter carries no ฿, so it falls back to Sarabun
@@ -1931,12 +1956,28 @@ button.gl-card:active {
 .gl-dash-hero {
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-sm-card);
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: border-color var(--duration-micro) var(--ease-out), box-shadow var(--duration-micro) var(--ease-out);
+}
+
+.gl-dash-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 65%, #0ea5e9) 100%);
 }
 
 .gl-dash-hero__value {
   margin-top: var(--space-2);
-  font-size: var(--text-5xl);
+  font-size: clamp(2.25rem, 4vw, 3.25rem);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
@@ -4775,8 +4816,15 @@ a {
   .gl-pagination__btn,
   .gl-accordion__trigger,
   .gl-table-row,
-  .gl-rise-stagger {
-    transition: none;
+  .gl-rise-stagger,
+  .gl-btn,
+  .gl-icon-btn,
+  .gl-card,
+  .gl-dash-hero,
+  .gl-btn--cta-2026 {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
   }
 }
 

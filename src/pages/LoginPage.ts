@@ -96,7 +96,7 @@ export class LoginPage {
               <li>${VAULT_FACT_ICONS.audit}บันทึกตรวจสอบย้อนหลังทุกรายการ</li>
               <li>${VAULT_FACT_ICONS.pin}รหัส PIN 6 หลักปกป้องทุกบัญชี</li>
             </ul>
-            <p class="gl-vault-foot">มาตรฐานความปลอดภัยระดับการเงิน</p>
+            <p class="gl-vault-foot">ระบบบัญชีและการเงินคริสตจักร</p>
           </div>
         </aside>
         <main class="gl-login-workspace">
@@ -104,7 +104,7 @@ export class LoginPage {
             ${this.renderViewHtml()}
             <div class="gl-login-trust-badge">
               <span aria-hidden="true">${VAULT_LOCK_SVG}</span>
-              <span>ระบบความปลอดภัยมาตรฐานการเงิน · รหัส PIN ได้รับการปกป้องในระดับหน่วยความจำ</span>
+              <span>รหัส PIN ได้รับการปกป้องในระดับหน่วยความจำ · แยกสิทธิ์การใช้งานตามบทบาท</span>
             </div>
           </div>
         </main>

@@ -7,6 +7,58 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-04 15:30 (Real Browser Smoke Test สำเร็จสมบูรณ์ — พร้อม Commit)
+
+- **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)
+- **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
+- **บริบทงาน (Context):** รัน Browser Smoke Test จริงด้วย Playwright บนเซิร์ฟเวอร์ `http://localhost:5500` ทุก Viewport และทุก Route พร้อมจับภาพหน้าจอหลักฐานจริง
+- **ผลการตรวจ Browser Smoke Test จริง (Real Browser Execution):**
+  1. **Route Reachability (8/8 Routes PASS):** ตรวจสอบผ่าน `router.matchRoute` ครบทั้ง `Dashboard`, `Transactions`, `Offerings`, `Funds`, `Approvals`, `Members`, `Reports`, และ `Profile` ทุกเส้นทางเปิดได้จริงใน Browser
+  2. **Viewport Responsiveness (PASS ทุก Viewport):**
+     - Desktop 1280x900: Sidebar แสดงผลถูกต้อง, ไม่พบ Horizontal Overflow (0px scroll leak), Login เป็น Split view (Vault + Workspace)
+     - Tablet 768x900: Sidebar ยุบเป็น Mobile Nav Bar อัตโนมัติ, Layout ยืดหยุ่น
+     - Mobile 390x844: Mobile Bottom Nav แสดง 5 ปุ่มหลักพร้อม badge, ปุ่ม PIN มี touch target >= 44px, ไม่พบ Horizontal Overflow
+  3. **UI States (PASS):** Loading skeleton, Empty state, และ Danger alert render สวยงามสมบูรณ์
+  4. **Accessibility & Interactions (PASS):**
+     - Skip link `<a href="#main-content" class="gl-skip-link">` โฟกัสได้ทันทีเมื่อกด Tab
+     - Attention popover (`#gl-attention-panel`) เปิดเมื่อคลิกกระดิ่ง และปิดพร้อมคืนโฟกัสเมื่อกด Escape
+     - `prefers-reduced-motion: reduce` บังคับ transition duration เป็น `0s` ทันที
+  5. **Screenshots Proof:** บันทึกภาพจริงรวม 31 ภาพใน `docs/screenshots/browser_smoke_test/`
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน 100% (0 errors)**
+  - `npm test`: **ผ่านครบทั้ง 64 test suites (595 tests passed 100%, 0 failures)**
+  - `npm run lint`: **ผ่าน 100%**
+  - `npm run build`: **สร้าง production bundle สำเร็จใน 3.96s**
+- **สถานะ:** 🟢 Verified Real Browser + Code Base ผ่าน 100% สมบูรณ์ (ยังไม่มีการ Commit/Push รอคำสั่งผู้ใช้)
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-04 14:50 (ยกระดับ Grace Ledger สู่ Modern Financial Dashboard 2026 — One-Day UX/UI Modernization)
+
+- **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)
+- **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
+- **บริบทงาน (Context):** ยกระดับ Grace Ledger ให้มีหน้าตาและประสบการณ์การใช้งานเป็น Modern Financial Dashboard ตามมาตรฐานกันยายน 2026 ภายใต้อัตลักษณ์ "Emerald Vault" (`#14532D`) และ Porcelain
+- **ผลการวิเคราะห์ & สิ่งที่แก้ไข (Diagnosis & Fix):**
+  1. **เอกสารสถาปัตยกรรม & Audit:**
+     - สร้าง [`docs/ONE_DAY_UX_AUDIT.md`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/docs/ONE_DAY_UX_AUDIT.md)
+     - สร้าง [`docs/ONE_DAY_UX_CHANGELOG.md`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/docs/ONE_DAY_UX_CHANGELOG.md)
+  2. **Accessibility & Assistive Tech:**
+     - เพิ่ม `.gl-skip-link` ใน `src/styles/app.css` และฝัง `<a href="#main-content" class="gl-skip-link">ข้ามไปเนื้อหาหลัก</a>` ใน `src/components/layout/AppShell.ts` โดยเชื่อมโยงกับ `<main id="main-content">` จริง
+     - ขยาย `@media (prefers-reduced-motion: reduce)` ครอบคลุมปุ่ม, การ์ด และ Hero elements
+  3. **Factual Capability Indicators:**
+     - ปรับปรุงข้อความบนหน้า Login (`src/pages/LoginPage.ts`) จากข้อความโฆษณาเป็นการสื่อสารขีดความสามารถที่ตรวจสอบได้จริง (สิทธิ์แยกตามบทบาท, การปกป้อง PIN ในหน่วยความจำ)
+  4. **Dashboard Balance Hero:**
+     - ปรับแต่ง `.gl-dash-hero` ให้เป็น Operational Focal Point ที่โดดเด่น สวยงาม มั่นคง พร้อม double ledger rule (`.gl-total-rule`) และแถบเกรเดียนต์มรกต-ทีล
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `git status --short`: มีการแก้ไขเฉพาะ 3 ไฟล์ใน scope + เอกสาร 2 ไฟล์
+  - `npm run typecheck`: **ผ่าน 100% (0 errors)**
+  - `npm run lint`: **ผ่าน 100% (`tsc --noEmit && node scripts/lint-design.mjs` ผ่านฉลุย)**
+  - `npm test`: **ผ่านครบทั้ง 64 test suites (595 tests passed 100%, 0 failures)**
+  - `npm run build`: **สร้าง production bundle สำเร็จใน 2.30s**
+- **สถานะ:** 🟢 ผ่าน 100% สมบูรณ์ พร้อมนำไป commit, push และ deploy
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-04 14:22 (นำปุ่มและแผง 'เมนูเพิ่มเติม' ออกจาก Mobile Navigation ตามความต้องการของผู้ใช้)
 
 - **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)

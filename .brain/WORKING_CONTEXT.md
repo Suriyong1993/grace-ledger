@@ -7,24 +7,29 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
-- **เป้าหมายหลัก (Goal):** นำปุ่ม/แผง "เมนูเพิ่มเติม" ออกจากแถบ Navigation ล่างของมือถือ (Mobile Bottom Bar) ให้เหลือ 5 ปุ่มหลักสะอาดตา
-- **สถานะรวม (Overall Status):** `IDLE` (งานสำเร็จสมบูรณ์ 100% Green)
+- **เป้าหมายหลัก (Goal):** ยกระดับ Grace Ledger ให้เป็น Modern Financial Dashboard ตามมาตรฐานกันยายน 2026 (One-Day UX/UI Modernization)
+- **สถานะรวม (Overall Status):** `WAITING_USER_REVIEW` (Final Verification 24-point report เสร็จสมบูรณ์, รอคำสั่งจากผู้ใช้ก่อน Commit/Push)
 - **Agent ที่กำลังทำงาน (Active Agent):** Gemini (Antigravity IDE)
-- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 14:22 (Asia/Bangkok)
+- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 14:52 (Asia/Bangkok)
 
 ---
 
 ## 2. งานที่ทำเสร็จสิ้น (Completed Tasks)
 
-- [x] นำปุ่ม "เมนูเพิ่มเติม" ออกจากแถบนำทางมือถือ (Mobile Bottom Navigation):
-  - ตัดปุ่ม `#gl-more-btn` และแผงป๊อปอัป `#gl-more-panel` ออกจาก `AppShell.ts` และ `main.ts`
-  - ปรับการจัดแถบเมนูล่างบนหน้าจอมือถือ (Mobile Composition) ให้แสดง 5 ปุ่มหลักชัดเจน: `หน้าหลัก`, `การเงิน`, `เงินถวาย`, `อนุมัติ`, `โปรไฟล์`
-  - เพิ่มลิงก์ "รายงานการเงิน" (`#/reports`) ลงในหน้า Profile ร่วมกับ กองทุน และ สมาชิก เพื่อให้เข้าถึงโมดูลรองได้อย่างสะดวก
-  - อัปเดต `tests/unit/app-shell-navigation.test.ts` ให้ครอบคลุมสถาปัตยกรรมเมนูใหม่
-- [x] รันการทดสอบและ Verification ผ่าน 100%:
+- [x] จัดทำเอกสาร UX/UI Audit: `docs/ONE_DAY_UX_AUDIT.md` ครอบคลุมเป้าหมาย Modern Financial Dashboard 2026
+- [x] ยกระดับการเข้าถึงและความปลอดภัย (Accessibility & Factual Indicators):
+- [x] จัดทำเอกสาร Final Verification ครอบคลุม 24 หัวข้อ: `docs/FINAL_UX_VERIFICATION.md` (ยืนยัน PASS 23 รายการ / 1 รายการ Offline, Zero Regression, ไม่มีการ commit/push)
+  - เพิ่ม `.gl-skip-link` รองรับ Keyboard Navigation & Assistive Technology ชี้ไปที่ `<main id="main-content">`
+  - ปรับปรุงข้อความบนหน้า Login ให้เป็น Factual Capability Indicators (ไม่ใช้คำโฆษณาเกินจริง)
+  - เพิ่ม Reduced-Motion safety rules สำหรับ interactive elements (`.gl-btn`, `.gl-card`, `.gl-dash-hero`)
+- [x] ปรับปรุง Dashboard Hero Balance Card:
+  - ยกระดับ `.gl-dash-hero` ให้เป็น Visual Focal Point พร้อม Double Ledger Rule (`.gl-total-rule`) และ Accent Gradient Rule
+- [x] จัดทำบันทึกการเปลี่ยนแปลง: `docs/ONE_DAY_UX_CHANGELOG.md`
+- [x] รันการทดสอบและ Verification ผ่านครบทุกขั้นตอน:
   - `npm run typecheck` (0 errors)
+  - `npm run lint` (tsc + lint-design ผ่าน 100%)
   - `npm test` (ผ่านครบทั้ง 64 test files / 595 tests passed 100%, 0 failures)
-  - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 2.62s)
+  - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 2.30s)
 
 - [x] สอบถามและยืนยันขอบเขตการแก้ไขกับผู้ใช้ (เลือกแก้ไขใน `scripts/capture_*.mjs`)
 - [/] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ:
