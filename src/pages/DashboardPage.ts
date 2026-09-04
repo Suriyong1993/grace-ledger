@@ -444,6 +444,30 @@ export class DashboardPage {
         <a href="#/reports" class="gl-dash-context__link">ดูรายงานเต็ม →</a>
       </div>`;
 
+    // Per-figure month-over-month delta for the hero's income/expense lines —
+    // net already gets its own delta in the context card above, so this only
+    // covers the two figures that previously had none. Income: higher is
+    // better (green/up). Expense: higher is worse (red/up) — the arrow always
+    // reflects the real direction the number moved, only the color inverts.
+    const prevIncomeMoney = prevBar ? parseMoneySafe(prevBar.income) : null;
+    const incomeDelta = prevIncomeMoney ? incomeMoney.subtract(prevIncomeMoney) : null;
+    const incomeDeltaHtml = incomeDelta
+      ? `<span class="gl-dash-hero__figure-delta ${incomeDelta.isPositive() ? 'gl-income' : 'gl-expense'}">
+          <span class="gl-dash-context__direction" aria-hidden="true">${incomeDelta.isPositive() ? ICON_TREND_UP : ICON_TREND_DOWN}</span>
+          <span class="num-display">${incomeDelta.isPositive() ? "+" : ""}${incomeDelta.format()}</span>
+        </span>`
+      : "";
+
+    const prevExpenseMoney = prevBar ? parseMoneySafe(prevBar.expense) : null;
+    const expenseDelta = prevExpenseMoney ? expenseMoney.subtract(prevExpenseMoney) : null;
+    const expenseDeltaIsWorse = expenseDelta ? expenseDelta.isPositive() : false;
+    const expenseDeltaHtml = expenseDelta
+      ? `<span class="gl-dash-hero__figure-delta ${expenseDeltaIsWorse ? 'gl-expense' : 'gl-income'}">
+          <span class="gl-dash-context__direction" aria-hidden="true">${expenseDeltaIsWorse ? ICON_TREND_UP : ICON_TREND_DOWN}</span>
+          <span class="num-display">${expenseDeltaIsWorse ? "+" : ""}${expenseDelta.format()}</span>
+        </span>`
+      : "";
+
     // 2. Funds List
     const fundsHtml =
       funds.length === 0
@@ -546,7 +570,16 @@ export class DashboardPage {
 
     const trendHtml =
       trend.length === 0
-        ? ""
+        ? `
+      <section class="gl-section">
+        <div class="gl-section__head">
+          <h2>รายรับและรายจ่ายรายเดือน</h2>
+        </div>
+        ${renderEmptyStateHtml({
+          message: "ยังไม่มีข้อมูลย้อนหลังสำหรับแสดงกราฟ",
+          hint: "กราฟจะแสดงเมื่อมีข้อมูลอย่างน้อย 1 เดือน",
+        })}
+      </section>`
         : `
       <section class="gl-section">
         <div class="gl-section__head">
@@ -689,8 +722,8 @@ export class DashboardPage {
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 
             <div class="gl-dash-hero__figures">
-              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong></span>
-              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong></span>
+              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong>${incomeDeltaHtml}</span>
+              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong>${expenseDeltaHtml}</span>
               <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display ${netIsPositive ? 'gl-income' : netMoney.isNegative() ? 'gl-expense' : 'gl-net'}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
             </div>
 

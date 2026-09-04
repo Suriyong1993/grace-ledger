@@ -258,6 +258,7 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 | `.gl-dash-hero` | Hero card |
 | `.gl-dash-hero__value` | Hero figure |
 | `.gl-dash-hero__actions` | Action strip |
+| `.gl-dash-hero__figure-delta` | Month-over-month delta chip under an income/expense hero figure |
 | `.gl-dash-review` | Review panel |
 | `.gl-dash-user-card` | Identity card |
 | `.gl-dash-context` | Month context |

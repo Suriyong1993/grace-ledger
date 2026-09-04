@@ -2060,6 +2060,19 @@ button.gl-card:active {
   font-weight: var(--weight-bold);
 }
 
+/* Small month-over-month delta chip under an income/expense hero figure.
+   Direction (icon) always reflects the real sign; color is figure-specific
+   (income up = good, expense up = worse) and set by the caller via the
+   existing .gl-income/.gl-expense utility classes. */
+.gl-dash-hero__figure-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+}
+
 /* Uneven action strip: one committing action, plus compact icon-only
    controls for the rest — never four identical rectangles in a row. */
 .gl-dash-hero__actions {
