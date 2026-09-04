@@ -250,10 +250,6 @@ export class App {
         button: root.querySelector<HTMLElement>("#gl-attention-btn"),
         panel: root.querySelector<HTMLElement>("#gl-attention-panel"),
       },
-      {
-        button: root.querySelector<HTMLElement>("#gl-more-btn"),
-        panel: root.querySelector<HTMLElement>("#gl-more-panel"),
-      },
     ].filter((entry): entry is { button: HTMLElement; panel: HTMLElement } =>
       Boolean(entry.button && entry.panel),
     );

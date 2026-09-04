@@ -7,6 +7,26 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-04 14:22 (นำปุ่มและแผง 'เมนูเพิ่มเติม' ออกจาก Mobile Navigation ตามความต้องการของผู้ใช้)
+
+- **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)
+- **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้สอบถามและยืนยันว่าไม่ต้องการปุ่ม "เมนูเพิ่มเติม" บนแถบล่างมือถือ ("เมนูเพิ่มเติม ไม่เอาได้ไหม")
+- **ผลการวิเคราะห์ & สิ่งที่แก้ไข (Diagnosis & Fix):**
+  - **การปรับปรุง:**
+    1. นำปุ่ม `#gl-more-btn`, แผง `#gl-more-panel` และฟังก์ชัน `renderMorePanel` ออกจาก [`src/components/layout/AppShell.ts`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/src/components/layout/AppShell.ts)
+    2. จัดแถบ Mobile Navigation Bar ด้านล่างให้แสดง 5 เมนูหลักที่ตรงไปตรงมา: `หน้าหลัก`, `การเงิน`, `เงินถวาย`, `อนุมัติ`, `โปรไฟล์` (ไม่มีปุ่ม popover sheet ซ้อนทับ)
+    3. นำ listener ของ `#gl-more-btn` ออกจาก [`src/main.ts`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/src/main.ts)
+    4. เพิ่มลิงก์ "รายงานการเงิน" (`#/reports`) ลงใน Quick Access ของหน้า Profile ([`src/pages/ProfilePage.ts`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/src/pages/ProfilePage.ts)) เพื่อให้สามารถเปิดโมดูลรองได้อย่างสะดวก
+    5. อัปเดต assertion ใน [`tests/unit/app-shell-navigation.test.ts`](file:///c:/Users/Administrator/Desktop/grace-v.2/grace-ledger/tests/unit/app-shell-navigation.test.ts) ให้ตรวจสอบโครงสร้างแถบ 5 เมนูใหม่และยืนยันว่าไม่มีปุ่ม/แผง more หลงเหลือ
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน 100% (0 errors)**
+  - `npm test`: **ผ่านครบทั้ง 64 test suites (595 tests passed, 0 failures)**
+  - `npm run build`: **สร้าง bundle สำเร็จสมบูรณ์ (2.62s)**
+- **สถานะ:** 🟢 ผ่าน 100% (A+)
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-04 14:05 (แก้ไขปัญหาการพิมพ์ตัวเลขบนมือถือให้พิมพ์ได้ต่อเนื่อง 100% ไม่หลุดโฟกัส)
 
 - **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)

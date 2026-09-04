@@ -116,22 +116,19 @@ describe("Authenticated App Shell & Navigation", () => {
     expect(unknownHtml).toContain('href="#/funds"');
   });
 
-  it("composes the mobile bar deliberately: fixed workflows + เพิ่มเติม sheet + topbar profile", () => {
+  it("composes the mobile bar deliberately: 5 core workflow tabs with Profile and no overflow sheet", () => {
     const html = renderAppShellHtml(treasurerProps, "<div>Content</div>");
 
     expect(html).toContain('class="gl-mobilenav"');
-    // Fixed + priority workflow tabs…
+    // Core workflow tabs + Profile
     expect(html).toContain('href="#/"');
+    expect(html).toContain('href="#/transactions"');
     expect(html).toContain('href="#/offerings"');
     expect(html).toContain('href="#/approvals"');
-    // …and an explicit overflow sheet instead of hiding pages behind Profile.
-    expect(html).toContain('id="gl-more-btn"');
-    expect(html).toContain('id="gl-more-panel"');
-    expect(html).toContain("เพิ่มเติม");
-    // Reports/Members live in the sheet, reachable in one tap.
-    const morePanelStart = html.indexOf('id="gl-more-panel"');
-    expect(html.slice(morePanelStart)).toContain('href="#/reports"');
-    expect(html.slice(morePanelStart)).toContain('href="#/members"');
+    expect(html).toContain('href="#/profile"');
+    // No overflow sheet or more button
+    expect(html).not.toContain('id="gl-more-btn"');
+    expect(html).not.toContain('id="gl-more-panel"');
   });
 
   it("marks the active page with aria-current='page' on both navs", () => {

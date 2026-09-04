@@ -7,23 +7,24 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
-- **เป้าหมายหลัก (Goal):** แก้ไขปัญหาการพิมพ์ตัวเลขบนมือถือในหน้าบันทึกเงินถวายและการตรวจนับเงินสด ให้พิมพ์ได้ต่อเนื่อง แป้นพิมพ์ไม่เด้งออก
+- **เป้าหมายหลัก (Goal):** นำปุ่ม/แผง "เมนูเพิ่มเติม" ออกจากแถบ Navigation ล่างของมือถือ (Mobile Bottom Bar) ให้เหลือ 5 ปุ่มหลักสะอาดตา
 - **สถานะรวม (Overall Status):** `IDLE` (งานสำเร็จสมบูรณ์ 100% Green)
 - **Agent ที่กำลังทำงาน (Active Agent):** Gemini (Antigravity IDE)
-- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 14:05 (Asia/Bangkok)
+- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 14:22 (Asia/Bangkok)
 
 ---
 
 ## 2. งานที่ทำเสร็จสิ้น (Completed Tasks)
 
-- [x] แก้ไขปัญหาการพิมพ์ตัวเลขบนมือถือ (Mobile Continuous Numeric Input):
-  - สาเหตุ: ฟังก์ชันตรวจจับการพิมพ์ `input` ในหน้า `OfferingPage.ts` (`OfferingEntryForm` และ `CashCountView`) มีการเรียก `onStateChange()` / `restoreFocusAfterRender()` ซึ่งสั่ง re-render ทั้งหน้า (`root.innerHTML = ...`) ส่งผลให้ Virtual Keyboard บนเบราว์เซอร์มือถือเด้งออก/ปิดทันทีหลังพิมพ์ตัวเลข 1 ตัว
-  - แก้ไข: ปรับระบบคำนวณยอดจัดสรร, ผลรวม และ Variance ให้ใช้วิธี In-place DOM mutation ผ่านฟังก์ชัน `updateEntryFormCalculations()` และ `updateCashCountCalculations()` โดยไม่อนุญาตให้ Re-render DOM ในระหว่างพิมพ์ พร้อมใส่ `inputmode="numeric" pattern="[0-9]*"` และ `inputmode="decimal"` ครบทุกช่องตัวเลข
+- [x] นำปุ่ม "เมนูเพิ่มเติม" ออกจากแถบนำทางมือถือ (Mobile Bottom Navigation):
+  - ตัดปุ่ม `#gl-more-btn` และแผงป๊อปอัป `#gl-more-panel` ออกจาก `AppShell.ts` และ `main.ts`
+  - ปรับการจัดแถบเมนูล่างบนหน้าจอมือถือ (Mobile Composition) ให้แสดง 5 ปุ่มหลักชัดเจน: `หน้าหลัก`, `การเงิน`, `เงินถวาย`, `อนุมัติ`, `โปรไฟล์`
+  - เพิ่มลิงก์ "รายงานการเงิน" (`#/reports`) ลงในหน้า Profile ร่วมกับ กองทุน และ สมาชิก เพื่อให้เข้าถึงโมดูลรองได้อย่างสะดวก
+  - อัปเดต `tests/unit/app-shell-navigation.test.ts` ให้ครอบคลุมสถาปัตยกรรมเมนูใหม่
 - [x] รันการทดสอบและ Verification ผ่าน 100%:
   - `npm run typecheck` (0 errors)
   - `npm test` (ผ่านครบทั้ง 64 test files / 595 tests passed 100%, 0 failures)
-  - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 3.90s)
-- [x] อัปเดตบทเรียนลงใน `.brain/MEMORY.md` (หมวด 3.4: การกรอกข้อมูลตัวเลขบนมือถือ)
+  - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 2.62s)
 
 - [x] สอบถามและยืนยันขอบเขตการแก้ไขกับผู้ใช้ (เลือกแก้ไขใน `scripts/capture_*.mjs`)
 - [/] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ:

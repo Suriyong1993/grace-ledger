@@ -40,7 +40,6 @@ const ICON_REPORTS = `<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d
 const ICON_PROFILE = `<circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/>`;
 const ICON_BELL = `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`;
 const ICON_LOGOUT = `<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>`;
-const ICON_MORE = `<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>`;
 const ICON_PLUS = `<path d="M12 5v14M5 12h14"/>`;
 const ICON_CHECK = `<path d="M20 6L9 17l-5-5"/>`;
 const ICON_ALERT = `<circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>`;
@@ -134,23 +133,23 @@ function destinationsForRole(role: UserRole, approvalsBadge: number | undefined)
 }
 
 /** Mobile bottom-bar priority for content tabs (after the fixed หน้าหลัก). */
-const MOBILE_CONTENT_PRIORITY = ["offerings", "approvals", "transactions"] as const;
-
-interface MobileNavComposition {
-  tabs: NavDestination[];
-  more: NavDestination[];
-}
+const MOBILE_CONTENT_PRIORITY = [
+  "transactions",
+  "offerings",
+  "approvals",
+  "funds",
+  "reports",
+  "members",
+] as const;
 
 /**
- * Deliberate mobile composition: หน้าหลัก + up to three workflow tabs by
- * priority + a "เพิ่มเติม" sheet carrying everything else, so no reachable
- * destination ever hides behind the Profile page. Profile itself stays in the
- * topbar avatar on every width.
+ * Mobile composition: หน้าหลัก + up to 3 core workflow tabs + โปรไฟล์
+ * (Total 4-5 tabs, fits cleanly on standard 390px mobile screens without overflow sheet)
  */
 function buildMobileComposition(
   destinations: NavDestination[],
   approvalsBadge: number | undefined,
-): MobileNavComposition {
+): NavDestination[] {
   const dashboard = destinations.find((d) => d.href === "#/")!;
   const profile = destinations.find((d) => d.href === "#/profile")!;
   const contentPool = destinations.filter(
@@ -160,30 +159,17 @@ function buildMobileComposition(
   const byPriority = MOBILE_CONTENT_PRIORITY.map((key) =>
     contentPool.find((d) => d.href === `#/${key}`),
   ).filter((d): d is NavDestination => Boolean(d));
-  const leftovers = contentPool.filter((d) => !byPriority.includes(d));
 
-  const tabs: NavDestination[] = [dashboard, ...byPriority.slice(0, 3)];
-  let more = leftovers;
-  // If nothing overflows, promote hidden-but-accessible destinations so the
-  // bar never carries a "เพิ่มเติม" tab pointing at an empty sheet.
-  if (more.length === 0) {
-    const overflowCandidates = byPriority.slice(3);
-    more = overflowCandidates;
+  const leftovers = contentPool.filter((d) => !byPriority.includes(d));
+  const candidateContent = [...byPriority, ...leftovers];
+
+  const selectedContent = candidateContent.slice(0, 3);
+  const approvalsTab = selectedContent.find((d) => d.resource === "approvals");
+  if (approvalsTab && approvalsBadge !== undefined) {
+    approvalsTab.badge = approvalsBadge;
   }
-  if (more.length > 0) {
-    const approvalsTab = tabs.find((d) => d.resource === "approvals");
-    if (approvalsTab && approvalsBadge !== undefined) approvalsTab.badge = approvalsBadge;
-    tabs.push({
-      href: "#more",
-      label: "เมนูเพิ่มเติม",
-      shortLabel: "เพิ่มเติม",
-      group: "หลัก",
-      icon: ICON_MORE,
-      isActive: () => false,
-    });
-  }
-  tabs.push(profile);
-  return { tabs, more };
+
+  return [dashboard, ...selectedContent, profile];
 }
 
 function renderSidebarLink(dest: NavDestination, isActive: boolean): string {
@@ -203,15 +189,6 @@ function renderMobileNavLink(dest: NavDestination, isActive: boolean): string {
   const badge = dest.badge
     ? `<span class="gl-mobilenav__badge num-display">${dest.badge}</span>`
     : "";
-  if (dest.href === "#more") {
-    return `
-    <button type="button" id="gl-more-btn" class="gl-mobilenav__item gl-mobilenav__item--button" aria-haspopup="true" aria-expanded="false" aria-controls="gl-more-panel">
-      <span style="position: relative; display: inline-flex;">
-        ${icon(dest.icon, 22)}
-      </span>
-      <span>${dest.shortLabel}</span>
-    </button>`;
-  }
   return `
     <a href="${dest.href}" class="gl-mobilenav__item" ${isActive ? 'aria-current="page"' : ""}>
       <span style="position: relative; display: inline-flex;">
@@ -285,15 +262,6 @@ function renderAttentionPanel(attention: AttentionSummary | null | undefined): s
     </div>`;
 }
 
-function renderMorePanel(more: NavDestination[]): string {
-  if (more.length === 0) return "";
-  return `
-    <div id="gl-more-panel" class="gl-more-panel" role="dialog" aria-modal="false" aria-label="เมนูเพิ่มเติม" hidden>
-      <div class="gl-more-panel__head">เมนูเพิ่มเติม</div>
-      ${more.map((dest) => renderSidebarLink(dest, false)).join("")}
-    </div>`;
-}
-
 export function renderAppShellHtml(props: AppShellProps, contentHtml: string): string {
   const user = props.user;
   const displayName = user?.name || "ยังไม่ระบุผู้ใช้";
@@ -320,7 +288,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     can(role, "read", "transactions");
 
   const sidebarDestinations = destinationsForRole(role, approvalsBadge);
-  const { tabs: mobileTabs, more: moreDestinations } = buildMobileComposition(
+  const mobileTabs = buildMobileComposition(
     sidebarDestinations,
     approvalsBadge,
   );
@@ -597,38 +565,6 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       place-items: center;
     }
 
-    /* --- Mobile "เพิ่มเติม" sheet --- */
-    .gl-more-panel {
-      position: fixed;
-      left: var(--space-3);
-      right: var(--space-3);
-      bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-elevated);
-      padding: var(--space-2);
-      z-index: 220;
-    }
-    .gl-more-panel .gl-nav-item { color: var(--foreground); }
-    .gl-more-panel .gl-nav-item__icon { color: var(--muted-foreground); }
-    .gl-more-panel__head {
-      padding: var(--space-2) var(--space-3);
-      font-size: var(--text-2xs);
-      font-weight: var(--weight-semibold);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted-foreground);
-    }
-    .gl-mobilenav__item--button,
-    .gl-mobilenav__item--button.gl-mobilenav__item {
-      background: none;
-      border: none;
-      font-family: inherit;
-      color: inherit;
-      cursor: pointer;
-      text-decoration: none;
-    }
     .gl-mobilenav__item:focus-visible {
       outline: 2px solid var(--ring);
       outline-offset: -2px;
@@ -651,8 +587,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       .gl-shell-primary-action__short { display: inline; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .gl-attention-panel,
-      .gl-more-panel { transition: none; }
+      .gl-attention-panel { transition: none; }
     }
   </style>
 
@@ -796,7 +731,6 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     <nav class="gl-mobilenav" aria-label="เมนูหลัก">
       ${mobileTabs.map((d) => renderMobileNavLink(d, d.isActive(props.activeRoute))).join("")}
     </nav>
-    ${renderMorePanel(moreDestinations)}
   </div>
   `;
 }

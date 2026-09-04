@@ -49,7 +49,7 @@ export class ProfilePage {
 
         <!-- Quick Access Hub (Mobile Navigation to secondary modules) -->
         <div class="gl-card gl-profile__card gl-profile__card--tight">
-          <div class="kicker" style="margin-bottom: var(--space-3);">ระบบงานเพิ่มเติม</div>
+          <div class="kicker" style="margin-bottom: var(--space-3);">เมนูระบบงาน</div>
           <div class="gl-profile__links">
             <a href="#/transactions" class="gl-profile__link">
               <span class="gl-profile__link-icon" aria-hidden="true">
@@ -76,6 +76,16 @@ export class ProfilePage {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/></svg>
               </span>
               <span>ทะเบียนสมาชิกและการถวาย</span>
+              <span class="gl-profile__chevron" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>
+              </span>
+            </a>
+
+            <a href="#/reports" class="gl-profile__link">
+              <span class="gl-profile__link-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+              </span>
+              <span>รายงานการเงิน</span>
               <span class="gl-profile__chevron" aria-hidden="true">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>
               </span>
