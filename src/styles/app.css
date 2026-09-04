@@ -198,25 +198,24 @@ body {
 }
 
 .gl-card--attention {
-
-/* --------------------------------------------------------------------------
+  /* --------------------------------------------------------------------------
    HMR visual indicator (temporary)
    This block is intentionally small and reversible — it shows a fixed badge
    when the dev server is running and updates on HMR edits.
    -------------------------------------------------------------------------- */
-.hmr-indicator {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(15, 23, 42, 0.85);
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  z-index: 99999;
-  pointer-events: none;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.35);
-}
+  .hmr-indicator {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.85);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    z-index: 99999;
+    pointer-events: none;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35);
+  }
 
   border-color: var(--primary);
 }
@@ -613,7 +612,9 @@ button.gl-card:active {
   justify-content: flex-end;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--duration-component) var(--ease-out), visibility var(--duration-component) var(--ease-out);
+  transition:
+    opacity var(--duration-component) var(--ease-out),
+    visibility var(--duration-component) var(--ease-out);
 }
 
 .gl-sheet-backdrop.is-open {
@@ -703,7 +704,9 @@ button.gl-card:active {
    Ledger Table & Transaction Rows
    -------------------------------------------------------------------------- */
 .gl-txn-row {
-  transition: background var(--duration-micro) var(--ease-out), transform var(--duration-micro) var(--ease-out);
+  transition:
+    background var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
   border-radius: var(--radius-sm);
   padding-left: var(--space-2) !important;
   padding-right: var(--space-2) !important;
@@ -841,7 +844,8 @@ button.gl-card:active {
   background: var(--card);
   text-decoration: none;
   color: var(--foreground);
-  transition: background var(--duration-micro) var(--ease-out),
+  transition:
+    background var(--duration-micro) var(--ease-out),
     border-color var(--duration-micro) var(--ease-out);
 }
 
@@ -885,6 +889,7 @@ button.gl-card:active {
 }
 
 .gl-attention-row__title {
+  display: block;
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   overflow: hidden;
@@ -893,6 +898,7 @@ button.gl-card:active {
 }
 
 .gl-attention-row__meta {
+  display: block;
   font-size: var(--text-xs);
   color: var(--muted-foreground);
   overflow: hidden;
@@ -2012,7 +2018,9 @@ button.gl-card:active {
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: border-color var(--duration-micro) var(--ease-out), box-shadow var(--duration-micro) var(--ease-out);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out);
 }
 
 .gl-dash-hero::before {
@@ -2022,7 +2030,11 @@ button.gl-card:active {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 65%, #0ea5e9) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--primary) 0%,
+    color-mix(in srgb, var(--primary) 65%, #0ea5e9) 100%
+  );
 }
 
 .gl-dash-hero__value {
@@ -2553,7 +2565,6 @@ a.gl-row:focus-visible {
   box-shadow: inset 0 0 0 1px
     color-mix(in srgb, var(--sidebar-primary) 12%, transparent);
 }
-
 
 /* .gl-shell-mark / .gl-shell-avatar are owned by AppShell's own style block
    (solid --sidebar-primary on the vault chrome). The old orange-gradient
@@ -5096,4 +5107,3 @@ a {
     transition: none;
   }
 }
-

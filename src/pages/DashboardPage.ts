@@ -85,14 +85,22 @@ export class DashboardPage {
    * count comes from the shared aggregation, so the shell badge and this page
    * always agree.
    */
-  public async loadData(churchId: string, attention?: AttentionSummary): Promise<DashboardData> {
+  public async loadData(
+    churchId: string,
+    attention?: AttentionSummary,
+  ): Promise<DashboardData> {
     try {
-      const approvalsGroup = attention?.groups.find((g) => g.key === "approvals");
+      const approvalsGroup = attention?.groups.find(
+        (g) => g.key === "approvals",
+      );
       const pendingCount = approvalsGroup
         ? approvalsGroup.count
         : await (async () => {
-            const pendingRes = await this.approvalsService.getPendingApprovals(churchId);
-            return pendingRes.success && pendingRes.data ? pendingRes.data.length : 0;
+            const pendingRes =
+              await this.approvalsService.getPendingApprovals(churchId);
+            return pendingRes.success && pendingRes.data
+              ? pendingRes.data.length
+              : 0;
           })();
 
       const { data: fundsData, error: fundsError } = await (
@@ -360,16 +368,15 @@ export class DashboardPage {
     if (attention === undefined) {
       // Fallback for callers/tests without a loaded summary: derive the one
       // group this page has always known about from pendingApprovalsCount.
-      attentionBodyHtml =
-        hasPending
-          ? renderAttentionRow(
-              "approvals",
-              `คิวอนุมัติรอพิจารณา · ${data.pendingApprovalsCount} รายการ`,
-              "คำขอเบิกจ่ายรอการตรวจสอบ",
-              "#/approvals",
-              true,
-            )
-          : `<div class="gl-attention-empty" role="status">
+      attentionBodyHtml = hasPending
+        ? renderAttentionRow(
+            "approvals",
+            `คิวอนุมัติรอพิจารณา · ${data.pendingApprovalsCount} รายการ`,
+            "คำขอเบิกจ่ายรอการตรวจสอบ",
+            "#/approvals",
+            true,
+          )
+        : `<div class="gl-attention-empty" role="status">
               <span class="gl-attention-empty__icon" aria-hidden="true">${ICON_CHECK}</span>
               <span>งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง</span>
             </div>`;
@@ -431,9 +438,13 @@ export class DashboardPage {
           netDelta && prevBar
             ? `<div class="gl-dash-context__delta">
                 <span class="gl-dash-context__direction" aria-hidden="true">${
-                  deltaIsPositive ? ICON_TREND_UP : deltaIsNegative ? ICON_TREND_DOWN : ICON_TREND_UP
+                  deltaIsPositive
+                    ? ICON_TREND_UP
+                    : deltaIsNegative
+                      ? ICON_TREND_DOWN
+                      : ICON_TREND_UP
                 }</span>
-                <span class="num-display gl-dash-context__value ${deltaIsPositive ? 'gl-income' : deltaIsNegative ? 'gl-expense' : 'gl-net'}">${deltaLabel}</span>
+                <span class="num-display gl-dash-context__value ${deltaIsPositive ? "gl-income" : deltaIsNegative ? "gl-expense" : "gl-net"}">${deltaLabel}</span>
               </div>
               <p class="gl-dash-context__note">
                 ${escapeHtml(period)} สุทธิ <span class="num-display">${netIsPositive ? "+" : ""}${netMoney.format()}</span>
@@ -449,32 +460,46 @@ export class DashboardPage {
     // covers the two figures that previously had none. Income: higher is
     // better (green/up). Expense: higher is worse (red/up) — the arrow always
     // reflects the real direction the number moved, only the color inverts.
+    // A delta chip beside a ฿0.00 current figure reads as "the zero dropped by
+    // X" rather than "no transactions posted yet this month" — suppress the
+    // chip when the current figure itself is zero. The delta is still shown
+    // whenever the current figure is real, even if the delta computes to
+    // ฿0.00 (a flat month vs. last month is still meaningful).
     const prevIncomeMoney = prevBar ? parseMoneySafe(prevBar.income) : null;
-    const incomeDelta = prevIncomeMoney ? incomeMoney.subtract(prevIncomeMoney) : null;
-    const incomeDeltaHtml = incomeDelta
-      ? `<span class="gl-dash-hero__figure-delta ${incomeDelta.isPositive() ? 'gl-income' : 'gl-expense'}">
+    const incomeDelta = prevIncomeMoney
+      ? incomeMoney.subtract(prevIncomeMoney)
+      : null;
+    const incomeDeltaHtml =
+      incomeDelta && !incomeMoney.isZero()
+        ? `<span class="gl-dash-hero__figure-delta ${incomeDelta.isPositive() ? "gl-income" : "gl-expense"}">
           <span class="gl-dash-context__direction" aria-hidden="true">${incomeDelta.isPositive() ? ICON_TREND_UP : ICON_TREND_DOWN}</span>
           <span class="num-display">${incomeDelta.isPositive() ? "+" : ""}${incomeDelta.format()}</span>
         </span>`
-      : "";
+        : "";
 
     const prevExpenseMoney = prevBar ? parseMoneySafe(prevBar.expense) : null;
-    const expenseDelta = prevExpenseMoney ? expenseMoney.subtract(prevExpenseMoney) : null;
-    const expenseDeltaIsWorse = expenseDelta ? expenseDelta.isPositive() : false;
-    const expenseDeltaHtml = expenseDelta
-      ? `<span class="gl-dash-hero__figure-delta ${expenseDeltaIsWorse ? 'gl-expense' : 'gl-income'}">
+    const expenseDelta = prevExpenseMoney
+      ? expenseMoney.subtract(prevExpenseMoney)
+      : null;
+    const expenseDeltaIsWorse = expenseDelta
+      ? expenseDelta.isPositive()
+      : false;
+    const expenseDeltaHtml =
+      expenseDelta && !expenseMoney.isZero()
+        ? `<span class="gl-dash-hero__figure-delta ${expenseDeltaIsWorse ? "gl-expense" : "gl-income"}">
           <span class="gl-dash-context__direction" aria-hidden="true">${expenseDeltaIsWorse ? ICON_TREND_UP : ICON_TREND_DOWN}</span>
           <span class="num-display">${expenseDeltaIsWorse ? "+" : ""}${expenseDelta.format()}</span>
         </span>`
-      : "";
+        : "";
 
     // 2. Funds List
     const fundsHtml =
       funds.length === 0
         ? renderEmptyStateHtml({
-            message: "ยังไม่มีกองทุน เริ่มจากสร้างกองทุนแรกเพื่อแยกเงินตามวัตถุประสงค์",
+            message:
+              "ยังไม่มีกองทุน เริ่มจากสร้างกองทุนแรกเพื่อแยกเงินตามวัตถุประสงค์",
           })
-        : `<div class="gl-fundlist">
+        : `<div class="gl-card gl-fundlist">
             ${funds
               .map((f) => {
                 const target = f.targetAmount || null;
@@ -494,7 +519,7 @@ export class DashboardPage {
                 <div>
                   <div class="gl-fundrow__head">
                     <span class="gl-fundrow__name">${escapeHtml(f.name)}</span>
-                    <span class="num-display ${f.balance.isNegative() ? 'gl-expense' : 'gl-net'}">${f.balance.format()}</span>
+                    <span class="num-display ${f.balance.isNegative() ? "gl-expense" : "gl-net"}">${f.balance.format()}</span>
                   </div>
                   ${
                     hasTarget
@@ -611,7 +636,7 @@ export class DashboardPage {
                     <span class="gl-trend__bar gl-trend__bar--expense" style="height: ${expH}px;"></span>
                   </span>
                   <span class="gl-trend__label">${escapeHtml(t.monthName)}</span>
-                  <span class="gl-trend__net num-display ${t.isPositive ? 'gl-income' : 'gl-expense'}">${t.net}</span>
+                  <span class="gl-trend__net num-display ${t.isPositive ? "gl-income" : "gl-expense"}">${t.net}</span>
                   <span class="gl-visually-hidden">${escapeHtml(t.monthName)} รายรับ ${escapeHtml(t.income)} รายจ่าย ${escapeHtml(t.expense)} คงเหลือ ${escapeHtml(t.net)}</span>
                 </div>`;
               })
@@ -631,7 +656,9 @@ export class DashboardPage {
         </div>
       </section>`;
 
-    const attentionTotal = attention ? attention.totalCount : data.pendingApprovalsCount;
+    const attentionTotal = attention
+      ? attention.totalCount
+      : data.pendingApprovalsCount;
 
     // Role-gated hero quick actions — each opens the existing workflow.
     const heroActionsHtml = [
@@ -655,23 +682,25 @@ export class DashboardPage {
       .join("");
 
     const displayName = activeUser?.name || "";
-    const userRoleLabel = activeUser?.role === "pastor"
-      ? "ศิษยาภิบาล"
-      : activeUser?.role === "treasurer"
-        ? "เหรัญญิก"
-        : activeUser?.role === "counter"
-          ? "ผู้นับเงิน"
-          : activeUser?.role === "super_admin"
-            ? "ผู้ตรวจสอบบัญชี"
-            : "";
+    const userRoleLabel =
+      activeUser?.role === "pastor"
+        ? "ศิษยาภิบาล"
+        : activeUser?.role === "treasurer"
+          ? "เหรัญญิก"
+          : activeUser?.role === "counter"
+            ? "ผู้นับเงิน"
+            : activeUser?.role === "super_admin"
+              ? "ผู้ตรวจสอบบัญชี"
+              : "";
 
     const greetingTitle = displayName
       ? `สวัสดีครับ ${escapeHtml(displayName)}${userRoleLabel ? ` · ${escapeHtml(userRoleLabel)}` : ""}`
       : "ระบบบันทึกบัญชีคริสตจักร Grace Ledger";
 
-    const aiGreetingMessage = attentionTotal > 0
-      ? `สัปดาห์นี้มีงานสำคัญ <strong>${attentionTotal} รายการ</strong> ที่รอการดำเนินการของคุณ`
-      : `ระบบการเงินเป็นระเบียบเรียบร้อย ไม่มีรายการค้างที่ต้องดำเนินการ`;
+    const aiGreetingMessage =
+      attentionTotal > 0
+        ? `สัปดาห์นี้มีงานสำคัญ <strong>${attentionTotal} รายการ</strong> ที่รอการดำเนินการของคุณ`
+        : `ระบบการเงินเป็นระเบียบเรียบร้อย ไม่มีรายการค้างที่ต้องดำเนินการ`;
 
     const aiGreetingHtml = `
       <div class="gl-ai-greeting" role="region" aria-label="ข้อความจาก Grace AI">
@@ -724,7 +753,7 @@ export class DashboardPage {
             <div class="gl-dash-hero__figures">
               <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong>${incomeDeltaHtml}</span>
               <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong>${expenseDeltaHtml}</span>
-              <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display ${netIsPositive ? 'gl-income' : netMoney.isNegative() ? 'gl-expense' : 'gl-net'}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
+              <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display ${netIsPositive ? "gl-income" : netMoney.isNegative() ? "gl-expense" : "gl-net"}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
             </div>
 
             ${heroActionsHtml ? `<div class="gl-dash-hero__actions">${heroActionsHtml}</div>` : ""}
