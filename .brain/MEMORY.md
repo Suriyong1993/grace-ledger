@@ -79,6 +79,11 @@
   - จำนวนนับธนบัตร (จำนวนเต็ม): `type="number" inputmode="numeric" pattern="[0-9]*"`
   - ยอดเงิน/เหรียญ (มีทศนิยม): `type="number" step="0.01" inputmode="decimal"`
 
+### 🔤 3.5 การตัดข้อความ (Text Truncation & Overflow Ellipsis)
+- **หลุมพราง:** การใช้ `overflow: hidden; text-overflow: ellipsis; white-space: nowrap;` บนองค์ประกอบที่เป็น Inline element เช่น `<span>` (เช่น `.gl-row__title`, `.gl-row__meta`) จะไม่มีผลตามมาตรฐาน CSS ทำให้ข้อความยาวไหลทะลุไปทับ element อื่นด้านขวา
+- **วิธีแก้:** ต้องกำหนด `display: block;` (หรือ `inline-block`) ให้กับคลาสนั้นเสมอ จึงจะตัดคำและแสดง `...` (ellipsis) ได้อย่างถูกต้อง
+- **กล่องยอดเงิน (.gl-row__end):** ควรจัดเป็น Flex column (`display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1);`) เพื่อแยกยอดเงินไว้ด้านบนและ Badge สถานะไว้ด้านล่างอย่างเป็นสัดส่วน
+
 ---
 
 ## 4. ตัวตนและชื่อทางการของคริสตจักร (Canonical Identity & Governance Roster)
