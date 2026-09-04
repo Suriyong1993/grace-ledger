@@ -312,13 +312,15 @@ button.gl-card:active {
   color: var(--foreground);
 }
 
-.gl-btn--destructive {
+.gl-btn--destructive,
+.gl-btn--danger {
   background: var(--card);
   border-color: var(--border);
   color: var(--destructive);
 }
 
-.gl-btn--destructive:hover:not(:disabled) {
+.gl-btn--destructive:hover:not(:disabled),
+.gl-btn--danger:hover:not(:disabled) {
   background: var(--expense-muted);
   border-color: var(--destructive);
 }
@@ -3562,6 +3564,1419 @@ a {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Attention Panel — grouped pending-work list with loading/empty/hint states
+   ========================================================================== */
+.gl-attention-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.gl-attention-panel__loading,
+.gl-attention-panel__empty,
+.gl-attention-panel__hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.gl-attention-panel__loading {
+  display: grid;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.gl-attention-panel__empty {
+  gap: var(--space-3);
+}
+
+.gl-attention-panel__hint {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  padding: var(--space-3) var(--space-4);
+  background: var(--secondary);
+  border-top: 1px solid var(--border);
+}
+
+.gl-attention-panel__group {
+  display: flex;
+  flex-direction: column;
+}
+
+.gl-attention-panel__group + .gl-attention-panel__group {
+  border-top: 1px solid var(--border);
+}
+
+.gl-attention-panel__group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.gl-attention-panel__group-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.gl-attention-panel__group-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+}
+
+.gl-attention-panel__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  color: var(--foreground);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-attention-panel__item:hover {
+  background: var(--accent);
+}
+
+.gl-attention-panel__item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-attention-panel__item + .gl-attention-panel__item {
+  border-top: 1px solid var(--border);
+}
+
+.gl-attention-panel__item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-attention-panel__item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.gl-attention-panel__item-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-attention-panel__item-meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-attention-panel__more-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--primary);
+  text-decoration: none;
+  border-top: 1px solid var(--border);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-attention-panel__more-link:hover {
+  background: var(--secondary);
+}
+
+.gl-attention-panel__more-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-attention-panel__item,
+  .gl-attention-panel__more-link {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   More Panel — overflow menu / additional actions panel
+   ========================================================================== */
+.gl-more-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+}
+
+.gl-more-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--secondary);
+}
+
+.gl-more-panel__head h3 {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  margin: 0;
+  color: var(--foreground);
+}
+
+/* ==========================================================================
+   Shell — topbar, icon buttons, primary action, bell badge, mark, avatar
+   ========================================================================== */
+.gl-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  height: var(--gl-topbar-h);
+  padding: 0 var(--space-4);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.gl-shell-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    color var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-shell-icon-btn:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+.gl-shell-icon-btn:active {
+  transform: scale(0.96);
+}
+
+.gl-shell-icon-btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-shell-primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-button);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-shell-primary-action:hover {
+  background: var(--primary-dark);
+}
+
+.gl-shell-primary-action:active {
+  transform: scale(0.97);
+}
+
+.gl-shell-primary-action:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.gl-shell-bell-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+
+.gl-shell-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+.gl-shell-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-shell-avatar:hover {
+  transform: scale(1.05);
+}
+
+.gl-shell-avatar:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.gl-sidebar__dim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgb(0 0 0 / 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--duration-component) var(--ease-out),
+    visibility var(--duration-component) var(--ease-out);
+}
+
+.gl-sidebar__dim.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-shell-icon-btn,
+  .gl-shell-primary-action,
+  .gl-shell-avatar,
+  .gl-sidebar__dim {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Avatar — circular identity mark
+   ========================================================================== */
+.gl-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.gl-avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--text-xs);
+}
+
+.gl-avatar--lg {
+  width: 56px;
+  height: 56px;
+  font-size: var(--text-xl);
+}
+
+/* ==========================================================================
+   Modal — container + close button
+   ========================================================================== */
+.gl-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-dialog);
+  box-shadow: var(--shadow-elevated);
+}
+
+.gl-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-size: var(--text-md);
+  line-height: 1;
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    color var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-modal-close:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+.gl-modal-close:active {
+  transform: scale(0.96);
+}
+
+.gl-modal-close:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+/* ==========================================================================
+   Dropdown — popup menu container and items
+   ========================================================================== */
+.gl-dropdown {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: var(--space-1);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+}
+
+.gl-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-dropdown-item:hover {
+  background: var(--accent);
+}
+
+.gl-dropdown-item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-dropdown-item[aria-disabled="true"] {
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Table — header + row variants
+   ========================================================================== */
+.gl-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--secondary);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.gl-table-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-table-row:hover {
+  background: var(--accent);
+}
+
+.gl-table-row:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+.gl-pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+}
+
+.gl-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    border-color var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out);
+}
+
+.gl-pagination__btn:hover:not(:disabled) {
+  background: var(--secondary);
+  border-color: var(--primary);
+}
+
+.gl-pagination__btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.gl-pagination__btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.gl-pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gl-pagination__btn.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* ==========================================================================
+   Tabs — tab container
+   ========================================================================== */
+.gl-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ==========================================================================
+   Accordion
+   ========================================================================== */
+.gl-accordion {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.gl-accordion__item + .gl-accordion__item {
+  border-top: 1px solid var(--border);
+}
+
+.gl-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: var(--card);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-accordion__trigger:hover {
+  background: var(--secondary);
+}
+
+.gl-accordion__trigger:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-accordion__panel {
+  padding: var(--space-3) var(--space-4);
+  background: var(--background);
+  border-top: 1px solid var(--border);
+}
+
+/* ==========================================================================
+   Tooltip
+   ========================================================================== */
+.gl-tooltip {
+  position: relative;
+}
+
+.gl-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: var(--space-1) var(--space-2);
+  background: var(--foreground);
+  color: var(--background);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--duration-micro) var(--ease-out),
+    transform var(--duration-micro) var(--ease-out),
+    visibility var(--duration-micro) var(--ease-out);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.gl-tooltip:hover::after,
+.gl-tooltip:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-tooltip::after {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Progress bar — alias for .gl-progress with semantic color support
+   ========================================================================== */
+.gl-progress-bar {
+  height: var(--space-1);
+  background: var(--secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.gl-progress-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--gl-progress-fill, var(--primary));
+  transform-origin: left center;
+  animation: glFillGrow var(--duration-page) var(--ease-out) both;
+}
+
+/* ==========================================================================
+   Button group
+   ========================================================================== */
+.gl-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.gl-btn-group > .gl-btn {
+  border-radius: 0;
+}
+
+.gl-btn-group > .gl-btn:first-child {
+  border-radius: var(--radius-button) 0 0 var(--radius-button);
+}
+
+.gl-btn-group > .gl-btn:last-child {
+  border-radius: 0 var(--radius-button) var(--radius-button) 0;
+}
+
+.gl-btn-group > .gl-btn + .gl-btn {
+  border-left: 0;
+}
+
+/* ==========================================================================
+   Form — group, error, hint, input group, input icon
+   ========================================================================== */
+.gl-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.gl-form-error {
+  font-size: var(--text-xs);
+  color: var(--destructive);
+  font-weight: var(--weight-medium);
+}
+
+.gl-form-hint {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-input-group {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.gl-input-group > .gl-input,
+.gl-input-group > .gl-select {
+  border-radius: 0;
+  flex: 1;
+}
+
+.gl-input-group > .gl-input:first-child,
+.gl-input-group > .gl-select:first-child {
+  border-radius: var(--radius-input) 0 0 var(--radius-input);
+}
+
+.gl-input-group > .gl-input:last-child,
+.gl-input-group > .gl-select:last-child {
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
+}
+
+.gl-input-group > * + * {
+  border-left: 0;
+}
+
+.gl-input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-3);
+  background: var(--secondary);
+  border: 1px solid var(--input);
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-input-icon:first-child {
+  border-radius: var(--radius-input) 0 0 var(--radius-input);
+}
+
+.gl-input-icon:last-child {
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
+}
+
+/* ==========================================================================
+   Status badge — semantic status indicator
+   ========================================================================== */
+.gl-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.gl-status-badge--income {
+  background: var(--income-muted);
+  color: var(--on-income-muted);
+}
+
+.gl-status-badge--expense {
+  background: var(--expense-muted);
+  color: var(--on-expense-muted);
+}
+
+.gl-status-badge--pending {
+  background: var(--pending-muted);
+  color: var(--on-pending-muted);
+}
+
+.gl-status-badge--neutral {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+/* ==========================================================================
+   Empty state — icon, title, description, action
+   ========================================================================== */
+.gl-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.gl-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--text-2xl);
+}
+
+.gl-empty-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.gl-empty-description {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  max-width: 40ch;
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+.gl-empty-action {
+  margin-top: var(--space-2);
+}
+
+/* ==========================================================================
+   Card — header, body, footer
+   ========================================================================== */
+.gl-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.gl-card-header h3 {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  margin: 0;
+  color: var(--foreground);
+}
+
+.gl-card-body {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.gl-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--border);
+  background: var(--secondary);
+}
+
+/* ==========================================================================
+   Stat card — KPI display with semantic variants
+   ========================================================================== */
+.gl-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.gl-stat-card__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.gl-stat-card__value {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-heading);
+  color: var(--foreground);
+}
+
+.gl-stat-card__hint {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.gl-stat-card--income .gl-stat-card__value {
+  color: var(--income);
+}
+
+.gl-stat-card--expense .gl-stat-card__value {
+  color: var(--expense);
+}
+
+.gl-stat-card--pending .gl-stat-card__value {
+  color: var(--pending);
+}
+
+.gl-stat-card--neutral .gl-stat-card__value {
+  color: var(--foreground);
+}
+
+/* ==========================================================================
+   KPI grid
+   ========================================================================== */
+.gl-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .gl-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 390px) {
+  .gl-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Fund grid
+   ========================================================================== */
+.gl-fund-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .gl-fund-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Transaction list
+   ========================================================================== */
+.gl-txn-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ==========================================================================
+   Approval queue
+   ========================================================================== */
+.gl-approval-queue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ==========================================================================
+   Offering session
+   ========================================================================== */
+.gl-offering-session {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ==========================================================================
+   Member directory
+   ========================================================================== */
+.gl-member-directory {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .gl-member-directory {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Report chart
+   ========================================================================== */
+.gl-report-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ==========================================================================
+   Profile form
+   ========================================================================== */
+.gl-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 560px;
+}
+
+/* ==========================================================================
+   Login card
+   ========================================================================== */
+.gl-login-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-6);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 390px) {
+  .gl-login-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-md);
+  }
+}
+
+/* ==========================================================================
+   PIN pad — numeric entry for authentication
+   ========================================================================== */
+.gl-pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.gl-pin-digit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-pin-digit--filled {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+@media (max-width: 390px) {
+  .gl-pin-digit {
+    height: 48px;
+    font-size: var(--text-xl);
+  }
+}
+
+/* ==========================================================================
+   Onboarding — first-run experience
+   ========================================================================== */
+.gl-onboarding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Rise stagger — entrance animation with delay
+   ========================================================================== */
+.gl-rise-stagger {
+  animation: glRiseIn var(--duration-component) var(--ease-out) both;
+  animation-delay: calc(var(--gl-rise-delay, 0ms) * var(--gl-rise-index, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-rise-stagger {
+    animation-delay: 0ms !important;
+  }
+}
+
+/* ==========================================================================
+   Attention row — attention variant
+   ========================================================================== */
+.gl-attention-row--attention {
+  border-color: var(--pending);
+  background: color-mix(in srgb, var(--pending-muted) 30%, var(--card));
+}
+
+.gl-attention-row--attention:hover {
+  background: color-mix(in srgb, var(--pending-muted) 50%, var(--card));
+}
+
+/* ==========================================================================
+   Responsive utilities
+   ========================================================================== */
+@media (max-width: 390px) {
+  .gl-btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-xs);
+  }
+
+  .gl-card {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+  }
+
+  .gl-input,
+  .gl-select,
+  .gl-textarea {
+    min-height: 44px;
+    font-size: var(--text-sm);
+  }
+
+  .gl-page-header h1 {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .gl-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gl-fund-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .gl-page {
+    padding: var(--space-6) var(--space-8) var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-modal-close,
+  .gl-dropdown-item,
+  .gl-pagination__btn,
+  .gl-accordion__trigger,
+  .gl-table-row,
+  .gl-rise-stagger {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Nav item — sidebar navigation entry
+   ========================================================================== */
+.gl-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--sidebar-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-micro) var(--ease-out),
+    color var(--duration-micro) var(--ease-out);
+}
+
+.gl-nav-item:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+}
+
+.gl-nav-item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.gl-nav-item--active {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+  font-weight: var(--weight-semibold);
+}
+
+.gl-nav-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--sidebar-icon);
+}
+
+.gl-nav-item--active .gl-nav-item__icon {
+  color: var(--sidebar-primary);
+}
+
+.gl-nav-item__badge {
+  margin-left: auto;
+  background: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-nav-item {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Tag — semantic color variants
+   ========================================================================== */
+.gl-tag--success {
+  background: var(--income-muted);
+  border-color: var(--income);
+  color: var(--on-income-muted);
+}
+
+.gl-tag--warning {
+  background: var(--pending-muted);
+  border-color: var(--pending);
+  color: var(--on-pending-muted);
+}
+
+.gl-tag--danger {
+  background: var(--expense-muted);
+  border-color: var(--expense);
+  color: var(--on-expense-muted);
+}
+
+.gl-tag--info {
+  background: var(--secondary);
+  border-color: var(--info);
+  color: var(--info);
+}
+
+.gl-tag--neutral {
+  background: var(--muted);
+  border-color: var(--border);
+  color: var(--muted-foreground);
+}
+
+/* ==========================================================================
+   Spinner — loading indicator
+   ========================================================================== */
+.gl-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: var(--radius-full);
+  animation: glSpin 1s linear infinite;
+}
+
+.gl-spinner--sm {
+  width: 16px;
+  height: 16px;
+  border-width: 1.5px;
+}
+
+.gl-spinner--lg {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-spinner {
+    animation: none;
+    border-color: var(--border);
+    border-top-color: var(--primary);
+  }
+}
+
+/* ==========================================================================
+   Notice — info variant
+   ========================================================================== */
+.gl-notice--info {
+  background: var(--secondary);
+  border-color: var(--info);
+  color: var(--info);
+}
+
+/* ==========================================================================
+   Divider — vertical and horizontal
+   ========================================================================== */
+.gl-divider--vertical {
+  width: 1px;
+  height: auto;
+  margin: 0 var(--space-3);
+  border: 0;
+  background: var(--border);
+}
+
+/* ==========================================================================
+   Fund row — progress variant
+   ========================================================================== */
+.gl-fundrow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    background-color var(--duration-micro) var(--ease-out);
+}
+
+.gl-fundrow:hover {
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+}
+
+.gl-fundrow__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.gl-fundrow__name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gl-fundrow__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-fundrow {
+    transition: none;
   }
 }
 

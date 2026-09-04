@@ -3,7 +3,8 @@ import { Database } from "../lib/supabase/types";
 import { OfferingService } from "../lib/offering/offering-service";
 import { OfferingSession, OfferingPaymentChannel, CashDenominations } from "../lib/offering/types";
 import { Money } from "../lib/money";
-import { restoreFocusAfterRender } from "../lib/ui/focus";
+import { DenominationEngine } from "../lib/offering/denomination-engine";
+import { VarianceEngine } from "../lib/offering/variance-engine";
 import { router } from "../router";
 import {
   FundOption,
@@ -475,7 +476,7 @@ export class OfferingPage {
         const target = e.target as HTMLInputElement;
         this.formState.rawAmounts.cash = target.value;
         this.formState.channels.cash = this.parseAmountSafe(target.value);
-        restoreFocusAfterRender(target, onStateChange);
+        this.updateEntryFormCalculations(rootElement);
       });
     }
 
@@ -485,7 +486,7 @@ export class OfferingPage {
         const target = e.target as HTMLInputElement;
         this.formState.rawAmounts.transfer = target.value;
         this.formState.channels.transfer = this.parseAmountSafe(target.value);
-        restoreFocusAfterRender(target, onStateChange);
+        this.updateEntryFormCalculations(rootElement);
       });
     }
 
@@ -495,7 +496,7 @@ export class OfferingPage {
         const target = e.target as HTMLInputElement;
         this.formState.rawAmounts.qr = target.value;
         this.formState.channels.qr = this.parseAmountSafe(target.value);
-        restoreFocusAfterRender(target, onStateChange);
+        this.updateEntryFormCalculations(rootElement);
       });
     }
 
@@ -557,7 +558,7 @@ export class OfferingPage {
         if (row) {
           row.rawAmount = target.value;
           row.amount = this.parseAmountSafe(target.value);
-          restoreFocusAfterRender(target, onStateChange, `.input-row-amount[data-row-id="${rowId}"]`);
+          this.updateEntryFormCalculations(rootElement);
         }
       });
     });
@@ -652,8 +653,14 @@ export class OfferingPage {
         const key = target.dataset.denom as keyof CashDenominations;
         if (key && key !== "coins") {
           const val = parseInt(target.value, 10);
-          (this.cashCountState.denominations as any)[key] = isNaN(val) || val < 0 ? 0 : val;
-          onStateChange();
+          const cleanVal = isNaN(val) || val < 0 ? 0 : val;
+          (this.cashCountState.denominations as any)[key] = cleanVal;
+          const rowEl = target.closest(".gl-denom-row");
+          const minusBtn = rowEl?.querySelector<HTMLButtonElement>('.btn-denom-step[data-action="minus"]');
+          if (minusBtn) {
+            minusBtn.disabled = cleanVal <= 0;
+          }
+          this.updateCashCountCalculations(rootElement);
         }
       });
     });
@@ -666,12 +673,23 @@ export class OfferingPage {
         const key = btn?.dataset.denom as keyof CashDenominations;
         if (key && key !== "coins") {
           const current = (this.cashCountState.denominations as any)[key] || 0;
+          let next = current;
           if (action === "plus") {
-            (this.cashCountState.denominations as any)[key] = current + 1;
+            next = current + 1;
           } else if (action === "minus") {
-            (this.cashCountState.denominations as any)[key] = Math.max(0, current - 1);
+            next = Math.max(0, current - 1);
           }
-          onStateChange();
+          (this.cashCountState.denominations as any)[key] = next;
+          const rowEl = btn.closest(".gl-denom-row");
+          const inputEl = rowEl?.querySelector<HTMLInputElement>(`.input-denom-count[data-denom="${key}"]`);
+          if (inputEl) {
+            inputEl.value = next > 0 ? String(next) : "";
+          }
+          const minusBtn = rowEl?.querySelector<HTMLButtonElement>('.btn-denom-step[data-action="minus"]');
+          if (minusBtn) {
+            minusBtn.disabled = next <= 0;
+          }
+          this.updateCashCountCalculations(rootElement);
         }
       });
     });
@@ -681,8 +699,8 @@ export class OfferingPage {
     if (coinsInput) {
       coinsInput.addEventListener("input", (e) => {
         const val = (e.target as HTMLInputElement).value;
-        this.cashCountState.denominations.coins = val ? Money.from(val) : Money.zero();
-        onStateChange();
+        this.cashCountState.denominations.coins = this.parseAmountSafe(val);
+        this.updateCashCountCalculations(rootElement);
       });
     }
 
@@ -1118,6 +1136,145 @@ export class OfferingPage {
     }
   }
 
+
+  private updateEntryFormCalculations(rootElement: HTMLElement): void {
+    const grandExpected = this.formState.channels.cash
+      .add(this.formState.channels.transfer)
+      .add(this.formState.channels.qr);
+
+    const allocCash = this.formState.allocations
+      .filter((a) => a.channel === "cash")
+      .reduce((acc, a) => acc.add(a.amount), Money.zero());
+
+    const allocTransfer = this.formState.allocations
+      .filter((a) => a.channel === "bank_transfer")
+      .reduce((acc, a) => acc.add(a.amount), Money.zero());
+
+    const allocQr = this.formState.allocations
+      .filter((a) => a.channel === "qr_code")
+      .reduce((acc, a) => acc.add(a.amount), Money.zero());
+
+    const totalAllocated = allocCash.add(allocTransfer).add(allocQr);
+
+    const diffCash = allocCash.subtract(this.formState.channels.cash);
+    const diffTransfer = allocTransfer.subtract(this.formState.channels.transfer);
+    const diffQr = allocQr.subtract(this.formState.channels.qr);
+
+    const isCashMatch = diffCash.isZero();
+    const isTransferMatch = diffTransfer.isZero();
+    const isQrMatch = diffQr.isZero();
+    const isAllAllocMatched =
+      isCashMatch && isTransferMatch && isQrMatch && !grandExpected.isZero();
+
+    const grandExpectedEl = rootElement.querySelector<HTMLElement>('[data-entry="grand-expected"]');
+    if (grandExpectedEl) {
+      grandExpectedEl.textContent = grandExpected.format();
+    }
+
+    const cashStatusEl = rootElement.querySelector<HTMLElement>('[data-entry="alloc-cash-status"]');
+    if (cashStatusEl) {
+      cashStatusEl.textContent = `${allocCash.format()}${allocCash.isZero() ? "" : !isCashMatch ? ` · ต่าง ${diffCash.format()}` : ""}`;
+      cashStatusEl.style.color = allocCash.isZero() ? "var(--muted-foreground)" : isCashMatch ? "var(--income)" : "var(--pending)";
+    }
+
+    const transferStatusEl = rootElement.querySelector<HTMLElement>('[data-entry="alloc-transfer-status"]');
+    if (transferStatusEl) {
+      transferStatusEl.textContent = `${allocTransfer.format()}${allocTransfer.isZero() ? "" : !isTransferMatch ? ` · ต่าง ${diffTransfer.format()}` : ""}`;
+      transferStatusEl.style.color = allocTransfer.isZero() ? "var(--muted-foreground)" : isTransferMatch ? "var(--income)" : "var(--pending)";
+    }
+
+    const qrStatusEl = rootElement.querySelector<HTMLElement>('[data-entry="alloc-qr-status"]');
+    if (qrStatusEl) {
+      qrStatusEl.textContent = `${allocQr.format()}${allocQr.isZero() ? "" : !isQrMatch ? ` · ต่าง ${diffQr.format()}` : ""}`;
+      qrStatusEl.style.color = allocQr.isZero() ? "var(--muted-foreground)" : isQrMatch ? "var(--income)" : "var(--pending)";
+    }
+
+    const noticeEl = rootElement.querySelector<HTMLElement>('[data-entry="summary-notice"]');
+    const noticeBodyEl = rootElement.querySelector<HTMLElement>('[data-entry="summary-notice-body"]');
+    const noticeAmountEl = rootElement.querySelector<HTMLElement>('[data-entry="summary-notice-amount"]');
+    if (noticeEl && noticeBodyEl && noticeAmountEl) {
+      if (totalAllocated.isZero() && grandExpected.isZero()) {
+        noticeEl.className = "gl-notice";
+        noticeBodyEl.textContent = "กรอกยอดตามช่องทาง แล้วจัดสรรเข้ากองทุนให้ครบ";
+        noticeAmountEl.style.display = "none";
+      } else {
+        noticeEl.className = `gl-notice ${isAllAllocMatched ? "gl-notice--success" : "gl-notice--warning"}`;
+        noticeBodyEl.textContent = isAllAllocMatched
+          ? "ยอดจัดสรรถูกต้องตรงตามช่องทางทั้งหมด"
+          : "ยอดจัดสรรกองทุนยังไม่ตรงกับยอดตามช่องทาง";
+        noticeAmountEl.textContent = `รวมจัดสรร: ${totalAllocated.format()} / คาดหวัง: ${grandExpected.format()}`;
+        noticeAmountEl.style.display = "";
+      }
+    }
+  }
+
+  private updateCashCountCalculations(rootElement: HTMLElement): void {
+    if (!this.selectedSession) return;
+    const session = this.selectedSession;
+
+    const denomResult = DenominationEngine.calculateTotal({
+      b1000: this.cashCountState.denominations.b1000,
+      b500: this.cashCountState.denominations.b500,
+      b100: this.cashCountState.denominations.b100,
+      b50: this.cashCountState.denominations.b50,
+      b20: this.cashCountState.denominations.b20,
+      coins: this.cashCountState.denominations.coins,
+    });
+
+    const actualCash = denomResult.grandTotal;
+    const expectedCash = session.expectedCashAmount;
+
+    const varianceResult = VarianceEngine.calculateCashVariance(
+      expectedCash,
+      actualCash,
+    );
+    const varianceAmount = varianceResult.varianceAmount;
+    const isMatch = varianceResult.isZeroMatch;
+    const isShortage = varianceResult.isShortage;
+
+    const varianceStat = isMatch
+      ? { head: "ยอดเงินสดตรวจนับตรงสมบูรณ์" }
+      : isShortage
+        ? { head: "ยอดเงินสดตรวจนับขาด" }
+        : { head: "ยอดเงินสดตรวจนับเกิน" };
+
+    const keys: Array<"b1000" | "b500" | "b100" | "b50" | "b20"> = ["b1000", "b500", "b100", "b50", "b20"];
+    keys.forEach((k) => {
+      const el = rootElement.querySelector<HTMLElement>(`[data-denom-total="${k}"]`);
+      if (el) el.textContent = denomResult.breakdown[k].total.format();
+    });
+    const coinsEl = rootElement.querySelector<HTMLElement>('[data-denom-total="coins"]');
+    if (coinsEl) coinsEl.textContent = denomResult.coinTotal.format();
+
+    const topKickerEl = rootElement.querySelector<HTMLElement>('[data-cashcount="top-kicker"]');
+    if (topKickerEl) topKickerEl.textContent = varianceStat.head;
+
+    const topVarianceEl = rootElement.querySelector<HTMLElement>('[data-cashcount="top-variance"]');
+    if (topVarianceEl) {
+      topVarianceEl.textContent = varianceAmount.format({ showSign: true });
+      topVarianceEl.style.color = isMatch
+        ? "var(--income)"
+        : isShortage
+          ? "var(--expense)"
+          : "var(--pending)";
+    }
+
+    const topActualEl = rootElement.querySelector<HTMLElement>('[data-cashcount="top-actual"]');
+    if (topActualEl) topActualEl.textContent = actualCash.format();
+
+    const bottomActualEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-actual"]');
+    if (bottomActualEl) bottomActualEl.textContent = actualCash.format();
+
+    const bottomNoticeEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-notice"]');
+    if (bottomNoticeEl) {
+      bottomNoticeEl.className = `gl-notice ${isMatch ? "gl-notice--success" : isShortage ? "gl-notice--error" : "gl-notice--warning"}`;
+    }
+    const bottomHeadEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-notice-head"]');
+    if (bottomHeadEl) bottomHeadEl.textContent = varianceStat.head;
+
+    const bottomNoticeAmountEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-notice-amount"]');
+    if (bottomNoticeAmountEl) bottomNoticeAmountEl.textContent = varianceAmount.format({ showSign: true });
+  }
 
   /**
    * Amount inputs hold free-typed text; partial values like "5." or "5e"

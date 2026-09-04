@@ -21,6 +21,9 @@
 - **Split Immutability Guard**:
   Trigger `trg_enforce_split_immutability` จะบล็อกการ INSERT/UPDATE/DELETE split โดยตรงทันทีหากสถานะของ Parent Transaction ไม่ใช่ `draft`
 
+### ⚠️ 1.2 Supabase PostgREST Query Methods
+- Supabase JS Client ใช้ `.in("column", values)` ในการ filter หลายค่า **ห้ามใช้ `.in_()`** เด็ดขาด (มิฉะนั้นจะ throw TypeError runtime error ทำให้ `loadData` ล้มเหลวและหน้า UI ตกไปที่ Error State)
+
 ---
 
 ## 2. กฎความปลอดภัยทางการเงิน (Financial Safety Invariants)
@@ -68,6 +71,13 @@
 - ภาษาไทยกระชับ เป็นธรรมชาติของมนุษย์ ไม่แปลตรงตัวแบบ AI
 - ห้ามใช้คำศัพท์เทคนิคภายในบนหน้าจอ เช่น "Slice 3", "Screen 06", "PostgreSQL 17", "(Status: draft)"
 - ห้ามใช้ข้อความสองภาษาปนกัน เช่น "จัดการผลต่าง (Variance Resolution)" ให้เลือกใช้ภาษาไทยที่สละสลวย
+
+### 📱 3.4 การกรอกข้อมูลตัวเลขบนมือถือ (Mobile Continuous Numeric Input)
+- **หลุมพราง:** การสั่ง `onStateChange()` หรือ `restoreFocusAfterRender()` ในระหว่าง `input` event จะทำให้ DOM element ถูกทำลายและเรนเดอร์ใหม่ทั้งหน้า (`innerHTML = ...`) ส่งผลให้ Virtual Keyboard บนมือถือ (iOS Safari / Android Chrome) ยุบ/เด้งออกทันทีหลังพิมพ์ตัวเลขเพียงตัวเดียว
+- **กฎเหล็ก:** ห้าม full re-render บน continuous `input` events เด็ดขาด ให้ใช้ In-place DOM mutation อัปเดตเฉพาะจุด (เช่น element ที่มี `data-entry` หรือ `data-denom-total`) ควบคู่กับการเก็บค่าลง state ในหน่วยความจำ
+- **Attributes สำหรับ Numeric Inputs:**
+  - จำนวนนับธนบัตร (จำนวนเต็ม): `type="number" inputmode="numeric" pattern="[0-9]*"`
+  - ยอดเงิน/เหรียญ (มีทศนิยม): `type="number" step="0.01" inputmode="decimal"`
 
 ---
 

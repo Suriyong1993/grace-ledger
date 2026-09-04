@@ -1,122 +1,418 @@
-# DESIGN.md — Grace Ledger visual contract
+# Grace Ledger — Design System
 
-> Target path: repo root, `DESIGN.md` (new file). Source of truth for every visual value in the product.
-> Read this before writing any CSS or inline style. If a value you need is not here, it does not exist yet —
-> add it deliberately and record why in `DECISIONS.md`, do not invent it inline.
+Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, brass accents. Church financial OS. Thai-first. Money is the product — every UI decision protects the number.
 
-## Hierarchy — where to look first
+## Governing Principle
 
-```
-1. design-system-extracted/tokens/*.css   VALUES   — colors, type scale, spacing, radius, shadow, motion
-2. src/styles/app.css                      CLASSES  — every .gl-* primitive/composite + shell + responsive rules
-3. src/components/shared/*.ts (future)     HELPERS  — render*Html for patterns that need logic (status, row, empty)
-4. feature stylesheets (loginStyles.ts,
-   aiDrawerStyles.ts)                      Only for a surface with its own shell (login, AI drawer)
-5. inline style=""                         LAYOUT ONLY — flex/grid/gap/min-width. Never color, radius, shadow, font-size.
-```
+**"เรียบ สุขุม, แม่นยำ"** (Calm, Refined, Exact) — three words that define every choice. No decoration serves the eye at the expense of the number. If a screen shows money, the money is the most legible thing on it. The interface recedes; the work surfaces.
 
-If you are about to write a color, a pixel radius, a shadow, or a font-size as a literal in a `.ts` file:
-stop. Either the token already exists (use it) or it doesn't (this is a design decision — record it).
+---
 
-## Colors
+## Identity
 
-**Emerald Vault (2026-09).** Porcelain background (`--gl-bg` `#F4F5F2`), white cards, ink-green text
-(`--gl-ink` `#14201A`), deep-evergreen brand (`--gl-evergreen-800` `#14532D`) for the primary CTA / active
-nav / focus ring, and a brass accent (`--gl-brass-500` `#B45309`) for secondary highlights. Neither brand nor
-accent is ever a large background fill, a data value, a progress bar, or a number. The desktop sidebar is the
-identity's signature "vault": dark evergreen chrome (`--sidebar` `#0B1F17`) over the porcelain workspace.
-Finance meaning is fixed and exclusive: emerald = income/approved, red = expense/rejected, amber =
-offering/pending. Max two background colors per screen.
+| Aspect | Choice | Rationale |
+|---|---|---|
+| Brand color | Deep evergreen `#14532D` | Church — sacred, trustworthy, not corporate-blue |
+| Accent | Brass `#B45309` | Warm offering/attention, never primary |
+| Income | Emerald `#0D9273` | Credit/positive — fixed, never reused |
+| Expense | Red `#D92D20` | Debit/negative — fixed, never reused |
+| Pending | Amber `#d97706` | Attention/warning — fixed, never reused |
+| Background | Porcelain `#F4F5F2` | Warm near-white, soft on elderly eyes |
+| Card | White `#FFFFFF` | Clean separation via border, not shadow |
+| Sidebar | Vault black `#0B1F17` | Dark chrome, porcelain workspace |
+| Thai type | Anuphan | Native Thai, not Latin fallback |
+| Latin/numeral | Space Grotesk | Tabular-nums, financial precision |
 
-The token values live in `design-system-extracted/tokens/colors.css` and are canonical — see `DECISIONS.md`
-→ D8. Do not reintroduce the pre-2026-09 orange palette (`--gl-orange-*`); it has no live consumers.
-
-`--on-{income,expense,pending,info}-muted` are the text colors for content sitting on a `-muted` surface
-(badges, notices, stat tiles). The `--*-foreground` tokens are for text on the **solid** color only — pairing
-`--income-foreground` with `--income-muted` is a contrast bug, not a style choice.
+---
 
 ## Typography
 
-Anuphan (Thai) + Space Grotesk (Latin/numerals). Body 15px/1.6. Headings 600-weight, −0.02em tracking.
-`.num-display` on every amount (tabular, lining, slashed-zero) — no exceptions. One date format across the
-app: `23 ส.ค. 2569` (Thai Buddhist calendar, short month). Off-scale literal font sizes are banned; use the
-`--text-*` scale.
+| Token | Size | Use |
+|---|---|---|
+| `--text-2xs` | 11px | Kicker/eyebrow |
+| `--text-xs` | 12px | Meta, secondary |
+| `--text-sm` | 13px | Body, nav |
+| `--text-base` | 15px | Body default |
+| `--text-md` | 16px | Section heading |
+| `--text-lg` | 18px | Card title |
+| `--text-xl` | 20px | Page heading (mobile) |
+| `--text-2xl` | 22px | Page heading |
+| `--text-3xl` | 26px | Page heading (desktop) |
+| `--text-4xl` | 32px | Hero balance |
+| `--text-5xl` | 40px | Hero balance (lg) |
 
-## Radius (live values — see `DECISIONS.md` → D8; D1's earlier set is superseded)
+**Rules:**
+- `.num-display` for every money value — tabular-nums, lining-nums, slashed-zero
+- `--tracking-heading: -0.02em` on display text
+- `--leading-heading: 1.2`, `--leading-body: 1.6`
+- Kicker: uppercase, `0.08em` spacing, `--muted-foreground`
 
-Values below are read from `design-system-extracted/tokens/radius.css` as shipped. `app.css` consumes these
-tokens directly (`var(--radius-card)` at `.gl-card`, `var(--radius-input)`, `var(--radius-dialog)`, …), so
-editing the token file changes the rendered product immediately.
+---
 
-| Token             | Value  | Used by                                                                             |
-| ----------------- | ------ | ----------------------------------------------------------------------------------- |
-| `--radius`        | 10px   | base                                                                                |
-| `--radius-sm`     | 6px    | small chips, nav item (via `AppShell.ts`'s own style block)                         |
-| `--radius-md`     | 10px   | surfaces that aren't full cards (`.gl-surface`, table-card mode, stat, notice base) |
-| `--radius-lg`     | 12px   | `.gl-notice`, `.gl-toast`, `.gl-stat`                                               |
-| `--radius-xl`     | 14px   | —                                                                                   |
-| `--radius-2xl`    | 18px   | —                                                                                   |
-| `--radius-card`   | 20px   | `.gl-card` and all its variants                                                     |
-| `--radius-button` | 12px   | `.gl-btn`                                                                           |
-| `--radius-input`  | 10px   | `.gl-input`, `.gl-select`, `.gl-textarea`                                           |
-| `--radius-dialog` | 24px   | `.gl-modal-content`                                                                 |
-| `--radius-sheet`  | 28px   | reserved for the R2 `.gl-sheet` primitive — not yet used                            |
-| `--radius-full`   | 9999px | pills, badges, avatars                                                              |
-| `--radius-table`  | 0px    | **documented but not currently honored** — see Open Findings below                  |
+## Spacing
 
-Control height (button/input): **46px**, a literal in `app.css` (`.gl-btn`, `.gl-input` — the later of the
-two declaration blocks wins). `--touch-target-min` (44px) remains the accessibility floor and is unchanged.
+| Token | Size | Use |
+|---|---|---|
+| `--space-1` | 4px | Tight gaps |
+| `--space-2` | 8px | Inside buttons, badge gaps |
+| `--space-3` | 12px | Form gaps, card padding |
+| `--space-4` | 16px | Section gaps |
+| `--space-5` | 20px | Card padding, table cells |
+| `--space-6` | 24px | Page sections |
+| `--space-8` | 32px | Major breaks |
+| `--touch-target-min` | 44px | Minimum touch target |
 
-## Shadows
+**Rules:**
+- Page padding: `--gl-page-pad-x` (clamp 16-40px), `--gl-page-pad-top` (clamp 20-32px)
+- Card padding: `--space-5`
+- Table cells: `--table-cell-x: --space-5`, `--table-cell-y: --space-3`
 
-Border beats shadow. Shadows are ink-green tinted (`rgb(16 32 24 / …)`) so they sit inside the porcelain
-palette — values in `design-system-extracted/tokens/shadows.css`. Real shadow is reserved for genuine overlap
-(dialogs) and the one "lifted" hero surface per screen (`.gl-card--elevated`, used once on the dashboard
-balance card — a flat card plus the faint `--shadow-card`; the old decorative radial-gradient wash was
-removed in the Emerald Vault revision and must not come back).
+---
+
+## Radius
+
+| Token | Size | Use |
+|---|---|---|
+| `--radius-sm` | 6px | Tags, small elements |
+| `--radius-md` | 10px | Inputs, badges |
+| `--radius-lg` | 12px | Cards, buttons |
+| `--radius-xl` | 14px | Modals, sheets |
+| `--radius-2xl` | 18px | Large cards |
+| `--radius-button` | 12px | Buttons |
+| `--radius-input` | 10px | Form inputs |
+| `--radius-card` | 20px | Cards |
+| `--radius-dialog` | 24px | Dialogs |
+| `--radius-sheet` | 28px | Bottom sheet top corners |
+| `--radius-full` | 9999px | Pills, avatars |
+
+---
+
+## Shadows (Minimal)
+
+| Token | Use |
+|---|---|
+| `--shadow-xs` | Hairline |
+| `--shadow-sm-card` | Subtle card lift |
+| `--shadow-card` | Standard card |
+| `--shadow-elevated` | Modals, popovers |
+| `--shadow-hover-card` | Card hover |
+
+**Rules:**
+- Border-based depth over shadow
+- No glow, no heavy shadow
+- Cards: `border: 1px solid var(--border)` + optional `--shadow-sm-card`
+
+---
 
 ## Motion
 
-`--ease-out` + `--duration-micro`/`--duration-component` everywhere. 400ms is a hard ceiling. No bounce/spring
-on business UI. `--ease-spring` was removed from `motion.css` (2026-09-03): its last consumers in the old
-login stylesheet were replaced by the Emerald Vault login, and grep confirmed zero remaining consumers.
+| Token | Value | Use |
+|---|---|---|
+| `--duration-micro` | 120ms | Press feedback, micro-interactions |
+| `--duration-component` | 220ms | Modals, tabs, dropdowns |
+| `--duration-page` | 280ms | Page transitions |
+| `--duration-ceiling` | 400ms | Maximum animation |
+| `--ease-out` | cubic-bezier(0.23, 1, 0.32, 1) | Default (entering) |
+| `--ease-in-out` | cubic-bezier(0.77, 0, 0.175, 1) | Moving on screen |
+| `--ease-drawer` | cubic-bezier(0.32, 0.72, 0, 1) | Drawers, sheets |
 
-## Overlays (D3 — implemented in R1-d)
+**Rules:**
+- Never exceed `--duration-ceiling` (400ms)
+- Press feedback: `scale(0.97)` on `:active`, fires on pointer-down
+- No bounce/spring on business UI
+- Stagger: 30-80ms between items
+- `prefers-reduced-motion`: collapse durations, zero delays
 
-`.gl-modal-content` is a solid `--popover` surface with `--shadow-elevated` and `--radius-dialog` (24px).
-Glass/blur is banned on modal dialogs.
-The **one** sanctioned blur in the product is the sticky topbar (`background/88%` + `blur(10px)`). The modal
-backdrop keeps a light 3px blur (cheap, aids focus, not glassmorphism on content).
+---
 
-## Status semantics (D2)
+## Components
 
-One map, owned by `src/components/shared/StatusBadge.ts` (R3 — not yet created):
+### Buttons
 
-| Status             | Label       | Badge variant |
-| ------------------ | ----------- | ------------- |
-| `draft`            | ฉบับร่าง    | neutral       |
-| `pending_approval` | รออนุมัติ   | pending       |
-| `approved`         | อนุมัติแล้ว | approved      |
-| `posted`           | ลงบัญชีแล้ว | **info**      |
-| `rejected`         | ปฏิเสธ      | rejected      |
-| `voided`           | ยกเลิกแล้ว  | **neutral**   |
+| Class | Use |
+|---|---|
+| `.gl-btn` | Base button |
+| `.gl-btn--primary` | One per screen — committing action |
+| `.gl-btn--secondary` | Alternative action |
+| `.gl-btn--ghost` | Tertiary, navigation |
+| `.gl-btn--destructive` | Delete, void, danger |
+| `.gl-btn--sm` | Compact (34px on fine pointers, 44px touch) |
+| `.gl-btn--block` | Full width |
 
-## Iconography
+**Rules:**
+- One primary per screen
+- Destructive never looks like primary
+- `--touch-target-min` (44px) always
+- Press feedback: `scale(0.97)` on `:active`
 
-Inline SVG only, 24 viewBox, `stroke-width="1.8"` default / `"2"` for active states, `aria-hidden="true"` on
-every decorative icon. No icon font, no PNG set, no emoji anywhere in the product (CLAUDE.md ban).
+### Cards
 
-## Banned
+| Class | Use |
+|---|---|
+| `.gl-card` | Standard card |
+| `.gl-card--tight` | Dense padding |
+| `.gl-card--attention` | Primary border |
+| `.gl-card--danger` | Expense border |
+| `.gl-card--elevated` | With shadow |
 
-Generic glass cards (except the topbar exception above), gradients-for-decoration (except the one documented
-hero exception), glowing borders, giant hero sections, fake charts, decorative metrics, emoji as UI
-iconography, bilingual double-labels, count-up number animation on money, any new accent color without a
-`DECISIONS.md` entry.
+### Badges
 
-## Open findings (recorded, not yet resolved — do not silently fix)
+| Class | Use |
+|---|---|
+| `.gl-badge` | Base |
+| `.gl-badge--neutral` | Structural |
+| `.gl-badge--pending` | Amber |
+| `.gl-badge--approved` | Emerald |
+| `.gl-badge--rejected` | Red |
+| `.gl-badge--info` | Secondary |
 
-- `.gl-table` currently renders with `border-collapse: separate` + `border-radius: var(--radius-lg)` (rounded
-  corners), contradicting `--radius-table: 0px` and the "tables never round" rule stated in this file's
-  predecessor documentation. This is the **current live behavior** and was preserved as-is in R1. Needs an
-  explicit decision before it is changed either direction.
-- `--radius-sheet` is set but unused until the R2 `.gl-sheet` primitive exists.
+### Tags
+
+| Class | Use |
+|---|---|
+| `.gl-tag` | Fund/category context (neutral, no status) |
+
+### Notices
+
+| Class | Use |
+|---|---|
+| `.gl-notice` | Base |
+| `.gl-notice--success` | Emerald |
+| `.gl-notice--warning` | Amber |
+| `.gl-notice--error` | Red |
+
+### Forms
+
+| Class | Use |
+|---|---|
+| `.gl-field` | Field container |
+| `.gl-label` | Label |
+| `.gl-input` | Text input |
+| `.gl-select` | Select |
+| `.gl-textarea` | Textarea |
+| `.gl-hint` | Helper text |
+| `.gl-error-text` | Error message |
+
+### Table
+
+| Class | Use |
+|---|---|
+| `.gl-table` | Full table |
+| `.gl-table--cards` | Responsive card mode |
+| `.is-right` | Right-align numbers |
+| `.gl-td-lead` | Lead cell (full-width on mobile) |
+| `.gl-td-actions` | Actions row |
+
+### Navigation
+
+| Class | Use |
+|---|---|
+| `.gl-sidebar` | Desktop sidebar |
+| `.gl-nav-item` | Sidebar link |
+| `.gl-nav-item--active` | Current page |
+| `.gl-mobilenav` | Mobile bottom nav |
+| `.gl-mobilenav__item` | Mobile nav link |
+| `.gl-tablist` | Tab row |
+| `.gl-tab` | Individual tab |
+
+### Shell
+
+| Class | Use |
+|---|---|
+| `.gl-shell-topbar` | Top bar |
+| `.gl-shell-icon-btn` | Icon button |
+| `.gl-shell-primary-action` | Primary CTA |
+| `.gl-shell-bell-badge` | Notification badge |
+| `.gl-shell-mark` | Logo mark |
+| `.gl-shell-avatar` | User avatar |
+| `.gl-shell-church-chip` | Church name chip |
+| `.gl-shell-status-dot` | Online status |
+| `.gl-logout-btn` | Sign out |
+| `.gl-app-container` | Flex container |
+| `.gl-app-main` | Main content |
+
+### Content
+
+| Class | Use |
+|---|---|
+| `.gl-page` | Page wrapper |
+| `.gl-page-header` | Page title row |
+| `.gl-section` | Content section |
+| `.gl-section__head` | Section heading |
+| `.gl-section__link` | Section action link |
+| `.gl-loading-center` | Loading state |
+| `.gl-empty-center` | Empty state |
+| `.gl-fade-in` | Entrance animation |
+| `.gl-rise` | Staggered entrance |
+| `.gl-skeleton` | Skeleton loader |
+| `.gl-spin` | Spinner |
+| `.gl-progress` | Progress bar |
+| `.gl-progress__fill` | Fill |
+| `.gl-divider` | Horizontal rule |
+| `.gl-legend` | Chart legend |
+
+### Dashboard
+
+| Class | Use |
+|---|---|
+| `.gl-dash-hero` | Hero card |
+| `.gl-dash-hero__value` | Hero figure |
+| `.gl-dash-hero__actions` | Action strip |
+| `.gl-dash-review` | Review panel |
+| `.gl-dash-user-card` | Identity card |
+| `.gl-dash-context` | Month context |
+| `.gl-dash-split` | Two-column layout |
+| `.gl-dash-hero-row` | Hero row |
+
+### Funds
+
+| Class | Use |
+|---|---|
+| `.gl-fundlist` | Fund list |
+| `.gl-fundrow__head` | Fund row heading |
+| `.gl-fundrow__name` | Fund name |
+| `.gl-fundrow__foot` | Fund footer |
+| `.gl-funds-pagehead` | Page header |
+| `.gl-funds-grid` | Grid layout |
+| `.gl-funds-card__head` | Card heading |
+| `.gl-funds-card__balance` | Balance display |
+| `.gl-funds-progress-caption` | Progress label |
+
+### Transactions
+
+| Class | Use |
+|---|---|
+| `.gl-txn-row` | Clickable row |
+| `.gl-row` | Navigable row |
+| `.gl-row__icon` | Semantic icon |
+| `.gl-row__body` | Row content |
+| `.gl-row__title` | Row title |
+| `.gl-row__meta` | Row metadata |
+| `.gl-row__end` | Right-aligned content |
+| `.gl-row__chevron` | Chevron |
+| `.gl-row__icon--income` | Green icon |
+| `.gl-row__icon--expense` | Red icon |
+| `.gl-row__icon--transfer` | Neutral icon |
+| `.gl-row__icon--attention` | Amber icon |
+| `.gl-filter-pill` | Filter pill |
+| `.gl-command-center` | Command center |
+
+### Approvals
+
+| Class | Use |
+|---|---|
+| `.gl-approval-item` | Queue card |
+| `.gl-approval-item__row` | Card row |
+| `.gl-approval-item__badges` | Badge row |
+| `.gl-approval-item__ref` | Reference |
+| `.gl-approval-item__title` | Title |
+| `.gl-approval-item__meta` | Metadata |
+| `.gl-approval-item__amount` | Amount |
+| `.gl-approval-amount` | Hero amount |
+| `.gl-projbal__result` | Projected balance |
+| `.gl-projbal__result--deficit` | Deficit state |
+
+### Offering
+
+| Class | Use |
+|---|---|
+| `.gl-offering-backlink` | Back link |
+| `.gl-offering-step` | Step indicator |
+| `.gl-offering-step__badge` | Step badge |
+| `.gl-offering-step__label` | Step label |
+| `.gl-offering-chip` | Info chip |
+| `.gl-offering-kpi` | KPI card |
+| `.gl-allocation-row` | Allocation row |
+| `.gl-cashcount-summary__value` | Cash count hero |
+
+### Reports
+
+| Class | Use |
+|---|---|
+| `.gl-reports-pagehead` | Page header |
+| `.gl-reports-hero` | Hero card |
+| `.gl-reports-hero__value` | Hero figure |
+| `.gl-reports-hero__figures` | Figure row |
+| `.gl-reports-table-head` | Table header |
+| `.gl-reports-leadership-row` | Leadership row |
+
+---
+
+## Anti-AI-Slop Rules
+
+### Universal
+- No decorative gradients on KPI/stat cards
+- No glassmorphism unless justified by depth system
+- No bounce/spring animations on business UI
+- No animation > 300ms (except entrance)
+- No decorative SVG illustrations
+- No emoji as UI iconography
+- No hover scale-110 on icons
+- No drop-shadow glow on logos/icons
+
+### Financial
+- Green = credit/positive ONLY — never mixed
+- Red = debit/negative ONLY — never mixed
+- No NumberTicker animation on money values
+- No rounding totals — show exact calculated values
+- Tabular-nums ALWAYS on numbers
+- Right-align all numerical columns
+- Alternating row backgrounds when > 5 rows
+- Sticky header on scrollable tables
+- Status = color + icon, never color alone
+- No compact table padding below `py-3 px-5`
+
+### Thai UI
+- No bilingual double-labels
+- No internal vocabulary in UI (no "Screen 06", no "PostgreSQL 17")
+- No raw exception strings in UI
+- No vague declarative copy — say the state, not an essay about it
+
+---
+
+## Responsive Breakpoints
+
+| Breakpoint | Width | Behavior |
+|---|---|---|
+| Mobile | < 540px | Single column, full-width actions |
+| Tablet | < 768px | Sidebar → bottom nav, stacked header |
+| Desktop | > 900px | Two-column layouts, sidebar visible |
+| Wide | > 1024px | Max content width `--gl-page-max` |
+
+---
+
+## Dark Mode
+
+- Token-based via `.dark` class on `<html>`
+- Toggle via `prefers-color-scheme` or user preference (localStorage)
+- All colors defined in `:root` and `.dark` blocks
+- Background: slate dark, card: slightly lighter
+- Text: off-white
+- Border: white-alpha
+
+---
+
+## Accessibility
+
+- `--touch-target-min` (44px) on all interactive elements
+- Visible focus ring: `2px solid var(--ring)`, offset 2px
+- `aria-label` on icon-only buttons
+- `aria-live` on dynamic content
+- `prefers-reduced-motion`: collapse animations
+- `prefers-contrast: more`: increase contrast
+- Skip-to-content link
+- Semantic HTML: `<button>`, `<a>`, `<nav>`, `<main>`
+
+---
+
+## File Structure
+
+| File | Responsibility |
+|---|---|
+| `design-system-extracted/tokens/*.css` | Design tokens (values) |
+| `src/styles/app.css` | Component classes |
+| `src/components/layout/AppShell.ts` | Shell + nav |
+| `src/pages/*.ts` | Page rendering |
+| `src/services/*.ts` | Data layer |
+
+**Single source of truth:** Token NAMES in `design-system-extracted/` are the public API. Values can change; names cannot. Component classes in `app.css` consume tokens. Pages consume component classes. No page defines its own color, radius, shadow, or font-size.

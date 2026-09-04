@@ -77,6 +77,7 @@ export class ProjectedBalanceEngine {
   public static calculateProjectedFundBalance(
     fund: FundInput,
     evaluatingTransaction: {
+      id?: string;
       direction: TransactionDirection;
       amount: Money;
       splits?: Array<{ fundId: string; amount: Money }>;
@@ -84,6 +85,7 @@ export class ProjectedBalanceEngine {
       destFundId?: string | null;
     },
     approvedUnpostedTransactions: Array<{
+      id?: string;
       direction: TransactionDirection;
       amount: Money;
       splits?: Array<{ fundId: string; amount: Money }>;
@@ -97,8 +99,13 @@ export class ProjectedBalanceEngine {
         : Money.from(fund.currentBalance);
 
     // 1. Calculate net impact of all approved (unposted) transactions on this fund
+    // Filter out the evaluating transaction to avoid double-counting (by reference or matching id).
+    const evalId = evaluatingTransaction.id;
+    const filteredApproved = approvedUnpostedTransactions.filter(
+      (txn) => txn !== evaluatingTransaction && (evalId === undefined || txn.id !== evalId)
+    );
     let approvedUnpostedImpact = Money.zero();
-    for (const txn of approvedUnpostedTransactions) {
+    for (const txn of filteredApproved) {
       const delta = this.calculateTransactionFundDelta(fund.id, txn);
       approvedUnpostedImpact = approvedUnpostedImpact.add(delta);
     }

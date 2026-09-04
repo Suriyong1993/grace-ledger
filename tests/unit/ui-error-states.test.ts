@@ -51,8 +51,8 @@ describe("UI Error & Empty States (Fail-Closed Architecture)", () => {
       const html = page.renderHtml();
 
       expect(html).not.toContain("gl-notice--error");
-      expect(html).toContain("gl-empty-center");
-      expect(html).toContain("ยังไม่มีรายการธุรกรรม");
+      expect(html).toContain("gl-empty-center__msg");
+      expect(html).toContain("ไม่พบรายการที่ตรงกับเงื่อนไข");
     });
   });
 

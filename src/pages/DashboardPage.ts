@@ -328,7 +328,7 @@ export class DashboardPage {
         : "var(--foreground)";
 
     const loadFailedHtml = data.loadFailed
-      ? `<div class="gl-notice gl-notice--error" role="alert" style="margin-bottom: var(--space-5);">
+      ? `<div class="gl-notice gl-notice--error" role="alert">
           <div class="gl-notice__body">${escapeHtml(data.errorMessage || "โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชหน้านี้อีกครั้ง")}</div>
         </div>`
       : "";
@@ -391,7 +391,7 @@ export class DashboardPage {
       </div>`;
     } else if (attention.totalCount === 0) {
       const weeklyOffering = can(userRole, "create", "offering_sessions")
-        ? `<a href="#/offerings/new" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-2);">${ICON_PLUS}<span>บันทึกเงินถวายสัปดาห์นี้</span></a>`
+        ? `<a href="#/offerings/new" class="gl-btn gl-btn--primary gl-btn--sm">${ICON_PLUS}<span>บันทึกเงินถวายสัปดาห์นี้</span></a>`
         : "";
       attentionBodyHtml = `
       <div class="gl-attention-empty" role="status">
@@ -441,7 +441,7 @@ export class DashboardPage {
         ${
           netDelta && prevBar
             ? `<div class="gl-dash-context__delta">
-                <span class="gl-dash-context__direction" style="color: ${deltaColor};" aria-hidden="true">${
+                <span class="gl-dash-context__direction" aria-hidden="true">${
                   deltaIsPositive ? ICON_TREND_UP : deltaIsNegative ? ICON_TREND_DOWN : ICON_TREND_UP
                 }</span>
                 <span class="num-display gl-dash-context__value" style="color: ${deltaColor};">${deltaLabel}</span>
@@ -458,7 +458,7 @@ export class DashboardPage {
     // 2. Funds List
     const fundsHtml =
       funds.length === 0
-        ? `<p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0;">
+        ? `<p class="gl-empty-center__msg">
              ยังไม่มีกองทุน เริ่มจากสร้างกองทุนแรกเพื่อแยกเงินตามวัตถุประสงค์
            </p>`
         : `<div class="gl-fundlist">
@@ -485,7 +485,7 @@ export class DashboardPage {
                 <div>
                   <div class="gl-fundrow__head">
                     <span class="gl-fundrow__name">${escapeHtml(f.name)}</span>
-                    <span class="num-display" style="font-size: var(--text-md); font-weight: var(--weight-bold); color: ${balanceColor};">${f.balance.format()}</span>
+                    <span class="num-display" style="color: ${balanceColor};">${f.balance.format()}</span>
                   </div>
                   ${
                     hasTarget
@@ -506,10 +506,10 @@ export class DashboardPage {
     // 3. Recent Transactions Feed
     const recentHtml =
       recent.length === 0
-        ? `<p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0;">
+        ? `<p class="gl-empty-center__msg">
              ยังไม่มีรายการล่าสุด รายการที่บันทึกจะแสดงที่นี่
            </p>`
-        : `<div class="gl-card" style="padding: 0; overflow: hidden;">
+        : `<div class="gl-card gl-txn-list">
             ${recent
               .map((item) => {
                 const isIncome = item.direction === "income";
@@ -541,12 +541,12 @@ export class DashboardPage {
                 <a href="#/transactions" class="gl-row">
                   <span class="gl-row__icon ${iconClass}" aria-hidden="true">${iconSvg}</span>
                   <span class="gl-row__body">
-                    <span class="gl-row__title" style="display: block;">${escapeHtml(item.title)}</span>
-                    <span class="gl-row__meta" style="display: block;">${escapeHtml(item.subtitle)}</span>
+                    <span class="gl-row__title">${escapeHtml(item.title)}</span>
+                    <span class="gl-row__meta">${escapeHtml(item.subtitle)}</span>
                   </span>
                   <span class="gl-row__end">
-                    <span class="num-display" style="display: block; font-size: var(--text-sm); font-weight: var(--weight-bold); color: ${amountColor};">${sign}${item.amount.format()}</span>
-                    <span class="gl-badge gl-badge--${item.status}" style="font-size: var(--text-2xs); margin-top: 4px;">${statusLabel}</span>
+                    <span class="num-display" style="color: ${amountColor};">${sign}${item.amount.format()}</span>
+                    <span class="gl-badge gl-badge--${item.status}">${statusLabel}</span>
                   </span>
                 </a>`;
               })
@@ -568,7 +568,7 @@ export class DashboardPage {
           <h2>รายรับและรายจ่ายรายเดือน</h2>
           <a href="#/reports" class="gl-section__link">ดูรายงานเต็ม</a>
         </div>
-        <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0 0 var(--space-4);">
+        <p class="gl-trend__desc">
           เดือนที่แท่งสีแดงสูงกว่าสีเขียว คือเดือนที่จ่ายมากกว่ารับ
         </p>
         <div class="gl-card">
@@ -593,7 +593,7 @@ export class DashboardPage {
                     <span class="gl-trend__bar gl-trend__bar--expense" style="height: ${expH}px;"></span>
                   </span>
                   <span class="gl-trend__label">${escapeHtml(t.monthName)}</span>
-                  <span class="gl-trend__net num-display" style="font-size: var(--text-2xs); font-weight: var(--weight-bold); color: ${
+                  <span class="gl-trend__net num-display" style="color: ${
                     t.isPositive ? "var(--income)" : "var(--expense)"
                   };">${t.net}</span>
                   <span class="gl-visually-hidden">${escapeHtml(t.monthName)} รายรับ ${escapeHtml(t.income)} รายจ่าย ${escapeHtml(t.expense)} คงเหลือ ${escapeHtml(t.net)}</span>
@@ -688,7 +688,7 @@ export class DashboardPage {
           <h2 class="gl-command-center__title">
             <span>งานสัปดาห์นี้</span>
           </h2>
-          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}" style="font-size: var(--text-2xs);">
+          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}">
             ${attentionTotal > 0 ? `ต้องดำเนินการ ${attentionTotal} รายการ` : "ไม่มีงานค้าง"}
           </span>
         </div>
@@ -701,7 +701,7 @@ export class DashboardPage {
         <h2 class="gl-visually-hidden">สุขภาพการเงิน</h2>
         <div class="gl-dash-hero-row">
           <div class="gl-card gl-dash-hero gl-rise">
-            <div class="kicker" style="margin: 0;">ยอดเงินคงเหลือทั้งหมด</div>
+            <div class="kicker">ยอดเงินคงเหลือทั้งหมด</div>
             <div class="num-display gl-dash-hero__value gl-total-rule" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 

@@ -119,8 +119,8 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
     <!-- The variance is what a counting team acts on; expected/counted are the
          context behind it, not two more equal-weight boxes. -->
     <section class="gl-card gl-cashcount-summary" aria-label="สรุปการตรวจนับ" style="margin-bottom: var(--space-6);">
-      <div class="kicker" style="margin: 0;">${varianceStat.head}</div>
-      <div class="num-display gl-cashcount-summary__value" style="color: ${
+      <div class="kicker" data-cashcount="top-kicker" style="margin: 0;">${varianceStat.head}</div>
+      <div class="num-display gl-cashcount-summary__value" data-cashcount="top-variance" style="color: ${
         isMatch
           ? "var(--income)"
           : isShortage
@@ -130,7 +130,7 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
 
       <div class="gl-cashcount-summary__figures">
         <span class="gl-cashcount-summary__figure">คาดว่าจะมี<strong class="num-display">${expectedCash.format()}</strong></span>
-        <span class="gl-cashcount-summary__figure">นับได้<strong class="num-display">${actualCash.format()}</strong></span>
+        <span class="gl-cashcount-summary__figure">นับได้<strong class="num-display" data-cashcount="top-actual">${actualCash.format()}</strong></span>
       </div>
 
       <p class="gl-cashcount-summary__foot">
@@ -247,6 +247,7 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
                 min="0"
                 id="input-coins"
                 name="coins"
+                inputmode="decimal"
                 value="${state.denominations.coins.toNumber() > 0 ? state.denominations.coins.toNumber() : ""}"
                 placeholder="0.00"
                 class="gl-input num-display"
@@ -257,7 +258,7 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
           </div>
 
           <div style="text-align: right;">
-            <span class="num-display" style="font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--foreground);">
+            <span class="num-display" data-denom-total="coins" style="font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--foreground);">
               ${denomResult.coinTotal.format()}
             </span>
           </div>
@@ -274,18 +275,18 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
         border-top: 1px solid var(--border);
       ">
         <span style="font-size: var(--text-sm); font-weight: var(--weight-semibold);">รวมนับได้</span>
-        <span class="num-display" style="font-size: var(--text-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-heading);">
+        <span class="num-display" data-cashcount="bottom-actual" style="font-size: var(--text-2xl); font-weight: var(--weight-bold); letter-spacing: var(--tracking-heading);">
           ${actualCash.format()}
         </span>
       </div>
     </section>
 
     <!-- Variance verdict -->
-    <div class="gl-notice ${isMatch ? "gl-notice--success" : isShortage ? "gl-notice--error" : "gl-notice--warning"}" role="status" style="margin-bottom: var(--space-6); align-items: center;">
+    <div class="gl-notice ${isMatch ? "gl-notice--success" : isShortage ? "gl-notice--error" : "gl-notice--warning"}" role="status" data-cashcount="bottom-notice" style="margin-bottom: var(--space-6); align-items: center;">
       <div class="gl-notice__body">
-        <strong>${varianceStat.head}</strong>
+        <strong data-cashcount="bottom-notice-head">${varianceStat.head}</strong>
       </div>
-      <span class="num-display" style="font-size: var(--text-xl); font-weight: var(--weight-bold); white-space: nowrap;">
+      <span class="num-display" data-cashcount="bottom-notice-amount" style="font-size: var(--text-xl); font-weight: var(--weight-bold); white-space: nowrap;">
         ${varianceAmount.format({ showSign: true })}
       </span>
     </div>
@@ -367,6 +368,8 @@ function renderDenomRow(
         data-denom="${key}"
         value="${count > 0 ? count : ""}"
         placeholder="0"
+        inputmode="numeric"
+        pattern="[0-9]*"
         style="flex: 1; min-width: 0; text-align: center; font-weight: var(--weight-semibold);"
         ${isLocked ? "disabled" : ""}
       />
@@ -383,7 +386,7 @@ function renderDenomRow(
     </div>
 
     <div style="text-align: right;">
-      <span class="num-display" style="font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--foreground);">
+      <span class="num-display" data-denom-total="${key}" style="font-size: var(--text-md); font-weight: var(--weight-semibold); color: var(--foreground);">
         ${subtotal.format()}
       </span>
     </div>

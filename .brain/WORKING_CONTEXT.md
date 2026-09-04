@@ -7,30 +7,23 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
-- **เป้าหมายหลัก (Goal):** ยกระดับ UX/UI ของ Grace Ledger ตามมาตรฐาน 2026, Harmonize Church Identity, Push GitHub & Deploy Vercel Production
-- **สถานะรวม (Overall Status):** `IDLE` (งานสำเร็จเรียบร้อย ขึ้น Production แล้ว)
+- **เป้าหมายหลัก (Goal):** แก้ไขปัญหาการพิมพ์ตัวเลขบนมือถือในหน้าบันทึกเงินถวายและการตรวจนับเงินสด ให้พิมพ์ได้ต่อเนื่อง แป้นพิมพ์ไม่เด้งออก
+- **สถานะรวม (Overall Status):** `IDLE` (งานสำเร็จสมบูรณ์ 100% Green)
 - **Agent ที่กำลังทำงาน (Active Agent):** Gemini (Antigravity IDE)
-- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 00:58 (Asia/Bangkok)
+- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 14:05 (Asia/Bangkok)
 
 ---
 
 ## 2. งานที่ทำเสร็จสิ้น (Completed Tasks)
 
-- [x] จัดทำและได้รับอนุมัติ Implementation Plan เรียบร้อย
-- [x] Phase 1: ปรับปรุง Design Tokens ใน `src/styles/app.css` (Glassmorphism, 60-30-10, Crisp Borders)
-- [x] Phase 2: ปรับปรุง Topbar และ Floating BottomNav ด้วย Evolved Glassmorphism
-- [x] Phase 3: ปรับปรุง `src/pages/DashboardPage.ts` เพิ่ม Grace AI Personalized Greeting & Dynamic Task Action
-- [x] Harmonize Church Identity เป็น "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์" ครบทั้งระบบ
+- [x] แก้ไขปัญหาการพิมพ์ตัวเลขบนมือถือ (Mobile Continuous Numeric Input):
+  - สาเหตุ: ฟังก์ชันตรวจจับการพิมพ์ `input` ในหน้า `OfferingPage.ts` (`OfferingEntryForm` และ `CashCountView`) มีการเรียก `onStateChange()` / `restoreFocusAfterRender()` ซึ่งสั่ง re-render ทั้งหน้า (`root.innerHTML = ...`) ส่งผลให้ Virtual Keyboard บนเบราว์เซอร์มือถือเด้งออก/ปิดทันทีหลังพิมพ์ตัวเลข 1 ตัว
+  - แก้ไข: ปรับระบบคำนวณยอดจัดสรร, ผลรวม และ Variance ให้ใช้วิธี In-place DOM mutation ผ่านฟังก์ชัน `updateEntryFormCalculations()` และ `updateCashCountCalculations()` โดยไม่อนุญาตให้ Re-render DOM ในระหว่างพิมพ์ พร้อมใส่ `inputmode="numeric" pattern="[0-9]*"` และ `inputmode="decimal"` ครบทุกช่องตัวเลข
 - [x] รันการทดสอบและ Verification ผ่าน 100%:
   - `npm run typecheck` (0 errors)
-  - `npm test` (64 test files / 599 tests passed 100%)
-  - `npm run build` (Production bundle built successfully)
-- [x] Push Git Commits ขึ้น GitHub:
-  - `origin/main` (https://github.com/tlcchruchkalasin/my-org-grace-ledger.git)
-  - `old-origin/main` (https://github.com/Suriyong1993/grace-ledger.git)
-- [x] สร้าง `.vercelignore` ป้องกัน build collision และ ignore stray artifacts
-- [x] Deploy ขึ้น Vercel Production สำเร็จสมบูรณ์:
-  - Production URL: https://grace-ledger-mu.vercel.app
+  - `npm test` (ผ่านครบทั้ง 64 test files / 595 tests passed 100%, 0 failures)
+  - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 3.90s)
+- [x] อัปเดตบทเรียนลงใน `.brain/MEMORY.md` (หมวด 3.4: การกรอกข้อมูลตัวเลขบนมือถือ)
 
 - [x] สอบถามและยืนยันขอบเขตการแก้ไขกับผู้ใช้ (เลือกแก้ไขใน `scripts/capture_*.mjs`)
 - [/] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ:
@@ -71,7 +64,7 @@
 
 ## 4. สถานะการทดสอบล่าสุด (System Health Baseline)
 
-- **Vitest**: 64 passed (599 tests passing 100%)
+- **Vitest**: 64 passed (595 tests passing 100%, 0 failures)
 - **TypeScript**: `tsc --noEmit` ผ่าน 0 error / 0 warning
 - **Vite Build**: Production bundle สำเร็จเรียบร้อย (dist/)
 

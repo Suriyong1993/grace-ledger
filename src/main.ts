@@ -193,7 +193,6 @@ export class App {
     this.transactionsPage = new TransactionsPage(
       this.supabase,
       churchId,
-      userId,
     );
     this.fundsPage = new FundsPage(this.supabase, churchId);
     this.membersPage = new MembersPage(
@@ -381,7 +380,7 @@ export class App {
         this.transactionsPage.consumeDeepLinkActions();
         await this.transactionsPage.loadData();
         await attentionPromise;
-        contentHtml = this.transactionsPage.renderHtml(this.session.user);
+        contentHtml = this.transactionsPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/funds") {
       if (this.fundsPage) {
@@ -484,9 +483,8 @@ export class App {
         this.render(),
       );
     } else if (this.currentRoute.pattern === "/transactions") {
-      this.transactionsPage?.attachEventListeners(this.rootElement, () =>
-        this.render(),
-      );
+      // TransactionsPage uses HTML attributes for interactivity (data-action)
+      // No attachEventListeners needed
     } else if (this.currentRoute.pattern === "/funds") {
       this.fundsPage?.attachEventListeners(this.rootElement, () =>
         this.render(),

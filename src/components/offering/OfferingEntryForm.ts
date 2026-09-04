@@ -158,7 +158,7 @@ export function renderOfferingEntryFormHtml(
 
           <div style="text-align: right;">
             <span style="font-size: var(--text-xs); color: var(--muted-foreground);">ยอดรวมที่คาดหวังทั้งหมด: </span>
-            <span class="num-display" style="font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--primary); margin-left: 4px;">${grandExpected.format()}</span>
+            <span class="num-display" data-entry="grand-expected" style="font-size: var(--text-md); font-weight: var(--weight-bold); color: var(--primary); margin-left: 4px;">${grandExpected.format()}</span>
           </div>
         </div>
 
@@ -175,6 +175,7 @@ export function renderOfferingEntryFormHtml(
               <span style="position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%); font-weight: var(--weight-bold); color: var(--muted-foreground);">฿</span>
               <input
                 type="number" step="0.01" min="0" id="input-expected-cash" name="expectedCash"
+                inputmode="decimal"
                 value="${state.rawAmounts?.cash ?? (state.channels.cash.toNumber() > 0 ? state.channels.cash.toNumber() : "")}"
                 placeholder="0.00" class="num-display gl-input"
                 style="padding-left: 28px; font-weight: var(--weight-bold); text-align: right;"
@@ -182,7 +183,7 @@ export function renderOfferingEntryFormHtml(
             </div>
             <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: var(--space-2); display: flex; justify-content: space-between;">
               <span>จัดสรรแล้ว:</span>
-              <span class="num-display" style="font-weight: var(--weight-semibold); color: ${allocCash.isZero() ? "var(--muted-foreground)" : isCashMatch ? "var(--income)" : "var(--pending)"};">
+              <span class="num-display" data-entry="alloc-cash-status" style="font-weight: var(--weight-semibold); color: ${allocCash.isZero() ? "var(--muted-foreground)" : isCashMatch ? "var(--income)" : "var(--pending)"};">
                 ${allocCash.format()}${allocCash.isZero() ? "" : !isCashMatch ? ` · ต่าง ${diffCash.format()}` : ""}
               </span>
             </div>
@@ -200,6 +201,7 @@ export function renderOfferingEntryFormHtml(
               <span style="position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%); font-weight: var(--weight-bold); color: var(--muted-foreground);">฿</span>
               <input
                 type="number" step="0.01" min="0" id="input-expected-transfer" name="expectedTransfer"
+                inputmode="decimal"
                 value="${state.rawAmounts?.transfer ?? (state.channels.transfer.toNumber() > 0 ? state.channels.transfer.toNumber() : "")}"
                 placeholder="0.00" class="num-display gl-input"
                 style="padding-left: 28px; font-weight: var(--weight-bold); text-align: right;"
@@ -207,7 +209,7 @@ export function renderOfferingEntryFormHtml(
             </div>
             <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: var(--space-2); display: flex; justify-content: space-between;">
               <span>จัดสรรแล้ว:</span>
-              <span class="num-display" style="font-weight: var(--weight-semibold); color: ${allocTransfer.isZero() ? "var(--muted-foreground)" : isTransferMatch ? "var(--income)" : "var(--pending)"};">
+              <span class="num-display" data-entry="alloc-transfer-status" style="font-weight: var(--weight-semibold); color: ${allocTransfer.isZero() ? "var(--muted-foreground)" : isTransferMatch ? "var(--income)" : "var(--pending)"};">
                 ${allocTransfer.format()}${allocTransfer.isZero() ? "" : !isTransferMatch ? ` · ต่าง ${diffTransfer.format()}` : ""}
               </span>
             </div>
@@ -225,6 +227,7 @@ export function renderOfferingEntryFormHtml(
               <span style="position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%); font-weight: var(--weight-bold); color: var(--muted-foreground);">฿</span>
               <input
                 type="number" step="0.01" min="0" id="input-expected-qr" name="expectedQr"
+                inputmode="decimal"
                 value="${state.rawAmounts?.qr ?? (state.channels.qr.toNumber() > 0 ? state.channels.qr.toNumber() : "")}"
                 placeholder="0.00" class="num-display gl-input"
                 style="padding-left: 28px; font-weight: var(--weight-bold); text-align: right;"
@@ -232,7 +235,7 @@ export function renderOfferingEntryFormHtml(
             </div>
             <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: var(--space-2); display: flex; justify-content: space-between;">
               <span>จัดสรรแล้ว:</span>
-              <span class="num-display" style="font-weight: var(--weight-semibold); color: ${allocQr.isZero() ? "var(--muted-foreground)" : isQrMatch ? "var(--income)" : "var(--pending)"};">
+              <span class="num-display" data-entry="alloc-qr-status" style="font-weight: var(--weight-semibold); color: ${allocQr.isZero() ? "var(--muted-foreground)" : isQrMatch ? "var(--income)" : "var(--pending)"};">
                 ${allocQr.format()}${allocQr.isZero() ? "" : !isQrMatch ? ` · ต่าง ${diffQr.format()}` : ""}
               </span>
             </div>
@@ -295,6 +298,7 @@ export function renderOfferingEntryFormHtml(
                 <input
                   type="number" step="0.01" min="0" class="input-row-amount num-display gl-input"
                   data-row-id="${item.id}"
+                  inputmode="decimal"
                   value="${item.rawAmount ?? (item.amount.toNumber() > 0 ? item.amount.toNumber() : "")}"
                   placeholder="0.00" style="font-weight: var(--weight-bold); text-align: right;"
                 />
@@ -327,15 +331,16 @@ export function renderOfferingEntryFormHtml(
         ${
           totalAllocated.isZero() && grandExpected.isZero()
             ? `
-        <div class="gl-notice" style="margin-top: var(--space-4);">
-          <div class="gl-notice__body">กรอกยอดตามช่องทาง แล้วจัดสรรเข้ากองทุนให้ครบ</div>
+        <div class="gl-notice" data-entry="summary-notice" style="margin-top: var(--space-4);">
+          <div class="gl-notice__body" data-entry="summary-notice-body">กรอกยอดตามช่องทาง แล้วจัดสรรเข้ากองทุนให้ครบ</div>
+          <div class="num-display" data-entry="summary-notice-amount" style="font-size: var(--text-sm); font-weight: var(--weight-bold); display: none;"></div>
         </div>`
             : `
-        <div class="gl-notice ${isAllAllocMatched ? "gl-notice--success" : "gl-notice--warning"}" style="margin-top: var(--space-4); justify-content: space-between; flex-wrap: wrap;">
-          <div class="gl-notice__body" style="font-weight: var(--weight-semibold);">
+        <div class="gl-notice ${isAllAllocMatched ? "gl-notice--success" : "gl-notice--warning"}" data-entry="summary-notice" style="margin-top: var(--space-4); justify-content: space-between; flex-wrap: wrap;">
+          <div class="gl-notice__body" data-entry="summary-notice-body" style="font-weight: var(--weight-semibold);">
             ${isAllAllocMatched ? "ยอดจัดสรรถูกต้องตรงตามช่องทางทั้งหมด" : "ยอดจัดสรรกองทุนยังไม่ตรงกับยอดตามช่องทาง"}
           </div>
-          <div class="num-display" style="font-size: var(--text-sm); font-weight: var(--weight-bold);">
+          <div class="num-display" data-entry="summary-notice-amount" style="font-size: var(--text-sm); font-weight: var(--weight-bold);">
             รวมจัดสรร: ${totalAllocated.format()} / คาดหวัง: ${grandExpected.format()}
           </div>
         </div>`
