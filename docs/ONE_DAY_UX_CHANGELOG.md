@@ -42,7 +42,70 @@ This release delivers the One-Day UX/UI Modernization for Grace Ledger, advancin
 
 ---
 
-## 3. Scope & Safety Invariants Verified
+## 5. Visual Drift Fix — EmptyState Component & Inline Style Cleanup (2026-09-04 18:55)
+
+### 5.1 เป้าหมาย
+ลด visual drift ประเภท color/component/spacing/typography ให้เข้ากับ Emerald Vault identity โดย:
+- รวม empty-state ที่มี paddings ต่างกัน 3 แบบ → component เดียว
+- ลบ inline color styles → ใช้ semantic token classes
+
+### 5.2 ไฟล์ที่เปลี่ยนแปลง
+
+#### `src/components/shared/EmptyState.ts` (NEW)
+- สร้าง `renderEmptyStateHtml(props: EmptyStateProps): string`
+- Props: `icon?`, `message`, `hint?`, `action?` (button หรือ link variant)
+- Output: `.gl-card.gl-empty-center` + `__icon` + `__msg` + `__hint` + action
+
+#### `src/styles/app.css` (MODIFY)
+- `.gl-empty-center` — เพิ่ม padding มาตรฐาน `var(--space-6) var(--space-5)` (ทำให้ไม่ต้อง `gl-card--pad-lg`)
+- `.gl-empty-center__hint` — เพิ่ม hint text style
+- `.gl-empty-center__icon` — เพิ่ม icon spacing + color
+- `.gl-income` / `.gl-expense` / `.gl-net` — semantic color utility classes แทน inline styles
+
+#### `src/pages/FundsPage.ts` (MODIFY)
+- ใช้ `renderEmptyStateHtml()` แทน inline empty-state
+
+#### `src/pages/MembersPage.ts` (MODIFY)
+- ใช้ `renderEmptyStateHtml()` แทน inline empty-state (ทั้ง 2 blocks: members list + search empty)
+
+#### `src/pages/OfferingPage.ts` (MODIFY)
+- ใช้ `renderEmptyStateHtml()` แทน inline empty-state (link variant)
+
+#### `src/pages/TransactionsPage.ts` (MODIFY)
+- ใช้ `renderEmptyStateHtml()` แทน inline empty-state
+- ลบ `style="color: var(--income);"`, `style="color: var(--expense);"`, `style="color: ${netColor};"` → ใช้ `.gl-income`, `.gl-expense`, `.gl-net`
+- ลบตัวแปร `netColor` ที่ไม่ได้ใช้
+
+#### `src/pages/DashboardPage.ts` (MODIFY)
+- ใช้ `renderEmptyStateHtml()` แทน inline empty-state (funds section)
+- ลบ `style="color: ${deltaColor};"` → ใช้ dynamic class `.gl-income` / `.gl-expense` / `.gl-net`
+- ลบตัวแปร `deltaColor` ที่ไม่ได้ใช้
+
+#### `scripts/capture_drift_fix.mjs` (NEW)
+- Playwright script จับภาพ Dashboard + Transactions ที่ desktop 1280px + mobile 390px
+- Output: `docs/screenshots/drift-fix-2026-09-04/`
+
+### 5.3 Verification
+
+```bash
+$ npm run typecheck
+> tsc --noEmit (0 errors)
+
+$ npm test
+Test Files  5 passed (5) — 64 tests passed, 0 failures
+      Tests  64 passed (64)
+
+$ npm run build
+✓ built successfully
+```
+
+### 5.4 Known Remaining Inline Styles
+- `style="margin-top: var(--space-3);"` บน empty-state action buttons — เป็น spacing (ไม่ใช่ color) ใช้ token อยู่แล้ว
+- ถ้าต้องการแก้เพิ่ม → สร้าง utility class แยก (เช่น `.gl-empty-center__action`)
+
+---
+
+## 6. Scope & Safety Invariants Verified
 - **Financial Calculations:** Zero modifications to `Money`, `decimal.js`, currency formatting, or balance calculations.
 - **Database & RPCs:** No modifications to migrations, RPCs, RLS policies, or Supabase clients.
 - **Two-Person Rule & Authorization:** Fully preserved; tested and passing across all role matrices.

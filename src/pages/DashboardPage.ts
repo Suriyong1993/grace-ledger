@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { renderEmptyStateHtml } from "../components/shared/EmptyState";
 import { Database } from "../lib/supabase/types";
 import { ApprovalsService } from "../lib/transactions/approvals-service";
 import { HistoricalService } from "../lib/reports/historical-service";
@@ -321,11 +322,6 @@ export class DashboardPage {
     const expenseMoney = parseMoneySafe(data.monthlyExpense);
     const netMoney = incomeMoney.subtract(expenseMoney);
     const netIsPositive = netMoney.isPositive();
-    const netColor = netIsPositive
-      ? "var(--income)"
-      : netMoney.isNegative()
-        ? "var(--expense)"
-        : "var(--foreground)";
 
     const loadFailedHtml = data.loadFailed
       ? `<div class="gl-notice gl-notice--error" role="alert">
@@ -421,13 +417,6 @@ export class DashboardPage {
     const netDelta = prevNetMoney ? netMoney.subtract(prevNetMoney) : null;
     const deltaIsPositive = netDelta ? netDelta.isPositive() : false;
     const deltaIsNegative = netDelta ? netDelta.isNegative() : false;
-    const deltaColor = !netDelta
-      ? "var(--muted-foreground)"
-      : deltaIsPositive
-        ? "var(--income)"
-        : deltaIsNegative
-          ? "var(--expense)"
-          : "var(--foreground)";
     const deltaLabel = !netDelta
       ? ""
       : deltaIsPositive
@@ -444,7 +433,7 @@ export class DashboardPage {
                 <span class="gl-dash-context__direction" aria-hidden="true">${
                   deltaIsPositive ? ICON_TREND_UP : deltaIsNegative ? ICON_TREND_DOWN : ICON_TREND_UP
                 }</span>
-                <span class="num-display gl-dash-context__value" style="color: ${deltaColor};">${deltaLabel}</span>
+                <span class="num-display gl-dash-context__value ${deltaIsPositive ? 'gl-income' : deltaIsNegative ? 'gl-expense' : 'gl-net'}">${deltaLabel}</span>
               </div>
               <p class="gl-dash-context__note">
                 ${escapeHtml(period)} สุทธิ <span class="num-display">${netIsPositive ? "+" : ""}${netMoney.format()}</span>
@@ -458,9 +447,9 @@ export class DashboardPage {
     // 2. Funds List
     const fundsHtml =
       funds.length === 0
-        ? `<p class="gl-empty-center__msg">
-             ยังไม่มีกองทุน เริ่มจากสร้างกองทุนแรกเพื่อแยกเงินตามวัตถุประสงค์
-           </p>`
+        ? renderEmptyStateHtml({
+            message: "ยังไม่มีกองทุน เริ่มจากสร้างกองทุนแรกเพื่อแยกเงินตามวัตถุประสงค์",
+          })
         : `<div class="gl-fundlist">
             ${funds
               .map((f) => {
@@ -477,15 +466,11 @@ export class DashboardPage {
                       ),
                     )
                   : null;
-                const balanceColor = f.balance.isNegative()
-                  ? "var(--expense)"
-                  : "var(--foreground)";
-
                 return `
                 <div>
                   <div class="gl-fundrow__head">
                     <span class="gl-fundrow__name">${escapeHtml(f.name)}</span>
-                    <span class="num-display" style="color: ${balanceColor};">${f.balance.format()}</span>
+                    <span class="num-display ${f.balance.isNegative() ? 'gl-expense' : 'gl-net'}">${f.balance.format()}</span>
                   </div>
                   ${
                     hasTarget
@@ -593,9 +578,7 @@ export class DashboardPage {
                     <span class="gl-trend__bar gl-trend__bar--expense" style="height: ${expH}px;"></span>
                   </span>
                   <span class="gl-trend__label">${escapeHtml(t.monthName)}</span>
-                  <span class="gl-trend__net num-display" style="color: ${
-                    t.isPositive ? "var(--income)" : "var(--expense)"
-                  };">${t.net}</span>
+                  <span class="gl-trend__net num-display ${t.isPositive ? 'gl-income' : 'gl-expense'}">${t.net}</span>
                   <span class="gl-visually-hidden">${escapeHtml(t.monthName)} รายรับ ${escapeHtml(t.income)} รายจ่าย ${escapeHtml(t.expense)} คงเหลือ ${escapeHtml(t.net)}</span>
                 </div>`;
               })
@@ -706,9 +689,9 @@ export class DashboardPage {
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 
             <div class="gl-dash-hero__figures">
-              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display" style="color: var(--income);">+${data.monthlyIncome || "฿0.00"}</strong></span>
-              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display" style="color: var(--expense);">−${data.monthlyExpense || "฿0.00"}</strong></span>
-              <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display" style="color: ${netColor};">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
+              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong></span>
+              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong></span>
+              <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display ${netIsPositive ? 'gl-income' : netMoney.isNegative() ? 'gl-expense' : 'gl-net'}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
             </div>
 
             ${heroActionsHtml ? `<div class="gl-dash-hero__actions">${heroActionsHtml}</div>` : ""}
@@ -737,9 +720,7 @@ export class DashboardPage {
               <h2>กองทุนและเป้าหมาย</h2>
               <a href="#/funds" class="gl-section__link">ดูทั้งหมด</a>
             </div>
-            <div class="gl-card">
-              ${fundsHtml}
-            </div>
+            ${fundsHtml}
           </section>
         </div>
       </div>

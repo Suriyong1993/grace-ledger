@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { renderEmptyStateHtml } from "../components/shared/EmptyState";
 import { Database } from "../lib/supabase/types";
 import { OfferingService } from "../lib/offering/offering-service";
 import { OfferingSession, OfferingPaymentChannel, CashDenominations } from "../lib/offering/types";
@@ -347,12 +348,15 @@ export class OfferingPage {
       }
     } else if (this.mode === "detail") {
       if (!this.selectedSession) {
-        contentHtml = `
-        <div class="gl-page gl-fade-in gl-empty-center">
-          <p class="gl-empty-center__msg">ไม่พบข้อมูลรอบเงินถวาย</p>
-          <a href="#/offerings" class="gl-btn gl-btn--secondary">กลับไปหน้ารายการ</a>
-        </div>
-        `;
+        contentHtml = renderEmptyStateHtml({
+          message: "ไม่พบข้อมูลรอบเงินถวาย",
+          action: {
+            label: "กลับไปหน้ารายการ",
+            type: "link",
+            href: "#/offerings",
+            variant: "secondary",
+          },
+        });
       } else {
         const session = this.selectedSession;
         const needsVariance = session.status === "variance_review";

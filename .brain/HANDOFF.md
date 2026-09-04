@@ -7,6 +7,66 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-04 18:55 (Visual Drift Fix — EmptyState Component + Inline Style Cleanup)
+
+- **ผู้ส่งมอบ (Handed off by):** Claude Code
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex ในรอบถัดไป
+- **บริบทงาน (Context):** แก้ visual drift ให้เข้า Emerald Vault identity — ลด color/component/spacing/typography drift บน TransactionsPage + DashboardPage
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  - สร้าง `src/components/shared/EmptyState.ts` — `renderEmptyStateHtml(props)` รวม empty-state 3 แบบ paddings ต่างกัน → component เดียว
+  - อัปเดต `src/styles/app.css` — เพิ่ม `.gl-empty-center__hint`, `.gl-empty-center__icon`, `.gl-income`, `.gl-expense`, `.gl-net` + padding มาตรฐาน
+  - Refactor 4 หน้าให้ใช้ EmptyState: FundsPage, MembersPage, OfferingPage, TransactionsPage
+  - ลบ inline color styles จาก TransactionsPage summary (`style="color: var(--income);"`, `var(--expense)`, `netColor`) → ใช้ `.gl-income`, `.gl-expense`, `.gl-net` classes
+  - ลบ inline delta color style จาก DashboardPage → ใช้ dynamic class
+  - สร้าง `scripts/capture_drift_fix.mjs` — Playwright screenshot script
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `src/components/shared/EmptyState.ts` (NEW)
+  - `src/styles/app.css` (MODIFY)
+  - `src/pages/FundsPage.ts` (MODIFY)
+  - `src/pages/MembersPage.ts` (MODIFY)
+  - `src/pages/OfferingPage.ts` (MODIFY)
+  - `src/pages/TransactionsPage.ts` (MODIFY)
+  - `src/pages/DashboardPage.ts` (MODIFY)
+  - `scripts/capture_drift_fix.mjs` (NEW)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: ผ่าน 100% (0 errors)
+  - `npm test`: ผ่านครบ 5 test files (64 tests passed, 0 failures)
+  - `npm run build`: ผ่าน 100%
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - รัน `node scripts/capture_drift_fix.mjs` เพื่อจับภาพ before/after (ต้อง login ก่อนถึงจะเห็นข้อมูลจริง)
+  - อัปเดต `docs/ONE_DAY_UX_CHANGELOG.md` ด้วยรายการ drift-fix
+  - รอผู้ใช้ตรวจสอบก่อน commit/push
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  - EmptyState component ใช้ `gl-card` padding มาตรฐาน (`--space-6 --space-5`) แทน `gl-card--pad-lg` ที่เคยใช้บางหน้า
+  - Inline styles ที่เหลือบน `button` และ `a` (เช่น `style="margin-top: var(--space-3);"`) ยังอยู่เพราะเป็น spacing ไม่ใช่ color — ถ้าต้องการแก้เพิ่มต้องสร้าง utility class แยก
+  - ห้ามแตะ financial math, RLS, RBAC, schema เด็ดขาด
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-04 16:30 (แก้ไขบั๊กตัวหนังสือซ้อนกันในรายการธุรกรรม — Text Truncation & Ellipsis Fix)
+
+- **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)
+- **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้แจ้งปัญหาตัวหนังสือซ้อนกันบนหน้าแดชบอร์ดจริงที่ Vercel (`grace-ledger-mu.vercel.app`) ตรงส่วนรายการธุรกรรมล่าสุด
+- **สาเหตุของปัญหา (Root Cause):**
+  - `.gl-row__title` และ `.gl-row__meta` ใน `DashboardPage.ts` / `TransactionsPage.ts` เป็นแท็ก HTML `<span>` ซึ่งมีพฤติกรรมเป็น inline element ตามธรรมชาติ
+  - CSS กำหนด `overflow: hidden; text-overflow: ellipsis; white-space: nowrap;` ไว้ แต่ตามมาตรฐาน CSS สเปค properties เหล่านี้จะไม่มีผลกับ non-replaced inline element หากไม่ได้ตั้ง `display: block` หรือ `inline-block`
+  - ผลลัพธ์คือข้อความชื่อรายการที่ยาว จะไม่ถูกตัดคำด้วย `...` และล้นออกไปทับช่องยอดเงินและ badge ฝั่งขวา
+- **การแก้ไข (Fix Applied):**
+  - แก้ไข `src/styles/app.css` (บรรทัด ~2159-2180):
+    1. เพิ่ม `display: block;` ให้ `.gl-row__title`
+    2. เพิ่ม `display: block;` ให้ `.gl-row__meta`
+    3. ปรับ `.gl-row__end` ให้เป็น Flex column (`display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1);`) เพื่อแยกยอดเงินไว้ด้านบน และ Badge สถานะไว้ด้านล่างอย่างสวยงามเป็นสัดส่วน
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน 100% (0 errors)**
+  - `npm run lint`: **ผ่าน 100%**
+  - `npm test`: **ผ่านครบทั้ง 64 test suites (595 tests passed 100%, 0 failures)**
+  - `npm run build`: **สร้าง production bundle สำเร็จเรียบร้อย**
+  - ทดสอบจับภาพหน้าจอเปรียบเทียบด้วย Playwright ยืนยันข้อความตัดด้วย ellipsis สวยงาม ไม่มีการซ้อนทับกันอีกต่อไป
+- **สถานะ:** พร้อมให้ผู้ใช้ตรวจสอบและตัดสินใจ Commit / Push
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-04 15:30 (Real Browser Smoke Test สำเร็จสมบูรณ์ — พร้อม Commit)
 
 - **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)

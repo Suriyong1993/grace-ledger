@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { renderEmptyStateHtml } from "../components/shared/EmptyState";
 import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
@@ -392,11 +393,6 @@ export class TransactionsPage {
     const netSum = incomeSum.subtract(expenseSum);
     const netIsPositive = netSum.isPositive();
     const netSign = netIsPositive ? "+" : "";
-    const netColor = netIsPositive
-      ? "var(--income)"
-      : netSum.isNegative()
-        ? "var(--expense)"
-        : "var(--foreground)";
 
     const todayItems = sorted.filter((t) => t.dateGroup === "today");
     const yesterdayItems = sorted.filter((t) => t.dateGroup === "yesterday");
@@ -454,10 +450,10 @@ export class TransactionsPage {
     };
 
     const emptyHtml = sorted.length === 0
-      ? `<div class="gl-card gl-empty-center">
-          <p class="gl-empty-center__msg">ไม่พบรายการที่ตรงกับเงื่อนไข</p>
-          <p class="gl-empty-center__hint">ลองเปลี่ยนตัวกรองหรือคำค้นหา</p>
-        </div>`
+      ? renderEmptyStateHtml({
+          message: "ไม่พบรายการที่ตรงกับเงื่อนไข",
+          hint: "ลองเปลี่ยนตัวกรองหรือคำค้นหา",
+        })
       : "";
 
     return `
@@ -474,15 +470,15 @@ export class TransactionsPage {
       <div class="gl-card gl-txn-summary">
         <div class="gl-txn-summary__item">
           <span class="gl-txn-summary__label">รายรับ</span>
-          <span class="num-display gl-txn-summary__value" style="color: var(--income);">+${incomeSum.format()}</span>
+          <span class="num-display gl-txn-summary__value gl-income">+${incomeSum.format()}</span>
         </div>
         <div class="gl-txn-summary__item">
           <span class="gl-txn-summary__label">รายจ่าย</span>
-          <span class="num-display gl-txn-summary__value" style="color: var(--expense);">−${expenseSum.format()}</span>
+          <span class="num-display gl-txn-summary__value gl-expense">−${expenseSum.format()}</span>
         </div>
         <div class="gl-txn-summary__item">
           <span class="gl-txn-summary__label">สุทธิ</span>
-          <span class="num-display gl-txn-summary__value" style="color: ${netColor};">${netSign}${netSum.format()}</span>
+          <span class="num-display gl-txn-summary__value ${netSum.isPositive() ? 'gl-income' : netSum.isNegative() ? 'gl-expense' : 'gl-net'}">${netSign}${netSum.format()}</span>
         </div>
       </div>
 

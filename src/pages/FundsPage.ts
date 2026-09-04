@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { renderEmptyStateHtml } from "../components/shared/EmptyState";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { FundsService } from "../lib/funds/funds-service";
@@ -219,12 +220,17 @@ export class FundsPage {
     const fundsGridHtml = this.errorMessage
       ? ""
       : this.funds.length === 0
-        ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
-          <div class="gl-empty-center__icon" aria-hidden="true">${ICON_TRANSFER}</div>
-          <p class="gl-empty-center__msg">ยังไม่มีกองทุนในระบบ</p>
-          <p class="gl-empty-center__hint">สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท</p>
-          <button id="empty-create-fund-btn" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-3);">สร้างกองทุนแรก</button>
-        </div>`
+        ? renderEmptyStateHtml({
+            icon: ICON_TRANSFER,
+            message: "ยังไม่มีกองทุนในระบบ",
+            hint: "สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท",
+            action: {
+              label: "สร้างกองทุนแรก",
+              type: "button",
+              id: "empty-create-fund-btn",
+              variant: "primary",
+            },
+          })
         : `
         <div class="gl-funds-grid">
           ${this.funds

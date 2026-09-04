@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { renderEmptyStateHtml } from "../components/shared/EmptyState";
 import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
@@ -345,18 +346,28 @@ export class MembersPage {
     const membersGridHtml = this.errorMessage
       ? ""
       : this.members.length === 0
-        ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
-          <div class="gl-empty-center__icon" aria-hidden="true">${ICON_CERT}</div>
-          <p class="gl-empty-center__msg">ยังไม่มีรายชื่อสมาชิก</p>
-          <p class="gl-empty-center__hint">เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี</p>
-          <button id="empty-add-member-btn" class="gl-btn gl-btn--primary gl-btn--sm" style="margin-top: var(--space-3);">เพิ่มสมาชิกคนแรก</button>
-        </div>`
+        ? renderEmptyStateHtml({
+            icon: ICON_CERT,
+            message: "ยังไม่มีรายชื่อสมาชิก",
+            hint: "เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี",
+            action: {
+              label: "เพิ่มสมาชิกคนแรก",
+              type: "button",
+              id: "empty-add-member-btn",
+              variant: "primary",
+            },
+          })
         : filtered.length === 0
-          ? `<div class="gl-card gl-card--pad-lg gl-empty-center">
-          <p class="gl-empty-center__msg">ไม่พบสมาชิกที่ค้นหา</p>
-          <p class="gl-empty-center__hint">ลองเปลี่ยนคำค้น หรือค้นหาด้วยชื่อ รหัส หรือกลุ่มแคร์</p>
-          <button id="clear-member-search-btn" class="gl-btn gl-btn--secondary gl-btn--sm" style="margin-top: var(--space-3);">ล้างคำค้นหา</button>
-        </div>`
+          ? renderEmptyStateHtml({
+              message: "ไม่พบสมาชิกที่ค้นหา",
+              hint: "ลองเปลี่ยนคำค้น หรือค้นหาด้วยชื่อ รหัส หรือกลุ่มแคร์",
+              action: {
+                label: "ล้างคำค้นหา",
+                type: "button",
+                id: "clear-member-search-btn",
+                variant: "secondary",
+              },
+            })
         : `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-3);">
           ${filtered

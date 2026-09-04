@@ -102,8 +102,8 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).not.toContain('class="gl-stats"');
 
     // Sign and colour stay attached to the figure they describe.
-    expect(html).toContain('style="color: var(--income);">+฿18,450.00<');
-    expect(html).toContain('style="color: var(--expense);">−฿12,820.00<');
+    expect(html).toContain('class="num-display gl-income">+฿18,450.00<');
+    expect(html).toContain('class="num-display gl-expense">−฿12,820.00<');
   });
 
   it("puts the trend chart on its own full-width band above the activity split", () => {
