@@ -44,6 +44,7 @@ const ICON_PLUS = `<path d="M12 5v14M5 12h14"/>`;
 const ICON_CHECK = `<path d="M20 6L9 17l-5-5"/>`;
 const ICON_ALERT = `<circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>`;
 const ICON_DOC = `<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>`;
+const ICON_MORE = `<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>`;
 
 function icon(paths: string, size: number): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false">${paths}</svg>`;
@@ -142,16 +143,26 @@ const MOBILE_CONTENT_PRIORITY = [
   "members",
 ] as const;
 
+interface MobileComposition {
+  /** หน้าหลัก + up to 3 core workflow tabs, rendered as bar links. */
+  tabs: NavDestination[];
+  /** Every reachable destination that did not fit as a tab. Never dropped
+   * silently — surfaced via the "เพิ่มเติม" sheet instead. Profile is
+   * reachable from the topbar avatar on every width, so it is excluded
+   * from both the tabs and this overflow list. */
+  overflow: NavDestination[];
+}
+
 /**
- * Mobile composition: หน้าหลัก + up to 3 core workflow tabs + โปรไฟล์
- * (Total 4-5 tabs, fits cleanly on standard 390px mobile screens without overflow sheet)
+ * Mobile composition: หน้าหลัก + up to 3 core workflow tabs + "เพิ่มเติม"
+ * (a role with more than 3 reachable content destinations gets an overflow
+ * sheet instead of losing access to the rest — see DECISIONS.md D13).
  */
 function buildMobileComposition(
   destinations: NavDestination[],
   approvalsBadge: number | undefined,
-): NavDestination[] {
+): MobileComposition {
   const dashboard = destinations.find((d) => d.href === "#/")!;
-  const profile = destinations.find((d) => d.href === "#/profile")!;
   const contentPool = destinations.filter(
     (d) => d.href !== "#/" && d.href !== "#/profile",
   );
@@ -164,12 +175,15 @@ function buildMobileComposition(
   const candidateContent = [...byPriority, ...leftovers];
 
   const selectedContent = candidateContent.slice(0, 3);
-  const approvalsTab = selectedContent.find((d) => d.resource === "approvals");
+  const overflow = candidateContent.slice(3);
+  const approvalsTab = [...selectedContent, ...overflow].find(
+    (d) => d.resource === "approvals",
+  );
   if (approvalsTab && approvalsBadge !== undefined) {
     approvalsTab.badge = approvalsBadge;
   }
 
-  return [dashboard, ...selectedContent, profile];
+  return { tabs: [dashboard, ...selectedContent], overflow };
 }
 
 function renderSidebarLink(dest: NavDestination, isActive: boolean): string {
@@ -196,6 +210,18 @@ function renderMobileNavLink(dest: NavDestination, isActive: boolean): string {
         ${badge}
       </span>
       <span>${dest.shortLabel}</span>
+    </a>`;
+}
+
+function renderMoreSheetLink(dest: NavDestination): string {
+  const badge = dest.badge
+    ? `<span class="gl-attention-panel__group-count num-display" style="margin-left: auto;">${dest.badge}</span>`
+    : "";
+  return `
+    <a href="${dest.href}" class="gl-attention-panel__item" style="align-items: center;">
+      <span class="gl-attention-panel__item-icon" aria-hidden="true">${icon(dest.icon, 18)}</span>
+      <span class="gl-attention-panel__item-title">${dest.label}</span>
+      ${badge}
     </a>`;
 }
 
@@ -288,10 +314,11 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     can(role, "read", "transactions");
 
   const sidebarDestinations = destinationsForRole(role, approvalsBadge);
-  const mobileTabs = buildMobileComposition(
+  const { tabs: mobileTabs, overflow: mobileOverflow } = buildMobileComposition(
     sidebarDestinations,
     approvalsBadge,
   );
+  const mobileOverflowCount = mobileOverflow.reduce((sum, d) => sum + (d.badge || 0), 0);
 
   const activeSidebar = sidebarDestinations.find((d) => d.isActive(props.activeRoute));
   const activePageLabel = activeSidebar ? activeSidebar.label : "Grace Ledger";
@@ -578,6 +605,13 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         left: var(--space-3);
         width: auto;
       }
+      /* The "เพิ่มเติม" sheet opens from the bottom bar, not the topbar bell —
+         anchor it above the bar instead of below the header. */
+      .gl-more-panel {
+        top: auto;
+        bottom: calc(var(--gl-mobilenav-h) + env(safe-area-inset-bottom, 0px) + 8px);
+        max-height: min(420px, 60vh);
+      }
       .gl-shell-primary-action {
         min-height: 40px;
         padding: 0 var(--space-3);
@@ -733,6 +767,20 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     <!-- Role-aware Mobile Bottom Navigation -->
     <nav class="gl-mobilenav" aria-label="เมนูหลัก">
       ${mobileTabs.map((d) => renderMobileNavLink(d, d.isActive(props.activeRoute))).join("")}
+      ${
+        mobileOverflow.length > 0
+          ? `<button type="button" id="gl-more-btn" class="gl-mobilenav__item" aria-haspopup="dialog" aria-expanded="false" aria-controls="gl-more-panel" aria-label="เพิ่มเติม${mobileOverflowCount > 0 ? ` (${mobileOverflowCount} รายการ)` : ""}">
+              <span style="position: relative; display: inline-flex;">
+                ${icon(ICON_MORE, 22)}
+                ${mobileOverflowCount > 0 ? `<span class="gl-mobilenav__badge num-display">${mobileOverflowCount > 99 ? "99+" : mobileOverflowCount}</span>` : ""}
+              </span>
+              <span>เพิ่มเติม</span>
+            </button>
+            <div id="gl-more-panel" class="gl-attention-panel gl-more-panel" role="dialog" aria-modal="false" aria-label="เมนูเพิ่มเติม" hidden>
+              ${mobileOverflow.map((d) => renderMoreSheetLink(d)).join("")}
+            </div>`
+          : ""
+      }
     </nav>
   </div>
   `;

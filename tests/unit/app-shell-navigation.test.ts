@@ -116,17 +116,43 @@ describe("Authenticated App Shell & Navigation", () => {
     expect(unknownHtml).toContain('href="#/funds"');
   });
 
-  it("composes the mobile bar deliberately: 5 core workflow tabs with Profile and no overflow sheet", () => {
+  it("composes the mobile bar deliberately: หน้าหลัก + 3 priority workflow tabs, no destination silently dropped", () => {
     const html = renderAppShellHtml(treasurerProps, "<div>Content</div>");
 
     expect(html).toContain('class="gl-mobilenav"');
-    // Core workflow tabs + Profile
+    // หน้าหลัก + the 3 highest-priority content tabs for a treasurer.
     expect(html).toContain('href="#/"');
     expect(html).toContain('href="#/transactions"');
     expect(html).toContain('href="#/offerings"');
     expect(html).toContain('href="#/approvals"');
-    expect(html).toContain('href="#/profile"');
-    // No overflow sheet or more button
+    // Profile is not a bottom tab — it stays reachable from the topbar
+    // avatar on every width (D11 §4), so the bar is not spent on it.
+    const [, mobilenavHtml] = html.split('class="gl-mobilenav"');
+    expect(mobilenavHtml).not.toContain('href="#/profile"');
+
+    // A treasurer can read 6 content destinations but only 3 fit as tabs;
+    // the rest must never disappear — they surface via "เพิ่มเติม" (D13).
+    expect(html).toContain('id="gl-more-btn"');
+    expect(html).toContain('id="gl-more-panel"');
+    expect(html).toContain('aria-label="เพิ่มเติม"');
+    expect(html).toMatch(/id="gl-more-panel"[^>]*hidden/);
+    expect(html).toContain('href="#/funds"');
+    expect(html).toContain('href="#/members"');
+    expect(html).toContain('href="#/reports"');
+  });
+
+  it("hides the เพิ่มเติม overflow entirely when every reachable destination already fits as a tab", () => {
+    // Counter only reads 2 content destinations (offerings, funds) — both
+    // fit as tabs, so there is nothing left to overflow.
+    const html = renderAppShellHtml(
+      {
+        ...treasurerProps,
+        user: { ...treasurerProps.user!, role: "counter" },
+        attention: attentionFixture({ groups: [], totalCount: 0 }),
+      },
+      "<div>Content</div>",
+    );
+
     expect(html).not.toContain('id="gl-more-btn"');
     expect(html).not.toContain('id="gl-more-panel"');
   });

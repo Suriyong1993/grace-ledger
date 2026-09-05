@@ -593,8 +593,7 @@ export function renderLoginStylesHtml(): string {
     }
 
     .gl-pin-key:active:not(:disabled) {
-      transform: scale(0.95);
-      background: color-mix(in srgb, var(--primary) 12%, var(--card));
+      transform: scale(0.98);
     }
 
     .gl-pin-key:disabled {

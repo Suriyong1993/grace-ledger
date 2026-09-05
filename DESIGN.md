@@ -216,7 +216,10 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 | `.gl-nav-item`         | Sidebar link      |
 | `.gl-nav-item--active` | Current page      |
 | `.gl-mobilenav`        | Mobile bottom nav |
-| `.gl-mobilenav__item`  | Mobile nav link   |
+| `.gl-mobilenav__item`  | Mobile nav link (also used for the "เพิ่มเติม" trigger button) |
+| `.gl-mobilenav__badge` | Mobile nav badge count |
+| `.gl-attention-panel`  | Popover sheet base (bell panel and "เพิ่มเติม" overflow share it) |
+| `.gl-more-panel`       | Mobile overflow sheet — positions `.gl-attention-panel` above the bottom nav instead of below the topbar |
 | `.gl-tablist`          | Tab row           |
 | `.gl-tab`              | Individual tab    |
 

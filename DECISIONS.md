@@ -304,3 +304,60 @@ reintroducing a minimal overflow entry point is wanted, scheduled for the next p
 **Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (596/596), `npm run
 lint:design`, `npm run build` all green; verified `.gl-ai-greeting`/`cta-2026`/`gl-fade-slide-in` are absent
 from the built `dist/` bundle.
+
+### D13 — Mobile bottom nav: "เพิ่มเติม" overflow restored (resolves D12's deferred mobile gap)
+
+**Decision:** `AppShell.buildMobileComposition` no longer places Profile in the bottom bar and no longer
+truncates a role's reachable destinations to whatever fits in 3 tabs. The bar is now หน้าหลัก + up to 3
+priority content tabs (unchanged priority order); any destination the role can read beyond those 3 renders
+as a link inside a new "เพิ่มเติม" sheet (`#gl-more-btn` / `#gl-more-panel`), opened from a button appended to
+`.gl-mobilenav`. The button and its badge total (sum of any badge counts among the overflowed destinations)
+are omitted entirely when nothing overflows — most roles still see a plain 4-5 tab bar with no sheet at all.
+Profile itself is not duplicated into the overflow sheet: it was already reachable from the topbar avatar on
+every width per D11 §4, which this pass leaves unchanged.
+
+**Why:** a treasurer (or any role reading more than 3 of the 6 content destinations) lost silent access to
+the rest on mobile after the 2026-09-04 removal of the original overflow affordance — funds, reports, and
+members had no path from a phone. D11 §4's own requirement ("destinations are never hidden behind Profile")
+was violated by that removal. This is a bug fix for an already-approved requirement, not a new UI system: it
+reuses `.gl-attention-panel`'s existing popover markup/CSS/tokens (new `.gl-more-panel` only repositions it
+above the bottom bar instead of below the topbar) and the existing generic popover-toggle wiring in
+`main.ts#attachShellPanels`, which already anticipated a second popover by that exact ID pair.
+
+**Which test assertion is no longer authoritative:** `app-shell-navigation.test.ts`'s "5 core workflow tabs
+with Profile and no overflow sheet" test — it pinned the exact regression this decision fixes. Replaced with
+two tests: one asserting a treasurer's 3 unreachable-by-tab destinations (funds/reports/members) surface
+through `#gl-more-panel` and Profile is absent from `.gl-mobilenav`, one asserting the button/panel are absent
+entirely for a role (counter) whose destinations all fit as tabs.
+
+**Not touched in this pass:** sidebar and topbar priority/grouping — reviewed against this directive's target
+order (page context → primary action → utility → identity for the topbar; primary/secondary/utility grouping
+for the sidebar) and already conform, so left as-is per "preserve working architecture absent a demonstrated
+problem." Login and further responsive verification continue in this same pass, reported separately below.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575 passed, 22 skipped —
+the two real-Postgres integration suites, pre-existing sandbox limitation, unrelated to this change),
+`npm run lint:design`, `npm run build` all green.
+
+### D14 — Login: PIN keypad press state brought back into the motion contract
+
+**Decision:** `.gl-pin-key:active:not(:disabled)` in `src/components/login/loginStyles.ts` changes from
+`transform: scale(0.95); background: color-mix(in srgb, var(--primary) 12%, var(--card));` to
+`transform: scale(0.98);` only.
+
+**Why:** `design-system-extracted/readme.md`'s binding hover/press contract states "Press = `scale(0.97–0.98)`
+only, no color flash." The live rule was outside that range and added a background flash — a drift from an
+already-documented contract, not a new design decision. `design-plans/03-login-pin-key-press-state.md` had
+already identified and specified this exact fix (against an earlier commit hash); this pass verified the
+other two login design-plans (`01`, stylesheet/markup reconciliation, and `02`, the raw `#10b981` → `--success`
+token swap) were already applied in the current codebase, and applied the one that was not (`03`).
+
+**Login review against this directive's priorities (brand recognition, clear auth purpose, simple form
+hierarchy, obvious primary action, error states, responsive usability, no marketing/decorative content):** the
+existing split-panel login (`LoginPage.ts`, `loginStyles.ts`) already meets these — brand mark + wordmark +
+church name and a plain-language purpose statement on the vault panel, one profile-select-then-PIN flow with
+a single primary action per step, explicit `checking`/`incomplete`/`locked`/`requires_reset` PIN states, no
+gradients/illustrations/promotional copy. No further change made; this is a review finding, not a rewrite.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575/597, 22 pre-existing
+skips), `npm run lint:design`, `npm run build` all green.
