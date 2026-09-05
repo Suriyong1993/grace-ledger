@@ -719,7 +719,7 @@ export class DashboardPage {
         <h2 class="gl-visually-hidden">สุขภาพการเงิน</h2>
         <div class="gl-dash-hero-row">
           <div class="gl-card gl-dash-hero gl-rise">
-            <div class="kicker">ยอดเงินคงเหลือทั้งหมด</div>
+            <div class="kicker">ยอดคงเหลือทั้งหมด</div>
             <div class="num-display gl-dash-hero__value gl-total-rule" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 
