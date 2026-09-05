@@ -7,7 +7,7 @@ import { ReportsService } from "../lib/reports/reports-service";
 import { Money } from "../lib/money";
 import { escapeHtml, formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
-import { can, toUserRole, type UserRole } from "../lib/rbac";
+import { can, roleLabelTh, toUserRole, type UserRole } from "../lib/rbac";
 import type { AppShellUser } from "../components/layout/AppShell";
 import type { AttentionSummary } from "../services/attention-service";
 
@@ -682,16 +682,7 @@ export class DashboardPage {
       .join("");
 
     const displayName = activeUser?.name || "";
-    const userRoleLabel =
-      activeUser?.role === "pastor"
-        ? "ศิษยาภิบาล"
-        : activeUser?.role === "treasurer"
-          ? "เหรัญญิก"
-          : activeUser?.role === "counter"
-            ? "ผู้นับเงิน"
-            : activeUser?.role === "super_admin"
-              ? "ผู้ตรวจสอบบัญชี"
-              : "";
+    const userRoleLabel = activeUser?.role ? roleLabelTh(activeUser.role) : "";
 
     const greetingTitle = displayName
       ? `สวัสดีครับ ${escapeHtml(displayName)}${userRoleLabel ? ` · ${escapeHtml(userRoleLabel)}` : ""}`
