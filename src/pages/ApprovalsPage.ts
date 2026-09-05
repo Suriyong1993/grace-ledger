@@ -272,8 +272,7 @@ export class ApprovalsPage {
       <div class="gl-modal-content gl-modal-content--sheet" role="dialog" aria-modal="true" aria-labelledby="gl-modal-title">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
           <h2 id="gl-modal-title" style="font-size: var(--text-md); font-weight: var(--weight-bold); margin: 0;">${title}</h2>
-          <button type="button" class="gl-modal-close" aria-label="ปิด"
-            style="background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--muted-foreground); line-height: 1; padding: 4px;">&times;</button>
+          <button type="button" class="gl-modal-close" aria-label="ปิด">&times;</button>
         </div>
         <div style="background: var(--secondary); border-radius: var(--radius); padding: var(--space-3); margin-bottom: var(--space-4); font-size: var(--text-xs);">
           <div><strong>รายการ:</strong> ${escapeHtml(item.description)}</div>

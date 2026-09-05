@@ -105,7 +105,7 @@ body {
    -------------------------------------------------------------------------- */
 .gl-total-rule {
   position: relative;
-  padding-bottom: 12px;
+  padding-bottom: var(--space-3);
 }
 
 .gl-total-rule::after {
@@ -142,7 +142,7 @@ body {
   font-family: var(--font-display);
   font-size: clamp(var(--text-xl), 2.4vw, var(--text-3xl));
   font-weight: var(--weight-bold);
-  letter-spacing: -0.025em;
+  letter-spacing: var(--tracking-heading);
   color: var(--foreground);
   margin: 0;
 }
@@ -710,7 +710,7 @@ button.gl-card:active {
 }
 
 .gl-txn-row:active {
-  transform: scale(0.995);
+  transform: scale(0.98);
 }
 
 .gl-txn-row:focus-visible {
@@ -818,7 +818,7 @@ button.gl-card:active {
   margin-top: var(--space-2);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 /* --------------------------------------------------------------------------
@@ -1595,7 +1595,7 @@ button.gl-card:active {
 .gl-cashcount-summary__value {
   margin-top: var(--space-1);
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
 }
@@ -1804,7 +1804,7 @@ button.gl-card:active {
 
 .gl-approval-amount__value {
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
 }
 
@@ -2035,8 +2035,14 @@ button.gl-card:active {
 
 .gl-dash-hero__value {
   margin-top: var(--space-2);
-  font-size: clamp(2.25rem, 4vw, 3.25rem);
-  font-weight: var(--weight-bold);
+  /* The scale already names these two steps: --text-5xl is commented
+     "hero balance" and --text-6xl "hero balance lg". The previous min, a bare
+     2.25rem, sat off the scale between --text-4xl and --text-5xl. */
+  font-size: clamp(var(--text-5xl), 4vw, var(--text-6xl));
+  /* Semibold, not bold. At 40-52px the size, the tight tracking and the
+     tabular figures already carry the hierarchy; the extra weight only adds
+     mass. See D17. */
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
 }
@@ -2204,8 +2210,10 @@ a.gl-row:hover {
 }
 
 a.gl-row:active {
+  /* Same tint as :hover, so this is not a flash to another colour — it is
+     the touch equivalent of hover, where no hover exists. */
   background: var(--accent);
-  transform: scale(0.99);
+  transform: scale(0.98);
 }
 
 a.gl-row:focus-visible {
@@ -2749,13 +2757,38 @@ a.gl-row:focus-visible {
   letter-spacing: -0.015em;
 }
 
+/* The controls in the top bar never shrink; the page title absorbs the
+   squeeze and ellipsizes instead.
+
+   Before this, __context was a shrinkable flex item whose contents are
+   `white-space: nowrap`, so on a 390px phone it was squeezed to 172px while
+   its content stayed 247px wide. The tail — the avatar and the mobile sign-out
+   button — was pushed to x=405, off the right edge of a 390px screen. The page
+   did not scroll sideways, so the button was invisible yet still focusable: a
+   keyboard or screen-reader user could reach a control nobody could see. The
+   640px rule that drops the church chip was an earlier, partial answer to the
+   same squeeze.
+
+   The cap itself was the cause: __context carried `max-width: 42%` (48% under
+   768px) with `overflow: hidden`, which reserved 172px of a 358px content box
+   for a row whose controls measure 247px. That cap was written when the slot
+   held the church name as text; it now holds the primary action, the bell, the
+   avatar and sign-out, and a percentage cap on fixed 44px controls clips them.
+   Text truncation stays where it belongs — the church chip keeps its own
+   `max-width: 140px` with an ellipsis, and the page title ellipsizes. */
+.gl-shell-topbar__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gl-shell-topbar__context {
+  flex: 0 0 auto;
+}
+
 .gl-shell-topbar__context {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  max-width: 42%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .gl-shell-status-dot {
@@ -2793,7 +2826,7 @@ a.gl-row:focus-visible {
 }
 
 .gl-logout-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .gl-logout-btn:focus-visible {
@@ -2896,7 +2929,6 @@ a {
   }
 
   .gl-shell-topbar__context {
-    max-width: 48%;
     font-size: var(--text-2xs) !important;
   }
 }
@@ -2954,7 +2986,7 @@ a {
   justify-content: space-between;
   font-size: var(--text-2xs);
   color: var(--muted-foreground);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .gl-funds-modal-head {
@@ -3018,13 +3050,13 @@ a {
 .gl-reports-hero__value {
   margin-top: var(--space-2);
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
 }
 
 .gl-reports-hero__caption {
-  margin-top: 4px;
+  margin-top: var(--space-1);
   font-size: var(--text-2xs);
   color: var(--muted-foreground);
 }
@@ -3655,6 +3687,8 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  /* Tappable row in the bell panel; padding alone left it at 37px. */
+  min-height: var(--touch-target-min);
   padding: var(--space-3) var(--space-4);
   background: var(--secondary);
   border-bottom: 1px solid var(--border);
@@ -3746,6 +3780,8 @@ a {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
+  /* Tappable link in the bell panel; padding alone left it at 31px. */
+  min-height: var(--touch-target-min);
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
@@ -3840,7 +3876,7 @@ a {
 }
 
 .gl-shell-icon-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .gl-shell-icon-btn:focus-visible {
@@ -4036,7 +4072,7 @@ a {
 }
 
 .gl-modal-close:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .gl-modal-close:focus-visible {

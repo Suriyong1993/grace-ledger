@@ -334,7 +334,9 @@ export function renderLoginStylesHtml(): string {
     }
 
     .gl-profile-item:active {
-      transform: scale(0.99);
+      /* 0.98, matching .gl-pin-key. D14 brought the PIN key into the contract
+         and this control, the first one a user touches, was missed. */
+      transform: scale(0.98);
     }
 
     .gl-profile-item:focus-visible {

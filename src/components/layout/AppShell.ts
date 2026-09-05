@@ -613,7 +613,12 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         max-height: min(420px, 60vh);
       }
       .gl-shell-primary-action {
-        min-height: 40px;
+        /* Narrower padding and the short label buy the width; the touch target
+           itself stays at the 44px minimum. It was 40px, which compacted the
+           app's most-tapped control below the size the design system sets for
+           every other one. The room came back when the topbar's percentage
+           cap was removed. */
+        min-height: var(--touch-target-min);
         padding: 0 var(--space-3);
         font-size: var(--text-xs);
       }
