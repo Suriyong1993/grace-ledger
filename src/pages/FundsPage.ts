@@ -33,6 +33,8 @@ export class FundsPage {
   private transferSuccessMsg: string | null = null;
   private errorMessage: string | null = null;
   private formErrorMessage: string | null = null;
+  private createFieldErrors: Record<string, string> = {};
+  private transferFieldErrors: Record<string, string> = {};
   private isLoading = false;
   private isSubmitting = false;
 
@@ -84,6 +86,16 @@ export class FundsPage {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  private fieldErrorHtml(
+    errors: Record<string, string>,
+    field: string,
+  ): string {
+    const msg = errors[field];
+    return msg
+      ? `<p class="gl-field-error" role="alert">${escapeHtml(msg)}</p>`
+      : "";
   }
 
   public renderHtml(): string {
@@ -142,29 +154,33 @@ export class FundsPage {
 
           ${formErrorHtml}
 
-          <form id="transfer-form" class="gl-stack">
+          <form id="transfer-form" class="gl-stack" novalidate>
             <div class="gl-field">
               <label class="gl-label" for="from-fund">กองทุนต้นทาง (หักเงินออก)</label>
-              <select class="gl-select" id="from-fund" required>
+              <select class="gl-select ${this.transferFieldErrors.fromFund ? "has-error" : ""}" id="from-fund">
                 ${this.funds.map((f) => `<option value="${f.id}">${escapeHtml(f.name)} (${f.balance.format()})</option>`).join("")}
               </select>
+              ${this.fieldErrorHtml(this.transferFieldErrors, "fromFund")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="to-fund">กองทุนปลายทาง (รับเงินเข้า)</label>
-              <select class="gl-select" id="to-fund" required>
+              <select class="gl-select ${this.transferFieldErrors.toFund ? "has-error" : ""}" id="to-fund">
                 ${this.funds.map((f, idx) => `<option value="${f.id}" ${idx === 1 ? "selected" : ""}>${escapeHtml(f.name)}</option>`).join("")}
               </select>
+              ${this.fieldErrorHtml(this.transferFieldErrors, "toFund")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="transfer-amount">จำนวนเงิน (฿)</label>
-              <input type="number" class="gl-input" id="transfer-amount" required placeholder="0.00" step="0.01" min="1" />
+              <input type="number" class="gl-input ${this.transferFieldErrors.amount ? "has-error" : ""}" id="transfer-amount" placeholder="0.00" step="0.01" min="1" />
+              ${this.fieldErrorHtml(this.transferFieldErrors, "amount")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="transfer-reason">เหตุผลประกอบการโอนเงิน</label>
-              <textarea class="gl-textarea" id="transfer-reason" required placeholder="เช่น มติคณะกรรมการ หรือ สมทบโครงการพันธกิจ..."></textarea>
+              <textarea class="gl-textarea ${this.transferFieldErrors.reason ? "has-error" : ""}" id="transfer-reason" placeholder="เช่น มติคณะกรรมการ หรือ สมทบโครงการพันธกิจ..."></textarea>
+              ${this.fieldErrorHtml(this.transferFieldErrors, "reason")}
             </div>
 
             <div class="gl-funds-modal-actions">
@@ -192,10 +208,11 @@ export class FundsPage {
 
           ${formErrorHtml}
 
-          <form id="create-fund-form" class="gl-stack">
+          <form id="create-fund-form" class="gl-stack" novalidate>
             <div class="gl-field">
               <label class="gl-label" for="fund-name-input">ชื่อกองทุน *</label>
-              <input type="text" class="gl-input" id="fund-name-input" required placeholder="เช่น กองทุนสร้างพระวิหาร, กองทุนสงเคราะห์" />
+              <input type="text" class="gl-input ${this.createFieldErrors.name ? "has-error" : ""}" id="fund-name-input" placeholder="เช่น กองทุนสร้างพระวิหาร, กองทุนสงเคราะห์" />
+              ${this.fieldErrorHtml(this.createFieldErrors, "name")}
             </div>
 
             <div class="gl-field">
@@ -205,7 +222,8 @@ export class FundsPage {
 
             <div class="gl-field">
               <label class="gl-label" for="fund-target-input">เป้าหมายงบประมาณ (฿) (ถ้ามี)</label>
-              <input type="number" class="gl-input" id="fund-target-input" placeholder="0.00" step="0.01" min="0" />
+              <input type="number" class="gl-input ${this.createFieldErrors.target ? "has-error" : ""}" id="fund-target-input" placeholder="0.00" step="0.01" min="0" />
+              ${this.fieldErrorHtml(this.createFieldErrors, "target")}
             </div>
 
             <div class="gl-funds-modal-actions">
@@ -348,12 +366,14 @@ export class FundsPage {
       this.isTransferModalOpen = true;
       this.transferSuccessMsg = null;
       this.formErrorMessage = null;
+      this.transferFieldErrors = {};
       onStateChange();
     });
 
     const closeTransferModal = () => {
       this.isTransferModalOpen = false;
       this.formErrorMessage = null;
+      this.transferFieldErrors = {};
       onStateChange();
     };
 
@@ -372,6 +392,7 @@ export class FundsPage {
     const openCreate = () => {
       this.isCreateModalOpen = true;
       this.formErrorMessage = null;
+      this.createFieldErrors = {};
       onStateChange();
     };
 
@@ -385,6 +406,7 @@ export class FundsPage {
     const closeCreateModal = () => {
       this.isCreateModalOpen = false;
       this.formErrorMessage = null;
+      this.createFieldErrors = {};
       onStateChange();
     };
 
@@ -414,16 +436,38 @@ export class FundsPage {
 
       const fromId = fromFundSelect?.value || "";
       const toId = toFundSelect?.value || "";
-      const amountVal = amountInput?.value || "0";
-      const reasonVal = reasonInput?.value || "";
+      const amountVal = amountInput?.value || "";
+      const reasonVal = reasonInput?.value.trim() || "";
 
-      if (fromId === toId) {
-        this.formErrorMessage =
-          "กองทุนต้นทางและกองทุนปลายทางต้องไม่เป็นกองทุนเดียวกัน";
+      const errors: Record<string, string> = {};
+      if (!fromId) errors.fromFund = "กรุณาเลือกกองทุนต้นทาง";
+      if (!toId) errors.toFund = "กรุณาเลือกกองทุนปลายทาง";
+      if (fromId && toId && fromId === toId) {
+        errors.toFund = "กองทุนต้นทางและปลายทางต้องไม่เป็นกองทุนเดียวกัน";
+      }
+      if (!amountVal) {
+        errors.amount = "กรุณาระบุจำนวนเงิน";
+      } else {
+        try {
+          const m = Money.from(amountVal);
+          if (!m.isPositive() || m.isZero()) {
+            errors.amount = "จำนวนเงินต้องมากกว่า 0.00 บาท";
+          }
+        } catch {
+          errors.amount = "จำนวนเงินไม่ถูกต้อง";
+        }
+      }
+      if (!reasonVal || reasonVal.length < 5) {
+        errors.reason = "กรุณาระบุเหตุผลอย่างน้อย 5 ตัวอักษร";
+      }
+
+      if (Object.keys(errors).length > 0) {
+        this.transferFieldErrors = errors;
         onStateChange();
         return;
       }
 
+      this.transferFieldErrors = {};
       this.isSubmitting = true;
       this.formErrorMessage = null;
       onStateChange();
@@ -434,11 +478,12 @@ export class FundsPage {
           from_fund_id: fromId,
           to_fund_id: toId,
           amount: amountVal,
-          notes: reasonVal || "โอนเงินระหว่างกองทุน",
+          notes: reasonVal,
         });
 
         if (!res.success) {
-          this.formErrorMessage = res.error || "เกิดข้อผิดพลาดในการโอนเงิน";
+          this.formErrorMessage =
+            res.error || "เกิดข้อผิดพลาดในการโอนเงิน กรุณาลองใหม่อีกครั้ง";
           this.isSubmitting = false;
           onStateChange();
           return;
@@ -450,7 +495,8 @@ export class FundsPage {
         await this.loadData();
         onStateChange();
       } catch (err: any) {
-        this.formErrorMessage = err.message || "เกิดข้อผิดพลาด";
+        this.formErrorMessage =
+          err?.message || "เชื่อมต่อฐานข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
         this.isSubmitting = false;
         onStateChange();
       }
@@ -471,12 +517,24 @@ export class FundsPage {
       const descVal = descInput?.value?.trim() || undefined;
       const targetVal = targetInput?.value ? targetInput.value : undefined;
 
-      if (!nameVal) {
-        this.formErrorMessage = "กรุณาระบุชื่อกองทุน";
+      const errors: Record<string, string> = {};
+      if (!nameVal) errors.name = "กรุณาระบุชื่อกองทุน";
+      if (targetVal) {
+        try {
+          const m = Money.from(targetVal);
+          if (m.isNegative()) errors.target = "เป้าหมายงบประมาณต้องไม่ติดลบ";
+        } catch {
+          errors.target = "เป้าหมายงบประมาณไม่ถูกต้อง";
+        }
+      }
+
+      if (Object.keys(errors).length > 0) {
+        this.createFieldErrors = errors;
         onStateChange();
         return;
       }
 
+      this.createFieldErrors = {};
       this.isSubmitting = true;
       this.formErrorMessage = null;
       onStateChange();
@@ -490,7 +548,8 @@ export class FundsPage {
         });
 
         if (!res.success) {
-          this.formErrorMessage = res.error || "เกิดข้อผิดพลาดในการสร้างกองทุน";
+          this.formErrorMessage =
+            res.error || "เกิดข้อผิดพลาดในการสร้างกองทุน กรุณาลองใหม่อีกครั้ง";
           this.isSubmitting = false;
           onStateChange();
           return;
@@ -502,7 +561,8 @@ export class FundsPage {
         await this.loadData();
         onStateChange();
       } catch (err: any) {
-        this.formErrorMessage = err.message || "เกิดข้อผิดพลาด";
+        this.formErrorMessage =
+          err?.message || "เชื่อมต่อฐานข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
         this.isSubmitting = false;
         onStateChange();
       }

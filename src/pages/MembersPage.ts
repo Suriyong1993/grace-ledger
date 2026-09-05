@@ -39,6 +39,7 @@ export class MembersPage {
   private errorMessage: string | null = null;
   private successMessage: string | null = null;
   private formErrorMessage: string | null = null;
+  private addMemberFieldErrors: Record<string, string> = {};
   private isLoading = false;
   private isSubmitting = false;
   // Per-member confidential giving history, loaded only on explicit detail view
@@ -324,20 +325,23 @@ export class MembersPage {
               : ""
           }
 
-          <form id="add-member-form" style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <form id="add-member-form" style="display: flex; flex-direction: column; gap: var(--space-3);" novalidate>
             <div class="gl-field">
               <label class="gl-label" for="member-name-input">ชื่อ-นามสกุล *</label>
-              <input type="text" class="gl-input" id="member-name-input" required placeholder="เช่น สมเกียรติ วงศ์สว่าง" />
+              <input type="text" class="gl-input ${this.addMemberFieldErrors.name ? "has-error" : ""}" id="member-name-input" placeholder="เช่น สมเกียรติ วงศ์สว่าง" />
+              ${this.addMemberFieldErrors.name ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.name)}</p>` : ""}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="member-phone-input">เบอร์โทรศัพท์</label>
-              <input type="tel" class="gl-input" id="member-phone-input" placeholder="เช่น 081-234-5678" />
+              <input type="tel" class="gl-input ${this.addMemberFieldErrors.phone ? "has-error" : ""}" id="member-phone-input" placeholder="เช่น 081-234-5678" />
+              ${this.addMemberFieldErrors.phone ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.phone)}</p>` : ""}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="member-email-input">อีเมล</label>
-              <input type="email" class="gl-input" id="member-email-input" placeholder="เช่น somkiat@example.com" />
+              <input type="email" class="gl-input ${this.addMemberFieldErrors.email ? "has-error" : ""}" id="member-email-input" placeholder="เช่น somkiat@example.com" />
+              ${this.addMemberFieldErrors.email ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.email)}</p>` : ""}
             </div>
 
             <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">
@@ -519,6 +523,7 @@ export class MembersPage {
       this.isAddMemberModalOpen = true;
       this.formErrorMessage = null;
       this.successMessage = null;
+      this.addMemberFieldErrors = {};
       onStateChange();
     };
 
@@ -532,6 +537,7 @@ export class MembersPage {
     const closeAddMemberModal = () => {
       this.isAddMemberModalOpen = false;
       this.formErrorMessage = null;
+      this.addMemberFieldErrors = {};
       onStateChange();
     };
 
@@ -565,12 +571,22 @@ export class MembersPage {
       const phoneVal = phoneInput?.value?.trim() || undefined;
       const emailVal = emailInput?.value?.trim() || undefined;
 
-      if (!nameVal) {
-        this.formErrorMessage = "กรุณาระบุชื่อ-นามสกุลสมาชิก";
+      const errors: Record<string, string> = {};
+      if (!nameVal) errors.name = "กรุณาระบุชื่อ-นามสกุลสมาชิก";
+      if (phoneVal && !/^[0-9+\-\s()]{7,20}$/.test(phoneVal)) {
+        errors.phone = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง";
+      }
+      if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        errors.email = "รูปแบบอีเมลไม่ถูกต้อง";
+      }
+
+      if (Object.keys(errors).length > 0) {
+        this.addMemberFieldErrors = errors;
         onStateChange();
         return;
       }
 
+      this.addMemberFieldErrors = {};
       this.isSubmitting = true;
       this.formErrorMessage = null;
       onStateChange();
@@ -584,7 +600,8 @@ export class MembersPage {
         });
 
         if (!res.success) {
-          this.formErrorMessage = res.error || "ไม่สามารถเพิ่มสมาชิกได้";
+          this.formErrorMessage =
+            res.error || "ไม่สามารถเพิ่มสมาชิกได้ กรุณาลองใหม่อีกครั้ง";
           this.isSubmitting = false;
           onStateChange();
           return;
