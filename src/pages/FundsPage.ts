@@ -4,6 +4,7 @@ import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { FundsService } from "../lib/funds/funds-service";
 import { escapeHtml } from "../lib/format";
+import { UserRole, can } from "../lib/rbac";
 
 export interface FundDetail {
   id: string;
@@ -38,8 +39,9 @@ export class FundsPage {
   constructor(
     supabase: SupabaseClient<Database>,
     private churchId: string,
+    private userRole?: UserRole,
   ) {
-    this.fundsService = new FundsService(supabase);
+    this.fundsService = new FundsService(supabase, userRole);
   }
 
   public async loadData(): Promise<void> {
@@ -217,6 +219,13 @@ export class FundsPage {
       </div>`
       : "";
 
+    const canCreateFund = can(this.userRole ?? "member", "create", "funds");
+    const canTransferFunds = can(
+      this.userRole ?? "member",
+      "create",
+      "fund_transfers",
+    );
+
     const fundsGridHtml = this.errorMessage
       ? ""
       : this.funds.length === 0
@@ -224,12 +233,14 @@ export class FundsPage {
             icon: ICON_TRANSFER,
             message: "ยังไม่มีกองทุนในระบบ",
             hint: "สร้างกองทุนเพื่อเริ่มต้นการจัดสรรงบประมาณและบันทึกบัญชีแยกประเภท",
-            action: {
-              label: "สร้างกองทุนแรก",
-              type: "button",
-              id: "empty-create-fund-btn",
-              variant: "primary",
-            },
+            action: canCreateFund
+              ? {
+                  label: "สร้างกองทุนแรก",
+                  type: "button",
+                  id: "empty-create-fund-btn",
+                  variant: "primary",
+                }
+              : undefined,
           })
         : `
         <div class="gl-funds-grid">
@@ -271,14 +282,22 @@ export class FundsPage {
           <p>บริหารจัดการกองทุนเฉพาะกิจ ยอดคงเหลือ และการจัดสรรงบประมาณ</p>
         </div>
         <div class="gl-funds-pagehead__actions">
-          <button id="open-create-btn" class="gl-btn gl-btn--secondary">
-            ${ICON_PLUS}
-            <span>สร้างกองทุนใหม่</span>
-          </button>
-          <button id="open-transfer-btn" class="gl-btn gl-btn--primary" ${this.funds.length < 2 ? "disabled" : ""}>
-            ${ICON_TRANSFER}
-            <span>โอนเงินกองทุน</span>
-          </button>
+          ${
+            canCreateFund
+              ? `<button id="open-create-btn" class="gl-btn gl-btn--secondary">
+                  ${ICON_PLUS}
+                  <span>สร้างกองทุนใหม่</span>
+                </button>`
+              : ""
+          }
+          ${
+            canTransferFunds
+              ? `<button id="open-transfer-btn" class="gl-btn gl-btn--primary" ${this.funds.length < 2 ? "disabled" : ""}>
+                  ${ICON_TRANSFER}
+                  <span>โอนเงินกองทุน</span>
+                </button>`
+              : ""
+          }
         </div>
       </div>
 

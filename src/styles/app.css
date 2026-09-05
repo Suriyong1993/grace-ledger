@@ -24,7 +24,6 @@
   --on-expense-muted: oklch(0.4 0.13 25);
   --on-pending-muted: oklch(0.38 0.08 80);
   --on-info-muted: oklch(0.42 0.11 250);
-
 }
 
 .dark {
@@ -550,6 +549,18 @@ button.gl-card:active {
 .gl-hint {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
+}
+
+.gl-field-error {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--expense);
+}
+
+.gl-input.has-error,
+.gl-select.has-error,
+.gl-textarea.has-error {
+  border-color: var(--expense);
 }
 
 .gl-error-text {

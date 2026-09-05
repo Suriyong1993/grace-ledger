@@ -1,12 +1,33 @@
 import { describe, it, expect } from "vitest";
 import { FundsPage } from "../../src/pages/FundsPage";
+import { UserRole } from "../../src/lib/rbac";
 
 describe("FundsPage UI — Unit Tests", () => {
   const mockFunds = [
-    { id: "f-1", name: "กองทุนทั่วไป", current_balance: "128450.00", is_active: true },
-    { id: "f-2", name: "กองทุนพันธกิจ", current_balance: "42300.00", is_active: true },
-    { id: "f-3", name: "กองทุนอาคารและสถานที่", current_balance: "65800.00", is_active: true },
-    { id: "f-4", name: "กองทุนเยาวชนและการศึกษา", current_balance: "12010.00", is_active: true },
+    {
+      id: "f-1",
+      name: "กองทุนทั่วไป",
+      current_balance: "128450.00",
+      is_active: true,
+    },
+    {
+      id: "f-2",
+      name: "กองทุนพันธกิจ",
+      current_balance: "42300.00",
+      is_active: true,
+    },
+    {
+      id: "f-3",
+      name: "กองทุนอาคารและสถานที่",
+      current_balance: "65800.00",
+      is_active: true,
+    },
+    {
+      id: "f-4",
+      name: "กองทุนเยาวชนและการศึกษา",
+      current_balance: "12010.00",
+      is_active: true,
+    },
   ];
 
   const mockSupabase = {
@@ -21,17 +42,33 @@ describe("FundsPage UI — Unit Tests", () => {
     }),
   } as any;
 
-  it("renders total fund balance card and header", async () => {
-    const page = new FundsPage(mockSupabase, "church-1");
+  it("renders total fund balance card and header for a role that can create/transfer funds", async () => {
+    const page = new FundsPage(
+      mockSupabase,
+      "church-1",
+      "treasurer" as UserRole,
+    );
     await page.loadData();
     const html = page.renderHtml();
 
     expect(html).toContain("<h1>กองทุนและงบประมาณ</h1>");
-    expect(html).toContain("บริหารจัดการกองทุนเฉพาะกิจ ยอดคงเหลือ และการจัดสรรงบประมาณ");
+    expect(html).toContain(
+      "บริหารจัดการกองทุนเฉพาะกิจ ยอดคงเหลือ และการจัดสรรงบประมาณ",
+    );
     expect(html).toContain("ยอดคงเหลือรวมทุกกองทุน");
     expect(html).toContain("฿248,560.00");
     expect(html).toContain('id="open-transfer-btn"');
+    expect(html).toContain('id="open-create-btn"');
     expect(html).toContain("โอนเงินกองทุน");
+  });
+
+  it("hides create-fund and transfer buttons for a role without funds/fund_transfers create rights", async () => {
+    const page = new FundsPage(mockSupabase, "church-1", "member" as UserRole);
+    await page.loadData();
+    const html = page.renderHtml();
+
+    expect(html).not.toContain('id="open-create-btn"');
+    expect(html).not.toContain('id="open-transfer-btn"');
   });
 
   it("renders clean Thai fund cards without bilingual double-labels", async () => {
@@ -71,7 +108,8 @@ describe("FundsPage UI — Unit Tests", () => {
     const page = new FundsPage(mockSupabase, "church-1");
     await page.loadData();
 
-    (page as any).transferSuccessMsg = "บันทึกคำขอโอนเงิน ฿5,000.00 เรียบร้อยแล้ว (รอการอนุมัติ)";
+    (page as any).transferSuccessMsg =
+      "บันทึกคำขอโอนเงิน ฿5,000.00 เรียบร้อยแล้ว (รอการอนุมัติ)";
     const html = page.renderHtml();
 
     expect(html).toContain("gl-notice--success");

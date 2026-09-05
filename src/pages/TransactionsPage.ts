@@ -5,6 +5,17 @@ import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
+import { UserRole, can } from "../lib/rbac";
+import { TransactionsService } from "../lib/transactions/transactions-service";
+
+interface SelectOption {
+  id: string;
+  name: string;
+}
+
+interface CategoryOption extends SelectOption {
+  direction: "income" | "expense";
+}
 
 export interface TransactionItem {
   id: string;
@@ -39,6 +50,8 @@ const ICON_INCOME = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 const ICON_EXPENSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
 const ICON_TRANSFER = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>`;
 const ICON_DOWNLOAD = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const ICON_PLUS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`;
+const ICON_CLOSE = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
 // Real transaction lifecycle status -> Thai label + badge class.
 const TXN_STATUS: Record<
@@ -83,8 +96,8 @@ export class TransactionsPage {
   /**
    * One-shot deep-link actions, consumed before render:
    * `#/transactions?create=1` (shell "บันทึกรายการ" action) opens the
-   * existing create form. The query is cleaned from the URL afterwards so a
-   * later back/refresh does not replay the action.
+   * create-transaction modal directly. The query is cleaned from the URL
+   * afterwards so a later back/refresh does not replay the action.
    */
   public consumeDeepLinkActions(): void {
     if (typeof window === "undefined") return;
@@ -93,7 +106,9 @@ export class TransactionsPage {
     if (queryIndex === -1) return;
     const params = new URLSearchParams(hash.slice(queryIndex + 1));
     if (params.get("create") === "1") {
-      // create action handled by URL detection
+      this.isCreateModalOpen = true;
+      this.formErrorMessage = null;
+      this.createFieldErrors = {};
     }
     window.history.replaceState(
       null,
@@ -109,11 +124,23 @@ export class TransactionsPage {
   private successMessage: string | null = null;
   private isLoading = false;
 
+  private accountsList: SelectOption[] = [];
+  private fundsList: SelectOption[] = [];
+  private categoriesList: CategoryOption[] = [];
+  private isCreateModalOpen = false;
+  private createDirection: "income" | "expense" = "income";
+  private formErrorMessage: string | null = null;
+  private createFieldErrors: Record<string, string> = {};
+  private isSubmitting = false;
+  private txnService: TransactionsService;
+
   constructor(
     private supabase: SupabaseClient<Database>,
     private churchId: string,
+    private userId?: string,
+    private userRole?: UserRole,
   ) {
-    // TransactionsService available if needed for future features
+    this.txnService = new TransactionsService(this.supabase, this.userRole);
   }
 
   public async loadData(): Promise<void> {
@@ -145,27 +172,36 @@ export class TransactionsPage {
         return;
       }
 
-      // Safe auxiliary queries — results used for form dropdowns if needed
+      // Auxiliary lookups for the create-transaction form's dropdowns.
       try {
-        await this.supabase
-          .from("accounts")
+        const res: any = await (this.supabase.from("accounts") as any)
           .select("id, name")
-          .eq("church_id", this.churchId);
-      } catch {}
+          .eq("church_id", this.churchId)
+          .eq("is_active", true);
+        this.accountsList = Array.isArray(res?.data) ? res.data : [];
+      } catch {
+        this.accountsList = [];
+      }
 
       try {
-        await this.supabase
-          .from("funds")
+        const res: any = await (this.supabase.from("funds") as any)
           .select("id, name")
-          .eq("church_id", this.churchId);
-      } catch {}
+          .eq("church_id", this.churchId)
+          .eq("is_active", true);
+        this.fundsList = Array.isArray(res?.data) ? res.data : [];
+      } catch {
+        this.fundsList = [];
+      }
 
       try {
-        await this.supabase
-          .from("categories")
-          .select("id, name")
-          .eq("church_id", this.churchId);
-      } catch {}
+        const res: any = await (this.supabase.from("categories") as any)
+          .select("id, name, direction")
+          .eq("church_id", this.churchId)
+          .eq("is_active", true);
+        this.categoriesList = Array.isArray(res?.data) ? res.data : [];
+      } catch {
+        this.categoriesList = [];
+      }
 
       if (txnsRes.data && Array.isArray(txnsRes.data)) {
         const creatorIds = new Set<string>();
@@ -276,8 +312,7 @@ export class TransactionsPage {
       `"${(t.recordedBy || "").replace(/"/g, '""')}"`,
     ]);
     const csvContent =
-      "﻿" +
-      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+      "﻿" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -289,6 +324,186 @@ export class TransactionsPage {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  public attachEventListeners(
+    root: HTMLElement,
+    onStateChange: () => void,
+  ): void {
+    root
+      .querySelector<HTMLButtonElement>("#retry-load-btn")
+      ?.addEventListener("click", async () => {
+        await this.loadData();
+        onStateChange();
+      });
+
+    // Search: filter on "change" (blur / Enter), never on every keystroke —
+    // a full re-render mid-typing collapses the on-screen keyboard on
+    // mobile (see .brain/MEMORY.md §3.4).
+    const searchInput = root.querySelector<HTMLInputElement>(
+      '[data-action="search"]',
+    );
+    searchInput?.addEventListener("change", () => {
+      this.searchQuery = searchInput.value;
+      onStateChange();
+    });
+    searchInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        searchInput.blur();
+      }
+    });
+
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-action="filter"]')
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.activeFilter = btn.dataset.value as typeof this.activeFilter;
+          onStateChange();
+        });
+      });
+
+    const periodSelect = root.querySelector<HTMLSelectElement>(
+      '[data-action="period"]',
+    );
+    periodSelect?.addEventListener("change", () => {
+      this.activePeriod = periodSelect.value as TxnPeriod;
+      onStateChange();
+    });
+
+    root
+      .querySelector<HTMLButtonElement>('[data-action="export"]')
+      ?.addEventListener("click", () => this.exportCsv());
+
+    // Create-transaction modal
+    const openModal = () => {
+      this.isCreateModalOpen = true;
+      this.formErrorMessage = null;
+      this.createFieldErrors = {};
+      onStateChange();
+    };
+    root
+      .querySelector<HTMLButtonElement>("#open-create-txn-btn")
+      ?.addEventListener("click", openModal);
+
+    const closeModal = () => {
+      this.isCreateModalOpen = false;
+      this.formErrorMessage = null;
+      this.createFieldErrors = {};
+      onStateChange();
+    };
+    root
+      .querySelector<HTMLButtonElement>("#close-create-txn-btn")
+      ?.addEventListener("click", closeModal);
+    root
+      .querySelector<HTMLButtonElement>("#cancel-create-txn-btn")
+      ?.addEventListener("click", closeModal);
+    const backdrop = root.querySelector<HTMLElement>("#create-txn-modal");
+    backdrop?.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeModal();
+    });
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-txn-direction]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.createDirection = btn.dataset.txnDirection as
+            | "income"
+            | "expense";
+          onStateChange();
+        });
+      });
+
+    const form = root.querySelector<HTMLFormElement>("#create-txn-form");
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const descriptionInput = root.querySelector<HTMLInputElement>(
+        "#txn-description-input",
+      );
+      const amountInput =
+        root.querySelector<HTMLInputElement>("#txn-amount-input");
+      const fundSelect =
+        root.querySelector<HTMLSelectElement>("#txn-fund-select");
+      const categorySelect = root.querySelector<HTMLSelectElement>(
+        "#txn-category-select",
+      );
+      const accountSelect = root.querySelector<HTMLSelectElement>(
+        "#txn-account-select",
+      );
+      const dateInput = root.querySelector<HTMLInputElement>("#txn-date-input");
+
+      const description = descriptionInput?.value.trim() || "";
+      const amountRaw = amountInput?.value || "";
+      const fundId = fundSelect?.value || "";
+      const categoryId = categorySelect?.value || "";
+      const accountId = accountSelect?.value || "";
+      const date = dateInput?.value || "";
+
+      const errors: Record<string, string> = {};
+      if (!description) errors.description = "กรุณาระบุรายละเอียดรายการ";
+      let amount: Money | null = null;
+      if (!amountRaw) {
+        errors.amount = "กรุณาระบุจำนวนเงิน";
+      } else {
+        try {
+          amount = Money.from(amountRaw);
+          if (!amount.isPositive() || amount.isZero()) {
+            errors.amount = "จำนวนเงินต้องมากกว่า 0.00 บาท";
+          }
+        } catch {
+          errors.amount = "จำนวนเงินไม่ถูกต้อง";
+        }
+      }
+      if (!fundId) errors.fundId = "กรุณาเลือกกองทุน";
+      if (!categoryId) errors.categoryId = "กรุณาเลือกหมวดหมู่";
+      if (!accountId) errors.accountId = "กรุณาเลือกบัญชี";
+      if (!date) errors.date = "กรุณาระบุวันที่";
+
+      if (Object.keys(errors).length > 0) {
+        this.createFieldErrors = errors;
+        onStateChange();
+        return;
+      }
+
+      this.createFieldErrors = {};
+      this.formErrorMessage = null;
+      this.isSubmitting = true;
+      onStateChange();
+
+      const createdBy = this.userId || "";
+      const createRes = await this.txnService.createDraftTransaction({
+        church_id: this.churchId,
+        created_by: createdBy,
+        description,
+        direction: this.createDirection,
+        transaction_date: date,
+        category_id: categoryId,
+        account_id: accountId,
+        amount: amount!.toFixed(2),
+        splits: [{ fund_id: fundId, amount: amount!.toFixed(2) }],
+      });
+
+      if (!createRes.success || !createRes.data) {
+        this.formErrorMessage =
+          createRes.error || "เกิดข้อผิดพลาดในการบันทึกรายการ";
+        this.isSubmitting = false;
+        onStateChange();
+        return;
+      }
+
+      const submitRes = await this.txnService.submitTransaction(
+        createRes.data.transaction_id,
+      );
+
+      this.isCreateModalOpen = false;
+      this.isSubmitting = false;
+      this.successMessage = submitRes.success
+        ? `บันทึกรายการ "${description}" เรียบร้อยแล้ว ส่งขออนุมัติแล้ว`
+        : `บันทึกร่างรายการ "${description}" แล้ว แต่ส่งขออนุมัติไม่สำเร็จ: ${submitRes.error || "เกิดข้อผิดพลาด"}`;
+      await this.loadData();
+      onStateChange();
+    });
   }
 
   public renderHtml(_user?: any): string {
@@ -449,21 +664,34 @@ export class TransactionsPage {
         </div>`;
     };
 
-    const emptyHtml = sorted.length === 0
-      ? renderEmptyStateHtml({
-          message: "ไม่พบรายการที่ตรงกับเงื่อนไข",
-          hint: "ลองเปลี่ยนตัวกรองหรือคำค้นหา",
-        })
-      : "";
+    const emptyHtml =
+      sorted.length === 0
+        ? renderEmptyStateHtml({
+            message: "ไม่พบรายการที่ตรงกับเงื่อนไข",
+            hint: "ลองเปลี่ยนตัวกรองหรือคำค้นหา",
+          })
+        : "";
+
+    const canCreate = can(this.userRole ?? "member", "create", "transactions");
 
     return `
     <div class="gl-page gl-fade-in">
       ${errorNoticeHtml}
       ${successNoticeHtml}
 
-      <div class="gl-page-header">
-        <h1>รายการเงิน</h1>
-        <p>บันทึกรายรับ รายจ่าย และประวัติธุรกรรมทั้งหมดของคริสตจักร</p>
+      <div class="gl-page-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;">
+        <div>
+          <h1>รายการเงิน</h1>
+          <p>บันทึกรายรับ รายจ่าย และประวัติธุรกรรมทั้งหมดของคริสตจักร</p>
+        </div>
+        ${
+          canCreate
+            ? `<button id="open-create-txn-btn" class="gl-btn gl-btn--primary">
+                ${ICON_PLUS}
+                <span>บันทึกรายการ</span>
+              </button>`
+            : ""
+        }
       </div>
 
       <!-- Summary Stats -->
@@ -478,7 +706,7 @@ export class TransactionsPage {
         </div>
         <div class="gl-txn-summary__item">
           <span class="gl-txn-summary__label">สุทธิ</span>
-          <span class="num-display gl-txn-summary__value ${netSum.isPositive() ? 'gl-income' : netSum.isNegative() ? 'gl-expense' : 'gl-net'}">${netSign}${netSum.format()}</span>
+          <span class="num-display gl-txn-summary__value ${netSum.isPositive() ? "gl-income" : netSum.isNegative() ? "gl-expense" : "gl-net"}">${netSign}${netSum.format()}</span>
         </div>
       </div>
 
@@ -511,6 +739,106 @@ export class TransactionsPage {
       ${renderGroup("เมื่อวาน", yesterdayItems)}
       ${renderGroup("ก่อนหน้านี้", earlierItems)}
       ${renderGroup("ไม่ระบุวันที่", undatedItems)}
+
+      ${canCreate ? this.renderCreateModalHtml() : ""}
+    </div>`;
+  }
+
+  private fieldErrorHtml(field: string): string {
+    const msg = this.createFieldErrors[field];
+    return msg
+      ? `<p class="gl-field-error" role="alert">${escapeHtml(msg)}</p>`
+      : "";
+  }
+
+  private renderCreateModalHtml(): string {
+    if (!this.isCreateModalOpen) return "";
+
+    const formErrorHtml = this.formErrorMessage
+      ? `<div class="gl-notice gl-notice--error" style="margin-bottom: var(--space-3); font-size: var(--text-xs);">
+          <div class="gl-notice__body">${escapeHtml(this.formErrorMessage)}</div>
+        </div>`
+      : "";
+
+    const categoryOptions = this.categoriesList.filter(
+      (c) => c.direction === this.createDirection,
+    );
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    return `
+    <div id="create-txn-modal" class="gl-modal-backdrop gl-fade-in">
+      <div class="gl-modal-content gl-rise" style="max-width: 460px;">
+        <div class="gl-funds-modal-head">
+          <div class="gl-funds-modal-title">บันทึกรายการ</div>
+          <button id="close-create-txn-btn" class="gl-modal-close gl-btn gl-btn--ghost gl-btn--sm">
+            ${ICON_CLOSE}
+          </button>
+        </div>
+
+        ${formErrorHtml}
+
+        <form id="create-txn-form" class="gl-stack" novalidate>
+          <div class="gl-field">
+            <label class="gl-label">ประเภทรายการ *</label>
+            <div class="gl-filter-group">
+              <button type="button" class="filter-pill ${this.createDirection === "income" ? "is-active" : ""}" data-txn-direction="income">รายรับ</button>
+              <button type="button" class="filter-pill ${this.createDirection === "expense" ? "is-active" : ""}" data-txn-direction="expense">รายจ่าย</button>
+            </div>
+          </div>
+
+          <div class="gl-field">
+            <label class="gl-label" for="txn-description-input">รายละเอียดรายการ *</label>
+            <input type="text" class="gl-input ${this.createFieldErrors.description ? "has-error" : ""}" id="txn-description-input" placeholder="เช่น ถวายทรัพย์วันอาทิตย์, ค่าไฟฟ้าประจำเดือน" />
+            ${this.fieldErrorHtml("description")}
+          </div>
+
+          <div class="gl-field">
+            <label class="gl-label" for="txn-amount-input">จำนวนเงิน (฿) *</label>
+            <input type="number" class="gl-input ${this.createFieldErrors.amount ? "has-error" : ""}" id="txn-amount-input" placeholder="0.00" step="0.01" min="0.01" />
+            ${this.fieldErrorHtml("amount")}
+          </div>
+
+          <div class="gl-field">
+            <label class="gl-label" for="txn-fund-select">กองทุน *</label>
+            <select class="gl-select ${this.createFieldErrors.fundId ? "has-error" : ""}" id="txn-fund-select">
+              <option value="">เลือกกองทุน</option>
+              ${this.fundsList.map((f) => `<option value="${f.id}">${escapeHtml(f.name)}</option>`).join("")}
+            </select>
+            ${this.fieldErrorHtml("fundId")}
+          </div>
+
+          <div class="gl-field">
+            <label class="gl-label" for="txn-category-select">หมวดหมู่ *</label>
+            <select class="gl-select ${this.createFieldErrors.categoryId ? "has-error" : ""}" id="txn-category-select">
+              <option value="">เลือกหมวดหมู่</option>
+              ${categoryOptions.map((c) => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("")}
+            </select>
+            ${this.fieldErrorHtml("categoryId")}
+          </div>
+
+          <div class="gl-field">
+            <label class="gl-label" for="txn-account-select">บัญชี *</label>
+            <select class="gl-select ${this.createFieldErrors.accountId ? "has-error" : ""}" id="txn-account-select">
+              <option value="">เลือกบัญชี</option>
+              ${this.accountsList.map((a) => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join("")}
+            </select>
+            ${this.fieldErrorHtml("accountId")}
+          </div>
+
+          <div class="gl-field">
+            <label class="gl-label" for="txn-date-input">วันที่ *</label>
+            <input type="date" class="gl-input ${this.createFieldErrors.date ? "has-error" : ""}" id="txn-date-input" value="${todayStr}" max="${todayStr}" />
+            ${this.fieldErrorHtml("date")}
+          </div>
+
+          <div class="gl-funds-modal-actions">
+            <button type="button" id="cancel-create-txn-btn" class="gl-btn gl-btn--secondary" ${this.isSubmitting ? "disabled" : ""}>ยกเลิก</button>
+            <button type="submit" class="gl-btn gl-btn--primary" ${this.isSubmitting ? "disabled" : ""}>
+              ${this.isSubmitting ? "กำลังบันทึก…" : "บันทึกรายการ"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>`;
   }
 }

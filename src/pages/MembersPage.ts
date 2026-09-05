@@ -7,6 +7,7 @@ import { formatDateThai, toUserMessage } from "../lib/format";
 import { restoreFocusAfterRender } from "../lib/ui/focus";
 import { CHURCH_NAME_TH } from "../lib/org";
 import { MembersService } from "../lib/members/members-service";
+import { UserRole, can } from "../lib/rbac";
 
 export interface MemberRecord {
   id: string;
@@ -48,6 +49,7 @@ export class MembersPage {
     private supabase: SupabaseClient<Database>,
     private churchId: string,
     private churchName: string = CHURCH_NAME_TH,
+    private userRole?: UserRole,
   ) {
     this.membersService = new MembersService(supabase);
   }
@@ -103,7 +105,13 @@ export class MembersPage {
     const existing = this.givingById[memberId];
     // Only skip when the cached state is still authoritative: a successful
     // load or an in-flight request. "failed" and "denied" are retryable.
-    if (existing && (existing.status === "loaded" || existing.status === "loading" || existing.status === "denied")) return;
+    if (
+      existing &&
+      (existing.status === "loaded" ||
+        existing.status === "loading" ||
+        existing.status === "denied")
+    )
+      return;
 
     this.givingById[memberId] = {
       status: "loading",
@@ -343,6 +351,8 @@ export class MembersPage {
       </div>`
       : "";
 
+    const canAddMember = can(this.userRole ?? "member", "create", "members");
+
     const membersGridHtml = this.errorMessage
       ? ""
       : this.members.length === 0
@@ -350,12 +360,14 @@ export class MembersPage {
             icon: ICON_CERT,
             message: "ยังไม่มีรายชื่อสมาชิก",
             hint: "เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี",
-            action: {
-              label: "เพิ่มสมาชิกคนแรก",
-              type: "button",
-              id: "empty-add-member-btn",
-              variant: "primary",
-            },
+            action: canAddMember
+              ? {
+                  label: "เพิ่มสมาชิกคนแรก",
+                  type: "button",
+                  id: "empty-add-member-btn",
+                  variant: "primary",
+                }
+              : undefined,
           })
         : filtered.length === 0
           ? renderEmptyStateHtml({
@@ -368,7 +380,7 @@ export class MembersPage {
                 variant: "secondary",
               },
             })
-        : `
+          : `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-3);">
           ${filtered
             .map(
@@ -416,10 +428,14 @@ export class MembersPage {
           <h1>สมาชิกและการถวาย</h1>
           <p>ทะเบียนสมาชิก ประวัติการถวายสิบลด และการออกหนังสือรับรองภาษี</p>
         </div>
-        <button id="open-add-member-btn" class="gl-btn gl-btn--primary">
-          ${ICON_PLUS}
-          <span>เพิ่มสมาชิกใหม่</span>
-        </button>
+        ${
+          canAddMember
+            ? `<button id="open-add-member-btn" class="gl-btn gl-btn--primary">
+                ${ICON_PLUS}
+                <span>เพิ่มสมาชิกใหม่</span>
+              </button>`
+            : ""
+        }
       </div>
 
       ${errorNoticeHtml}
@@ -464,13 +480,15 @@ export class MembersPage {
     root: HTMLElement,
     onStateChange: () => void,
   ): void {
-    root.querySelectorAll<HTMLButtonElement>(".btn-retry-giving").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-member-id");
-        if (id) void this.loadGivingForMember(id, onStateChange);
+    root
+      .querySelectorAll<HTMLButtonElement>(".btn-retry-giving")
+      .forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-member-id");
+          if (id) void this.loadGivingForMember(id, onStateChange);
+        });
       });
-    });
 
     const retryBtn =
       root.querySelector<HTMLButtonElement>("#retry-members-btn");
@@ -488,7 +506,9 @@ export class MembersPage {
       restoreFocusAfterRender(target, onStateChange);
     });
 
-    const clearSearchBtn = root.querySelector<HTMLButtonElement>("#clear-member-search-btn");
+    const clearSearchBtn = root.querySelector<HTMLButtonElement>(
+      "#clear-member-search-btn",
+    );
     clearSearchBtn?.addEventListener("click", () => {
       this.searchQuery = "";
       onStateChange();
@@ -576,7 +596,10 @@ export class MembersPage {
         await this.loadData();
         onStateChange();
       } catch (err: any) {
-        this.formErrorMessage = toUserMessage(err, "เพิ่มสมาชิกไม่สำเร็จ ลองใหม่อีกครั้ง");
+        this.formErrorMessage = toUserMessage(
+          err,
+          "เพิ่มสมาชิกไม่สำเร็จ ลองใหม่อีกครั้ง",
+        );
         this.isSubmitting = false;
         onStateChange();
       }
