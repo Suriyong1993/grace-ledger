@@ -94,10 +94,13 @@ export class TransactionsPage {
   private searchQuery = "";
 
   /**
-   * One-shot deep-link actions, consumed before render:
    * `#/transactions?create=1` (shell "บันทึกรายการ" action) opens the
-   * create-transaction modal directly. The query is cleaned from the URL
-   * afterwards so a later back/refresh does not replay the action.
+   * create-transaction modal directly — a one-shot action, removed from the
+   * URL immediately so a later back/refresh does not replay it.
+   *
+   * `filter`, `period`, `sort`, `q` are read from the same query string but
+   * kept in the URL (via syncUrlFromState) so a refresh or back-navigation
+   * restores the filtered view instead of silently resetting to defaults.
    */
   public consumeDeepLinkActions(): void {
     if (typeof window === "undefined") return;
@@ -105,17 +108,67 @@ export class TransactionsPage {
     const queryIndex = hash.indexOf("?");
     if (queryIndex === -1) return;
     const params = new URLSearchParams(hash.slice(queryIndex + 1));
+
     if (params.get("create") === "1") {
       this.isCreateModalOpen = true;
       this.formErrorMessage = null;
       this.createFieldErrors = {};
     }
+
+    const filterParam = params.get("filter");
+    if (
+      filterParam === "all" ||
+      filterParam === "income" ||
+      filterParam === "expense" ||
+      filterParam === "transfer" ||
+      filterParam === "pending"
+    ) {
+      this.activeFilter = filterParam;
+    }
+    const periodParam = params.get("period");
+    if (
+      periodParam === "this_month" ||
+      periodParam === "last_month" ||
+      periodParam === "last_3_months" ||
+      periodParam === "all"
+    ) {
+      this.activePeriod = periodParam;
+    }
+    const sortParam = params.get("sort");
+    if (
+      sortParam === "newest" ||
+      sortParam === "oldest" ||
+      sortParam === "amount_desc" ||
+      sortParam === "amount_asc"
+    ) {
+      this.activeSort = sortParam;
+    }
+    const searchParam = params.get("q");
+    if (searchParam) this.searchQuery = searchParam;
+
+    this.syncUrlFromState();
+  }
+
+  /**
+   * Reflects the current filter/period/sort/search state into the URL query
+   * string via replaceState — no new history entry, no hashchange event, so
+   * it never fights the render triggered by the caller's own onStateChange.
+   */
+  private syncUrlFromState(): void {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams();
+    if (this.activeFilter !== "all") params.set("filter", this.activeFilter);
+    if (this.activePeriod !== "this_month")
+      params.set("period", this.activePeriod);
+    if (this.activeSort !== "newest") params.set("sort", this.activeSort);
+    if (this.searchQuery) params.set("q", this.searchQuery);
+
+    const query = params.toString();
+    const hash = "#/transactions" + (query ? `?${query}` : "");
     window.history.replaceState(
       null,
       "",
-      window.location.pathname +
-        window.location.search +
-        hash.slice(0, queryIndex),
+      window.location.pathname + window.location.search + hash,
     );
   }
 
@@ -345,6 +398,7 @@ export class TransactionsPage {
     );
     searchInput?.addEventListener("change", () => {
       this.searchQuery = searchInput.value;
+      this.syncUrlFromState();
       onStateChange();
     });
     searchInput?.addEventListener("keydown", (e) => {
@@ -359,6 +413,7 @@ export class TransactionsPage {
       .forEach((btn) => {
         btn.addEventListener("click", () => {
           this.activeFilter = btn.dataset.value as typeof this.activeFilter;
+          this.syncUrlFromState();
           onStateChange();
         });
       });
@@ -368,6 +423,7 @@ export class TransactionsPage {
     );
     periodSelect?.addEventListener("change", () => {
       this.activePeriod = periodSelect.value as TxnPeriod;
+      this.syncUrlFromState();
       onStateChange();
     });
 
@@ -408,8 +464,7 @@ export class TransactionsPage {
       .forEach((btn) => {
         btn.addEventListener("click", () => {
           this.createDirection = btn.dataset.txnDirection as
-            | "income"
-            | "expense";
+            "income" | "expense";
           onStateChange();
         });
       });
