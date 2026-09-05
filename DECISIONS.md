@@ -361,3 +361,196 @@ gradients/illustrations/promotional copy. No further change made; this is a revi
 
 **Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575/597, 22 pre-existing
 skips), `npm run lint:design`, `npm run build` all green.
+
+### D15 — The "2026 Evolved Glassmorphism" layer is retired (completes the D12 cleanup)
+
+**Decision:** the glass treatment on the three shell/content surfaces is replaced by opaque surfaces with a
+hairline border and, where a surface really overlaps, an ink-tinted token shadow.
+
+| Surface | Was | Now |
+| --- | --- | --- |
+| `.gl-shell-topbar` | `card 80%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.25)` shadow + a **white** 9% bottom border | `var(--card)`, `1px solid var(--border)`, `box-shadow: none` |
+| `.gl-shell-topbar` inline style (`AppShell.ts`) | `card 88%` + `blur(10px)` | `var(--card)` |
+| `.gl-mobilenav` (≤768px) | `card 85%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.3)` shadow | `var(--card)`, `1px solid var(--border)`, `var(--shadow-elevated)` |
+| `.gl-glass-surface` | glass utility, **zero consumers** in `src/` or `tests/` | deleted |
+| `--gl-glass-blur`, `--gl-glass-border` | tokens read only by the four rules above | deleted |
+
+**Why:**
+
+1. **It violated a rule this repo had already written down.** `DESIGN.md` § Anti-AI-Slop Rules: "No
+   glassmorphism unless justified by depth system." Nothing in the depth system justified it — `shadows.css`
+   states the opposite contract: *"Border beats shadow — these are intentionally faint … Shadows are
+   ink-green tinted to sit inside the porcelain palette."* The retired rules used pure black at 25–30%.
+2. **It was the surviving half of a known drift.** The layer arrived in the 2026-09-04 00:22 session, the
+   same session that added the "2026 Sunset Orange" CTA system. D12 removed the CTA half and left the glass
+   half. This completes that cleanup; it is not a new direction.
+3. **The topbar border was invisible.** `--gl-glass-border` was `rgba(255,255,255,0.09)` — 9% white on a
+   porcelain-light topbar. The bar had no readable bottom edge in light mode. `var(--border)` restores it.
+4. **Blur over a ledger costs legibility and frame time.** Figures scrolling under the bar were smeared, on
+   the surface where a treasurer is reading amounts.
+
+**Also corrected in the same pass, both found by bringing `app.css` under the lint (D16):**
+
+- `.gl-dash-hero::before` — the hero's 3px crown ramped `var(--primary)` into `#0ea5e9`, a bright sky blue
+  outside the Emerald Vault palette, on the single most important element of the dashboard. Now ramps
+  `var(--primary)` → `var(--gl-brass-500)`, the two accents the identity owns.
+- `.gl-modal-content--sheet` — `box-shadow: 0 -4px 24px rgb(0 0 0 / 0.2)` → `var(--shadow-elevated)`.
+
+**What did NOT change:** the `!important` on the topbar rule stays — `AppShell.ts` sets that header's base
+background and border as inline `style` attributes, so a stylesheet rule cannot win without it. The five
+remaining `backdrop-filter` uses stay: they are overlay scrims (modal backdrop, sheet backdrop, sticky mobile
+action bar), not content surfaces, and they blur at 2–6px behind a veil rather than 14px on the content
+itself. `.gl-total-rule` — the 2px + 1px double underline beneath the hero balance — stays: it is the
+accounting convention for a grand total, not decoration.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575 passed, 22 pre-existing
+skips), `npm run lint:design`, `npm run build` all green. No test assertion changed; no test needed changing.
+
+### D16 — `lint:design` now scans `.css`, and rejects `backdrop-filter` by count
+
+**Decision:** `scripts/lint-design.mjs` walks `.css` files in addition to `.ts`, gains a `backdrop-filter`
+pattern, and carries an allowlist entry for `src/styles/app.css` with the exact count of every literal that
+remains there.
+
+**Why:** the walker matched `entry.endsWith(".ts")` only. `src/styles/app.css` is 5,022 lines — the largest
+stylesheet in the product and the one every screen loads — and it was never scanned. That gap is precisely
+how the D15 layer landed with black shadows, an off-palette hex, and a white border, while `lint:design`
+reported "passed". The design source of truth cannot be guarded by a check that does not read it.
+
+**What the allowlist now pins in `app.css`** (a count that moves in *either* direction fails the lint, which
+is this script's existing convention):
+
+| Pattern | Count | What they are |
+| --- | --- | --- |
+| literal `font-size` | 1 | dev-only HMR badge |
+| literal `border-radius` | 3 | dev-only HMR badge (1), two hairline/pill radii below the smallest token (2) |
+| `rgb()`/`rgba()` | 7 | dev-only HMR badge (2), overlay scrim veils (2), faint ink-tinted shadows written inline instead of as tokens (3) |
+| hex | 10 | dev-only HMR badge (1), print stylesheet (9) — paper needs true black and white |
+| `backdrop-filter` | 5 | overlay scrims only |
+
+Each is R6 cleanup except the print block and the scrims, which are correct as they are.
+
+**Verified:** injecting `.gl-drift-probe { backdrop-filter: blur(14px); background: #0ea5e9; }` into
+`app.css` fails the lint on both counts and exits 1; removing it passes. The guard was tested, not assumed.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D15.
+
+### D17 — Weight falls as size rises
+
+**Decision:** at `--text-4xl` (32px) and above, a figure uses `--weight-semibold`, not `--weight-bold`. Below
+32px, bold stays where it separates a value from its label at small size.
+
+Changed — the complete set at or above 32px, found by pairing every `--weight-bold` declaration with its
+`font-size`:
+
+| Selector | Size | Was | Now |
+| --- | --- | --- | --- |
+| `.gl-dash-hero__value` | 40-52px | bold | semibold |
+| `.gl-cashcount-summary__value` | 32px | bold | semibold |
+| `.gl-approval-amount__value` | 32px | bold | semibold |
+| `.gl-reports-hero__value` | 32px | bold | semibold |
+
+`.gl-page-header h1` tops out at `--text-3xl` (26px), below the line, and keeps bold. Bold usage across
+`app.css` falls from 37 declarations to 33.
+
+**Why:** at 40-52px the size, the tight tracking and the tabular figures already carry the hierarchy. The
+extra weight adds mass without adding rank, which is the "Bolder Typography" half of the same 2026-09-04
+drift D12 and D15 unwound. Nothing below 32px changed: at 13px a badge or an avatar's initials needs the
+weight to stay legible.
+
+**Also in this pass:**
+
+- `.gl-dash-hero__value` sized itself `clamp(2.25rem, 4vw, 3.25rem)`. The max already equalled `--text-6xl`,
+  and the scale names both ends for this exact element — `--text-5xl` is commented "hero balance",
+  `--text-6xl` "hero balance lg". The min, a bare 2.25rem, sat off the scale between `--text-4xl` and
+  `--text-5xl`. Now `clamp(var(--text-5xl), 4vw, var(--text-6xl))`, so the mobile hero renders at the 40px
+  the design system always specified rather than 36px. Verified with a ฿12,847,235.50 stress value at
+  320-1440px: no horizontal scroll at any width.
+- `.gl-page-header h1` carried `letter-spacing: -0.025em`; `--tracking-heading` is -0.02em. Now the token.
+- `ApprovalsPage.ts` styled its modal close button inline with `font-size: 1.5rem` — off the scale, and
+  overriding `.gl-modal-close`, which already supplies a 44px target, a tokenised size, hover and
+  transitions. The five other call sites use the class alone. The inline override is deleted.
+- Four spacing values with an exact token equivalent (one 12px, three 4px) now read `var(--space-3)` and
+  `var(--space-1)`. The other 33 raw-px spacing values in `app.css` are 1-3px, 6px, 7px or 10px optical
+  nudges with no equivalent on a 4px scale; they are left alone rather than invented into new tokens.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575 passed, 22 pre-existing
+skips), `npm run lint:design`, `npm run build` all green.
+
+### D18 — The top bar's controls never shrink; the title absorbs the squeeze
+
+**Decision:** `.gl-shell-topbar__context` loses its percentage cap and becomes `flex: 0 0 auto`;
+`.gl-shell-topbar__title` becomes `flex: 1 1 auto; min-width: 0` and ellipsizes.
+
+**The bug.** `__context` carried `max-width: 42%` (48% under 768px) with `overflow: hidden`. On a 390px
+phone that reserved 172px of a 358px content box for a row whose controls measure 247px. Measured, the tail
+sat at x=405 on a 390px screen:
+
+```
+gl-shell-primary-action  w= 83  x=202  right=285
+gl-attention-wrap        w= 44  x=293  right=337
+gl-shell-avatar          w= 44  x=345  right=389
+gl-logout-btn--topbar    w= 44  x=405  right=449   <- off screen
+```
+
+The page did not scroll sideways, so the mobile sign-out button was **invisible yet still focusable** — a
+keyboard or screen-reader user could reach a control nobody could see. The cap was written when this slot
+held the church name as text; it now holds the primary action, the bell, the avatar and sign-out, and a
+percentage cap on fixed 44px controls clips them. The 640px rule that drops the church chip was an earlier,
+partial answer to the same squeeze.
+
+Confirmed pre-existing, not introduced by this pass: the same x=405.48 measures on `main`.
+
+After the fix, at 390px every control ends at right=374 — exactly the content edge. Verified at 320, 360,
+390, 414, 768, 1024 and 1440px: no horizontal scroll, no clipping, sign-out on screen at every mobile width.
+
+**Accepted trade-off:** at 390px the topbar wordmark truncates to "Grace Led…". That is the intended
+outcome of the rule — the wordmark is the least important thing in the bar, and the page states its own
+name in an `h1` directly below. Controls win over decoration.
+
+**No test added:** jsdom has no layout engine, so this class of regression cannot be caught by the current
+suite. Catching it needs a real browser; see the follow-up note in D19.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D17.
+
+### D19 — Every touch target meets the 44px the design system already sets
+
+**Decision:** three controls that fell below `--touch-target-min` on a 390px viewport are raised to it.
+
+| Control | Was | Why it mattered |
+| --- | --- | --- |
+| `.gl-shell-primary-action` (≤768px) | 40px | The app's global primary action (D11 §3) and its most-tapped control. It had been compacted in an inline `<style>` in `AppShell.ts` to fit the crowded top bar; the room came back when D18 removed the cap. The short label and narrower padding stay — they buy width without shrinking the target. |
+| `.gl-attention-panel__group-head` | 37px | Tappable row in the bell panel; it had padding but no `min-height`. |
+| `.gl-attention-panel__more-link` | 31px | Same. |
+
+Measured before and after by walking every focusable element at 390px. Only `.gl-skip-link` (133×37) now
+sits under 44px, and it is left alone: it is revealed on keyboard focus and is never a touch target.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D17.
+
+### D20 — Press states are brought inside the documented 0.97-0.98 range
+
+**Decision:** six press states outside the contract are corrected. `design-system-extracted/readme.md`
+states it: *"Press = `scale(0.97-0.98)` only, no color flash."*
+
+| Control | Was | Now |
+| --- | --- | --- |
+| `.gl-logout-btn:active` | 0.96 | 0.97 |
+| `.gl-shell-icon-btn:active` | 0.96 | 0.97 |
+| `.gl-modal-close:active` | 0.96 | 0.97 |
+| `.gl-txn-row:active` | 0.995 | 0.98 |
+| `a.gl-row:active` | 0.99 | 0.98 |
+| `.gl-profile-item:active` (login) | 0.99 | 0.98 |
+
+Small chrome controls take 0.97; full-width rows take 0.98, the gentle end, which suits their size. Half of
+the product's fourteen press states were off-contract before this — three snapping harder than allowed,
+three barely moving. `.gl-profile-item` is the first control a user touches on the login screen; D14 brought
+`.gl-pin-key` into the contract and missed this one in the same file.
+
+**What was left alone:** `a.gl-row:active` also sets `background: var(--accent)`. That is not the "colour
+flash" the contract forbids — it is the same tint as its own `:hover`, standing in for hover on a touch
+device, where none exists. Removing it would leave a touch user with a 2% scale as the only feedback. The
+single remaining `scale(0.99)` in the product is the login card's entrance keyframe, which is an animation,
+not a press.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D17.

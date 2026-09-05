@@ -25,8 +25,6 @@
   --on-pending-muted: oklch(0.38 0.08 80);
   --on-info-muted: oklch(0.42 0.11 250);
 
-  --gl-glass-blur: 14px;
-  --gl-glass-border: rgba(255, 255, 255, 0.09);
 }
 
 .dark {
@@ -107,7 +105,7 @@ body {
    -------------------------------------------------------------------------- */
 .gl-total-rule {
   position: relative;
-  padding-bottom: 12px;
+  padding-bottom: var(--space-3);
 }
 
 .gl-total-rule::after {
@@ -144,7 +142,7 @@ body {
   font-family: var(--font-display);
   font-size: clamp(var(--text-xl), 2.4vw, var(--text-3xl));
   font-weight: var(--weight-bold);
-  letter-spacing: -0.025em;
+  letter-spacing: var(--tracking-heading);
   color: var(--foreground);
   margin: 0;
 }
@@ -712,7 +710,7 @@ button.gl-card:active {
 }
 
 .gl-txn-row:active {
-  transform: scale(0.995);
+  transform: scale(0.98);
 }
 
 .gl-txn-row:focus-visible {
@@ -820,7 +818,7 @@ button.gl-card:active {
   margin-top: var(--space-2);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 /* --------------------------------------------------------------------------
@@ -1597,7 +1595,7 @@ button.gl-card:active {
 .gl-cashcount-summary__value {
   margin-top: var(--space-1);
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
 }
@@ -1806,7 +1804,7 @@ button.gl-card:active {
 
 .gl-approval-amount__value {
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
 }
 
@@ -2025,17 +2023,26 @@ button.gl-card:active {
   left: 0;
   right: 0;
   height: 3px;
+  /* Evergreen into brass — the two accents the Emerald Vault identity owns.
+     The previous ramp ended in sky blue (#0ea5e9), which is outside the
+     palette and read as a second brand colour on the hero. */
   background: linear-gradient(
     90deg,
     var(--primary) 0%,
-    color-mix(in srgb, var(--primary) 65%, #0ea5e9) 100%
+    var(--gl-brass-500) 100%
   );
 }
 
 .gl-dash-hero__value {
   margin-top: var(--space-2);
-  font-size: clamp(2.25rem, 4vw, 3.25rem);
-  font-weight: var(--weight-bold);
+  /* The scale already names these two steps: --text-5xl is commented
+     "hero balance" and --text-6xl "hero balance lg". The previous min, a bare
+     2.25rem, sat off the scale between --text-4xl and --text-5xl. */
+  font-size: clamp(var(--text-5xl), 4vw, var(--text-6xl));
+  /* Semibold, not bold. At 40-52px the size, the tight tracking and the
+     tabular figures already carry the hierarchy; the extra weight only adds
+     mass. See D17. */
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
 }
@@ -2203,8 +2210,10 @@ a.gl-row:hover {
 }
 
 a.gl-row:active {
+  /* Same tint as :hover, so this is not a flash to another colour — it is
+     the touch equivalent of hover, where no hover exists. */
   background: var(--accent);
-  transform: scale(0.99);
+  transform: scale(0.98);
 }
 
 a.gl-row:focus-visible {
@@ -2726,14 +2735,18 @@ a.gl-row:focus-visible {
   }
 }
 
-/* Shell enhancements — 2026 Evolved Glassmorphism */
+/* Shell — top bar.
+
+   The bar is an opaque content surface with one hairline under it. It carries
+   no blur and no shadow: a shadow here floats the whole page, and a blur makes
+   the figures scrolling under it unreadable while costing frame time on a
+   phone. `!important` is still required because AppShell.ts sets the base
+   background and border as inline style attributes. */
 .gl-shell-topbar {
   padding-inline: clamp(16px, 3vw, 32px) !important;
-  background: color-mix(in srgb, var(--card) 80%, transparent) !important;
-  backdrop-filter: blur(var(--gl-glass-blur, 14px)) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(var(--gl-glass-blur, 14px)) saturate(140%) !important;
-  border-bottom: 1px solid var(--gl-glass-border, rgba(255, 255, 255, 0.08)) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25) !important;
+  background: var(--card) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
 }
 
 .gl-shell-topbar__title {
@@ -2744,13 +2757,38 @@ a.gl-row:focus-visible {
   letter-spacing: -0.015em;
 }
 
+/* The controls in the top bar never shrink; the page title absorbs the
+   squeeze and ellipsizes instead.
+
+   Before this, __context was a shrinkable flex item whose contents are
+   `white-space: nowrap`, so on a 390px phone it was squeezed to 172px while
+   its content stayed 247px wide. The tail — the avatar and the mobile sign-out
+   button — was pushed to x=405, off the right edge of a 390px screen. The page
+   did not scroll sideways, so the button was invisible yet still focusable: a
+   keyboard or screen-reader user could reach a control nobody could see. The
+   640px rule that drops the church chip was an earlier, partial answer to the
+   same squeeze.
+
+   The cap itself was the cause: __context carried `max-width: 42%` (48% under
+   768px) with `overflow: hidden`, which reserved 172px of a 358px content box
+   for a row whose controls measure 247px. That cap was written when the slot
+   held the church name as text; it now holds the primary action, the bell, the
+   avatar and sign-out, and a percentage cap on fixed 44px controls clips them.
+   Text truncation stays where it belongs — the church chip keeps its own
+   `max-width: 140px` with an ellipsis, and the page title ellipsizes. */
+.gl-shell-topbar__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gl-shell-topbar__context {
+  flex: 0 0 auto;
+}
+
 .gl-shell-topbar__context {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  max-width: 42%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .gl-shell-status-dot {
@@ -2788,7 +2826,7 @@ a.gl-row:focus-visible {
 }
 
 .gl-logout-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .gl-logout-btn:focus-visible {
@@ -2891,7 +2929,6 @@ a {
   }
 
   .gl-shell-topbar__context {
-    max-width: 48%;
     font-size: var(--text-2xs) !important;
   }
 }
@@ -2949,7 +2986,7 @@ a {
   justify-content: space-between;
   font-size: var(--text-2xs);
   color: var(--muted-foreground);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .gl-funds-modal-head {
@@ -3013,13 +3050,13 @@ a {
 .gl-reports-hero__value {
   margin-top: var(--space-2);
   font-size: var(--text-4xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-heading);
   line-height: 1.1;
 }
 
 .gl-reports-hero__caption {
-  margin-top: 4px;
+  margin-top: var(--space-1);
   font-size: var(--text-2xs);
   color: var(--muted-foreground);
 }
@@ -3389,7 +3426,7 @@ a {
   max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.2);
+  box-shadow: var(--shadow-elevated);
 }
 
 /* Shared empty/loading icon slot. */
@@ -3561,15 +3598,6 @@ a {
    Bolder Typography · Smarter AI Greeting · Evolved Glass · Crisp Borders
    ========================================================================== */
 
-/* 1. Evolved Glassmorphism Layer */
-.gl-glass-surface {
-  background: color-mix(in srgb, var(--card) 82%, transparent) !important;
-  backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-  border: 1px solid var(--gl-glass-border) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
-}
-
 /* Page-context greeting line — plain text, no card/gradient surface so it
    never competes with the hero or the command center for attention. */
 .gl-dash-greeting {
@@ -3591,14 +3619,14 @@ a {
   background: color-mix(in srgb, var(--muted) 70%, transparent) !important;
 }
 
-/* 5. Floating Bottom Navigation Enhancements for Mobile (390px) */
+/* Mobile bottom bar — opaque, so a figure scrolling behind it stays legible.
+   The top hairline separates it from the page; the shadow only confirms the
+   separation and uses the ink-tinted ramp, not pure black. */
 @media (max-width: 768px) {
   .gl-mobilenav {
-    backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-    background: color-mix(in srgb, var(--card) 85%, transparent) !important;
-    border-top: 1px solid var(--gl-glass-border) !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow-elevated);
   }
 }
 
@@ -3659,6 +3687,8 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  /* Tappable row in the bell panel; padding alone left it at 37px. */
+  min-height: var(--touch-target-min);
   padding: var(--space-3) var(--space-4);
   background: var(--secondary);
   border-bottom: 1px solid var(--border);
@@ -3750,6 +3780,8 @@ a {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
+  /* Tappable link in the bell panel; padding alone left it at 31px. */
+  min-height: var(--touch-target-min);
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
@@ -3844,7 +3876,7 @@ a {
 }
 
 .gl-shell-icon-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .gl-shell-icon-btn:focus-visible {
@@ -4040,7 +4072,7 @@ a {
 }
 
 .gl-modal-close:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .gl-modal-close:focus-visible {
