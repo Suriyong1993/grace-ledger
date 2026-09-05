@@ -16,13 +16,20 @@ import { AiToolDefinition } from "./types";
 // 1. READ: Financial Summary
 const GetFinancialSummaryTool: AiToolDefinition = {
   name: "get_financial_summary",
-  description: "ดึงข้อมูลสรุปทางการเงินประจำเดือน (รายรับ, รายจ่าย, ยอดคงเหลือกองทุน)",
+  description:
+    "ดึงข้อมูลสรุปทางการเงินประจำเดือน (รายรับ, รายจ่าย, ยอดคงเหลือกองทุน)",
   capability: "READ",
   sensitiveDataLevel: "FINANCIAL",
   auditAction: "AI_READ_FINANCIAL_SUMMARY",
   requiresConfirmation: false,
   tenantScoped: true,
-  allowedRoles: ["super_admin", "pastor", "treasurer", "finance_staff", "approver"],
+  allowedRoles: [
+    "super_admin",
+    "pastor",
+    "treasurer",
+    "finance_staff",
+    "approver",
+  ],
   requiredPermissions: [{ action: "read", resource: "reports" }],
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
@@ -46,13 +53,34 @@ const GetTransactionsTool: AiToolDefinition = {
   auditAction: "AI_READ_TRANSACTIONS",
   requiresConfirmation: false,
   tenantScoped: true,
-  allowedRoles: ["super_admin", "pastor", "treasurer", "finance_staff", "approver"],
+  allowedRoles: [
+    "super_admin",
+    "pastor",
+    "treasurer",
+    "finance_staff",
+    "approver",
+  ],
   requiredPermissions: [{ action: "read", resource: "transactions" }],
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
-    status: z.enum(["draft", "pending_approval", "approved", "posted", "rejected", "voided"]).optional(),
-    start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-    end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    status: z
+      .enum([
+        "draft",
+        "pending_approval",
+        "approved",
+        "posted",
+        "rejected",
+        "voided",
+      ])
+      .optional(),
+    start_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    end_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
     limit: z.number().int().positive().max(100).optional().default(20),
   }),
   outputSchema: z.object({
@@ -70,7 +98,14 @@ const GetFundBalanceTool: AiToolDefinition = {
   auditAction: "AI_READ_FUNDS",
   requiresConfirmation: false,
   tenantScoped: true,
-  allowedRoles: ["super_admin", "pastor", "treasurer", "finance_staff", "approver", "member"],
+  allowedRoles: [
+    "super_admin",
+    "pastor",
+    "treasurer",
+    "finance_staff",
+    "approver",
+    "member",
+  ],
   requiredPermissions: [{ action: "read", resource: "funds" }],
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
@@ -83,7 +118,7 @@ const GetFundBalanceTool: AiToolDefinition = {
         name: z.string(),
         balance: z.string(),
         target_amount: z.string(),
-      })
+      }),
     ),
   }),
 };
@@ -133,7 +168,8 @@ const GetTransactionAuditTrailTool: AiToolDefinition = {
 // 6. READ (SENSITIVE): Member Giving History (Privacy by Design)
 const GetMemberGivingHistoryTool: AiToolDefinition = {
   name: "get_member_giving_history",
-  description: "ดึงประวัติการถวายของสมาชิก (ข้อมูลความลับทางการเงินสูงสุด ต้องระบุเหตุผลในการเข้าถึง)",
+  description:
+    "ดึงประวัติการถวายของสมาชิก (ข้อมูลความลับทางการเงินสูงสุด ต้องระบุเหตุผลในการเข้าถึง)",
   capability: "READ",
   sensitiveDataLevel: "SENSITIVE_FINANCIAL",
   auditAction: "AI_READ_CONFIDENTIAL_MEMBER_GIVING",
@@ -144,7 +180,10 @@ const GetMemberGivingHistoryTool: AiToolDefinition = {
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
     member_id: z.string().uuid("รหัสสมาชิกต้องเป็น UUID"),
-    reason: z.string().trim().min(5, "ต้องระบุเหตุผลในการเข้าถึงข้อมูลการถวายอย่างน้อย 5 ตัวอักษร"),
+    reason: z
+      .string()
+      .trim()
+      .min(5, "ต้องระบุเหตุผลในการเข้าถึงข้อมูลการถวายอย่างน้อย 5 ตัวอักษร"),
     tax_year: z.number().int().optional(),
   }),
   outputSchema: z.object({
@@ -158,7 +197,8 @@ const GetMemberGivingHistoryTool: AiToolDefinition = {
 // 7. DRAFT: Create Draft Transaction
 const CreateDraftTransactionTool: AiToolDefinition = {
   name: "create_draft_transaction",
-  description: "สร้างร่างรายการธุรกรรมใหม่ (สถานะ draft) เพื่อให้เจ้าหน้าที่ตรวจสอบ",
+  description:
+    "สร้างร่างรายการธุรกรรมใหม่ (สถานะ draft) เพื่อให้เจ้าหน้าที่ตรวจสอบ",
   capability: "DRAFT",
   sensitiveDataLevel: "FINANCIAL",
   auditAction: "AI_CREATE_DRAFT_TRANSACTION",
@@ -169,7 +209,9 @@ const CreateDraftTransactionTool: AiToolDefinition = {
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
     description: z.string().min(1, "กรุณาระบุรายละเอียดรายการ"),
-    transaction_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "รูปแบบวันที่ต้องเป็น YYYY-MM-DD"),
+    transaction_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "รูปแบบวันที่ต้องเป็น YYYY-MM-DD"),
     category_id: z.string().uuid("รหัสหมวดหมู่ต้องเป็น UUID"),
     account_id: z.string().uuid("รหัสบัญชีต้องเป็น UUID"),
     amount: z.union([z.string(), z.number()]),
@@ -179,7 +221,7 @@ const CreateDraftTransactionTool: AiToolDefinition = {
           fund_id: z.string().uuid(),
           amount: z.union([z.string(), z.number()]),
           notes: z.string().optional(),
-        })
+        }),
       )
       .min(1),
   }),
@@ -192,7 +234,8 @@ const CreateDraftTransactionTool: AiToolDefinition = {
 // 8. DRAFT: Create Transfer Draft
 const CreateTransferDraftTool: AiToolDefinition = {
   name: "create_transfer_draft",
-  description: "จัดเตรียมข้อเสนอการโอนเงินระหว่างกองทุนเพื่อตรวจสอบก่อนส่งอนุมัติ",
+  description:
+    "จัดเตรียมข้อเสนอการโอนเงินระหว่างกองทุนเพื่อตรวจสอบก่อนส่งอนุมัติ",
   capability: "DRAFT",
   sensitiveDataLevel: "FINANCIAL",
   auditAction: "AI_CREATE_TRANSFER_DRAFT",
@@ -218,7 +261,8 @@ const CreateTransferDraftTool: AiToolDefinition = {
 // 9. ACTION PROPOSAL: Propose Transaction Post
 const ProposeTransactionPostTool: AiToolDefinition = {
   name: "propose_transaction_post",
-  description: "สร้างข้อเสนอเพื่อขออนุมัติโพสต์รายการลงบัญชี (ต้องได้รับการยืนยันจากมนุษย์ก่อนดำเนินการ)",
+  description:
+    "สร้างข้อเสนอเพื่อขออนุมัติลงบัญชีรายการ (ต้องได้รับการยืนยันจากมนุษย์ก่อนดำเนินการ)",
   capability: "ACTION_PROPOSAL",
   sensitiveDataLevel: "FINANCIAL",
   auditAction: "AI_PROPOSE_TRANSACTION_POST",
@@ -229,7 +273,9 @@ const ProposeTransactionPostTool: AiToolDefinition = {
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
     transaction_id: z.string().uuid("รหัสรายการธุรกรรมต้องเป็น UUID"),
-    summary_justification: z.string().min(5, "เหตุผลข้อเสนอต้องมีความยาวอย่างน้อย 5 ตัวอักษร"),
+    summary_justification: z
+      .string()
+      .min(5, "เหตุผลข้อเสนอต้องมีความยาวอย่างน้อย 5 ตัวอักษร"),
   }),
   outputSchema: z.object({
     proposal_id: z.string(),
@@ -242,7 +288,8 @@ const ProposeTransactionPostTool: AiToolDefinition = {
 // 10. ACTION PROPOSAL: Propose Fund Transfer
 const ProposeFundTransferTool: AiToolDefinition = {
   name: "propose_fund_transfer",
-  description: "สร้างข้อเสนอเพื่อขออนุมัติโอนเงินระหว่างกองทุน (ต้องได้รับการยืนยันจากมนุษย์ก่อนดำเนินการ)",
+  description:
+    "สร้างข้อเสนอเพื่อขออนุมัติโอนเงินระหว่างกองทุน (ต้องได้รับการยืนยันจากมนุษย์ก่อนดำเนินการ)",
   capability: "ACTION_PROPOSAL",
   sensitiveDataLevel: "FINANCIAL",
   auditAction: "AI_PROPOSE_FUND_TRANSFER",
@@ -268,7 +315,8 @@ const ProposeFundTransferTool: AiToolDefinition = {
 // 11. ACTION PROPOSAL: Propose Void Transaction
 const ProposeVoidTransactionTool: AiToolDefinition = {
   name: "propose_void_transaction",
-  description: "สร้างข้อเสนอเพื่อขอยกเลิกรายการที่โพสต์แล้ว (ต้องได้รับการยืนยันจากมนุษย์ก่อนดำเนินการ)",
+  description:
+    "สร้างข้อเสนอเพื่อขอยกเลิกรายการที่ลงบัญชีแล้ว (ต้องได้รับการยืนยันจากมนุษย์ก่อนดำเนินการ)",
   capability: "ACTION_PROPOSAL",
   sensitiveDataLevel: "FINANCIAL",
   auditAction: "AI_PROPOSE_VOID_TRANSACTION",
@@ -279,7 +327,9 @@ const ProposeVoidTransactionTool: AiToolDefinition = {
   inputSchema: z.object({
     church_id: z.string().uuid("รหัสคริสตจักรต้องเป็น UUID"),
     transaction_id: z.string().uuid("รหัสรายการธุรกรรมต้องเป็น UUID"),
-    void_reason: z.string().min(5, "เหตุผลการยกเลิกต้องมีความยาวอย่างน้อย 5 ตัวอักษร"),
+    void_reason: z
+      .string()
+      .min(5, "เหตุผลการยกเลิกต้องมีความยาวอย่างน้อย 5 ตัวอักษร"),
   }),
   outputSchema: z.object({
     proposal_id: z.string(),
@@ -307,7 +357,7 @@ const APPROVED_TOOLS_LIST: ReadonlyArray<AiToolDefinition> = Object.freeze([
 ]);
 
 const APPROVED_TOOLS_MAP: ReadonlyMap<string, AiToolDefinition> = new Map(
-  APPROVED_TOOLS_LIST.map((tool) => [tool.name, tool])
+  APPROVED_TOOLS_LIST.map((tool) => [tool.name, tool]),
 );
 
 /**
@@ -340,6 +390,8 @@ export class GraceAiToolsRegistry {
    * Filter approved tools available for a given User Role
    */
   public static getToolsForRole(role: string): readonly AiToolDefinition[] {
-    return APPROVED_TOOLS_LIST.filter((tool) => tool.allowedRoles.includes(role as any));
+    return APPROVED_TOOLS_LIST.filter((tool) =>
+      tool.allowedRoles.includes(role as any),
+    );
   }
 }

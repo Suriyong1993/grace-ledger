@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { GraceAiProposalService, ActionProposalUiCardSchema } from "../../src/lib/ai/grace-ai-proposals";
+import {
+  GraceAiProposalService,
+  ActionProposalUiCardSchema,
+} from "../../src/lib/ai/grace-ai-proposals";
 
 describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Tests", () => {
   const dummyChurchId = "00000000-0000-0000-0000-000000000001";
@@ -43,8 +46,18 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
     ];
 
     const funds = [
-      { id: dummyFundA, church_id: dummyChurchId, name: "กองทุนทั่วไป", current_balance: "150000.00" },
-      { id: dummyFundB, church_id: dummyChurchId, name: "กองทุนพันธกิจ", current_balance: "60000.00" },
+      {
+        id: dummyFundA,
+        church_id: dummyChurchId,
+        name: "กองทุนทั่วไป",
+        current_balance: "150000.00",
+      },
+      {
+        id: dummyFundB,
+        church_id: dummyChurchId,
+        name: "กองทุนพันธกิจ",
+        current_balance: "60000.00",
+      },
     ];
 
     const client = {
@@ -54,8 +67,14 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
       auth: {
         getUser: () =>
           options.authenticated !== false
-            ? Promise.resolve({ data: { user: { id: dummyUserId } }, error: null })
-            : Promise.resolve({ data: { user: null }, error: { message: "No session", status: 401 } }),
+            ? Promise.resolve({
+                data: { user: { id: dummyUserId } },
+                error: null,
+              })
+            : Promise.resolve({
+                data: { user: null },
+                error: { message: "No session", status: 401 },
+              }),
       },
       from: (table: string) => {
         if (table === "profiles") {
@@ -79,7 +98,12 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
           return {
             insert: (payload: any) => {
               auditLogs.push(payload);
-              return { select: () => ({ single: () => Promise.resolve({ data: { id: "audit-1" }, error: null }) }) };
+              return {
+                select: () => ({
+                  single: () =>
+                    Promise.resolve({ data: { id: "audit-1" }, error: null }),
+                }),
+              };
             },
           };
         }
@@ -89,8 +113,13 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
               eq: (_col1: string, val1: string) => ({
                 eq: (_col2: string, val2: string) => ({
                   single: () => {
-                    const found = transactions.find((t) => t.id === val1 && t.church_id === val2);
-                    return Promise.resolve({ data: found || null, error: found ? null : { message: "Not found" } });
+                    const found = transactions.find(
+                      (t) => t.id === val1 && t.church_id === val2,
+                    );
+                    return Promise.resolve({
+                      data: found || null,
+                      error: found ? null : { message: "Not found" },
+                    });
                   },
                 }),
               }),
@@ -103,8 +132,13 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
               eq: (_col1: string, val1: string) => ({
                 eq: (_col2: string, val2: string) => ({
                   single: () => {
-                    const found = funds.find((f) => f.id === val1 && f.church_id === val2);
-                    return Promise.resolve({ data: found || null, error: found ? null : { message: "Not found" } });
+                    const found = funds.find(
+                      (f) => f.id === val1 && f.church_id === val2,
+                    );
+                    return Promise.resolve({
+                      data: found || null,
+                      error: found ? null : { message: "Not found" },
+                    });
                   },
                 }),
               }),
@@ -123,7 +157,11 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
             }),
           };
         }
-        return { select: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }) };
+        return {
+          select: () => ({
+            eq: () => Promise.resolve({ data: [], error: null }),
+          }),
+        };
       },
       rpc: (fn: string, args: any) => {
         rpcCalls.push({ fn, args });
@@ -140,13 +178,23 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
           };
           confirmationRecords.push(conf);
           return Promise.resolve({
-            data: { confirmation_id: conf.id, expires_at: conf.expires_at, nonce: conf.nonce },
+            data: {
+              confirmation_id: conf.id,
+              expires_at: conf.expires_at,
+              nonce: conf.nonce,
+            },
             error: null,
           });
         }
         // Critical Trap: If an execute RPC is called, throw error
-        if (fn === "transfer_funds" || fn === "post_transaction" || fn === "void_transaction") {
-          throw new Error(`CRITICAL VIOLATION: Financial execution RPC "${fn}" called in Proposal Generator!`);
+        if (
+          fn === "transfer_funds" ||
+          fn === "post_transaction" ||
+          fn === "void_transaction"
+        ) {
+          throw new Error(
+            `CRITICAL VIOLATION: Financial execution RPC "${fn}" called in Proposal Generator!`,
+          );
         }
         return Promise.resolve({ data: null, error: null });
       },
@@ -158,11 +206,15 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
   describe("1. Action Proposals Generation & Schema Validation", () => {
     it("generates a valid Post Transaction proposal card with confirmation binding", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       const res = await proposalService.proposeTransactionPost({
         transaction_id: dummyTxnId,
-        summary_justification: "รายการได้รับการอนุมัติจากคณะกรรมการแล้ว พร้อมโพสต์ลงบัญชี",
+        summary_justification:
+          "รายการได้รับการอนุมัติจากคณะกรรมการแล้ว พร้อมโพสต์ลงบัญชี",
       });
 
       expect(res.success).toBe(true);
@@ -179,7 +231,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
 
     it("generates a valid Fund Transfer proposal card with projected balances", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       const res = await proposalService.proposeFundTransfer({
         from_fund_id: dummyFundA,
@@ -191,9 +246,13 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
       expect(res.success).toBe(true);
       expect(res.proposal?.action).toBe("fund_transfer");
       expect(res.proposal?.current_state.from_fund_balance).toBe("฿150,000.00");
-      expect(res.proposal?.current_state.projected_from_balance).toBe("฿130,000.00");
+      expect(res.proposal?.current_state.projected_from_balance).toBe(
+        "฿130,000.00",
+      );
       expect(res.proposal?.current_state.to_fund_balance).toBe("฿60,000.00");
-      expect(res.proposal?.current_state.projected_to_balance).toBe("฿80,000.00");
+      expect(res.proposal?.current_state.projected_to_balance).toBe(
+        "฿80,000.00",
+      );
 
       const parseRes = ActionProposalUiCardSchema.safeParse(res.proposal);
       expect(parseRes.success).toBe(true);
@@ -201,7 +260,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
 
     it("generates a valid Void Transaction proposal card for posted transactions", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       const res = await proposalService.proposeVoidTransaction({
         transaction_id: dummyPostedTxnId,
@@ -211,7 +273,7 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
       expect(res.success).toBe(true);
       expect(res.proposal?.action).toBe("void_transaction");
       expect(res.proposal?.amount).toBe("฿8,500.00");
-      expect(res.proposal?.summary).toContain("Reversal Mirror Entry");
+      expect(res.proposal?.summary).toContain("รายการปรับปรุงยอดแบบย้อนกลับ");
 
       const parseRes = ActionProposalUiCardSchema.safeParse(res.proposal);
       expect(parseRes.success).toBe(true);
@@ -221,7 +283,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
   describe("2. CRITICAL PROOF: Zero Execution Guarantee", () => {
     it("CRITICAL PROOF 1: propose_fund_transfer() NEVER calls transfer_funds() RPC", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       await proposalService.proposeFundTransfer({
         from_fund_id: dummyFundA,
@@ -230,33 +295,45 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
         reason: "ทดสอบการสร้างข้อเสนอ",
       });
 
-      const executeCalls = mockSupabase.rpcCalls.filter((c: any) => c.fn === "transfer_funds");
+      const executeCalls = mockSupabase.rpcCalls.filter(
+        (c: any) => c.fn === "transfer_funds",
+      );
       expect(executeCalls).toHaveLength(0);
     });
 
     it("CRITICAL PROOF 2: propose_transaction_post() NEVER calls post_transaction() RPC", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       await proposalService.proposeTransactionPost({
         transaction_id: dummyTxnId,
         summary_justification: "ทดสอบการสร้างข้อเสนอโพสต์",
       });
 
-      const executeCalls = mockSupabase.rpcCalls.filter((c: any) => c.fn === "post_transaction");
+      const executeCalls = mockSupabase.rpcCalls.filter(
+        (c: any) => c.fn === "post_transaction",
+      );
       expect(executeCalls).toHaveLength(0);
     });
 
     it("CRITICAL PROOF 3: propose_void_transaction() NEVER calls void_transaction() RPC", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       await proposalService.proposeVoidTransaction({
         transaction_id: dummyPostedTxnId,
         void_reason: "ทดสอบการสร้างข้อเสนอยกเลิก",
       });
 
-      const executeCalls = mockSupabase.rpcCalls.filter((c: any) => c.fn === "void_transaction");
+      const executeCalls = mockSupabase.rpcCalls.filter(
+        (c: any) => c.fn === "void_transaction",
+      );
       expect(executeCalls).toHaveLength(0);
     });
   });
@@ -264,7 +341,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
   describe("3. Security & Resource State Protections", () => {
     it("DENIES propose_transaction_post when transaction is already posted", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       const res = await proposalService.proposeTransactionPost({
         transaction_id: dummyPostedTxnId, // Already posted
@@ -277,7 +357,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
 
     it("DENIES propose_void_transaction when transaction is not in posted status", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       const res = await proposalService.proposeVoidTransaction({
         transaction_id: dummyTxnId, // Status is 'approved', not 'posted'
@@ -290,7 +373,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
 
     it("DENIES proposal creation when user has unauthorized role (e.g. member)", async () => {
       const mockSupabase = createMockSupabase({ role: "member" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       const res = await proposalService.proposeFundTransfer({
         from_fund_id: dummyFundA,
@@ -304,8 +390,14 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
     });
 
     it("DENIES proposal when resource belongs to a different church (Tenant Isolation)", async () => {
-      const mockSupabase = createMockSupabase({ role: "treasurer", churchId: dummyChurchId });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyOtherChurchId);
+      const mockSupabase = createMockSupabase({
+        role: "treasurer",
+        churchId: dummyChurchId,
+      });
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyOtherChurchId,
+      );
 
       const res = await proposalService.proposeTransactionPost({
         transaction_id: dummyTxnId,
@@ -318,7 +410,10 @@ describe("Grace AI ACTION PROPOSAL Generation — Security & Zero Execution Test
 
     it("verifies dual-actor audit log is recorded on proposal generation", async () => {
       const mockSupabase = createMockSupabase({ role: "treasurer" });
-      const proposalService = new GraceAiProposalService(mockSupabase, dummyChurchId);
+      const proposalService = new GraceAiProposalService(
+        mockSupabase,
+        dummyChurchId,
+      );
 
       await proposalService.proposeTransactionPost({
         transaction_id: dummyTxnId,
