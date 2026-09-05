@@ -299,7 +299,7 @@ export class MembersPage {
           </div>
 
           <div style="display: flex; gap: var(--space-2);" class="no-print">
-            <button id="print-cert-btn" class="gl-btn gl-btn--primary" style="flex: 1;">พิมพ์เอกสาร / ดาวน์โหลด PDF</button>
+            <button id="print-cert-btn" class="gl-btn gl-btn--primary" style="flex: 1;">พิมพ์เอกสาร</button>
           </div>
         </div>
       </div>`
