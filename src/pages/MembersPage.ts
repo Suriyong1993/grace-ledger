@@ -5,7 +5,7 @@ import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { formatDateThai, toUserMessage } from "../lib/format";
 import { restoreFocusAfterRender } from "../lib/ui/focus";
-import { CHURCH_NAME_TH } from "../lib/org";
+import { CHURCH_NAME_TH, isPreviewChurchId } from "../lib/org";
 import { MembersService } from "../lib/members/members-service";
 
 export interface MemberRecord {
@@ -55,6 +55,28 @@ export class MembersPage {
   public async loadData(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
+    if (isPreviewChurchId(this.churchId)) {
+      this.members = [
+        {
+          id: "m1",
+          code: "M-001",
+          name: "สมเกียรติ วงศ์สว่าง",
+          email: "somkiat@example.com",
+          phone: "081-000-0001",
+          group: "กลุ่มแคร์ A",
+        },
+        {
+          id: "m2",
+          code: "M-002",
+          name: "มาลี จันทร์เพ็ญ",
+          email: "malee@example.com",
+          phone: "081-000-0002",
+          group: "กลุ่มแคร์ B",
+        },
+      ];
+      this.isLoading = false;
+      return;
+    }
     try {
       const { data, error } = await (this.supabase.from("members") as any)
         .select(
@@ -104,6 +126,17 @@ export class MembersPage {
     // Only skip when the cached state is still authoritative: a successful
     // load or an in-flight request. "failed" and "denied" are retryable.
     if (existing && (existing.status === "loaded" || existing.status === "loading" || existing.status === "denied")) return;
+
+    if (isPreviewChurchId(this.churchId)) {
+      this.givingById[memberId] = {
+        status: "loaded",
+        total: Money.from(12500),
+        titheCount: 4,
+        lastGivenDate: formatDateThai(new Date().toISOString()),
+      };
+      onStateChange();
+      return;
+    }
 
     this.givingById[memberId] = {
       status: "loading",

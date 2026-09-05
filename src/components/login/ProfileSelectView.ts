@@ -40,6 +40,8 @@ function renderProfilesBodyHtml(
     return `
       <div class="gl-login-profiles-status" role="alert">
         <p class="gl-login-hint">โหลดรายชื่อไม่สำเร็จ</p>
+        <p class="gl-login-hint">ดูหน้าตาแอปได้โดยไม่ต้องล็อกอิน</p>
+        <button type="button" id="login-preview-ui" class="gl-btn gl-btn--primary">ดูตัวอย่างหน้าจอ</button>
         <button type="button" id="login-profiles-retry" class="gl-btn gl-btn--secondary gl-btn--sm">ลองใหม่</button>
       </div>
     `;

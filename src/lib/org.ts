@@ -5,3 +5,10 @@
  * resolve it, so a printed document is never left with a placeholder.
  */
 export const CHURCH_NAME_TH = "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์";
+
+/** Walkthrough session — never sent to Postgres (not a UUID). */
+export const PREVIEW_CHURCH_ID = "preview";
+
+export function isPreviewChurchId(churchId: string): boolean {
+  return churchId === PREVIEW_CHURCH_ID;
+}

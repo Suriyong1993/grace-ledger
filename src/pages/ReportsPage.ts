@@ -1,7 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
-import { CHURCH_NAME_TH } from "../lib/org";
+import { CHURCH_NAME_TH, isPreviewChurchId } from "../lib/org";
 import {
   ReportsService,
   StatementOfFinancialPosition,
@@ -65,6 +65,72 @@ export class ReportsPage {
     this.historicalWeekly = [];
     this.historicalGrandTotals = null;
     this.historicalAllMonths = [];
+
+    if (isPreviewChurchId(this.churchId)) {
+      const income = Money.from(118000);
+      const expense = Money.from(68000);
+      this.statement = {
+        church_id: this.churchId,
+        period_start: `${this.selectedPeriod}-01`,
+        period_end: `${this.selectedPeriod}-28`,
+        total_income: income,
+        total_expense: expense,
+        net_surplus_deficit: income.subtract(expense),
+        posted_transactions_count: 12,
+        categories_summary: [
+          {
+            category_id: "c1",
+            category_name: "เงินถวายวันอาทิตย์",
+            type: "income",
+            total_amount: Money.from(98000),
+            transaction_count: 4,
+          },
+          {
+            category_id: "c2",
+            category_name: "สิบลด",
+            type: "income",
+            total_amount: Money.from(20000),
+            transaction_count: 2,
+          },
+          {
+            category_id: "c3",
+            category_name: "สาธารณูปโภค",
+            type: "expense",
+            total_amount: Money.from(32000),
+            transaction_count: 3,
+          },
+          {
+            category_id: "c4",
+            category_name: "พันธกิจ",
+            type: "expense",
+            total_amount: Money.from(36000),
+            transaction_count: 3,
+          },
+        ],
+        funds_allocation: [
+          {
+            fund_id: "f1",
+            fund_name: "กองทุนทั่วไป",
+            total_allocated: Money.from(186400),
+            split_count: 8,
+          },
+          {
+            fund_id: "f2",
+            fund_name: "กองทุนก่อสร้าง",
+            total_allocated: Money.from(94200),
+            split_count: 3,
+          },
+        ],
+        generated_at: new Date().toISOString(),
+      };
+      this.leadership = {
+        pastor: "ศิษยาภิบาลตัวอย่าง",
+        auditor: "ผู้ตรวจสอบบัญชีตัวอย่าง",
+        cashCounters: ["ผู้นับเงิน 1", "ผู้นับเงิน 2"],
+      };
+      this.isLoading = false;
+      return;
+    }
 
     await this.loadLeadership();
 
@@ -143,6 +209,7 @@ export class ReportsPage {
   }
 
   private async loadLeadership(): Promise<void> {
+    if (isPreviewChurchId(this.churchId)) return;
     try {
       const { data, error } = await (this.supabase.from("churches") as any)
         .select("settings")

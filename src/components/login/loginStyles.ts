@@ -178,12 +178,13 @@ export function renderLoginStylesHtml(): string {
       .gl-login-vault {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
+        min-height: 100dvh;
       }
 
       .gl-vault-panel {
         border-right: none;
         border-bottom: 1px solid color-mix(in srgb, var(--sidebar-primary) 22%, transparent);
-        padding: var(--space-3) var(--space-4);
+        padding: calc(var(--space-3) + env(safe-area-inset-top, 0px)) var(--space-4) var(--space-3);
       }
 
       .gl-vault-panel__inner {
@@ -220,7 +221,6 @@ export function renderLoginStylesHtml(): string {
       flex-direction: column;
       align-items: center;
       position: relative;
-      animation: gl-login-card-in var(--duration-component) var(--ease-out);
     }
 
     .gl-login-card--narrow {
@@ -234,21 +234,7 @@ export function renderLoginStylesHtml(): string {
       }
     }
 
-    @keyframes gl-login-card-in {
-      from {
-        opacity: 0;
-        transform: translateY(12px) scale(0.99);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .gl-login-card {
-        animation: none;
-      }
 
       .gl-pin-status--error {
         animation: none;
@@ -514,7 +500,6 @@ export function renderLoginStylesHtml(): string {
     .gl-pin-dot.is-filled {
       background: var(--primary);
       border-color: var(--primary);
-      transform: scale(1.15);
     }
 
     .gl-pin-status {

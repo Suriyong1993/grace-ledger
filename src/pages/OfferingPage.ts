@@ -153,6 +153,21 @@ export class OfferingPage {
     this.isLoading = true;
     this.errorMessage = null;
 
+    if (isPreviewChurchId(this.churchId)) {
+      this.funds = [
+        {
+          id: "f1",
+          name: "กองทุนทั่วไป",
+          description: "ใช้จ่ายประจำวัน",
+          currentBalance: "186400.00",
+        },
+      ];
+      this.sessions = [];
+      this.isLoading = false;
+      this.initialDataLoaded = true;
+      return;
+    }
+
     try {
       // 1. Fetch live active funds
       if (this.funds.length === 0) {

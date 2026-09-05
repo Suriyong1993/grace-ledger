@@ -4,6 +4,7 @@ import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { FundsService } from "../lib/funds/funds-service";
 import { escapeHtml } from "../lib/format";
+import { isPreviewChurchId } from "../lib/org";
 
 export interface FundDetail {
   id: string;
@@ -45,6 +46,30 @@ export class FundsPage {
   public async loadData(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
+    if (isPreviewChurchId(this.churchId)) {
+      this.funds = [
+        {
+          id: "f1",
+          name: "กองทุนทั่วไป",
+          description: "ใช้จ่ายประจำวันของคริสตจักร",
+          balance: Money.from(186400),
+          targetAmount: Money.from(250000),
+          percentageUsed: 75,
+          recentActivity: [],
+        },
+        {
+          id: "f2",
+          name: "กองทุนก่อสร้าง",
+          description: "สมทบสร้างอาคารนมัสการ",
+          balance: Money.from(94200),
+          targetAmount: Money.from(500000),
+          percentageUsed: 19,
+          recentActivity: [],
+        },
+      ];
+      this.isLoading = false;
+      return;
+    }
     try {
       const res = await this.fundsService.getFunds(this.churchId);
       if (!res.success || !res.data) {
@@ -408,6 +433,13 @@ export class FundsPage {
       this.isSubmitting = true;
       this.formErrorMessage = null;
       onStateChange();
+
+      if (isPreviewChurchId(this.churchId)) {
+        this.formErrorMessage = "โหมดพรีวิวไม่บันทึกข้อมูลจริง";
+        this.isSubmitting = false;
+        onStateChange();
+        return;
+      }
 
       try {
         const res = await this.fundsService.transferFunds({

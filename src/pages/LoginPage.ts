@@ -26,6 +26,7 @@ type PinAuthHandler = (userId: string) => void;
 
 export interface LoginPageHandlers {
   onPinAuthenticated: PinAuthHandler;
+  onPreviewWalkthrough?: () => void;
 }
 
 const SELECTION_HANDOFF_MS = 140;
@@ -87,9 +88,9 @@ export class LoginPage {
               </span>
             </div>
             <div class="gl-vault-hero">
-              <p class="gl-vault-eyebrow">ระบบการเงินคริสตจักร</p>
-              <h2 class="gl-vault-title">ตู้เซฟการเงินของคริสตจักร</h2>
-              <p class="gl-vault-sub">บันทึกโปร่งใส ตรวจสอบย้อนหลังได้ทุกรายการ</p>
+              <p class="gl-vault-eyebrow">บัญชีคริสตจักร</p>
+              <h2 class="gl-vault-title">เข้าสู่ระบบด้วย PIN</h2>
+              <p class="gl-vault-sub">เลือกโปรไฟล์ แล้วใส่รหัส 6 หลัก</p>
             </div>
             <ul class="gl-vault-facts">
               <li>${VAULT_FACT_ICONS.roles}สิทธิ์เข้าถึงแยกตามบทบาทผู้รับผิดชอบ</li>
@@ -104,7 +105,7 @@ export class LoginPage {
             ${this.renderViewHtml()}
             <div class="gl-login-trust-badge">
               <span aria-hidden="true">${VAULT_LOCK_SVG}</span>
-              <span>รหัส PIN ได้รับการปกป้องในระดับหน่วยความจำ · แยกสิทธิ์การใช้งานตามบทบาท</span>
+              <span>PIN 6 หลัก · สิทธิ์ตามบทบาท</span>
             </div>
           </div>
         </main>
@@ -150,6 +151,12 @@ export class LoginPage {
         this.profilesLoadStarted = false;
         this.profilesStatus = "loading";
         this.rerender();
+      });
+
+    root
+      .querySelector<HTMLButtonElement>("#login-preview-ui")
+      ?.addEventListener("click", () => {
+        this.handlers?.onPreviewWalkthrough?.();
       });
 
     root

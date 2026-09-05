@@ -64,7 +64,6 @@ const ICON_RECEIPT = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none
 const ICON_LIST = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h10"/></svg>`;
 const ICON_OFFERING = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><rect x="3" y="7" width="18" height="11" rx="2.5"/><circle cx="12" cy="12.5" r="2.2"/></svg>`;
 const ICON_DOC = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>`;
-const ICON_CHECK = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>`;
 const ICON_TREND_UP = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg>`;
 const ICON_TREND_DOWN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
 
@@ -89,6 +88,9 @@ export class DashboardPage {
     churchId: string,
     attention?: AttentionSummary,
   ): Promise<DashboardData> {
+    if (churchId === "preview") {
+      return previewDashboardData();
+    }
     try {
       const approvalsGroup = attention?.groups.find(
         (g) => g.key === "approvals",
@@ -364,45 +366,32 @@ export class DashboardPage {
         <span class="gl-attention-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
       </a>`;
 
-    let attentionBodyHtml: string;
+    let attentionBodyHtml = "";
+    let showCommandCenter = false;
     if (attention === undefined) {
-      // Fallback for callers/tests without a loaded summary: derive the one
-      // group this page has always known about from pendingApprovalsCount.
-      attentionBodyHtml = hasPending
-        ? renderAttentionRow(
+      if (hasPending) {
+        showCommandCenter = true;
+        attentionBodyHtml = renderAttentionRow(
             "approvals",
             `คิวอนุมัติรอพิจารณา · ${data.pendingApprovalsCount} รายการ`,
             "คำขอเบิกจ่ายรอการตรวจสอบ",
             "#/approvals",
             true,
-          )
-        : `<div class="gl-attention-empty" role="status">
-              <span class="gl-attention-empty__icon" aria-hidden="true">${ICON_CHECK}</span>
-              <span>งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง</span>
-            </div>`;
+          );
+      }
     } else if (attention === null) {
-      attentionBodyHtml = `
-      <div class="gl-attention-loading" role="status" aria-live="polite">
-        <span class="gl-skeleton" style="height: 52px; display: block;"></span>
-        <span class="gl-skeleton" style="height: 52px; display: block;"></span>
-      </div>`;
+      showCommandCenter = false;
     } else if (attention.loadFailed && attention.totalCount === 0) {
+      showCommandCenter = true;
       attentionBodyHtml = `
       <div class="gl-attention-empty" role="alert">
         <span>โหลดข้อมูลงานค้างไม่สำเร็จ</span>
         <button type="button" class="gl-btn gl-btn--secondary gl-btn--sm" id="dash-attention-retry">ลองใหม่</button>
       </div>`;
     } else if (attention.totalCount === 0) {
-      const weeklyOffering = can(userRole, "create", "offering_sessions")
-        ? `<a href="#/offerings/new" class="gl-btn gl-btn--primary gl-btn--sm">${ICON_PLUS}<span>บันทึกเงินถวายสัปดาห์นี้</span></a>`
-        : "";
-      attentionBodyHtml = `
-      <div class="gl-attention-empty" role="status">
-        <span class="gl-attention-empty__icon" aria-hidden="true">${ICON_CHECK}</span>
-        <span>งานเป็นที่เรียบร้อย — ไม่มีสิ่งที่ต้องดำเนินการค้าง</span>
-        ${weeklyOffering}
-      </div>`;
+      showCommandCenter = false;
     } else {
+      showCommandCenter = true;
       attentionBodyHtml = attention.groups
         .filter((group) => group.count > 0)
         .map((group) =>
@@ -564,12 +553,12 @@ export class DashboardPage {
                     ? "var(--expense)"
                     : "var(--foreground)";
                 const sign = isIncome ? "+" : isExpense ? "−" : "";
-                const statusLabel =
+                const statusHtml =
                   item.status === "approved"
-                    ? "อนุมัติแล้ว"
-                    : item.status === "rejected"
-                      ? "ไม่อนุมัติ"
-                      : "รอตรวจสอบ";
+                    ? ""
+                    : `<span class="gl-badge gl-badge--${item.status}">${
+                        item.status === "rejected" ? "ไม่อนุมัติ" : "รอตรวจสอบ"
+                      }</span>`;
 
                 return `
                 <a href="#/transactions" class="gl-row">
@@ -580,7 +569,7 @@ export class DashboardPage {
                   </span>
                   <span class="gl-row__end">
                     <span class="num-display" style="color: ${amountColor};">${sign}${item.amount.format()}</span>
-                    <span class="gl-badge gl-badge--${item.status}">${statusLabel}</span>
+                    ${statusHtml}
                   </span>
                 </a>`;
               })
@@ -708,31 +697,41 @@ export class DashboardPage {
       ${aiGreetingHtml}
 
       <div class="gl-page-header">
-        <h1>ภาพรวมการเงิน</h1>
-        <p>${escapeHtml(activeUser?.churchName || "คริสตจักร")} · ข้อมูล ณ ${period}</p>
+        <div>
+          <h1>ภาพรวมการเงิน</h1>
+          <p>${escapeHtml(activeUser?.churchName || "คริสตจักร")} · ข้อมูล ณ ${period}</p>
+        </div>
+        ${heroActionsHtml ? `<div class="gl-dash-toolbar">${heroActionsHtml}</div>` : ""}
       </div>
 
-      <!-- Financial position: total balance + month figures + month-over-
-           month net context. This is the page's primary orientation — it
-           leads. The balance card is the operational core. -->
-      <section class="gl-section">
-        <h2 class="gl-visually-hidden">สุขภาพการเงิน</h2>
-        <div class="gl-dash-hero-row">
-          <div class="gl-card gl-dash-hero gl-rise">
-            <div class="kicker">ยอดเงินคงเหลือทั้งหมด</div>
-            <div class="num-display gl-dash-hero__value gl-total-rule" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
-            <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
-
-            <div class="gl-dash-hero__figures">
-              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong>${incomeDeltaHtml}</span>
-              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong>${expenseDeltaHtml}</span>
-              <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display ${netIsPositive ? "gl-income" : netMoney.isNegative() ? "gl-expense" : "gl-net"}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
-            </div>
-
-            ${heroActionsHtml ? `<div class="gl-dash-hero__actions">${heroActionsHtml}</div>` : ""}
+      <section class="gl-section" aria-label="ตัวเลขหลัก">
+        <div class="gl-kpi-bento">
+          <article class="gl-kpi-tile gl-kpi-tile--lead">
+            <span class="gl-kpi-tile__label">ยอดคงเหลือทุกกองทุน</span>
+            <span class="num-display gl-kpi-tile__value gl-total-rule" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</span>
+            <span class="gl-kpi-tile__hint">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชี · ${escapeHtml(period)}</span>
+          </article>
+          <div class="gl-kpi-support">
+            <article class="gl-kpi-tile">
+              <span class="gl-kpi-tile__label">รายรับเดือนนี้</span>
+              <span class="num-display gl-kpi-tile__value gl-income">+${data.monthlyIncome || "฿0.00"}</span>
+              ${incomeDeltaHtml}
+            </article>
+            <article class="gl-kpi-tile">
+              <span class="gl-kpi-tile__label">รายจ่ายเดือนนี้</span>
+              <span class="num-display gl-kpi-tile__value gl-expense">−${data.monthlyExpense || "฿0.00"}</span>
+              ${expenseDeltaHtml}
+            </article>
+            <article class="gl-kpi-tile">
+              <span class="gl-kpi-tile__label">สุทธิเดือนนี้</span>
+              <span class="num-display gl-kpi-tile__value ${netIsPositive ? "gl-income" : netMoney.isNegative() ? "gl-expense" : "gl-net"}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</span>
+              ${
+                netDelta && prevBar
+                  ? `<span class="gl-dash-hero__figure-delta ${deltaIsPositive ? "gl-income" : deltaIsNegative ? "gl-expense" : "gl-net"}">${deltaLabel} จากเดือนก่อน</span>`
+                  : `<span class="gl-kpi-tile__hint">เทียบเดือนก่อนเมื่อมีข้อมูล</span>`
+              }
+            </article>
           </div>
-
-          ${contextCardHtml}
         </div>
       </section>
 
@@ -752,7 +751,29 @@ export class DashboardPage {
         ${attentionBodyHtml}
       </section>
 
-      ${trendHtml}
+      <div class="gl-analytics-grid">
+        <div>${trendHtml}</div>
+        <aside class="gl-mix-card gl-card">
+          <h2 class="gl-mix-card__title">สัดส่วนเดือนนี้</h2>
+          ${
+            incomeMoney.isZero() && expenseMoney.isZero()
+              ? `<p class="gl-kpi-tile__hint">ยังไม่มีรายรับรายจ่ายที่บันทึกในเดือนนี้</p>`
+              : (() => {
+                  const inc = Math.max(0, incomeMoney.toSatang());
+                  const exp = Math.max(0, expenseMoney.toSatang());
+                  const total = inc + exp || 1;
+                  const incPct = Math.round((inc / total) * 100);
+                  const expPct = 100 - incPct;
+                  return `<div class="gl-mix" style="--inc:${incPct}; --exp:${expPct};" role="img" aria-label="รายรับ ${incPct} เปอร์เซ็นต์ รายจ่าย ${expPct} เปอร์เซ็นต์"></div>
+                    <ul class="gl-mix__legend">
+                      <li><span class="gl-legend__swatch" style="background:var(--income)"></span>รายรับ ${incPct}%</li>
+                      <li><span class="gl-legend__swatch" style="background:var(--expense)"></span>รายจ่าย ${expPct}%</li>
+                    </ul>`;
+                })()
+          }
+          ${contextCardHtml}
+        </aside>
+      </div>
 
       <div class="gl-dash-split">
         <div>
@@ -778,4 +799,87 @@ export class DashboardPage {
     </div>
     `;
   }
+}
+
+function previewDashboardData(): DashboardData {
+  const months = [
+    { monthName: "ม.ค.", income: 82000, expense: 54000 },
+    { monthName: "ก.พ.", income: 91000, expense: 61000 },
+    { monthName: "มี.ค.", income: 88000, expense: 59000 },
+    { monthName: "เม.ย.", income: 102000, expense: 64000 },
+    { monthName: "พ.ค.", income: 96000, expense: 71000 },
+    { monthName: "มิ.ย.", income: 118000, expense: 68000 },
+  ];
+  const historicalTrend: HistoricalTrendBar[] = months.map((m) => {
+    const income = Money.from(m.income);
+    const expense = Money.from(m.expense);
+    const net = income.subtract(expense);
+    return {
+      monthName: m.monthName,
+      income: income.format(),
+      expense: expense.format(),
+      net: net.format(),
+      isPositive: net.isPositive(),
+      incomeSatang: income.toSatang(),
+      expenseSatang: expense.toSatang(),
+    };
+  });
+  const general = Money.from(186400);
+  const building = Money.from(94200);
+  const mission = Money.from(41850);
+  return {
+    pendingApprovalsCount: 0,
+    totalFundsBalance: general.add(building).add(mission).format(),
+    monthlyIncome: Money.from(118000).format(),
+    monthlyExpense: Money.from(68000).format(),
+    activeAccountsCount: 3,
+    funds: [
+      {
+        name: "กองทุนทั่วไป",
+        balance: general,
+        targetAmount: Money.from(200000),
+      },
+      {
+        name: "กองทุนก่อสร้าง",
+        balance: building,
+        targetAmount: Money.from(150000),
+      },
+      {
+        name: "กองทุนพันธกิจ",
+        balance: mission,
+        targetAmount: Money.from(50000),
+      },
+    ],
+    recentTransactions: [
+      {
+        id: "p1",
+        title: "เงินถวายวันอาทิตย์",
+        subtitle: "วันนี้",
+        amount: Money.from(24500),
+        direction: "income",
+        date: "วันนี้",
+        status: "approved",
+      },
+      {
+        id: "p2",
+        title: "ค่าสาธารณูปโภค",
+        subtitle: "เมื่อวาน",
+        amount: Money.from(3200),
+        direction: "expense",
+        date: "เมื่อวาน",
+        status: "approved",
+      },
+      {
+        id: "p3",
+        title: "โอนเข้ากองทุนก่อสร้าง",
+        subtitle: "2 วันที่แล้ว",
+        amount: Money.from(10000),
+        direction: "transfer",
+        date: "2 วันที่แล้ว",
+        status: "approved",
+      },
+    ],
+    historicalTrend,
+    loadFailed: false,
+  };
 }

@@ -252,7 +252,7 @@ function renderAttentionPanel(attention: AttentionSummary | null | undefined): s
     body = `
       <div class="gl-attention-panel__empty" role="status">
         <span class="gl-attention-panel__done" aria-hidden="true">${icon(ICON_CHECK, 20)}</span>
-        <p>ไม่มีงานค้าง — ทุกอย่างเรียบร้อย</p>
+        <p>ไม่มีงานที่ต้องดำเนินการ</p>
       </div>`;
   } else {
     body = attention.groups
@@ -485,6 +485,10 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
 
     /* --- Attention (bell) panel --- */
     .gl-attention-wrap { position: relative; display: inline-flex; }
+    .gl-attention-panel[hidden],
+    .gl-more-panel[hidden] {
+      display: none !important;
+    }
     .gl-attention-panel {
       position: absolute;
       top: calc(100% + 8px);

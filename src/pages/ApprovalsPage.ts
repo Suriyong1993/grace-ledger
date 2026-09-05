@@ -6,6 +6,7 @@ import { Money } from "../lib/money";
 import { router } from "../router";
 import { escapeHtml, formatDateThai, toUserMessage } from "../lib/format";
 import { type AppShellUser } from "../components/layout/AppShell";
+import { isPreviewChurchId } from "../lib/org";
 
 /* Per-page ICON_* inline SVGs — the repo convention (see design-plans/08).
    Lucide-style stroke icons; decorative ones are aria-hidden at the call site. */
@@ -59,6 +60,11 @@ export class ApprovalsPage {
   public async loadQueue(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
+    if (isPreviewChurchId(this.churchId)) {
+      this.items = [];
+      this.isLoading = false;
+      return;
+    }
     try {
       const res = await this.approvalsService.getPendingApprovals(this.churchId, this.currentUserId);
       if (res.success && res.data) {
@@ -93,7 +99,7 @@ export class ApprovalsPage {
       </div>
       <div class="gl-appr-profile__count${pendingCount > 0 ? " gl-appr-profile__count--attention" : ""}">
         <span class="num-display gl-appr-profile__count-value">${pendingCount}</span>
-        <span class="gl-appr-profile__count-label">รออนุมัติ</span>
+        <span class="gl-appr-profile__count-label">${pendingCount > 0 ? "รออนุมัติ" : "ไม่มีค้าง"}</span>
       </div>
     </div>`;
   }

@@ -44,12 +44,16 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
   font-family: var(--font-sans);
   color: var(--foreground);
   background: var(--background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 #app {
@@ -191,26 +195,21 @@ body {
 }
 
 .gl-card--attention {
-  /* --------------------------------------------------------------------------
-   HMR visual indicator (temporary)
-   This block is intentionally small and reversible — it shows a fixed badge
-   when the dev server is running and updates on HMR edits.
-   -------------------------------------------------------------------------- */
-  .hmr-indicator {
-    position: fixed;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(15, 23, 42, 0.85);
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    z-index: 99999;
-    pointer-events: none;
-    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35);
-  }
-
   border-color: var(--primary);
+}
+
+.hmr-indicator {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-2xs);
+  z-index: 99999;
+  pointer-events: none;
+  border: 1px solid var(--sidebar-border);
 }
 
 .gl-card--danger {
@@ -1000,10 +999,11 @@ button.gl-card:active {
    -------------------------------------------------------------------------- */
 .gl-tablist {
   display: flex;
-  gap: var(--space-5);
+  gap: var(--space-4);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 88%, transparent);
 }
 
 .gl-tablist::-webkit-scrollbar {
@@ -2021,16 +2021,9 @@ button.gl-card:active {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 3px;
-  /* Evergreen into brass — the two accents the Emerald Vault identity owns.
-     The previous ramp ended in sky blue (#0ea5e9), which is outside the
-     palette and read as a second brand colour on the hero. */
-  background: linear-gradient(
-    90deg,
-    var(--primary) 0%,
-    var(--gl-brass-500) 100%
-  );
+  width: 3px;
+  height: 100%;
+  background: var(--primary);
 }
 
 .gl-dash-hero__value {
@@ -3601,18 +3594,18 @@ a {
 /* Page-context greeting line — plain text, no card/gradient surface so it
    never competes with the hero or the command center for attention. */
 .gl-dash-greeting {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
 }
 
 /* Micro-Interactions */
 .gl-btn:active,
 .gl-icon-btn:active,
 .gl-attention-row:active {
-  transform: scale(0.97) !important;
-  transition: transform 80ms ease-out !important;
+  transform: scale(0.97);
 }
 
 .gl-row:active {
@@ -3634,12 +3627,21 @@ a {
    Attention Panel — grouped pending-work list with loading/empty/hint states
    ========================================================================== */
 .gl-attention-panel {
-  display: flex;
   flex-direction: column;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+}
+
+.gl-attention-panel:not([hidden]),
+.gl-more-panel:not([hidden]) {
+  display: flex;
+}
+
+.gl-attention-panel[hidden],
+.gl-more-panel[hidden] {
+  display: none !important;
 }
 
 .gl-attention-panel__loading,
@@ -3810,7 +3812,7 @@ a {
 /* ==========================================================================
    More Panel — overflow menu / additional actions panel
    ========================================================================== */
-.gl-more-panel {
+.gl-more-panel:not([hidden]) {
   display: flex;
   flex-direction: column;
   background: var(--card);
@@ -3967,7 +3969,7 @@ a {
 }
 
 .gl-shell-avatar:hover {
-  transform: scale(1.05);
+  opacity: 0.92;
 }
 
 .gl-shell-avatar:focus-visible {
@@ -3975,28 +3977,13 @@ a {
   outline-offset: 2px;
 }
 
-.gl-sidebar__dim {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgb(0 0 0 / 0.4);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity var(--duration-component) var(--ease-out),
-    visibility var(--duration-component) var(--ease-out);
-}
-
-.gl-sidebar__dim.is-open {
-  opacity: 1;
-  visibility: visible;
-}
+/* Muted labels inside the vault sidebar — not an overlay. Overlay was a
+   name collision that painted every kicker as a full-screen scrim. */
 
 @media (prefers-reduced-motion: reduce) {
   .gl-shell-icon-btn,
   .gl-shell-primary-action,
-  .gl-shell-avatar,
-  .gl-sidebar__dim {
+  .gl-shell-avatar {
     transition: none;
   }
 }
@@ -5050,5 +5037,280 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .gl-fundrow {
     transition: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Analytics dashboard — KPI strip, mix chart, floating mobile dock.
+   Layout language from product analytics UIs; colour still means money.
+   -------------------------------------------------------------------------- */
+.gl-kpi-bento {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.gl-kpi-support {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.gl-kpi-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.gl-kpi-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  min-height: 0;
+}
+
+.gl-kpi-tile--lead {
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-color: var(--sidebar-border);
+  padding: var(--space-6);
+  justify-content: center;
+}
+
+.gl-kpi-tile--lead .gl-kpi-tile__label,
+.gl-kpi-tile--lead .gl-kpi-tile__hint {
+  color: color-mix(in srgb, var(--sidebar-foreground) 68%, transparent);
+}
+
+.gl-kpi-tile--lead .gl-kpi-tile__value {
+  color: var(--sidebar-foreground);
+}
+
+.gl-kpi-tile__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--muted-foreground);
+}
+
+.gl-kpi-tile__value {
+  font-size: clamp(var(--text-lg), 2vw, var(--text-2xl));
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-heading);
+  line-height: 1.15;
+}
+
+.gl-kpi-tile--lead .gl-kpi-tile__value {
+  font-size: clamp(var(--text-3xl), 3.4vw, var(--text-5xl));
+  font-weight: var(--weight-semibold);
+}
+
+.gl-kpi-tile__hint {
+  font-size: var(--text-2xs);
+  color: var(--muted-foreground);
+}
+
+.gl-dash-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gl-analytics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(260px, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  align-items: stretch;
+}
+
+.gl-analytics-grid > .gl-card,
+.gl-analytics-grid .gl-mix-card,
+.gl-analytics-grid .gl-section .gl-card {
+  height: 100%;
+  border-radius: calc(var(--radius-card) + 2px);
+}
+
+.gl-analytics-grid .gl-section {
+  margin-bottom: 0;
+}
+
+.gl-mix-card__title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.gl-mix {
+  width: 168px;
+  height: 168px;
+  margin: 0 auto var(--space-4);
+  border-radius: var(--radius-full);
+  background: conic-gradient(
+    var(--income) 0 calc(var(--inc, 50) * 1%),
+    var(--expense) calc(var(--inc, 50) * 1%) 100%
+  );
+  mask: radial-gradient(circle closest-side, transparent 58%, #000 59%);
+}
+
+.gl-mix__legend {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.gl-mix__legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gl-mix-card .gl-dash-context {
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+@media (max-width: 900px) {
+  .gl-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gl-analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .gl-mobilenav {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    width: auto !important;
+    border-radius: 28px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-elevated) !important;
+    padding: 6px !important;
+    gap: 2px;
+    overflow: hidden;
+  }
+
+  .gl-mobilenav__item {
+    border-radius: 22px;
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .gl-mobilenav__item[aria-current="page"] {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .gl-app-main {
+    padding-bottom: calc(var(--gl-mobilenav-h) + 28px);
+  }
+}
+
+@media (max-width: 540px) {
+  .gl-kpi-support {
+    grid-template-columns: 1fr;
+  }
+
+  .gl-kpi-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gl-kpi-tile {
+    min-height: 0;
+    padding: var(--space-4);
+  }
+
+  .gl-kpi-tile--lead {
+    grid-column: 1 / -1;
+  }
+
+  .gl-kpi-tile__value {
+    font-size: var(--text-xl);
+  }
+
+  .gl-dash-toolbar {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .gl-dash-toolbar .gl-btn--primary {
+    flex: 1 1 100%;
+  }
+
+  .gl-mix {
+    width: 128px;
+    height: 128px;
+  }
+
+  .gl-page-header {
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 380px) {
+  .gl-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .gl-kpi-tile--lead {
+    grid-column: auto;
+  }
+
+  .gl-mobilenav__item {
+    font-size: 10px;
+    padding-inline: 2px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .gl-shell-topbar {
+    min-height: 52px !important;
+  }
+
+  .gl-mobilenav {
+    min-height: 56px;
+  }
+
+  .gl-dash-greeting {
+    display: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .gl-btn,
+  .gl-icon-btn,
+  .gl-shell-icon-btn,
+  .gl-profile-item,
+  .gl-pin-key {
+    min-height: var(--touch-target-min);
+  }
+
+  a.gl-card:hover,
+  button.gl-card:hover,
+  .gl-command-card:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-kpi-tile,
+  .gl-mix,
+  .gl-mobilenav__item {
+    transition: none;
+    animation: none;
   }
 }

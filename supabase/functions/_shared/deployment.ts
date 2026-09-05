@@ -119,8 +119,18 @@ function configuredOriginPattern(): RegExp | null {
   }
 }
 
+function isSandboxPreviewOrigin(origin: string): boolean {
+  try {
+    const host = new URL(origin).hostname;
+    return host.endsWith(".e2b.app") || host.endsWith(".e2b.dev");
+  } catch {
+    return false;
+  }
+}
+
 function isAllowedOrigin(origin: string): boolean {
   if (FIXED_ALLOWED_ORIGINS.has(origin)) return true;
+  if (isSandboxPreviewOrigin(origin)) return true;
   // Legacy default: team-scoped Vercel pattern, retained only until
   // ALLOWED_ORIGIN_REGEX is configured for the deployment. Set the secret
   // (even to the same pattern) to take explicit ownership of this list.

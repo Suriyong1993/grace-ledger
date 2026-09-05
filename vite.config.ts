@@ -1,10 +1,12 @@
 import { defineConfig } from "vite";
 
-// Split the vendor libraries out of the main chunk: @supabase/supabase-js
-// dominates the bundle, and keeping it (plus decimal/zod) in separate chunks
-// improves cache reuse across app-code releases and keeps every chunk below
-// the 500 kB warning threshold.
 export default defineConfig({
+  server: {
+    host: true,
+    port: 5500,
+    strictPort: true,
+    allowedHosts: true,
+  },
   build: {
     rollupOptions: {
       output: {

@@ -52,6 +52,7 @@ export class App {
   private rootElement: HTMLElement | null = null;
   private pendingCount = 0;
   private session: ActiveSession | null = null;
+  private isPreviewSession = false;
   private attentionService: AttentionService | null = null;
   private attention: AttentionSummary | null = null;
 
@@ -83,6 +84,7 @@ export class App {
       }
 
       if (!authSession) {
+        if (this.isPreviewSession) return;
         this.session = null;
         this.pinSetupPage = null;
         this.approvalsPage = null;
@@ -219,6 +221,64 @@ export class App {
     );
   }
 
+  private async enterPreviewWalkthrough(): Promise<void> {
+    this.isPreviewSession = true;
+    const churchId = "preview";
+    const userId = "preview";
+    const fullName = "เหรัญญิกตัวอย่าง";
+    const userRole: UserRole = "treasurer";
+    this.session = {
+      userId,
+      churchId,
+      user: {
+        name: fullName,
+        role: userRole,
+        initials: "หร",
+        churchName: CHURCH_NAME_TH,
+      },
+    };
+    this.approvalsPage = new ApprovalsPage(this.supabase, churchId, userId);
+    this.attentionService = null;
+    this.pendingCount = 0;
+    this.attention = {
+      totalCount: 0,
+      loadFailed: false,
+      groups: [],
+    };
+    this.offeringPage = new OfferingPage(
+      this.supabase,
+      churchId,
+      userId,
+      fullName,
+    );
+    this.transactionsPage = new TransactionsPage(this.supabase, churchId);
+    this.fundsPage = new FundsPage(this.supabase, churchId);
+    this.membersPage = new MembersPage(
+      this.supabase,
+      churchId,
+      this.session.user.churchName ?? CHURCH_NAME_TH,
+    );
+    this.reportsPage = new ReportsPage(
+      this.supabase,
+      churchId,
+      this.session.user.churchName ?? CHURCH_NAME_TH,
+    );
+    this.profilePage = new ProfilePage(this.supabase, {
+      user: this.session.user,
+      userId,
+      churchId,
+    });
+    this.aiDrawer = new GraceAiDrawer(
+      this.supabase,
+      churchId,
+      userRole,
+      userId,
+      this.aiDrawerCallbacks,
+    );
+    router.navigate("/");
+    await this.render();
+  }
+
   private async handlePinAuthenticated(userId: string): Promise<void> {
     this.isBootstrappingSession = true;
     try {
@@ -340,6 +400,7 @@ export class App {
       this.loginPage.attachEventListeners(this.rootElement, {
         onPinAuthenticated: (userId) =>
           void this.handlePinAuthenticated(userId),
+        onPreviewWalkthrough: () => void this.enterPreviewWalkthrough(),
       });
       return;
     }
@@ -361,15 +422,20 @@ export class App {
             })
         : Promise.resolve();
 
+    await attentionPromise;
+    this.pendingCount =
+      this.attention?.groups.find((g) => g.key === "approvals")?.count ??
+      this.attention?.totalCount ??
+      0;
+
     if (
       this.currentRoute.pattern === "/" ||
       this.currentRoute.pattern === "not_found"
     ) {
-      const data = await this.dashboardPage.loadData(this.session.churchId);
-      await attentionPromise;
-      this.pendingCount =
-        this.attention?.groups.find((g) => g.key === "approvals")?.count ??
-        data.pendingApprovalsCount;
+      const data = await this.dashboardPage.loadData(
+        this.session.churchId,
+        this.attention ?? undefined,
+      );
       contentHtml = this.dashboardPage.renderHtml(
         data,
         this.session.user,
@@ -379,30 +445,25 @@ export class App {
       if (this.transactionsPage) {
         this.transactionsPage.consumeDeepLinkActions();
         await this.transactionsPage.loadData();
-        await attentionPromise;
         contentHtml = this.transactionsPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/funds") {
       if (this.fundsPage) {
         await this.fundsPage.loadData();
-        await attentionPromise;
         contentHtml = this.fundsPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/members") {
       if (this.membersPage) {
         await this.membersPage.loadData();
-        await attentionPromise;
         contentHtml = this.membersPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/reports") {
       if (this.reportsPage) {
         await this.reportsPage.loadData();
-        await attentionPromise;
         contentHtml = this.reportsPage.renderHtml();
       }
     } else if (this.currentRoute.pattern === "/profile") {
       if (this.profilePage) {
-        await attentionPromise;
         this.profilePage.updateProps({
           user: this.session.user,
           userId: this.session.userId,
@@ -414,13 +475,12 @@ export class App {
       this.currentRoute.pattern === "/approvals" ||
       this.currentRoute.pattern === "/approvals/:id"
     ) {
-      await attentionPromise;
       const approvalId =
         this.currentRoute.pattern === "/approvals/:id"
           ? this.currentRoute.params.id
-          : null;
-      this.approvalsPage?.setSelectedItem(approvalId);
-      contentHtml = this.approvalsPage?.renderHtml() ?? "";
+          : undefined;
+      await this.approvalsPage?.init(approvalId);
+      contentHtml = this.approvalsPage?.renderHtml(this.session.user) ?? "";
     } else if (this.currentRoute.pattern.startsWith("/offerings")) {
       if (this.offeringPage) {
         const offeringMode: OfferingPageMode =
@@ -440,11 +500,8 @@ export class App {
         if (shouldLoadOfferingData) {
           await this.offeringPage.loadInitialData(offeringSessionId);
         }
-        await attentionPromise;
         contentHtml = this.offeringPage.renderHtml();
       }
-    } else {
-      await attentionPromise;
     }
 
     const appShellHtml = renderAppShellHtml(
@@ -468,6 +525,12 @@ export class App {
       .querySelectorAll<HTMLButtonElement>("[data-logout]")
       .forEach((btn) => {
         btn.addEventListener("click", () => {
+          if (this.isPreviewSession) {
+            this.isPreviewSession = false;
+            this.session = null;
+            void this.render();
+            return;
+          }
           void this.supabase.auth.signOut();
         });
       });

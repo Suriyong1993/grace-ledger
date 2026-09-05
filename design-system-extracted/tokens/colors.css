@@ -6,11 +6,11 @@
 :root{
   /* base ramp — porcelain surfaces, ink-green text, evergreen brand, brass accent */
   --gl-white:#ffffff;
-  --gl-bg:#F4F5F2;
-  --gl-ink:#14201A;
+  --gl-bg:#F2F4F1;
+  --gl-ink:#121C17;
   --gl-stone-50:#f7f8f6;
-  --gl-stone-200:#e4e7e2;
-  --gl-stone-500:#6b7a6f;
+  --gl-stone-200:#dde3dc;
+  --gl-stone-500:#5f6e64;
   --gl-evergreen-50:#eef5f0;
   --gl-evergreen-100:#dcebe1;
   --gl-evergreen-600:#1d7a4f;

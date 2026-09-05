@@ -5,6 +5,7 @@ import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
+import { isPreviewChurchId } from "../lib/org";
 
 export interface TransactionItem {
   id: string;
@@ -119,6 +120,55 @@ export class TransactionsPage {
   public async loadData(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
+    if (isPreviewChurchId(this.churchId)) {
+      const today = new Date().toISOString().slice(0, 10);
+      this.transactions = [
+        {
+          id: "t1",
+          code: "TX-001",
+          description: "เงินถวายวันอาทิตย์",
+          categoryName: "เงินถวายวันอาทิตย์",
+          fundName: "กองทุนทั่วไป",
+          accountName: "บัญชีหลัก",
+          amount: Money.from(24500),
+          direction: "income",
+          date: today,
+          dateGroup: "today",
+          recordedBy: "เหรัญญิกตัวอย่าง",
+          status: "posted",
+          timeline: [
+            {
+              title: "สร้างรายการ",
+              detail: "ตัวอย่างโหมดพรีวิว",
+              status: "done",
+            },
+          ],
+        },
+        {
+          id: "t2",
+          code: "TX-002",
+          description: "ค่าไฟฟ้า",
+          categoryName: "สาธารณูปโภค",
+          fundName: "กองทุนทั่วไป",
+          accountName: "บัญชีหลัก",
+          amount: Money.from(4200),
+          direction: "expense",
+          date: today,
+          dateGroup: "today",
+          recordedBy: "เหรัญญิกตัวอย่าง",
+          status: "posted",
+          timeline: [
+            {
+              title: "สร้างรายการ",
+              detail: "ตัวอย่างโหมดพรีวิว",
+              status: "done",
+            },
+          ],
+        },
+      ];
+      this.isLoading = false;
+      return;
+    }
     try {
       const txnsRes = await (this.supabase.from("transactions") as any)
         .select(
