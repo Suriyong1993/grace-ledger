@@ -696,8 +696,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       <header class="gl-shell-topbar" style="
         min-height: var(--gl-topbar-h);
         border-bottom: 1px solid var(--border);
-        background: color-mix(in srgb, var(--card) 88%, transparent);
-        backdrop-filter: blur(10px);
+        background: var(--card);
         display: flex;
         align-items: center;
         justify-content: space-between;

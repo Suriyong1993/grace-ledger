@@ -21,12 +21,37 @@ const PATTERNS = [
   { name: "literal border-radius", re: /border-radius:\s*[0-9]+px/g },
   { name: "rgba()/rgb() color literal", re: /rgba?\([^)]*\)/g },
   { name: "hex color literal", re: /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b(?!-)/g },
+  // Blur belongs on an overlay scrim only. Glass on a content surface makes the
+  // figures behind it unreadable and costs frame time on a phone, which is why
+  // the directive rejects it. Each allowed use is counted below.
+  { name: "backdrop-filter", re: /backdrop-filter:/g },
 ];
 
 // Each entry: file path relative to repo root, and the exact number of expected hits per pattern name.
 // A count mismatch (higher OR lower) fails the lint — this catches both new violations and forgotten
 // cleanup (so nobody "fixes" an allowlisted file and leaves a stale, now-too-generous allowance).
 const ALLOWLIST = {
+  // Application stylesheet. Brought under this lint in the 2026-09-05 refinement
+  // pass; before that only .ts files were scanned, which is how the "2026
+  // Evolved Glassmorphism" layer landed unnoticed. Every remaining literal is
+  // accounted for here:
+  //   font-size 1, border-radius 3 — dev-only HMR badge (1 of each) and two
+  //     hairline/pill radii below the smallest radius token. R6 cleanup.
+  //   rgb/rgba 7 — dev-only HMR badge (2), two overlay scrims that need a plain
+  //     black veil (2), and three faint ink-tinted shadows written inline
+  //     rather than as tokens (3). R6 cleanup.
+  //   hex 10 — dev-only HMR badge (1) and the print stylesheet (9), which must
+  //     use pure black and white on paper.
+  //   backdrop-filter 5 — overlay scrims only: modal backdrop, sheet backdrop,
+  //     sticky mobile action bar. No content surface may blur.
+  "src/styles/app.css": {
+    "literal font-size": 1,
+    "literal border-radius": 3,
+    "rgba()/rgb() color literal": 7,
+    "hex color literal": 10,
+    "backdrop-filter": 5,
+  },
+
   // Confirmation modal uses ad-hoc semantic tints instead of --pending-muted/--expense-muted. R3/R6 cleanup.
   "src/components/ai/ProposalConfirmationModal.ts": {
     "literal font-size": 0,
@@ -41,7 +66,12 @@ function walk(dir, out = []) {
     const full = join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) walk(full, out);
-    else if (entry.endsWith(".ts") && !entry.endsWith(".test.ts")) out.push(full);
+    else if (
+      (entry.endsWith(".ts") && !entry.endsWith(".test.ts")) ||
+      entry.endsWith(".css")
+    ) {
+      out.push(full);
+    }
   }
   return out;
 }

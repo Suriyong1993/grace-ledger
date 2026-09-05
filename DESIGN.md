@@ -353,7 +353,10 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 ### Universal
 
 - No decorative gradients on KPI/stat cards
-- No glassmorphism unless justified by depth system
+- No glassmorphism on a content or chrome surface. Blur is for overlay scrims
+  only (modal/sheet backdrop), at 2-6px behind a veil. Depth on a surface comes
+  from the border and the surface step; the token shadow only confirms it. See
+  D15 — a 14px glass layer on the topbar and bottom bar was retired for this.
 - No bounce/spring animations on business UI
 - No animation > 300ms (except entrance)
 - No decorative SVG illustrations

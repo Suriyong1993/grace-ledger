@@ -25,8 +25,6 @@
   --on-pending-muted: oklch(0.38 0.08 80);
   --on-info-muted: oklch(0.42 0.11 250);
 
-  --gl-glass-blur: 14px;
-  --gl-glass-border: rgba(255, 255, 255, 0.09);
 }
 
 .dark {
@@ -2025,10 +2023,13 @@ button.gl-card:active {
   left: 0;
   right: 0;
   height: 3px;
+  /* Evergreen into brass — the two accents the Emerald Vault identity owns.
+     The previous ramp ended in sky blue (#0ea5e9), which is outside the
+     palette and read as a second brand colour on the hero. */
   background: linear-gradient(
     90deg,
     var(--primary) 0%,
-    color-mix(in srgb, var(--primary) 65%, #0ea5e9) 100%
+    var(--gl-brass-500) 100%
   );
 }
 
@@ -2726,14 +2727,18 @@ a.gl-row:focus-visible {
   }
 }
 
-/* Shell enhancements — 2026 Evolved Glassmorphism */
+/* Shell — top bar.
+
+   The bar is an opaque content surface with one hairline under it. It carries
+   no blur and no shadow: a shadow here floats the whole page, and a blur makes
+   the figures scrolling under it unreadable while costing frame time on a
+   phone. `!important` is still required because AppShell.ts sets the base
+   background and border as inline style attributes. */
 .gl-shell-topbar {
   padding-inline: clamp(16px, 3vw, 32px) !important;
-  background: color-mix(in srgb, var(--card) 80%, transparent) !important;
-  backdrop-filter: blur(var(--gl-glass-blur, 14px)) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(var(--gl-glass-blur, 14px)) saturate(140%) !important;
-  border-bottom: 1px solid var(--gl-glass-border, rgba(255, 255, 255, 0.08)) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25) !important;
+  background: var(--card) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
 }
 
 .gl-shell-topbar__title {
@@ -3389,7 +3394,7 @@ a {
   max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.2);
+  box-shadow: var(--shadow-elevated);
 }
 
 /* Shared empty/loading icon slot. */
@@ -3561,15 +3566,6 @@ a {
    Bolder Typography · Smarter AI Greeting · Evolved Glass · Crisp Borders
    ========================================================================== */
 
-/* 1. Evolved Glassmorphism Layer */
-.gl-glass-surface {
-  background: color-mix(in srgb, var(--card) 82%, transparent) !important;
-  backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-  border: 1px solid var(--gl-glass-border) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
-}
-
 /* Page-context greeting line — plain text, no card/gradient surface so it
    never competes with the hero or the command center for attention. */
 .gl-dash-greeting {
@@ -3591,14 +3587,14 @@ a {
   background: color-mix(in srgb, var(--muted) 70%, transparent) !important;
 }
 
-/* 5. Floating Bottom Navigation Enhancements for Mobile (390px) */
+/* Mobile bottom bar — opaque, so a figure scrolling behind it stays legible.
+   The top hairline separates it from the page; the shadow only confirms the
+   separation and uses the ink-tinted ramp, not pure black. */
 @media (max-width: 768px) {
   .gl-mobilenav {
-    backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(var(--gl-glass-blur)) saturate(140%) !important;
-    background: color-mix(in srgb, var(--card) 85%, transparent) !important;
-    border-top: 1px solid var(--gl-glass-border) !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow-elevated);
   }
 }
 

@@ -361,3 +361,76 @@ gradients/illustrations/promotional copy. No further change made; this is a revi
 
 **Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575/597, 22 pre-existing
 skips), `npm run lint:design`, `npm run build` all green.
+
+### D15 — The "2026 Evolved Glassmorphism" layer is retired (completes the D12 cleanup)
+
+**Decision:** the glass treatment on the three shell/content surfaces is replaced by opaque surfaces with a
+hairline border and, where a surface really overlaps, an ink-tinted token shadow.
+
+| Surface | Was | Now |
+| --- | --- | --- |
+| `.gl-shell-topbar` | `card 80%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.25)` shadow + a **white** 9% bottom border | `var(--card)`, `1px solid var(--border)`, `box-shadow: none` |
+| `.gl-shell-topbar` inline style (`AppShell.ts`) | `card 88%` + `blur(10px)` | `var(--card)` |
+| `.gl-mobilenav` (≤768px) | `card 85%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.3)` shadow | `var(--card)`, `1px solid var(--border)`, `var(--shadow-elevated)` |
+| `.gl-glass-surface` | glass utility, **zero consumers** in `src/` or `tests/` | deleted |
+| `--gl-glass-blur`, `--gl-glass-border` | tokens read only by the four rules above | deleted |
+
+**Why:**
+
+1. **It violated a rule this repo had already written down.** `DESIGN.md` § Anti-AI-Slop Rules: "No
+   glassmorphism unless justified by depth system." Nothing in the depth system justified it — `shadows.css`
+   states the opposite contract: *"Border beats shadow — these are intentionally faint … Shadows are
+   ink-green tinted to sit inside the porcelain palette."* The retired rules used pure black at 25–30%.
+2. **It was the surviving half of a known drift.** The layer arrived in the 2026-09-04 00:22 session, the
+   same session that added the "2026 Sunset Orange" CTA system. D12 removed the CTA half and left the glass
+   half. This completes that cleanup; it is not a new direction.
+3. **The topbar border was invisible.** `--gl-glass-border` was `rgba(255,255,255,0.09)` — 9% white on a
+   porcelain-light topbar. The bar had no readable bottom edge in light mode. `var(--border)` restores it.
+4. **Blur over a ledger costs legibility and frame time.** Figures scrolling under the bar were smeared, on
+   the surface where a treasurer is reading amounts.
+
+**Also corrected in the same pass, both found by bringing `app.css` under the lint (D16):**
+
+- `.gl-dash-hero::before` — the hero's 3px crown ramped `var(--primary)` into `#0ea5e9`, a bright sky blue
+  outside the Emerald Vault palette, on the single most important element of the dashboard. Now ramps
+  `var(--primary)` → `var(--gl-brass-500)`, the two accents the identity owns.
+- `.gl-modal-content--sheet` — `box-shadow: 0 -4px 24px rgb(0 0 0 / 0.2)` → `var(--shadow-elevated)`.
+
+**What did NOT change:** the `!important` on the topbar rule stays — `AppShell.ts` sets that header's base
+background and border as inline `style` attributes, so a stylesheet rule cannot win without it. The five
+remaining `backdrop-filter` uses stay: they are overlay scrims (modal backdrop, sheet backdrop, sticky mobile
+action bar), not content surfaces, and they blur at 2–6px behind a veil rather than 14px on the content
+itself. `.gl-total-rule` — the 2px + 1px double underline beneath the hero balance — stays: it is the
+accounting convention for a grand total, not decoration.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). `npm run typecheck`, `npm test` (575 passed, 22 pre-existing
+skips), `npm run lint:design`, `npm run build` all green. No test assertion changed; no test needed changing.
+
+### D16 — `lint:design` now scans `.css`, and rejects `backdrop-filter` by count
+
+**Decision:** `scripts/lint-design.mjs` walks `.css` files in addition to `.ts`, gains a `backdrop-filter`
+pattern, and carries an allowlist entry for `src/styles/app.css` with the exact count of every literal that
+remains there.
+
+**Why:** the walker matched `entry.endsWith(".ts")` only. `src/styles/app.css` is 5,022 lines — the largest
+stylesheet in the product and the one every screen loads — and it was never scanned. That gap is precisely
+how the D15 layer landed with black shadows, an off-palette hex, and a white border, while `lint:design`
+reported "passed". The design source of truth cannot be guarded by a check that does not read it.
+
+**What the allowlist now pins in `app.css`** (a count that moves in *either* direction fails the lint, which
+is this script's existing convention):
+
+| Pattern | Count | What they are |
+| --- | --- | --- |
+| literal `font-size` | 1 | dev-only HMR badge |
+| literal `border-radius` | 3 | dev-only HMR badge (1), two hairline/pill radii below the smallest token (2) |
+| `rgb()`/`rgba()` | 7 | dev-only HMR badge (2), overlay scrim veils (2), faint ink-tinted shadows written inline instead of as tokens (3) |
+| hex | 10 | dev-only HMR badge (1), print stylesheet (9) — paper needs true black and white |
+| `backdrop-filter` | 5 | overlay scrims only |
+
+Each is R6 cleanup except the print block and the scrims, which are correct as they are.
+
+**Verified:** injecting `.gl-drift-probe { backdrop-filter: blur(14px); background: #0ea5e9; }` into
+`app.css` fails the lint on both counts and exits 1; removing it passes. The guard was tested, not assumed.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D15.
