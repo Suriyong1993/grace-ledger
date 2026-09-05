@@ -18,6 +18,12 @@ jobs:
 
       - run: npm ci
 
+      # Runs before the tests so a type error fails in ~5s instead of after a
+      # full 20s test run. `npm run build` is `tsc --noEmit && vite build`, so
+      # the types are checked there too; naming the step makes a type failure
+      # legible in the run summary instead of hiding inside "build".
+      - run: npm run typecheck
+
       - run: npm test
 
       - run: npm run lint:design
