@@ -80,7 +80,7 @@ export class GraceAiProposalService {
    */
   constructor(
     private supabase: SupabaseClient<Database>,
-    private trustedChurchId: string
+    private trustedChurchId: string,
   ) {
     this.executor = new SecureAiToolExecutor(supabase);
   }
@@ -89,12 +89,15 @@ export class GraceAiProposalService {
    * 1. Propose Transaction Post (Proposes posting an approved transaction to the ledger)
    */
   public async proposeTransactionPost(
-    input: ProposeTransactionPostInput
+    input: ProposeTransactionPostInput,
   ): Promise<GraceAiProposalResponse> {
     // 1. Revalidate current resource state from Database
-    const { data: txn, error: txnErr } = await (this.supabase
-      .from("transactions") as any)
-      .select("id, amount, status, description, transaction_date, direction, categories(name), accounts(name)")
+    const { data: txn, error: txnErr } = await (
+      this.supabase.from("transactions") as any
+    )
+      .select(
+        "id, amount, status, description, transaction_date, direction, categories(name), accounts(name)",
+      )
       .eq("id", input.transaction_id)
       .eq("church_id", this.trustedChurchId)
       .single();
@@ -103,7 +106,8 @@ export class GraceAiProposalService {
       return {
         success: false,
         proposal: null,
-        message: "ไม่พบรายการธุรกรรมที่ต้องการโพสต์ หรือรายการไม่ได้อยู่ในคริสตจักรนี้",
+        message:
+          "ไม่พบรายการธุรกรรมที่ต้องการลงบัญชี หรือรายการไม่ได้อยู่ในคริสตจักรนี้",
         requires_human_confirmation: true,
         code: "TRANSACTION_NOT_FOUND",
         denial_reason: "Transaction not found or church mismatch",
@@ -114,7 +118,8 @@ export class GraceAiProposalService {
       return {
         success: false,
         proposal: null,
-        message: "รายการนี้ถูกโพสต์ลงบัญชีแยกประเภทเรียบร้อยแล้ว ไม่สามารถโพสต์ซ้ำได้",
+        message:
+          "รายการนี้ลงบัญชีแยกประเภทเรียบร้อยแล้ว ไม่สามารถลงบัญชีซ้ำได้",
         requires_human_confirmation: true,
         code: "INVALID_RESOURCE_STATE",
         denial_reason: "Transaction is already posted",
@@ -136,7 +141,7 @@ export class GraceAiProposalService {
       return {
         success: false,
         proposal: null,
-        message: execRes.error || "ไม่สามารถสร้างข้อเสนอโพสต์รายการได้",
+        message: execRes.error || "ไม่สามารถสร้างข้อเสนอลงบัญชีรายการได้",
         requires_human_confirmation: true,
         denial_reason: execRes.denial_reason || execRes.error,
         code: execRes.code,
@@ -144,8 +149,9 @@ export class GraceAiProposalService {
     }
 
     // 3. Fetch confirmation state details
-    const { data: confRecord } = await (this.supabase
-      .from("action_confirmations") as any)
+    const { data: confRecord } = await (
+      this.supabase.from("action_confirmations") as any
+    )
       .select("id, payload_hash, nonce, expires_at")
       .eq("id", execRes.data.proposal_id)
       .single();
@@ -155,7 +161,7 @@ export class GraceAiProposalService {
     const proposalCard: ActionProposalUiCard = {
       proposal_id: execRes.data.proposal_id,
       action: "post_transaction",
-      title: `ข้อเสนอขอโพสต์รายการ: ${txn.description || "รายการธุรกรรม"}`,
+      title: `ข้อเสนอขอลงบัญชีรายการ: ${txn.description || "รายการธุรกรรม"}`,
       summary: input.summary_justification,
       financial_effect: `จะทำการบันทึกยอด ${formattedAmount} (${txn.direction === "income" ? "รายรับ" : "รายจ่าย"}) ลงในบัญชีแยกประเภท`,
       source: txn.accounts?.name || "บัญชีหลัก",
@@ -171,7 +177,8 @@ export class GraceAiProposalService {
       confirmation_id: execRes.data.proposal_id,
       payload_hash: confRecord?.payload_hash || "0".repeat(64),
       nonce: confRecord?.nonce || "conf_nonce_default_000000000000",
-      expires_at: confRecord?.expires_at || new Date(Date.now() + 300000).toISOString(),
+      expires_at:
+        confRecord?.expires_at || new Date(Date.now() + 300000).toISOString(),
       provenance: {
         source_tool: "propose_transaction_post",
         source_type: "POSTGRESQL_POSTED_LEDGER",
@@ -183,7 +190,8 @@ export class GraceAiProposalService {
     return {
       success: true,
       proposal: proposalCard,
-      message: "สร้างข้อเสนอขอโพสต์รายการเรียบร้อยแล้ว กรุณาตรวจสอบและยืนยันเพื่อดำเนินการ",
+      message:
+        "สร้างข้อเสนอขอลงบัญชีรายการเรียบร้อยแล้ว กรุณาตรวจสอบและยืนยันเพื่อดำเนินการ",
       requires_human_confirmation: true,
     };
   }
@@ -192,7 +200,7 @@ export class GraceAiProposalService {
    * 2. Propose Fund Transfer (Proposes inter-fund transfer with current & projected balances)
    */
   public async proposeFundTransfer(
-    input: ProposeFundTransferInput
+    input: ProposeFundTransferInput,
   ): Promise<GraceAiProposalResponse> {
     if (input.from_fund_id === input.to_fund_id) {
       return {
@@ -206,15 +214,13 @@ export class GraceAiProposalService {
     }
 
     // 1. Revalidate current fund balances
-    const { data: fromFund } = await (this.supabase
-      .from("funds") as any)
+    const { data: fromFund } = await (this.supabase.from("funds") as any)
       .select("id, name, current_balance")
       .eq("id", input.from_fund_id)
       .eq("church_id", this.trustedChurchId)
       .single();
 
-    const { data: toFund } = await (this.supabase
-      .from("funds") as any)
+    const { data: toFund } = await (this.supabase.from("funds") as any)
       .select("id, name, current_balance")
       .eq("id", input.to_fund_id)
       .eq("church_id", this.trustedChurchId)
@@ -259,8 +265,9 @@ export class GraceAiProposalService {
       };
     }
 
-    const { data: confRecord } = await (this.supabase
-      .from("action_confirmations") as any)
+    const { data: confRecord } = await (
+      this.supabase.from("action_confirmations") as any
+    )
       .select("id, payload_hash, nonce, expires_at")
       .eq("id", execRes.data.proposal_id)
       .single();
@@ -291,7 +298,8 @@ export class GraceAiProposalService {
       confirmation_id: execRes.data.proposal_id,
       payload_hash: confRecord?.payload_hash || "0".repeat(64),
       nonce: confRecord?.nonce || "conf_nonce_default_000000000000",
-      expires_at: confRecord?.expires_at || new Date(Date.now() + 300000).toISOString(),
+      expires_at:
+        confRecord?.expires_at || new Date(Date.now() + 300000).toISOString(),
       provenance: {
         source_tool: "propose_fund_transfer",
         source_type: "POSTGRESQL_POSTED_LEDGER",
@@ -303,7 +311,8 @@ export class GraceAiProposalService {
     return {
       success: true,
       proposal: proposalCard,
-      message: "จัดเตรียมข้อเสนอการโอนเงินเรียบร้อยแล้ว กรุณาตรวจสอบและกดยืนยันเพื่อดำเนินการ",
+      message:
+        "จัดเตรียมข้อเสนอการโอนเงินเรียบร้อยแล้ว กรุณาตรวจสอบและกดยืนยันเพื่อดำเนินการ",
       requires_human_confirmation: true,
     };
   }
@@ -312,11 +321,12 @@ export class GraceAiProposalService {
    * 3. Propose Void Transaction (Proposes voiding a posted transaction and issuing reversal mirror entry)
    */
   public async proposeVoidTransaction(
-    input: ProposeVoidTransactionInput
+    input: ProposeVoidTransactionInput,
   ): Promise<GraceAiProposalResponse> {
     // 1. Revalidate transaction exists and is currently posted
-    const { data: txn, error: txnErr } = await (this.supabase
-      .from("transactions") as any)
+    const { data: txn, error: txnErr } = await (
+      this.supabase.from("transactions") as any
+    )
       .select("id, amount, status, description, transaction_date, direction")
       .eq("id", input.transaction_id)
       .eq("church_id", this.trustedChurchId)
@@ -337,7 +347,7 @@ export class GraceAiProposalService {
       return {
         success: false,
         proposal: null,
-        message: `ไม่อนุญาตให้ยกเลิกรายการที่อยู่ในสถานะ ${txn.status} (สามารถยกเลิกได้เฉพาะรายการที่โพสต์แล้วเท่านั้น)`,
+        message: `ไม่อนุญาตให้ยกเลิกรายการที่อยู่ในสถานะ ${txn.status} (สามารถยกเลิกได้เฉพาะรายการที่ลงบัญชีแล้วเท่านั้น)`,
         requires_human_confirmation: true,
         code: "INVALID_RESOURCE_STATE",
         denial_reason: `Transaction status is "${txn.status}", must be "posted"`,
@@ -366,8 +376,9 @@ export class GraceAiProposalService {
       };
     }
 
-    const { data: confRecord } = await (this.supabase
-      .from("action_confirmations") as any)
+    const { data: confRecord } = await (
+      this.supabase.from("action_confirmations") as any
+    )
       .select("id, payload_hash, nonce, expires_at")
       .eq("id", execRes.data.proposal_id)
       .single();
@@ -378,7 +389,7 @@ export class GraceAiProposalService {
       proposal_id: execRes.data.proposal_id,
       action: "void_transaction",
       title: `ข้อเสนอยกเลิกรายการ: ${txn.description || "รายการธุรกรรม"}`,
-      summary: `ขอยกเลิกรายการ ${formattedAmount} และสร้างรายการปรับปรุงยอดแบบย้อนกลับ (Reversal Mirror Entry)`,
+      summary: `ขอยกเลิกรายการ ${formattedAmount} และสร้างรายการปรับปรุงยอดแบบย้อนกลับ`,
       financial_effect: `จะสร้างรายการคู่ล้างยอดเงิน ${formattedAmount} เพื่อปรับยอดคงเหลือให้ถูกต้องตามหลักการบัญชี`,
       amount: formattedAmount,
       reason: input.void_reason,
@@ -391,7 +402,8 @@ export class GraceAiProposalService {
       confirmation_id: execRes.data.proposal_id,
       payload_hash: confRecord?.payload_hash || "0".repeat(64),
       nonce: confRecord?.nonce || "conf_nonce_default_000000000000",
-      expires_at: confRecord?.expires_at || new Date(Date.now() + 300000).toISOString(),
+      expires_at:
+        confRecord?.expires_at || new Date(Date.now() + 300000).toISOString(),
       provenance: {
         source_tool: "propose_void_transaction",
         source_type: "POSTGRESQL_POSTED_LEDGER",
@@ -403,7 +415,8 @@ export class GraceAiProposalService {
     return {
       success: true,
       proposal: proposalCard,
-      message: "สร้างข้อเสนอยกเลิกรายการเรียบร้อยแล้ว กรุณาตรวจสอบและยืนยันเพื่อดำเนินการ",
+      message:
+        "สร้างข้อเสนอยกเลิกรายการเรียบร้อยแล้ว กรุณาตรวจสอบและยืนยันเพื่อดำเนินการ",
       requires_human_confirmation: true,
     };
   }

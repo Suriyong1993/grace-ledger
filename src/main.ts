@@ -193,12 +193,15 @@ export class App {
     this.transactionsPage = new TransactionsPage(
       this.supabase,
       churchId,
+      userId,
+      userRole,
     );
-    this.fundsPage = new FundsPage(this.supabase, churchId);
+    this.fundsPage = new FundsPage(this.supabase, churchId, userRole);
     this.membersPage = new MembersPage(
       this.supabase,
       churchId,
       this.session.user.churchName ?? CHURCH_NAME_TH,
+      userRole,
     );
     this.reportsPage = new ReportsPage(
       this.supabase,
@@ -483,8 +486,9 @@ export class App {
         this.render(),
       );
     } else if (this.currentRoute.pattern === "/transactions") {
-      // TransactionsPage uses HTML attributes for interactivity (data-action)
-      // No attachEventListeners needed
+      this.transactionsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern === "/funds") {
       this.fundsPage?.attachEventListeners(this.rootElement, () =>
         this.render(),

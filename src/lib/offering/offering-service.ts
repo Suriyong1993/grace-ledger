@@ -38,19 +38,27 @@ export class OfferingService {
     const rawCode = err?.code || "UNKNOWN_ERROR";
 
     // 1. Dual Counter Violation
-    if (rawMessage.includes("DUAL_COUNTER_VIOLATION") || rawMessage.includes("Counter 1 and Counter 2 must be different")) {
+    if (
+      rawMessage.includes("DUAL_COUNTER_VIOLATION") ||
+      rawMessage.includes("Counter 1 and Counter 2 must be different")
+    ) {
       return {
         code: "DUAL_COUNTER_VIOLATION",
-        message: "ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกันตามหลักการควบคุมภายใน",
+        message:
+          "ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกันตามหลักการควบคุมภายใน",
         details: rawMessage,
       };
     }
 
     // 2. Unresolved Variance Guard
-    if (rawMessage.includes("CANNOT_CONFIRM_UNRESOLVED_VARIANCE") || rawMessage.includes("must be resolved or explained")) {
+    if (
+      rawMessage.includes("CANNOT_CONFIRM_UNRESOLVED_VARIANCE") ||
+      rawMessage.includes("must be resolved or explained")
+    ) {
       return {
         code: "UNRESOLVED_VARIANCE",
-        message: "ไม่สามารถยืนยันยอดถวายได้เนื่องจากมีผลต่างเงินสดที่ยังไม่ได้รับการอธิบาย กรุณาระบุคำอธิบายอย่างน้อย 5 ตัวอักษร",
+        message:
+          "ไม่สามารถยืนยันยอดถวายได้เนื่องจากมีผลต่างเงินสดที่ยังไม่ได้รับการอธิบาย กรุณาระบุคำอธิบายอย่างน้อย 5 ตัวอักษร",
         details: rawMessage,
       };
     }
@@ -68,7 +76,7 @@ export class OfferingService {
     if (rawMessage.includes("CANNOT_MODIFY_POSTED_OFFERING")) {
       return {
         code: "CANNOT_MODIFY_POSTED_OFFERING",
-        message: "ยอดถวายนี้ถูกบันทึกลงบัญชีแยกประเภทแล้ว (Posted) ไม่สามารถแก้ไขได้อีกต่อไป",
+        message: "ยอดถวายนี้ลงบัญชีแยกประเภทแล้ว ไม่สามารถแก้ไขได้อีกต่อไป",
         details: rawMessage,
         isStaleState: true,
       };
@@ -92,10 +100,14 @@ export class OfferingService {
       };
     }
 
-    if (rawMessage.includes("INVALID_CASH_ACCOUNT") || rawMessage.includes("INVALID_BANK_ACCOUNT")) {
+    if (
+      rawMessage.includes("INVALID_CASH_ACCOUNT") ||
+      rawMessage.includes("INVALID_BANK_ACCOUNT")
+    ) {
       return {
         code: "INVALID_ACCOUNT",
-        message: "บัญชีการเงินที่เลือกไม่ถูกต้อง หรือไม่ได้อยู่ในสังกัดคริสตจักรนี้",
+        message:
+          "บัญชีการเงินที่เลือกไม่ถูกต้อง หรือไม่ได้อยู่ในสังกัดคริสตจักรนี้",
         details: rawMessage,
       };
     }
@@ -105,13 +117,17 @@ export class OfferingService {
     if (rawMessage.includes("MANDATORY_REASON")) {
       return {
         code: "MANDATORY_REVISION_REASON",
-        message: "กรุณาระบุเหตุผลในการแก้ไขยอดถวายที่คาดหวังอย่างน้อย 5 ตัวอักษร",
+        message:
+          "กรุณาระบุเหตุผลในการแก้ไขยอดถวายที่คาดหวังอย่างน้อย 5 ตัวอักษร",
         details: rawMessage,
       };
     }
 
     // 6. RBAC & Tenant Permissions
-    if (rawMessage.includes("FORBIDDEN") || rawMessage.includes("Insufficient permissions")) {
+    if (
+      rawMessage.includes("FORBIDDEN") ||
+      rawMessage.includes("Insufficient permissions")
+    ) {
       return {
         code: "FORBIDDEN",
         message: "คุณไม่มีสิทธิ์ในการดำเนินการนี้",
@@ -139,7 +155,7 @@ export class OfferingService {
    * 1. Create a new Sunday Offering Session in 'draft' status.
    */
   async createSession(
-    input: CreateOfferingSessionInput
+    input: CreateOfferingSessionInput,
   ): Promise<OfferingServiceResult<{ sessionId: string }>> {
     if (!input.items || input.items.length === 0) {
       return {
@@ -162,15 +178,21 @@ export class OfferingService {
         notes: item.notes || null,
       }));
 
-      const { data, error } = await (this.supabase.rpc as any)("create_offering_session", {
-        p_service_date: input.serviceDate,
-        p_service_name: input.serviceName,
-        p_items: itemsPayload,
-        p_notes: input.notes || null,
-      });
+      const { data, error } = await (this.supabase.rpc as any)(
+        "create_offering_session",
+        {
+          p_service_date: input.serviceDate,
+          p_service_name: input.serviceName,
+          p_items: itemsPayload,
+          p_notes: input.notes || null,
+        },
+      );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       return {
@@ -188,9 +210,12 @@ export class OfferingService {
   async startCashCount(
     sessionId: string,
     counter1Id: string,
-    counter2Id: string
+    counter2Id: string,
   ): Promise<OfferingServiceResult<{ sessionId: string; status: string }>> {
-    const dualValidation = OfferingLifecycle.validateDualCounters(counter1Id, counter2Id);
+    const dualValidation = OfferingLifecycle.validateDualCounters(
+      counter1Id,
+      counter2Id,
+    );
     if (!dualValidation.isValid) {
       return {
         success: false,
@@ -199,14 +224,20 @@ export class OfferingService {
     }
 
     try {
-      const { data, error } = await (this.supabase.rpc as any)("start_cash_count", {
-        p_session_id: sessionId,
-        p_counter1_id: counter1Id,
-        p_counter2_id: counter2Id,
-      });
+      const { data, error } = await (this.supabase.rpc as any)(
+        "start_cash_count",
+        {
+          p_session_id: sessionId,
+          p_counter1_id: counter1Id,
+          p_counter2_id: counter2Id,
+        },
+      );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       return {
@@ -224,18 +255,18 @@ export class OfferingService {
   /**
    * 3. Record physical cash denomination counts and calculate variance.
    */
-  async recordCashCount(
-    input: RecordCashCountInput
-  ): Promise<OfferingServiceResult<{
-    sessionId: string;
-    totalCash: Money;
-    varianceAmount: Money;
-    varianceStatus: string;
-    status: OfferingSessionStatus;
-  }>> {
+  async recordCashCount(input: RecordCashCountInput): Promise<
+    OfferingServiceResult<{
+      sessionId: string;
+      totalCash: Money;
+      varianceAmount: Money;
+      varianceStatus: string;
+      status: OfferingSessionStatus;
+    }>
+  > {
     const dualValidation = OfferingLifecycle.validateDualCounters(
       input.counter1Id,
-      input.counter2Id
+      input.counter2Id,
     );
     if (!dualValidation.isValid) {
       return {
@@ -248,27 +279,36 @@ export class OfferingService {
     if (!denomValidation.isValid) {
       return {
         success: false,
-        error: { code: "VALIDATION_ERROR", message: denomValidation.errors.join(", ") },
+        error: {
+          code: "VALIDATION_ERROR",
+          message: denomValidation.errors.join(", "),
+        },
       };
     }
 
     try {
       const coinMoney = Money.from(input.denominations.coins);
 
-      const { data, error } = await (this.supabase.rpc as any)("record_cash_count", {
-        p_session_id: input.sessionId,
-        p_counter1_id: input.counter1Id,
-        p_counter2_id: input.counter2Id,
-        p_bill_1000: input.denominations.b1000,
-        p_bill_500: input.denominations.b500,
-        p_bill_100: input.denominations.b100,
-        p_bill_50: input.denominations.b50,
-        p_bill_20: input.denominations.b20,
-        p_coins: coinMoney.toNumber(),
-      });
+      const { data, error } = await (this.supabase.rpc as any)(
+        "record_cash_count",
+        {
+          p_session_id: input.sessionId,
+          p_counter1_id: input.counter1Id,
+          p_counter2_id: input.counter2Id,
+          p_bill_1000: input.denominations.b1000,
+          p_bill_500: input.denominations.b500,
+          p_bill_100: input.denominations.b100,
+          p_bill_50: input.denominations.b50,
+          p_bill_20: input.denominations.b20,
+          p_coins: coinMoney.toNumber(),
+        },
+      );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const res = data as any;
@@ -290,15 +330,15 @@ export class OfferingService {
   /**
    * 4. Resolve cash count variance (either recount or explain).
    */
-  async resolveVariance(
-    input: ResolveVarianceInput
-  ): Promise<OfferingServiceResult<{
-    sessionId: string;
-    action: string;
-    varianceStatus?: string;
-    varianceReason: string | null;
-    status?: OfferingSessionStatus;
-  }>> {
+  async resolveVariance(input: ResolveVarianceInput): Promise<
+    OfferingServiceResult<{
+      sessionId: string;
+      action: string;
+      varianceStatus?: string;
+      varianceReason: string | null;
+      status?: OfferingSessionStatus;
+    }>
+  > {
     if (input.action === "explain") {
       if (!input.explanation || input.explanation.trim().length < 5) {
         return {
@@ -312,14 +352,20 @@ export class OfferingService {
     }
 
     try {
-      const { data, error } = await (this.supabase.rpc as any)("resolve_offering_variance", {
-        p_session_id: input.sessionId,
-        p_action: input.action,
-        p_explanation: input.explanation?.trim() || null,
-      });
+      const { data, error } = await (this.supabase.rpc as any)(
+        "resolve_offering_variance",
+        {
+          p_session_id: input.sessionId,
+          p_action: input.action,
+          p_explanation: input.explanation?.trim() || null,
+        },
+      );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const res = data as any;
@@ -343,15 +389,15 @@ export class OfferingService {
   /**
    * 5. Revise Expected Amount (Immutable audit trail).
    */
-  async reviseExpectedAmount(
-    input: ReviseOfferingExpectedInput
-  ): Promise<OfferingServiceResult<{
-    sessionId: string;
-    expectedCash: Money;
-    expectedTotal: Money;
-    varianceAmount: Money;
-    revisionNumber: number;
-  }>> {
+  async reviseExpectedAmount(input: ReviseOfferingExpectedInput): Promise<
+    OfferingServiceResult<{
+      sessionId: string;
+      expectedCash: Money;
+      expectedTotal: Money;
+      varianceAmount: Money;
+      revisionNumber: number;
+    }>
+  > {
     if (!input.revisionReason || input.revisionReason.trim().length < 5) {
       return {
         success: false,
@@ -379,11 +425,14 @@ export class OfferingService {
           p_session_id: input.sessionId,
           p_new_items: itemsPayload,
           p_revision_reason: input.revisionReason.trim(),
-        }
+        },
       );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const res = data as any;
@@ -406,18 +455,23 @@ export class OfferingService {
    * 6. Confirm offering session after verification.
    */
   async confirmSession(
-    sessionId: string
-  ): Promise<OfferingServiceResult<{ sessionId: string; status: OfferingSessionStatus }>> {
+    sessionId: string,
+  ): Promise<
+    OfferingServiceResult<{ sessionId: string; status: OfferingSessionStatus }>
+  > {
     try {
       const { data, error } = await (this.supabase.rpc as any)(
         "confirm_offering_session",
         {
           p_session_id: sessionId,
-        }
+        },
       );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const res = data as any;
@@ -437,7 +491,7 @@ export class OfferingService {
    * 7. Post offering to financial ledger (Atomic double-entry posting with idempotency).
    */
   async postOfferingToLedger(
-    input: PostOfferingInput
+    input: PostOfferingInput,
   ): Promise<OfferingServiceResult<PostOfferingResult>> {
     if (!input.cashAccountId) {
       return {
@@ -456,11 +510,14 @@ export class OfferingService {
           p_session_id: input.sessionId,
           p_cash_account_id: input.cashAccountId,
           p_bank_account_id: input.bankAccountId || null,
-        }
+        },
       );
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const res = data as any;
@@ -481,11 +538,14 @@ export class OfferingService {
   /**
    * 8. Fetch complete offering session with items, cash count, and revisions.
    */
-  async getSession(sessionId: string): Promise<OfferingServiceResult<OfferingSession>> {
+  async getSession(
+    sessionId: string,
+  ): Promise<OfferingServiceResult<OfferingSession>> {
     try {
       const { data, error } = await this.supabase
         .from("offering_sessions" as any)
-        .select(`
+        .select(
+          `
           *,
           items:offering_session_items (
             id,
@@ -530,12 +590,16 @@ export class OfferingService {
             revised_by,
             created_at
           )
-        `)
+        `,
+        )
         .eq("id", sessionId)
         .single();
 
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const s = data as any;
@@ -553,7 +617,9 @@ export class OfferingService {
         notes: it.notes,
       }));
 
-      const rawCount = Array.isArray(s.cash_counts) ? s.cash_counts[0] : s.cash_counts;
+      const rawCount = Array.isArray(s.cash_counts)
+        ? s.cash_counts[0]
+        : s.cash_counts;
       let cashCount: CashCount | null = null;
       if (rawCount) {
         cashCount = {
@@ -568,29 +634,37 @@ export class OfferingService {
           coins: Money.from(rawCount.coins_amount ?? rawCount.coins ?? 0),
           totalCashCounted: Money.from(rawCount.total_cash_counted || 0),
           countedBy1: rawCount.counted_by_1,
-          countedBy1Name: rawCount.p1?.full_name || rawCount.counted_by_1_name || rawCount.counted_by_1,
+          countedBy1Name:
+            rawCount.p1?.full_name ||
+            rawCount.counted_by_1_name ||
+            rawCount.counted_by_1,
           countedBy2: rawCount.counted_by_2,
-          countedBy2Name: rawCount.p2?.full_name || rawCount.counted_by_2_name || rawCount.counted_by_2,
+          countedBy2Name:
+            rawCount.p2?.full_name ||
+            rawCount.counted_by_2_name ||
+            rawCount.counted_by_2,
           counter1SignedAt: rawCount.counted_at,
           counter2SignedAt: rawCount.counted_at,
           createdAt: rawCount.counted_at || rawCount.created_at,
         };
       }
 
-      const revisions: OfferingRevision[] = (s.revisions || []).map((rev: any) => ({
-        id: rev.id,
-        offeringSessionId: rev.offering_session_id,
-        churchId: rev.church_id,
-        revisionNumber: rev.revision_number,
-        previousCashAmount: Money.from(rev.previous_cash_amount),
-        newCashAmount: Money.from(rev.new_cash_amount),
-        previousTotalAmount: Money.from(rev.previous_total_amount),
-        newTotalAmount: Money.from(rev.new_total_amount),
-        revisionReason: rev.revision_reason,
-        revisedBy: rev.revised_by,
-        revisedByName: rev.profiles?.full_name,
-        createdAt: rev.created_at,
-      }));
+      const revisions: OfferingRevision[] = (s.revisions || []).map(
+        (rev: any) => ({
+          id: rev.id,
+          offeringSessionId: rev.offering_session_id,
+          churchId: rev.church_id,
+          revisionNumber: rev.revision_number,
+          previousCashAmount: Money.from(rev.previous_cash_amount),
+          newCashAmount: Money.from(rev.new_cash_amount),
+          previousTotalAmount: Money.from(rev.previous_total_amount),
+          newTotalAmount: Money.from(rev.new_total_amount),
+          revisionReason: rev.revision_reason,
+          revisedBy: rev.revised_by,
+          revisedByName: rev.profiles?.full_name,
+          createdAt: rev.created_at,
+        }),
+      );
 
       const session: OfferingSession = {
         id: s.id,
@@ -599,14 +673,22 @@ export class OfferingService {
         serviceName: s.service_name,
         location: s.location,
         status: s.status as OfferingSessionStatus,
-        expectedCashAmount: Money.from(s.expected_cash_amount || s.expected_amount || 0),
+        expectedCashAmount: Money.from(
+          s.expected_cash_amount || s.expected_amount || 0,
+        ),
         expectedTransferAmount: Money.from(s.expected_transfer_amount || 0),
         expectedQrAmount: Money.from(s.expected_qr_amount || 0),
-        expectedTotalAmount: Money.from(s.expected_total_amount || s.expected_amount || 0),
-        countedCashAmount: s.counted_cash_amount ? Money.from(s.counted_cash_amount) : null,
-        cashVarianceAmount: s.cash_variance_amount !== null && s.cash_variance_amount !== undefined
-          ? Money.from(s.cash_variance_amount)
+        expectedTotalAmount: Money.from(
+          s.expected_total_amount || s.expected_amount || 0,
+        ),
+        countedCashAmount: s.counted_cash_amount
+          ? Money.from(s.counted_cash_amount)
           : null,
+        cashVarianceAmount:
+          s.cash_variance_amount !== null &&
+          s.cash_variance_amount !== undefined
+            ? Money.from(s.cash_variance_amount)
+            : null,
         varianceStatus: s.variance_status,
         varianceReason: s.variance_reason,
         counter1Id: s.counter1_id,
@@ -636,12 +718,13 @@ export class OfferingService {
    */
   async listSessions(
     churchId: string,
-    status?: OfferingSessionStatus
+    status?: OfferingSessionStatus,
   ): Promise<OfferingServiceResult<OfferingSession[]>> {
     try {
       let query = this.supabase
         .from("offering_sessions" as any)
-        .select(`
+        .select(
+          `
           id,
           church_id,
           service_date,
@@ -656,7 +739,8 @@ export class OfferingService {
           variance_status,
           created_at,
           updated_at
-        `)
+        `,
+        )
         .eq("church_id", churchId)
         .order("service_date", { ascending: false });
 
@@ -666,7 +750,10 @@ export class OfferingService {
 
       const { data, error } = await query;
       if (error) {
-        return { success: false, error: OfferingService.mapDatabaseError(error) };
+        return {
+          success: false,
+          error: OfferingService.mapDatabaseError(error),
+        };
       }
 
       const sessions: OfferingSession[] = (data || []).map((s: any) => ({
@@ -679,10 +766,14 @@ export class OfferingService {
         expectedTransferAmount: Money.from(s.expected_transfer_amount || 0),
         expectedQrAmount: Money.from(s.expected_qr_amount || 0),
         expectedTotalAmount: Money.from(s.expected_total_amount || 0),
-        countedCashAmount: s.counted_cash_amount ? Money.from(s.counted_cash_amount) : null,
-        cashVarianceAmount: s.cash_variance_amount !== null && s.cash_variance_amount !== undefined
-          ? Money.from(s.cash_variance_amount)
+        countedCashAmount: s.counted_cash_amount
+          ? Money.from(s.counted_cash_amount)
           : null,
+        cashVarianceAmount:
+          s.cash_variance_amount !== null &&
+          s.cash_variance_amount !== undefined
+            ? Money.from(s.cash_variance_amount)
+            : null,
         varianceStatus: s.variance_status,
         createdAt: s.created_at,
         updatedAt: s.updated_at,

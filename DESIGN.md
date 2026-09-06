@@ -1,6 +1,6 @@
 # Grace Ledger — Design System
 
-Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, brass accents. Church financial OS. Thai-first. Money is the product — every UI decision protects the number.
+Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — paper/stone surfaces, coral brand, near-black vault sidebar. Church financial OS. Thai-first. Money is the product — every UI decision protects the number.
 
 ## Governing Principle
 
@@ -10,18 +10,20 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 
 ## Identity
 
-| Aspect        | Choice                   | Rationale                                        |
-| ------------- | ------------------------ | ------------------------------------------------ |
-| Brand color   | Deep evergreen `#14532D` | Church — sacred, trustworthy, not corporate-blue |
-| Accent        | Brass `#B45309`          | Warm offering/attention, never primary           |
-| Income        | Emerald `#0D9273`        | Credit/positive — fixed, never reused            |
-| Expense       | Red `#D92D20`            | Debit/negative — fixed, never reused             |
-| Pending       | Amber `#d97706`          | Attention/warning — fixed, never reused          |
-| Background    | Porcelain `#F4F5F2`      | Warm near-white, soft on elderly eyes            |
-| Card          | White `#FFFFFF`          | Clean separation via border, not shadow          |
-| Sidebar       | Vault black `#0B1F17`    | Dark chrome, porcelain workspace                 |
-| Thai type     | Anuphan                  | Native Thai, not Latin fallback                  |
-| Latin/numeral | Space Grotesk            | Tabular-nums, financial precision                |
+| Aspect        | Choice                    | Rationale                                                                                     |
+| ------------- | ------------------------- | --------------------------------------------------------------------------------------------- |
+| Brand color   | Coral `#C13F2E` (primary) | User-directed rebrand (D21); a deep coral so 4.5:1 white-text contrast holds on small buttons |
+| Accent        | Vivid coral `#F95C4B`     | Ring, hero gradient, large bold figures — never small-text-on-fill (only ~3.15:1 with white)  |
+| Income        | Emerald `#0D9273`         | Credit/positive — fixed, never reused, unchanged by the rebrand                               |
+| Expense       | Red `#D92D20`             | Debit/negative — fixed, never reused, deliberately kept distinct from brand coral             |
+| Pending       | Amber `#d97706`           | Attention/warning — fixed, never reused                                                       |
+| Background    | Paper `#F6F4F1`           | Warm near-white                                                                               |
+| Card          | White `#FFFFFF`           | Clean separation via border, not shadow                                                       |
+| Sidebar       | Vault black `#0A0A09`     | Dark chrome, paper workspace                                                                  |
+| Thai type     | Anuphan                   | Native Thai, not Latin fallback                                                               |
+| Latin/numeral | Space Grotesk             | Tabular-nums, financial precision                                                             |
+
+**Contrast note (D21):** `--primary` is the deep coral-700 shade, not the vivid coral-500 swatch, because vivid coral under white text measures ≈3.15:1 — below the 4.5:1 AA floor for normal-weight text. Vivid coral-500 is reserved for the ring, the hero gradient, and large bold figures (≥24px), where 3:1 is the correct threshold and it passes.
 
 ---
 
@@ -210,18 +212,18 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 
 ### Navigation
 
-| Class                  | Use               |
-| ---------------------- | ----------------- |
-| `.gl-sidebar`          | Desktop sidebar   |
-| `.gl-nav-item`         | Sidebar link      |
-| `.gl-nav-item--active` | Current page      |
-| `.gl-mobilenav`        | Mobile bottom nav |
-| `.gl-mobilenav__item`  | Mobile nav link (also used for the "เพิ่มเติม" trigger button) |
-| `.gl-mobilenav__badge` | Mobile nav badge count |
-| `.gl-attention-panel`  | Popover sheet base (bell panel and "เพิ่มเติม" overflow share it) |
+| Class                  | Use                                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `.gl-sidebar`          | Desktop sidebar                                                                                          |
+| `.gl-nav-item`         | Sidebar link                                                                                             |
+| `.gl-nav-item--active` | Current page                                                                                             |
+| `.gl-mobilenav`        | Mobile bottom nav                                                                                        |
+| `.gl-mobilenav__item`  | Mobile nav link (also used for the "เพิ่มเติม" trigger button)                                           |
+| `.gl-mobilenav__badge` | Mobile nav badge count                                                                                   |
+| `.gl-attention-panel`  | Popover sheet base (bell panel and "เพิ่มเติม" overflow share it)                                        |
 | `.gl-more-panel`       | Mobile overflow sheet — positions `.gl-attention-panel` above the bottom nav instead of below the topbar |
-| `.gl-tablist`          | Tab row           |
-| `.gl-tab`              | Individual tab    |
+| `.gl-tablist`          | Tab row                                                                                                  |
+| `.gl-tab`              | Individual tab                                                                                           |
 
 ### Shell
 

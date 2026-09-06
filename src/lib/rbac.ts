@@ -8,12 +8,7 @@ export type UserRole =
   | "member";
 
 export type PermissionAction =
-  | "create"
-  | "read"
-  | "update"
-  | "delete"
-  | "approve"
-  | "export";
+  "create" | "read" | "update" | "delete" | "approve" | "export";
 
 export type Resource =
   | "churches"
@@ -47,7 +42,14 @@ const ROLE_PERMISSIONS: Record<
     transactions: ["create", "read", "update", "delete", "approve", "export"],
     transaction_splits: ["create", "read", "update", "delete", "export"],
     fund_transfers: ["create", "read", "update", "approve", "export"],
-    offering_sessions: ["create", "read", "update", "delete", "approve", "export"],
+    offering_sessions: [
+      "create",
+      "read",
+      "update",
+      "delete",
+      "approve",
+      "export",
+    ],
     cash_count: ["create", "read", "update", "approve", "export"],
     approvals: ["create", "read", "update", "approve", "export"],
     budgets: ["create", "read", "update", "delete", "export"],
@@ -107,7 +109,7 @@ const ROLE_PERMISSIONS: Record<
     budgets: ["read"],
     members: ["create", "read"],
     member_giving: [], // Prohibited
-    audit_logs: [],    // Prohibited
+    audit_logs: [], // Prohibited
     reports: ["read"],
   },
 
@@ -125,7 +127,7 @@ const ROLE_PERMISSIONS: Record<
     budgets: ["read"],
     members: [],
     member_giving: [], // Prohibited
-    audit_logs: [],    // Prohibited
+    audit_logs: [], // Prohibited
     reports: ["read"],
   },
 
@@ -143,7 +145,7 @@ const ROLE_PERMISSIONS: Record<
     budgets: [],
     members: [],
     member_giving: [], // Prohibited
-    audit_logs: [],    // Prohibited
+    audit_logs: [], // Prohibited
     reports: [],
   },
 
@@ -172,7 +174,7 @@ const ROLE_PERMISSIONS: Record<
 export function can(
   role: UserRole,
   action: PermissionAction,
-  resource: Resource
+  resource: Resource,
 ): boolean {
   const perms = ROLE_PERMISSIONS[role]?.[resource];
   if (!perms) return false;
@@ -185,11 +187,11 @@ export function can(
 export function assertPermission(
   role: UserRole,
   action: PermissionAction,
-  resource: Resource
+  resource: Resource,
 ): void {
   if (!can(role, action, resource)) {
     throw new Error(
-      `Access Denied: Role "${role}" is not authorized to "${action}" on "${resource}".`
+      `Access Denied: Role "${role}" is not authorized to "${action}" on "${resource}".`,
     );
   }
 }
@@ -221,3 +223,25 @@ export function toUserRole(rawRole: string | null | undefined): UserRole {
   return (known as string[]).includes(role) ? (role as UserRole) : "member";
 }
 
+/**
+ * Single source of truth for the Thai label shown for each role. UI text
+ * must never print a raw role string (e.g. "treasurer") — always go
+ * through this map instead.
+ */
+const ROLE_LABELS_TH: Record<UserRole, string> = {
+  super_admin: "ผู้ตรวจสอบบัญชี",
+  pastor: "ศิษยาภิบาล",
+  treasurer: "เหรัญญิก",
+  finance_staff: "เจ้าหน้าที่การเงิน",
+  approver: "ผู้อนุมัติ",
+  counter: "ผู้นับเงิน",
+  member: "สมาชิก",
+};
+
+/**
+ * Thai label for a raw role string. Accepts the same loose input as
+ * toUserRole() (unknown/empty falls back to the "member" label).
+ */
+export function roleLabelTh(rawRole: string | null | undefined): string {
+  return ROLE_LABELS_TH[toUserRole(rawRole)];
+}

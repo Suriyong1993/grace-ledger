@@ -7,6 +7,7 @@ import { formatDateThai, toUserMessage } from "../lib/format";
 import { restoreFocusAfterRender } from "../lib/ui/focus";
 import { CHURCH_NAME_TH } from "../lib/org";
 import { MembersService } from "../lib/members/members-service";
+import { UserRole, can } from "../lib/rbac";
 
 export interface MemberRecord {
   id: string;
@@ -38,6 +39,7 @@ export class MembersPage {
   private errorMessage: string | null = null;
   private successMessage: string | null = null;
   private formErrorMessage: string | null = null;
+  private addMemberFieldErrors: Record<string, string> = {};
   private isLoading = false;
   private isSubmitting = false;
   // Per-member confidential giving history, loaded only on explicit detail view
@@ -48,6 +50,7 @@ export class MembersPage {
     private supabase: SupabaseClient<Database>,
     private churchId: string,
     private churchName: string = CHURCH_NAME_TH,
+    private userRole?: UserRole,
   ) {
     this.membersService = new MembersService(supabase);
   }
@@ -103,7 +106,13 @@ export class MembersPage {
     const existing = this.givingById[memberId];
     // Only skip when the cached state is still authoritative: a successful
     // load or an in-flight request. "failed" and "denied" are retryable.
-    if (existing && (existing.status === "loaded" || existing.status === "loading" || existing.status === "denied")) return;
+    if (
+      existing &&
+      (existing.status === "loaded" ||
+        existing.status === "loading" ||
+        existing.status === "denied")
+    )
+      return;
 
     this.givingById[memberId] = {
       status: "loading",
@@ -290,7 +299,7 @@ export class MembersPage {
           </div>
 
           <div style="display: flex; gap: var(--space-2);" class="no-print">
-            <button id="print-cert-btn" class="gl-btn gl-btn--primary" style="flex: 1;">พิมพ์เอกสาร / ดาวน์โหลด PDF</button>
+            <button id="print-cert-btn" class="gl-btn gl-btn--primary" style="flex: 1;">พิมพ์เอกสาร</button>
           </div>
         </div>
       </div>`
@@ -316,20 +325,23 @@ export class MembersPage {
               : ""
           }
 
-          <form id="add-member-form" style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <form id="add-member-form" style="display: flex; flex-direction: column; gap: var(--space-3);" novalidate>
             <div class="gl-field">
               <label class="gl-label" for="member-name-input">ชื่อ-นามสกุล *</label>
-              <input type="text" class="gl-input" id="member-name-input" required placeholder="เช่น สมเกียรติ วงศ์สว่าง" />
+              <input type="text" class="gl-input ${this.addMemberFieldErrors.name ? "has-error" : ""}" id="member-name-input" placeholder="เช่น สมเกียรติ วงศ์สว่าง" />
+              ${this.addMemberFieldErrors.name ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.name)}</p>` : ""}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="member-phone-input">เบอร์โทรศัพท์</label>
-              <input type="tel" class="gl-input" id="member-phone-input" placeholder="เช่น 081-234-5678" />
+              <input type="tel" class="gl-input ${this.addMemberFieldErrors.phone ? "has-error" : ""}" id="member-phone-input" placeholder="เช่น 081-234-5678" />
+              ${this.addMemberFieldErrors.phone ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.phone)}</p>` : ""}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="member-email-input">อีเมล</label>
-              <input type="email" class="gl-input" id="member-email-input" placeholder="เช่น somkiat@example.com" />
+              <input type="email" class="gl-input ${this.addMemberFieldErrors.email ? "has-error" : ""}" id="member-email-input" placeholder="เช่น somkiat@example.com" />
+              ${this.addMemberFieldErrors.email ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.email)}</p>` : ""}
             </div>
 
             <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">
@@ -343,6 +355,8 @@ export class MembersPage {
       </div>`
       : "";
 
+    const canAddMember = can(this.userRole ?? "member", "create", "members");
+
     const membersGridHtml = this.errorMessage
       ? ""
       : this.members.length === 0
@@ -350,12 +364,14 @@ export class MembersPage {
             icon: ICON_CERT,
             message: "ยังไม่มีรายชื่อสมาชิก",
             hint: "เพิ่มสมาชิกเพื่อบันทึกประวัติการถวายและออกหนังสือรับรองภาษี",
-            action: {
-              label: "เพิ่มสมาชิกคนแรก",
-              type: "button",
-              id: "empty-add-member-btn",
-              variant: "primary",
-            },
+            action: canAddMember
+              ? {
+                  label: "เพิ่มสมาชิกคนแรก",
+                  type: "button",
+                  id: "empty-add-member-btn",
+                  variant: "primary",
+                }
+              : undefined,
           })
         : filtered.length === 0
           ? renderEmptyStateHtml({
@@ -368,7 +384,7 @@ export class MembersPage {
                 variant: "secondary",
               },
             })
-        : `
+          : `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-3);">
           ${filtered
             .map(
@@ -416,10 +432,14 @@ export class MembersPage {
           <h1>สมาชิกและการถวาย</h1>
           <p>ทะเบียนสมาชิก ประวัติการถวายสิบลด และการออกหนังสือรับรองภาษี</p>
         </div>
-        <button id="open-add-member-btn" class="gl-btn gl-btn--primary">
-          ${ICON_PLUS}
-          <span>เพิ่มสมาชิกใหม่</span>
-        </button>
+        ${
+          canAddMember
+            ? `<button id="open-add-member-btn" class="gl-btn gl-btn--primary">
+                ${ICON_PLUS}
+                <span>เพิ่มสมาชิกใหม่</span>
+              </button>`
+            : ""
+        }
       </div>
 
       ${errorNoticeHtml}
@@ -464,13 +484,15 @@ export class MembersPage {
     root: HTMLElement,
     onStateChange: () => void,
   ): void {
-    root.querySelectorAll<HTMLButtonElement>(".btn-retry-giving").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-member-id");
-        if (id) void this.loadGivingForMember(id, onStateChange);
+    root
+      .querySelectorAll<HTMLButtonElement>(".btn-retry-giving")
+      .forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-member-id");
+          if (id) void this.loadGivingForMember(id, onStateChange);
+        });
       });
-    });
 
     const retryBtn =
       root.querySelector<HTMLButtonElement>("#retry-members-btn");
@@ -488,7 +510,9 @@ export class MembersPage {
       restoreFocusAfterRender(target, onStateChange);
     });
 
-    const clearSearchBtn = root.querySelector<HTMLButtonElement>("#clear-member-search-btn");
+    const clearSearchBtn = root.querySelector<HTMLButtonElement>(
+      "#clear-member-search-btn",
+    );
     clearSearchBtn?.addEventListener("click", () => {
       this.searchQuery = "";
       onStateChange();
@@ -499,6 +523,7 @@ export class MembersPage {
       this.isAddMemberModalOpen = true;
       this.formErrorMessage = null;
       this.successMessage = null;
+      this.addMemberFieldErrors = {};
       onStateChange();
     };
 
@@ -512,6 +537,7 @@ export class MembersPage {
     const closeAddMemberModal = () => {
       this.isAddMemberModalOpen = false;
       this.formErrorMessage = null;
+      this.addMemberFieldErrors = {};
       onStateChange();
     };
 
@@ -545,12 +571,22 @@ export class MembersPage {
       const phoneVal = phoneInput?.value?.trim() || undefined;
       const emailVal = emailInput?.value?.trim() || undefined;
 
-      if (!nameVal) {
-        this.formErrorMessage = "กรุณาระบุชื่อ-นามสกุลสมาชิก";
+      const errors: Record<string, string> = {};
+      if (!nameVal) errors.name = "กรุณาระบุชื่อ-นามสกุลสมาชิก";
+      if (phoneVal && !/^[0-9+\-\s()]{7,20}$/.test(phoneVal)) {
+        errors.phone = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง";
+      }
+      if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        errors.email = "รูปแบบอีเมลไม่ถูกต้อง";
+      }
+
+      if (Object.keys(errors).length > 0) {
+        this.addMemberFieldErrors = errors;
         onStateChange();
         return;
       }
 
+      this.addMemberFieldErrors = {};
       this.isSubmitting = true;
       this.formErrorMessage = null;
       onStateChange();
@@ -564,7 +600,8 @@ export class MembersPage {
         });
 
         if (!res.success) {
-          this.formErrorMessage = res.error || "ไม่สามารถเพิ่มสมาชิกได้";
+          this.formErrorMessage =
+            res.error || "ไม่สามารถเพิ่มสมาชิกได้ กรุณาลองใหม่อีกครั้ง";
           this.isSubmitting = false;
           onStateChange();
           return;
@@ -576,7 +613,10 @@ export class MembersPage {
         await this.loadData();
         onStateChange();
       } catch (err: any) {
-        this.formErrorMessage = toUserMessage(err, "เพิ่มสมาชิกไม่สำเร็จ ลองใหม่อีกครั้ง");
+        this.formErrorMessage = toUserMessage(
+          err,
+          "เพิ่มสมาชิกไม่สำเร็จ ลองใหม่อีกครั้ง",
+        );
         this.isSubmitting = false;
         onStateChange();
       }
