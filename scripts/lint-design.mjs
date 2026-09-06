@@ -20,7 +20,10 @@ const PATTERNS = [
   { name: "literal font-size", re: /font-size:\s*[0-9.]+px/g },
   { name: "literal border-radius", re: /border-radius:\s*[0-9]+px/g },
   { name: "rgba()/rgb() color literal", re: /rgba?\([^)]*\)/g },
-  { name: "hex color literal", re: /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b(?!-)/g },
+  {
+    name: "hex color literal",
+    re: /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b(?!-)/g,
+  },
   // Blur belongs on an overlay scrim only. Glass on a content surface makes the
   // figures behind it unreadable and costs frame time on a phone, which is why
   // the directive rejects it. Each allowed use is counted below.
@@ -50,14 +53,6 @@ const ALLOWLIST = {
     "rgba()/rgb() color literal": 7,
     "hex color literal": 10,
     "backdrop-filter": 5,
-  },
-
-  // Confirmation modal uses ad-hoc semantic tints instead of --pending-muted/--expense-muted. R3/R6 cleanup.
-  "src/components/ai/ProposalConfirmationModal.ts": {
-    "literal font-size": 0,
-    "literal border-radius": 0,
-    "rgba()/rgb() color literal": 7,
-    "hex color literal": 0,
   },
 };
 
@@ -91,18 +86,25 @@ for (const file of files) {
 
   for (const { name, re } of PATTERNS) {
     const count = countMatches(text, re);
-    const allowedCount = allowed ? allowed[name] ?? 0 : 0;
+    const allowedCount = allowed ? (allowed[name] ?? 0) : 0;
 
     if (count !== allowedCount) {
       failed = true;
-      const verb = count > allowedCount ? "found MORE than allowed" : "found FEWER than allowed — tighten the allowlist";
-      console.error(`[lint-design] ${rel}: ${verb} for "${name}" (expected ${allowedCount}, got ${count})`);
+      const verb =
+        count > allowedCount
+          ? "found MORE than allowed"
+          : "found FEWER than allowed — tighten the allowlist";
+      console.error(
+        `[lint-design] ${rel}: ${verb} for "${name}" (expected ${allowedCount}, got ${count})`,
+      );
     }
   }
 }
 
 if (failed) {
-  console.error("\nlint-design FAILED. See DESIGN.md and COMPONENTS.md before adding a literal value.");
+  console.error(
+    "\nlint-design FAILED. See DESIGN.md and COMPONENTS.md before adding a literal value.",
+  );
   process.exit(1);
 } else {
   console.log("lint-design passed.");

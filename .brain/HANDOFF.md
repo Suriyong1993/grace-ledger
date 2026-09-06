@@ -42,6 +42,47 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-05 20:05 (Premium UI/UX Transformation Phases 1–6 Complete & Verified)
+
+- **ผู้ส่งมอบ (Handed off by):** Antigravity
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex / Antigravity ในรอบถัดไป
+- **บริบทงาน (Context):** ดำเนินการตาม Master Engineering Task: Premium UI/UX Transformation ครบทั้ง 6 เฟส (Dashboard 4-tier hierarchy, Topbar 4-cluster micro-architecture, Sidebar & Mobile Navigation refinement, 15-question Red-Team review) ภายใต้ Emerald Vault identity โดยไม่แตะต้อง financial math (`decimal.js`), Supabase RLS หรือ RBAC
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. **Phase 1: Dashboard Information Hierarchy & Composition**:
+     - ปรับลำดับ 4 ลำดับขั้น: FINANCIAL POSITION (`.gl-dash-hero-row`) → FINANCIAL MOVEMENT (`trendHtml`) → EXPLANATION / CONTEXT (`.gl-dash-split`) → REQUIRED ACTIONS (`#gl-command-center`)
+     - เพิ่ม compact attention chip (`.gl-dash-context__attention-chip`) ภายใน context card เพื่อให้งานค้างถูกค้นพบได้ทันทีโดยไม่ต้อง scroll ลึก พร้อม deep-link (`#gl-command-center`)
+  2. **Phase 2: Top Bar Visual Grouping & Micro-architecture**:
+     - จัดกลุ่ม Top Bar เป็น 4 semantic clusters พร้อม visual dividers: Context (`.gl-shell-topbar__title`), Primary Action (`.gl-topbar-cluster--action`), Utility (`.gl-topbar-cluster--utility`), Identity (`.gl-topbar-cluster--identity`)
+  3. **Phase 3: Sidebar Refinement (Vault Navigation)**:
+     - ปรับปรุง typography kicker (`text-transform: uppercase`, subtle contrast), ปรับ geometry active pill ให้ประณีต สอดรับกับ Vault dark tokens
+  4. **Phase 4: Mobile Navigation (390px Viewport)**:
+     - ตรวจสอบ touch targets ≥ 44px, safe area insets, ไม่มี horizontal overflow
+  5. **Phase 5: Login Visual Refinement (Vault Terminal)**:
+     - ตรวจสอบ terminal styling tokens, zero raw hex, focus state และ accessible markup
+  6. **Phase 6: Cross-Page Consistency & Visual Red-Team Review**:
+     - รัน visual regression capture ผ่าน Playwright บันทึกภาพทั้ง 1440px, 1024px, 390px ใน `docs/screenshots/phase6/`
+     - ทำการตรวจสอบ 15-Question Visual Red-Team Audit ผ่านครบทุกมิติ
+     - บันทึก Decision D22 ใน `DECISIONS.md`
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `src/pages/DashboardPage.ts` (MODIFY — 4-tier hierarchy + context attention chip)
+  - `src/components/layout/AppShell.ts` (MODIFY — Top Bar 4 clusters)
+  - `src/styles/app.css` (MODIFY — styling สำหรับ attention chip & top bar clusters)
+  - `tests/unit/dashboard-page-ui.test.ts` (MODIFY — update assertion ตาม 4-tier hierarchy & attention chip)
+  - `DECISIONS.md` (MODIFY — เพิ่ม D22)
+  - `.brain/WORKING_CONTEXT.md` (MODIFY — สถานะปัจจุบัน)
+  - `.brain/HANDOFF.md` (MODIFY — บันทึกส่งมอบฉบับนี้)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน (0 errors)**
+  - `npm test`: **ผ่านครบ 65 test suites / 599 tests (100% PASS)**
+  - `npm run lint:design`: **ผ่าน (0 token violations)**
+  - `npm run build`: **ผ่านสมบูรณ์ (Production bundle generated)**
+  - Automated screenshots captured across viewports (1440px, 1024px, 390px)
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  - ใน `DashboardPage.ts` ตัวแปร `attentionTotal` ต้องถูกคำนวณก่อนสร้าง `contextCardHtml` (line 367) เพื่อหลีกเลี่ยง TDZ `ReferenceError`.
+  - เมื่อ push deploy Vercel โปรดจำ gotcha เรื่อง remote (`old-origin` หรือ `origin` ตาม config ปัจจุบัน).
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-05 01:20 (Premium UI/UX Refinement P0+P1 — Financial-Position-First Dashboard)
 
 - **ผู้ส่งมอบ (Handed off by):** Claude Code

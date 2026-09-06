@@ -186,6 +186,7 @@ export class LoginPage {
     } else {
       this.profiles = [];
       this.profilesStatus = result.status;
+      console.error("Login profiles load failed:", result.status);
     }
     this.rerender();
   }

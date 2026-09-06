@@ -621,3 +621,27 @@ been performed by this agent (no browser available in this pass); the user shoul
 considering this fully verified per CLAUDE.md's UX review gate.
 
 **Status:** APPROVED & IMPLEMENTED (2026-09-06), pending user visual confirmation.
+
+---
+
+## 2026-09-05 — Dashboard hierarchy & topbar grouping
+
+### D22 — Dashboard 4-Tier Information Hierarchy & Topbar 4-Cluster Grouping (2026-09-05)
+
+**Decision:** The dashboard information hierarchy is explicitly standardized into four distinct tiers:
+
+1. **Financial Position** (`.gl-dash-hero-row`): Anchor card with total cash balance, income/expense figures, and month-over-month delta context.
+2. **Financial Movement** (`trendHtml`): 12-Month income vs expense trend bar chart.
+3. **Explanation / Context** (`.gl-dash-split`): Recent activity ledger stream + fund breakdown cards.
+4. **Required Actions** (`#gl-command-center`): Operational clearinghouse for pending tasks/approvals.
+
+**Action Visibility Rule:** While the operational clearinghouse (`gl-command-center`) sits at Tier 4, critical pending actions remain instantly discoverable at the top of the viewport via a compact attention badge/chip (`.gl-dash-context__attention-chip`) within the hero context card that deep-links directly down to `#gl-command-center`.
+
+**Topbar Micro-architecture:** The global shell topbar is structured into 4 distinct semantic clusters with subtle dividers:
+
+- Context Cluster: Page Title (`.gl-shell-topbar__title`)
+- Primary Action Cluster: Quick Record (`.gl-topbar-cluster--action`)
+- Utility Cluster: Church badge + Notification bell (`.gl-topbar-cluster--utility`)
+- Identity Cluster: User Avatar + Logout button (`.gl-topbar-cluster--identity`)
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05).

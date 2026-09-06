@@ -390,7 +390,14 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
        --sidebar-foreground — the light-theme --muted-foreground fails
        contrast on --sidebar. */
     .gl-sidebar .gl-sidebar__dim {
-      color: color-mix(in srgb, var(--sidebar-foreground) 62%, transparent);
+      color: color-mix(in srgb, var(--sidebar-foreground) 68%, transparent);
+    }
+    .gl-sidebar .kicker {
+      font-size: var(--text-2xs);
+      font-weight: var(--weight-bold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--sidebar-foreground) 55%, transparent);
     }
     .gl-sidebar .gl-logout-btn {
       color: color-mix(in srgb, var(--sidebar-foreground) 72%, transparent);
@@ -482,6 +489,28 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       outline-offset: 2px;
     }
     .gl-shell-primary-action__short { display: none; }
+
+    /* --- Topbar Visual Clusters & Structural Dividers (Phase 2) --- */
+    .gl-topbar-cluster {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .gl-topbar-cluster--utility {
+      padding-left: var(--space-2);
+      border-left: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    }
+    .gl-topbar-cluster--identity {
+      padding-left: var(--space-2);
+      border-left: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+    }
+    @media (max-width: 768px) {
+      .gl-topbar-cluster--utility,
+      .gl-topbar-cluster--identity {
+        border-left: none;
+        padding-left: 0;
+      }
+    }
 
     /* --- Attention (bell) panel --- */
     .gl-attention-wrap { position: relative; display: inline-flex; }
@@ -725,41 +754,48 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
         <div class="gl-shell-topbar__context" style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--muted-foreground); white-space: nowrap;">
           ${
             canCreateTransactions
-              ? `<a href="#/transactions?create=1" class="gl-shell-primary-action gl-btn gl-btn--primary" title="บันทึกรายการรับ-จ่ายใหม่">
-                  ${icon(ICON_PLUS, 15)}
-                  <span class="gl-shell-primary-action__full">บันทึกรายการ</span>
-                  <span class="gl-shell-primary-action__short" aria-hidden="true">รายการ</span>
-                  <span class="gl-visually-hidden">บันทึกรายการรับ-จ่ายใหม่</span>
-                </a>`
-              : ""
-          }
-
-          <span class="gl-shell-church-chip" style="display: inline-flex; align-items: center; gap: 4px; background: var(--muted); padding: 3px 8px; border-radius: var(--radius-full); font-size: var(--text-2xs); font-weight: var(--weight-medium); max-width: 140px; overflow: hidden; text-overflow: ellipsis;">
-            <span class="gl-shell-status-dot" aria-hidden="true"></span>
-            <span style="overflow: hidden; text-overflow: ellipsis;">${churchName}</span>
-          </span>
-
-          ${
-            hasAttentionSources
-              ? `<div class="gl-attention-wrap">
-                  <button type="button" id="gl-attention-btn" class="gl-shell-icon-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="gl-attention-panel" aria-label="งานที่ต้องดำเนินการ${totalAttention > 0 ? ` (${totalAttention} รายการ)` : ""}" title="งานที่ต้องดำเนินการ">
-                    ${icon(ICON_BELL, 18)}
-                    ${totalAttention > 0 ? `<span class="gl-shell-bell-badge num-display">${totalAttention > 99 ? "99+" : totalAttention}</span>` : ""}
-                  </button>
-                  ${renderAttentionPanel(attention)}
+              ? `<div class="gl-topbar-cluster gl-topbar-cluster--action">
+                  <a href="#/transactions?create=1" class="gl-shell-primary-action gl-btn gl-btn--primary" title="บันทึกรายการรับ-จ่ายใหม่">
+                    ${icon(ICON_PLUS, 15)}
+                    <span class="gl-shell-primary-action__full">บันทึกรายการ</span>
+                    <span class="gl-shell-primary-action__short" aria-hidden="true">รายการ</span>
+                    <span class="gl-visually-hidden">บันทึกรายการรับ-จ่ายใหม่</span>
+                  </a>
                 </div>`
               : ""
           }
 
-          <!-- Profile Avatar Link -->
-          <a href="#/profile" class="gl-shell-avatar" style="width: var(--touch-target-min); height: var(--touch-target-min); font-size: var(--text-sm);" aria-label="โปรไฟล์ผู้ใช้" title="${displayName}">
-            ${initials}
-          </a>
+          <div class="gl-topbar-cluster gl-topbar-cluster--utility">
+            <span class="gl-shell-church-chip" style="display: inline-flex; align-items: center; gap: 4px; background: var(--muted); padding: 3px 8px; border-radius: var(--radius-full); font-size: var(--text-2xs); font-weight: var(--weight-medium); max-width: 140px; overflow: hidden; text-overflow: ellipsis;">
+              <span class="gl-shell-status-dot" aria-hidden="true"></span>
+              <span style="overflow: hidden; text-overflow: ellipsis;">${churchName}</span>
+            </span>
 
-          <!-- Sign Out Button -->
-          <button type="button" class="gl-logout-btn gl-logout-btn--topbar" data-logout aria-label="ออกจากระบบ" title="ออกจากระบบ">
-            ${icon(ICON_LOGOUT, 18)}
-          </button>
+            ${
+              hasAttentionSources
+                ? `<div class="gl-attention-wrap">
+                    <button type="button" id="gl-attention-btn" class="gl-shell-icon-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="gl-attention-panel" aria-label="งานที่ต้องดำเนินการ${totalAttention > 0 ? ` (${totalAttention} รายการ)` : ""}" title="งานที่ต้องดำเนินการ">
+                      ${icon(ICON_BELL, 18)}
+                      ${totalAttention > 0 ? `<span class="gl-shell-bell-badge num-display">${totalAttention > 99 ? "99+" : totalAttention}</span>` : ""}
+                    </button>
+                    ${renderAttentionPanel(attention)}
+                  </div>`
+                : ""
+            }
+          </div>
+
+          <!-- Identity Cluster: Avatar + Logout -->
+          <div class="gl-topbar-cluster gl-topbar-cluster--identity">
+            <!-- Profile Avatar Link -->
+            <a href="#/profile" class="gl-shell-avatar" style="width: var(--touch-target-min); height: var(--touch-target-min); font-size: var(--text-sm);" aria-label="โปรไฟล์ผู้ใช้" title="${displayName}">
+              ${initials}
+            </a>
+
+            <!-- Sign Out Button -->
+            <button type="button" class="gl-logout-btn gl-logout-btn--topbar" data-logout aria-label="ออกจากระบบ" title="ออกจากระบบ">
+              ${icon(ICON_LOGOUT, 18)}
+            </button>
+          </div>
         </div>
       </header>
 

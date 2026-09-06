@@ -1005,6 +1005,11 @@ button.gl-card:active {
   outline-offset: 2px;
 }
 
+.gl-dash-context__attention-chip {
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gl-attention-row,
   .gl-dash-context {
