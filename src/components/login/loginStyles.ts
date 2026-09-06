@@ -105,7 +105,7 @@ export function renderLoginStylesHtml(): string {
       display: block;
       width: 36px;
       height: 2px;
-      background: var(--gl-brass-500);
+      background: var(--gl-coral-500);
       border-radius: var(--radius-sm);
       margin-bottom: var(--space-4);
     }
