@@ -8,6 +8,28 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-06 12:20 (UI Lab — Premium Directions + Vision-less Reference Pipeline)
+
+- **ผู้ส่งมอบ (Handed off by):** Arena Agent (no-vision session)
+- **บริบทงาน (Context):** ผู้ใช้ขอ "adapt UI ให้เป็นแบบ premium" โดยอ้างอิงภาพ screenshot 6 ภาพที่แนบในแชท
+- **ข้อจำกัดที่ค้นพบ (สำคัญสำหรับ Agent รอบต่อไป):**
+  1. **เอเจนต์ไม่มี vision** — อ่านภาพไม่ได้ (read_file คืน "no vision capabilities")
+  2. **ไฟล์แนบไม่ลง sandbox** — ระบบแจ้งว่าเซฟที่ `/home/user/uploads/` แต่โฟลเดอร์นั้นไม่มีอยู่จริง (ตรวจด้วย `find /` แล้ว) → ต้องให้ผู้ใช้ commit รูปเข้า branch หรือให้ลิงก์/โค้ดแทน
+  3. **Network ใน sandbox จำกัด** — เข้าได้เฉพาะ PyPI (pip ลง package ได้); `deb.debian.org`, `raw.githubusercontent.com`, `upload.wikimedia.org` **เข้าไม่ได้**; แต่ `git`/`gh` ใช้ได้ปกติ → วิธีส่งไฟล์เข้ามาที่เชื่อถือได้คือ **git push**
+  4. `opencv-python` พัง (ขาด `libGL.so.1`) → ต้องใช้ `opencv-python-headless` แทน (apt ติดตั้งไม่ได้)
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. สร้าง **UI Lab** (`ui-lab/`): `index.html` + `option-a.html` (Porcelain Executive) / `option-b.html` (Vault Pro) / `option-c.html` (Glass Ledger) + `mock.css` (มาร์กอัปเดียวกัน สลับธีมด้วย `body[data-theme]`) — มีทั้งเดสก์ท็อปและเฟรมมือถือ 390px + จอ Login
+  2. สร้าง `scripts/analyze-ui-reference.py` — OCR (rapidocr-onnxruntime) + สกัด palette + ตรวจแถบแนวนอน → ออกเป็น markdown ให้อ่านแทนการมองเห็นภาพ (ทดสอบแล้วใช้งานได้จริง)
+  3. เพิ่ม `server.allowedHosts` + hmr (clientPort 443/wss) ใน `vite.config.ts` เพื่อให้พรีวิวผ่านโฮสต์พร็อกซีทำงาน
+  4. Dev server 2 ตัว: แอปจริงพอร์ต **5500**, UI Lab พอร์ต **5501** (แยก root = `ui-lab` → ไม่ปนเข้า production bundle)
+- **การตรวจสอบ (Verification):** `npm run typecheck` 0 error · `npm run lint:design` ผ่าน · HTTP 200 ทุกหน้า UI Lab · `tsconfig.json` include แค่ `src`+`tests` และ `lint-design` สแกนแค่ `src/**` → `ui-lab/` ไม่กระทบ CI
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  1. รอผู้ใช้เลือกแบบ (A/B/C/ผสม) หรือส่งภาพอ้างอิงเข้ามาทาง git → รัน `python3 scripts/analyze-ui-reference.py <ภาพ>` แล้วค่อย adapt ลง `src/`
+  2. เมื่อถึงขั้นลงโค้ดจริง ให้ทำเป็นธีม/โทเค็นก่อน (เพิ่มชุดโทเค็นใหม่ใน `design-system-extracted/tokens/` หรือ `src/styles/app.css`) แล้วค่อยย้ายโครงสร้าง — **ห้าม**แตะ money/lifecycle/RLS ตาม hard stops ใน `CLAUDE.md`
+- **คำเตือน (Gotchas):** `ui-lab/` เป็นของชั่วคราวสำหรับรีวิว — ควรลบหรือย้ายออกจาก repo หลังผู้ใช้ตัดสินใจเลือกแบบแล้ว
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-05 01:20 (Premium UI/UX Refinement P0+P1 — Financial-Position-First Dashboard)
 
 - **ผู้ส่งมอบ (Handed off by):** Claude Code

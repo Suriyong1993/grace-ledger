@@ -7,6 +7,13 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
+> **อัปเดต 2026-09-06 (Arena Agent):** ผู้ใช้ต้องการ "adapt" UI จากภาพอ้างอิงที่แนบมา (6 ภาพ) ให้เป็น **Premium UI**
+> แต่เอเจนต์ในเซสชันนี้ **ไม่มี vision capability** และไฟล์แนบไม่ปรากฏใน sandbox (`/home/user/uploads/` ไม่มีอยู่จริง)
+> → ทางออกที่ทำไว้แล้ว: สร้าง **UI Lab** (`ui-lab/`) เป็น mockup premium 3 แบบให้ผู้ใช้เลือกในเบราว์เซอร์
+> (พอร์ต 5501) + เตรียมสคริปต์วิเคราะห์ภาพ `scripts/analyze-ui-reference.py` (OCR + palette + แถบเลย์เอาต์)
+> ไว้ใช้ทันทีเมื่อได้ไฟล์ภาพจริง (เช่น ผู้ใช้ commit รูปเข้า branch นี้)
+> **สถานะ:** `WAITING_USER_PICK` — รอผู้ใช้เลือกแบบ A/B/C (หรือผสม) ก่อนลงมือแก้ `src/` จริง
+
 - **เป้าหมายหลัก (Goal):** Visual Drift Fix — ลด visual drift ให้เข้า Emerald Vault identity (EmptyState component + inline style cleanup)
 - **สถานะรวม (Overall Status):** `WAITING_USER_REVIEW` (ทำเสร็จ 8/9 ขั้น, รอจับภาพ screenshot + ตรวจสอบ changelog)
 - **Agent ที่กำลังทำงาน (Active Agent):** Claude Code

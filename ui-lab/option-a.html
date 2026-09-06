@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ตัวเลือก A · Porcelain Executive — Grace Ledger UI Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./mock.css" />
+</head>
+<body data-theme="a" data-view="desktop">
+
+<div class="lab-bar">
+  <span class="lab-bar__title">UI Lab</span>
+  <a class="lab-btn" href="./index.html">← ทั้งหมด</a>
+  <a class="lab-btn is-active" href="./option-a.html">A · Porcelain</a>
+  <a class="lab-btn" href="./option-b.html">B · Vault Pro</a>
+  <a class="lab-btn" href="./option-c.html">C · Glass</a>
+  <span class="lab-bar__spacer"></span>
+  <button class="lab-btn" data-view-btn="desktop">เดสก์ท็อป</button>
+  <button class="lab-btn" data-view-btn="devices">มือถือ 390px</button>
+</div>
+
+<div class="app">
+  <!-- ------------------------------------------------------------ sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand__mark">GL</span>
+      <span>
+        <span class="brand__name">Grace Ledger</span>
+        <span class="brand__sub">คริสตจักรเกรซ ร้อยเอ็ด</span>
+      </span>
+    </div>
+
+    <nav class="navgroup">
+      <span class="navgroup__label">ภาพรวม</span>
+      <a class="navitem is-active" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg>
+        แดชบอร์ด
+      </a>
+    </nav>
+
+    <nav class="navgroup">
+      <span class="navgroup__label">ธุรกรรมและการเงิน</span>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/><path d="M3 10h18"/></svg>
+        รายการเงิน
+      </a>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 10h20"/></svg>
+        เงินถวายวันอาทิตย์
+      </a>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/><path d="M4 13l8 4 8-4"/><path d="M4 17l8 4 8-4"/></svg>
+        กองทุนและงบประมาณ
+      </a>
+    </nav>
+
+    <nav class="navgroup">
+      <span class="navgroup__label">กำกับดูแล</span>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        คิวอนุมัติ
+        <span class="navitem__badge">9</span>
+      </a>
+    </nav>
+
+    <nav class="navgroup">
+      <span class="navgroup__label">สารบบและรายงาน</span>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2"/></svg>
+        สมาชิกและการถวาย
+      </a>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+        รายงานการเงิน
+      </a>
+    </nav>
+
+    <nav class="navgroup">
+      <span class="navgroup__label">บัญชีผู้ใช้</span>
+      <a class="navitem" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg>
+        โปรไฟล์และระบบ
+      </a>
+    </nav>
+
+    <div class="sidebar__foot">
+      <span class="sidebar__avatar">สม</span>
+      <span>
+        <span class="sidebar__user">สมชาย ใจดี</span><br />
+        <span class="sidebar__role">เหรัญญิก</span>
+      </span>
+    </div>
+  </aside>
+
+  <!-- --------------------------------------------------------------- main -->
+  <main>
+    <header class="topbar">
+      <div>
+        <div class="topbar__title">แดชบอร์ด</div>
+        <div class="topbar__sub">สิงหาคม 2569 · ปิดงวดล่าสุด 31 ก.ค. 2569</div>
+      </div>
+      <span class="topbar__spacer"></span>
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        ค้นหารายการ…
+      </div>
+      <button class="iconbtn" aria-label="การแจ้งเตือน">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="iconbtn__dot">9</span>
+      </button>
+      <button class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        บันทึกรายการ
+      </button>
+      <span class="avatar">สม</span>
+    </header>
+
+    <div class="content">
+      <!-- hero + stats -->
+      <section class="grid-hero">
+        <div class="card hero">
+          <span class="hero__kicker">ยอดเงินรวมทุกกองทุน</span>
+          <div class="hero__amount">฿1,284,650.00</div>
+          <span class="hero__delta">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+            +4.8% จากเดือนก่อน
+          </span>
+          <div class="hero__meta">
+            <div>
+              <div class="hero__meta-item">กองทุนที่ดูแล</div>
+              <div class="hero__meta-value num">4 กองทุน</div>
+            </div>
+            <div>
+              <div class="hero__meta-item">รายการรออนุมัติ</div>
+              <div class="hero__meta-value num">9 รายการ</div>
+            </div>
+            <div>
+              <div class="hero__meta-item">ปิดงวดล่าสุด</div>
+              <div class="hero__meta-value num">31 ก.ค. 69</div>
+            </div>
+          </div>
+          <div class="total-rule"></div>
+        </div>
+
+        <div class="grid-3" style="grid-template-columns:1fr; gap:14px;">
+          <div class="card">
+            <div class="stat__label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+              รายรับเดือนนี้
+            </div>
+            <div class="stat__value">฿486,200.00</div>
+            <div class="stat__delta">สูงกว่าเดือนก่อน ฿38,400.00</div>
+            <div class="stat__spark"><span style="height:40%"></span><span style="height:55%"></span><span style="height:34%"></span><span style="height:62%"></span><span style="height:48%"></span><span style="height:78%"></span><span style="height:100%"></span></div>
+          </div>
+          <div class="card">
+            <div class="stat__label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+              รายจ่ายเดือนนี้
+            </div>
+            <div class="stat__value">฿312,480.00</div>
+            <div class="stat__delta">ต่ำกว่าเดือนก่อน ฿12,900.00</div>
+            <div class="stat__spark"><span style="height:70%"></span><span style="height:52%"></span><span style="height:66%"></span><span style="height:44%"></span><span style="height:58%"></span><span style="height:40%"></span><span style="height:36%"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- trend + attention -->
+      <section class="grid-2">
+        <div class="card">
+          <div class="section-head">
+            <span class="section-head__title">แนวโน้ม 6 เดือน</span>
+            <span class="section-head__link" href="#">ดูรายงาน →</span>
+          </div>
+          <div class="chart">
+            <div class="chart__col"><div class="chart__bars"><div class="chart__bar" style="height:52%"></div><div class="chart__bar--out chart__bar" style="height:34%"></div></div><span class="chart__label">มี.ค.</span></div>
+            <div class="chart__col"><div class="chart__bars"><div class="chart__bar" style="height:64%"></div><div class="chart__bar--out chart__bar" style="height:40%"></div></div><span class="chart__label">เม.ย.</span></div>
+            <div class="chart__col"><div class="chart__bars"><div class="chart__bar" style="height:48%"></div><div class="chart__bar--out chart__bar" style="height:56%"></div></div><span class="chart__label">พ.ค.</span></div>
+            <div class="chart__col"><div class="chart__bars"><div class="chart__bar" style="height:74%"></div><div class="chart__bar--out chart__bar" style="height:44%"></div></div><span class="chart__label">มิ.ย.</span></div>
+            <div class="chart__col"><div class="chart__bars"><div class="chart__bar" style="height:58%"></div><div class="chart__bar--out chart__bar" style="height:50%"></div></div><span class="chart__label">ก.ค.</span></div>
+            <div class="chart__col"><div class="chart__bars"><div class="chart__bar" style="height:88%"></div><div class="chart__bar--out chart__bar" style="height:38%"></div></div><span class="chart__label">ส.ค.</span></div>
+          </div>
+          <div class="legend" style="margin-top:14px;">
+            <span><i style="background:var(--income)"></i>รายรับ</span>
+            <span><i style="background:var(--expense)"></i>รายจ่าย</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <span class="section-head__title">ต้องดำเนินการสัปดาห์นี้</span>
+            <span class="section-head__meta">9 รายการ</span>
+            <span class="section-head__link">ดูทั้งหมด →</span>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+              <span>
+                <span class="row__title">รายการรออนุมัติ</span><br />
+                <span class="row__meta">รอคุณเป็นผู้อนุมัติ · เกิน 3 วัน 2 รายการ</span>
+              </span>
+              <span class="row__right"><span class="badge badge--pending">9</span></span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12.5" r="2.2"/></svg></span>
+              <span>
+                <span class="row__title">เซสชันเงินถวายยังไม่ปิดยอด</span><br />
+                <span class="row__meta">วันอาทิตย์ที่ 24 ส.ค. · รอนับเงินสด</span>
+              </span>
+              <span class="row__right"><span class="badge badge--pending">2</span></span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span>
+              <span>
+                <span class="row__title">ใบเสร็จยังไม่แนบ</span><br />
+                <span class="row__meta">รายจ่ายที่ขาดเอกสารประกอบ</span>
+              </span>
+              <span class="row__right"><span class="badge badge--draft">4</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- funds + recent -->
+      <section class="grid-2">
+        <div class="card">
+          <div class="section-head">
+            <span class="section-head__title">กองทุน</span>
+            <span class="section-head__link">จัดการกองทุน →</span>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4l8 4-8 4-8-4 8-4z"/></svg></span>
+              <span style="flex:1">
+                <span class="row__title">กองทุนทั่วไป</span>
+                <div class="progress"><div class="progress__fill" style="width:84%"></div></div>
+              </span>
+              <span class="row__right">
+                <span class="row__amount">฿842,300.00</span><br />
+                <span class="row__meta">เป้า ฿1,000,000</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 13l8 4 8-4"/></svg></span>
+              <span style="flex:1">
+                <span class="row__title">กองทุนอาคาร</span>
+                <div class="progress"><div class="progress__fill" style="width:45%"></div></div>
+              </span>
+              <span class="row__right">
+                <span class="row__amount">฿320,150.00</span><br />
+                <span class="row__meta">เป้า ฿700,000</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 17l8 4 8-4"/></svg></span>
+              <span style="flex:1">
+                <span class="row__title">กองทุนเผยแผ่</span>
+                <div class="progress"><div class="progress__fill" style="width:61%"></div></div>
+              </span>
+              <span class="row__right">
+                <span class="row__amount">฿122,200.00</span><br />
+                <span class="row__meta">เป้า ฿200,000</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <span class="section-head__title">รายการล่าสุด</span>
+            <span class="section-head__link">ดูทั้งหมด →</span>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
+              <span>
+                <span class="row__title">เงินถวายวันอาทิตย์</span><br />
+                <span class="row__meta">24 ส.ค. 69 · กองทุนทั่วไป</span>
+              </span>
+              <span class="row__right">
+                <span class="row__amount row__amount--in">+฿42,500.00</span><br />
+                <span class="badge badge--approved">อนุมัติแล้ว</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span>
+              <span>
+                <span class="row__title">ค่าไฟฟ้าและน้ำประปา</span><br />
+                <span class="row__meta">22 ส.ค. 69 · กองทุนทั่วไป</span>
+              </span>
+              <span class="row__right">
+                <span class="row__amount row__amount--out">−฿3,840.00</span><br />
+                <span class="badge badge--pending">รออนุมัติ</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span>
+              <span>
+                <span class="row__title">เงินถวายพิเศษ — งานอภิบาล</span><br />
+                <span class="row__meta">20 ส.ค. 69 · กองทุนเผยแผ่</span>
+              </span>
+              <span class="row__right">
+                <span class="row__amount row__amount--in">+฿15,000.00</span><br />
+                <span class="badge badge--approved">อนุมัติแล้ว</span>
+              </span>
+            </div>
+            <div class="row">
+              <span class="row__icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span>
+              <span>
+                <span class="row__title">ค่าซ่อมเครื่องเสียง</span><br />
+                <span class="row__meta">18 ส.ค. 69 · กองทุนอาคาร</span>
+              </span>
+              <span class="row__right">
+                <span class="row__amount row__amount--out">−฿2,450.00</span><br />
+                <span class="badge badge--draft">ฉบับร่าง</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ------------------------------------------------------------- devices -->
+<div class="lab-devices">
+  <!-- mobile dashboard -->
+  <div class="phone">
+    <div class="phone__screen">
+      <div class="phone__status"><span>09:41</span><span>สัญญาณ · แบตเตอรี่</span></div>
+      <div class="m-topbar">
+        <div>
+          <div class="m-topbar__title">แดชบอร์ด</div>
+          <div class="m-topbar__sub">สิงหาคม 2569</div>
+        </div>
+        <span style="flex:1"></span>
+        <span class="iconbtn" style="width:34px;height:34px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="iconbtn__dot">9</span>
+        </span>
+        <span class="avatar" style="width:34px;height:34px;font-size:12px">สม</span>
+      </div>
+      <div class="m-body">
+        <div class="card hero" style="padding:20px 18px 16px">
+          <span class="hero__kicker">ยอดเงินรวมทุกกองทุน</span>
+          <div class="hero__amount" style="font-size:38px">฿1,284,650.00</div>
+          <span class="hero__delta">+4.8% จากเดือนก่อน</span>
+          <div class="total-rule" style="margin-top:14px"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head"><span class="section-head__title">เดือนนี้</span></div>
+          <div class="row" style="padding-top:0">
+            <span>
+              <span class="row__meta">รายรับ</span><br />
+              <span class="stat__value" style="font-size:20px;color:var(--income)">฿486,200.00</span>
+            </span>
+            <span class="row__right">
+              <span class="row__meta">รายจ่าย</span><br />
+              <span class="stat__value" style="font-size:20px;color:var(--expense)">฿312,480.00</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head"><span class="section-head__title">ต้องดำเนินการ</span><span class="section-head__meta">9</span></div>
+          <div class="rows">
+            <div class="row" style="padding-top:0">
+              <span><span class="row__title">รายการรออนุมัติ</span><br /><span class="row__meta">เกิน 3 วัน 2 รายการ</span></span>
+              <span class="row__right"><span class="badge badge--pending">9</span></span>
+            </div>
+            <div class="row">
+              <span><span class="row__title">เงินถวายยังไม่ปิดยอด</span><br /><span class="row__meta">24 ส.ค. 69</span></span>
+              <span class="row__right"><span class="badge badge--pending">2</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-head"><span class="section-head__title">รายการล่าสุด</span></div>
+          <div class="rows">
+            <div class="row" style="padding-top:0">
+              <span><span class="row__title">เงินถวายวันอาทิตย์</span><br /><span class="row__meta">24 ส.ค. 69</span></span>
+              <span class="row__right"><span class="row__amount row__amount--in">+฿42,500.00</span></span>
+            </div>
+            <div class="row">
+              <span><span class="row__title">ค่าไฟฟ้าและน้ำประปา</span><br /><span class="row__meta">22 ส.ค. 69</span></span>
+              <span class="row__right"><span class="row__amount row__amount--out">−฿3,840.00</span></span>
+            </div>
+            <div class="row">
+              <span><span class="row__title">เงินถวายพิเศษ</span><br /><span class="row__meta">20 ส.ค. 69</span></span>
+              <span class="row__right"><span class="row__amount row__amount--in">+฿15,000.00</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="m-fab">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <nav class="m-bottomnav">
+        <a class="is-active" href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"/></svg>หน้าหลัก</a>
+        <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg>การเงิน</a>
+        <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="12" cy="12.5" r="2.2"/></svg>เงินถวาย</a>
+        <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>อนุมัติ</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- login -->
+  <div class="phone">
+    <div class="phone__screen">
+      <div class="phone__status"><span>09:41</span><span>สัญญาณ · แบตเตอรี่</span></div>
+      <div class="login">
+        <div class="login__brand">
+          <span class="login__mark">GL</span>
+          <span>
+            <span class="login__title">Grace Ledger</span><br />
+            <span class="login__sub">คริสตจักรเกรซ ร้อยเอ็ด</span>
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="email">อีเมล</label>
+          <input id="email" type="email" value="somchai@grace.or.th" />
+        </div>
+        <div class="field">
+          <label for="pw">รหัสผ่าน</label>
+          <input id="pw" type="password" value="••••••••" />
+        </div>
+
+        <button class="btn-primary btn-block">เข้าสู่ระบบ</button>
+
+        <div class="field" style="margin-top:6px">
+          <label>รหัส PIN 6 หลัก</label>
+          <div class="pin">
+            <button>1</button><button>2</button><button>3</button>
+            <button>4</button><button>5</button><button>6</button>
+            <button>7</button><button>8</button><button>9</button>
+            <button style="background:transparent;border-style:dashed">ลบ</button><button>0</button><button>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="login__foot">ข้อมูลการเงินถูกเข้ารหัส · ทุกยอดเงินตรวจสอบได้จากใบเสร็จ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll("[data-view-btn]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const view = btn.getAttribute("data-view-btn");
+      document.body.setAttribute("data-view", view);
+      document.querySelectorAll("[data-view-btn]").forEach((b) => {
+        b.classList.toggle("is-active", b === btn);
+      });
+      window.scrollTo({ top: 0 });
+    });
+  });
+  const first = document.querySelector('[data-view-btn="desktop"]');
+  if (first) first.classList.add("is-active");
+</script>
+</body>
+</html>
