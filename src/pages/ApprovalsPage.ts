@@ -436,30 +436,14 @@ export class ApprovalsPage {
     const quickApproveBtns =
       rootElement.querySelectorAll<HTMLButtonElement>(".gl-quick-approve");
     quickApproveBtns.forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-id");
-        const item = this.items.find((i) => i.id === id);
-        if (!item || item.isCreator) return;
-        btn.disabled = true;
-        btn.textContent = "กำลังอนุมัติ…";
-        await this._handleApprove(item, refresh);
-      });
+      this._attachApproveWithConfirm(btn, refresh);
     });
 
     // 4. Approve button in detail panel
     const approveBtn =
       rootElement.querySelector<HTMLButtonElement>(".gl-btn-approve");
     if (approveBtn) {
-      approveBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const id = approveBtn.getAttribute("data-id") || this.selectedItemId;
-        const item = this.items.find((i) => i.id === id);
-        if (!item || item.isCreator) return;
-        approveBtn.disabled = true;
-        approveBtn.textContent = "กำลังอนุมัติ…";
-        await this._handleApprove(item, refresh);
-      });
+      this._attachApproveWithConfirm(approveBtn, refresh, this.selectedItemId);
     }
 
     // 5. Revision & Reject buttons in detail panel
@@ -585,6 +569,61 @@ export class ApprovalsPage {
         refresh();
       });
     }
+  }
+
+  // ─── Approve confirm-in-place ─────────────────────────────────────────────
+
+  /**
+   * Approve needs one confirmation tap, matching the deliberateness already
+   * required for Reject — but as an in-place DOM swap (not a modal or a full
+   * re-render) so it stays fast for a high-volume approval queue. First
+   * click turns the button into "ยืนยันอนุมัติ" with a sibling "ยกเลิก" to
+   * back out; the second click on the same button actually approves.
+   */
+  private _attachApproveWithConfirm(
+    btn: HTMLButtonElement,
+    refresh: () => void,
+    fallbackId?: string | null,
+  ): void {
+    const originalLabel = btn.innerHTML;
+    let cancelBtn: HTMLButtonElement | null = null;
+
+    const revert = () => {
+      btn.innerHTML = originalLabel;
+      btn.classList.remove("gl-btn--pending-confirm");
+      cancelBtn?.remove();
+      cancelBtn = null;
+    };
+
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute("data-id") || fallbackId;
+      const item = this.items.find((i) => i.id === id);
+      if (!item || item.isCreator) return;
+
+      if (!cancelBtn) {
+        // First tap: ask for confirmation in place.
+        btn.textContent = "ยืนยันอนุมัติ";
+        btn.classList.add("gl-btn--pending-confirm");
+        cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.className = "gl-btn gl-btn--ghost gl-btn--sm";
+        cancelBtn.textContent = "ยกเลิก";
+        cancelBtn.addEventListener("click", (ce) => {
+          ce.stopPropagation();
+          revert();
+        });
+        btn.insertAdjacentElement("afterend", cancelBtn);
+        return;
+      }
+
+      // Second tap on the same button: proceed with the actual approval.
+      cancelBtn.remove();
+      cancelBtn = null;
+      btn.disabled = true;
+      btn.textContent = "กำลังอนุมัติ…";
+      await this._handleApprove(item, refresh);
+    });
   }
 
   // ─── Private Action Handlers ──────────────────────────────────────────────
