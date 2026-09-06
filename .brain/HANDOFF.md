@@ -8,6 +8,40 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-06 (Brand rebrand — "Emerald Vault" → "Coral Vault", D21)
+
+- **ผู้ส่งมอบ (Handed off by):** Claude Code
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้ส่งภาพอ้างอิง 3 ภาพ (palette Paper/Stone/Coral/Black, dashboard Finexy สีส้ม, poster "UI Trends 2026") และยืนยันชัดเจนว่าต้องการ **เปลี่ยนอัตลักษณ์ทั้งหมด** เป็นโทนนี้ ไม่ใช่แค่หยิบบาง pattern มาปรับ
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. เปลี่ยนโทนสี identity ทั้งชุดใน `design-system-extracted/tokens/colors.css` (single source of truth): evergreen/brass/vault-green → coral/stone/paper/near-black
+  2. **ไม่แตะสีความหมายทางการเงิน** — `--income`/`--expense`/`--pending`/`--offering`/`--approved`/`--rejected`/`--success`/`--warning`/`--info` คงเดิมทั้งหมด (แจ้งผู้ใช้ก่อนแล้วว่า Coral ใกล้เคียงสี error/expense เดิม จึงแยกระบบสีแบรนด์ออกจากสีสถานะทางบัญชีเด็ดขาด)
+  3. แก้ contrast: `--primary` ใช้ coral-700 เข้ม (`#C13F2E`, ขาวบนพื้น ≈5.23:1) แทน coral-500 สดใส (`#F95C4B`, ขาวบนพื้นแค่ ≈3.15:1 — ไม่ผ่าน AA text ปกติ) coral-500 สงวนไว้สำหรับ ring/hero-gradient/ตัวเลขใหญ่เท่านั้น
+  4. **ไม่ใส่ glassmorphism กลับมา** แม้ภาพอ้างอิงหนึ่งภาพจะมี — เพราะเคยถอดออกไปแล้วโดยตั้งใจ (D15) ด้วยเหตุผลเรื่อง legibility ของตัวเลขเงิน
+  5. แก้ไฟล์ที่ reference token เดิมตรงๆ นอก colors.css: `src/styles/app.css` (hero gradient, sheet-backdrop scrim), `src/components/login/loginStyles.ts` (vault-hero accent bar)
+  6. อัปเดต `CLAUDE.md`, `DESIGN.md` (identity table + contrast note), `DECISIONS.md` (D21 — บันทึกละเอียดครบทุกเหตุผล/trade-off)
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `design-system-extracted/tokens/colors.css` (MODIFY — full rewrite of brand ramp, semantic tokens unchanged in name)
+  - `src/styles/app.css` (MODIFY — 2 token references)
+  - `src/components/login/loginStyles.ts` (MODIFY — 1 token reference)
+  - `CLAUDE.md`, `DESIGN.md`, `DECISIONS.md` (MODIFY — identity docs + D21)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm install` (node_modules ไม่เคยถูกติดตั้งในเซสชันนี้มาก่อน — ติดตั้งใหม่)
+  - `npm run lint:design`: **ผ่าน**
+  - `npm run build` (`tsc --noEmit && vite build`): **ผ่าน**
+  - `npm test`: **575 passed / 24 skipped** (เท่า baseline เดิม — 2 real-Postgres suite skip เพราะ sandbox ไม่มี privilege, ไม่เกี่ยวกับงานนี้)
+  - `grep` บน `dist/assets/*.css`: hex เดิม (`#14532d`/`#b45309`/`#0b1f17`/`#2fa36b`) หายไปหมด, hex ใหม่ (`#f95c4b`/`#c13f2e`/`#f6f4f1`) มีอยู่จริง
+  - **Visual (จริง ไม่ใช่เดา):** รัน `npm run dev` + Playwright เปิดหน้า Login จริงที่ desktop (1280px) และ mobile (390px) — ยืนยันด้วยตา: vault sidebar สีดำเข้ม, coral accent bar/logo/eyebrow, พื้นหลัง paper, การ์ดขาว, ไม่มี horizontal overflow ที่ 390px, error state ของ profile list (ไม่มี Supabase ใน sandbox) render สวยด้วยสี error ปกติไม่ใช่ coral
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - **ผู้ใช้ต้องตรวจหน้าอื่นๆ ด้วยตาจริง** (Dashboard, Transactions, Approvals ฯลฯ) — เซสชันนี้ตรวจได้แค่ Login เพราะไม่มี Supabase credential ใน sandbox ให้ login ผ่านได้จริง แม้ token architecture จะ cascade สีไปทุกหน้าอัตโนมัติ (ทุกหน้าใช้ `.gl-*` class ที่อ้าง token เดียวกัน ไม่มี hardcoded color เดิมหลงเหลือตาม `lint:design`)
+  - ถ้าผู้ใช้เห็นแล้วรู้สึกว่า `--destructive` (แดง) กับ `--primary` (coral) ใกล้กันเกินไปในบริบทจริง ให้ปรับ `--destructive` ไปทาง crimson/magenta แทนที่จะย้าย `--primary` ออกจากโทนส้ม (ดูเหตุผลใน D21)
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  1. **node_modules ไม่เคยถูกติดตั้งมาก่อนใน environment นี้** — `npm run build`/`npm test` จะ fail ด้วย `ERR_MODULE_NOT_FOUND` จนกว่าจะรัน `npm install` ก่อน (ใช้เวลา ~4 วินาที มี dependency แค่ 121 packages)
+  2. `tsc --noEmit` เจอ `TS5101` (baseUrl deprecated) เป็น pre-existing warning ของ environment/TypeScript version นี้ ไม่เกี่ยวกับงานนี้ — ยืนยันแล้วด้วย `git stash` ว่าเกิดก่อนแก้โค้ดด้วย
+  3. ห้ามลืม: token names (`--primary`, `--sidebar-*` ฯลฯ) ต้องคงเดิมเสมอเวลาเปลี่ยน identity — เปลี่ยนแค่ value ที่ base ramp แล้ว repoint semantic token ไปหา — ห้ามแก้ชื่อ semantic token เพราะจะพังทุก consumer ทันที
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-05 01:20 (Premium UI/UX Refinement P0+P1 — Financial-Position-First Dashboard)
 
 - **ผู้ส่งมอบ (Handed off by):** Claude Code
