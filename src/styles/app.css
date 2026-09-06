@@ -24,7 +24,6 @@
   --on-expense-muted: oklch(0.4 0.13 25);
   --on-pending-muted: oklch(0.38 0.08 80);
   --on-info-muted: oklch(0.42 0.11 250);
-
 }
 
 .dark {
@@ -598,7 +597,7 @@ button.gl-card:active {
   position: fixed;
   inset: 0;
   z-index: 900;
-  background: color-mix(in srgb, var(--gl-vault-950) 45%, transparent);
+  background: color-mix(in srgb, var(--gl-black) 45%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   display: flex;
@@ -2023,13 +2022,13 @@ button.gl-card:active {
   left: 0;
   right: 0;
   height: 3px;
-  /* Evergreen into brass — the two accents the Emerald Vault identity owns.
-     The previous ramp ended in sky blue (#0ea5e9), which is outside the
-     palette and read as a second brand colour on the hero. */
+  /* Deep coral into vivid coral — the two accents the Coral Vault identity
+     owns (see D21). The previous ramp ended in sky blue (#0ea5e9), which is
+     outside the palette and read as a second brand colour on the hero. */
   background: linear-gradient(
     90deg,
     var(--primary) 0%,
-    var(--gl-brass-500) 100%
+    var(--gl-coral-500) 100%
   );
 }
 

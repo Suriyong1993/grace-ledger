@@ -38,10 +38,10 @@ If a UI or refactor task requires one of these, **stop and report**: problem, im
 
 ## Design
 
-`design-system-extracted/` is the visual source of truth. **Identity: "Emerald Vault" (2026-09)** — porcelain surfaces, deep-evergreen brand, dark vault sidebar, brass accents. Upgrade the craft, do not replace the identity.
+`design-system-extracted/` is the visual source of truth. **Identity: "Coral Vault" (2026-09, supersedes "Emerald Vault" — see `DECISIONS.md` D21)** — paper/stone surfaces, coral brand, near-black vault sidebar. Upgrade the craft; the identity itself was changed once, deliberately, by user directive — do not drift it further without the same kind of explicit decision.
 
 - Reuse existing tokens: color, typography, spacing, radius, shadow, motion. No new palette, no new framework, no new component library.
-- Color carries fixed meaning: neutral = structure, emerald/`--income` = positive, amber/`--pending` = attention, red/`--expense` = error. No accent color without a documented reason.
+- Color carries fixed meaning: neutral = structure, emerald/`--income` = positive, amber/`--pending` = attention, red/`--expense` = error. These finance-status tokens are separate from the brand palette (`--primary`/`--accent`/`--sidebar-*`) and were not touched by the Coral Vault rebrand — no accent color without a documented reason.
 - `--*-foreground` tokens are for text on the **solid** color, not on the `-muted` surface. Pairing them is a contrast bug. Inside the dark vault sidebar, derive dimmed text from `--sidebar-foreground`, never `--muted-foreground`.
 - Fonts: Anuphan (Thai body/UI) + Space Grotesk (Latin/headline/numerals). `.num-display` is tabular; every money value uses it.
 - Signature: `.gl-total-rule` — the double ledger rule (2px over 1px) that closes a grand total. Use only on the figure a screen exists to answer.
@@ -116,6 +116,7 @@ No fake data, no placeholder identity in a production path, no hardcoded financi
 ## Workflow (JoejaBrain Standard)
 
 ทุก Agent ทำงานร่วมกันผ่าน `.brain/` (Universal Workflows & State):
+
 1. **Brief & State Check**: อ่าน `.brain/WORKING_CONTEXT.md` และ `.brain/MEMORY.md` เสมอ (`.brain/workflows/01_brief.md`)
 2. **Feature Planning & Focus**: ใช้ `/gl-spec` และ `/gl-plan` แบ่งงานตาม P0-P3 (`.brain/workflows/02_focus.md`)
 3. **Execution & Build**: ใช้ `/gl-build` หรือเขียนโค้ดทีละ task พร้อม tests

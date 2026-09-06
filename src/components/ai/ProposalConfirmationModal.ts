@@ -22,13 +22,16 @@ const ICON_ALERT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" 
 const ICON_SHIELD = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 const ICON_ARROW = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
 
-export function renderProposalConfirmationModalHtml(props: ProposalConfirmationModalProps): string {
+export function renderProposalConfirmationModalHtml(
+  props: ProposalConfirmationModalProps,
+): string {
   if (!props.isOpen || !props.proposal) {
     return "";
   }
 
   const { proposal, isLoading = false, error = null, currentUserRole } = props;
-  const isUnauthorized = currentUserRole && !["super_admin", "treasurer"].includes(currentUserRole);
+  const isUnauthorized =
+    currentUserRole && !["super_admin", "treasurer"].includes(currentUserRole);
 
   const expiresAt = new Date(proposal.expires_at).getTime();
   const now = Date.now();
@@ -198,8 +201,8 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
             isLoading
               ? "กำลังประมวลผล..."
               : isExpired
-              ? "ข้อเสนอหมดอายุแล้ว"
-              : actionTitle
+                ? "ข้อเสนอหมดอายุแล้ว"
+                : actionTitle
           }
         </button>
       </div>
@@ -210,11 +213,14 @@ export function renderProposalConfirmationModalHtml(props: ProposalConfirmationM
 
 export function attachProposalConfirmationModalHandlers(
   container: HTMLElement,
-  props: ProposalConfirmationModalProps
+  props: ProposalConfirmationModalProps,
 ): { destroy: () => void } {
-  const closeBtn = container.querySelector<HTMLButtonElement>(".gl-modal-close");
-  const cancelBtn = container.querySelector<HTMLButtonElement>(".gl-btn-cancel");
-  const confirmBtn = container.querySelector<HTMLButtonElement>(".gl-btn-confirm");
+  const closeBtn =
+    container.querySelector<HTMLButtonElement>(".gl-modal-close");
+  const cancelBtn =
+    container.querySelector<HTMLButtonElement>(".gl-btn-cancel");
+  const confirmBtn =
+    container.querySelector<HTMLButtonElement>(".gl-btn-confirm");
 
   const handleClose = () => {
     if (props.onClose) props.onClose();
