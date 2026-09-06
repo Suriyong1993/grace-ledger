@@ -6,6 +6,7 @@ import { Money } from "../lib/money";
 import { router } from "../router";
 import { escapeHtml, formatDateThai, toUserMessage } from "../lib/format";
 import { type AppShellUser } from "../components/layout/AppShell";
+import { roleLabelTh } from "../lib/rbac";
 
 /* Per-page ICON_* inline SVGs — the repo convention (see design-plans/08).
    Lucide-style stroke icons; decorative ones are aria-hidden at the call site. */
@@ -33,7 +34,7 @@ export class ApprovalsPage {
   constructor(
     supabase: SupabaseClient<Database>,
     private churchId: string,
-    private currentUserId?: string
+    private currentUserId?: string,
   ) {
     this.approvalsService = new ApprovalsService(supabase);
   }
@@ -60,11 +61,17 @@ export class ApprovalsPage {
     this.isLoading = true;
     this.errorMessage = null;
     try {
-      const res = await this.approvalsService.getPendingApprovals(this.churchId, this.currentUserId);
+      const res = await this.approvalsService.getPendingApprovals(
+        this.churchId,
+        this.currentUserId,
+      );
       if (res.success && res.data) {
         this.items = res.data;
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถโหลดรายการรออนุมัติได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถโหลดรายการรออนุมัติได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -78,7 +85,7 @@ export class ApprovalsPage {
   private renderProfileHeader(user?: AppShellUser): string {
     const initials = escapeHtml(user?.initials || "GL");
     const name = escapeHtml(user?.name || "ผู้ใช้งาน");
-    const role = escapeHtml(user?.role || "");
+    const role = user?.role ? escapeHtml(roleLabelTh(user.role)) : "";
     const church = escapeHtml(user?.churchName || "");
     const pendingCount = this.items.length;
     return `
@@ -101,8 +108,14 @@ export class ApprovalsPage {
   private renderSummaryStats(): string {
     const incomeItems = this.items.filter((i) => i.direction === "income");
     const expenseItems = this.items.filter((i) => i.direction === "expense");
-    const incomeTotal = incomeItems.reduce((acc, i) => acc.add(i.amount), Money.zero());
-    const expenseTotal = expenseItems.reduce((acc, i) => acc.add(i.amount), Money.zero());
+    const incomeTotal = incomeItems.reduce(
+      (acc, i) => acc.add(i.amount),
+      Money.zero(),
+    );
+    const expenseTotal = expenseItems.reduce(
+      (acc, i) => acc.add(i.amount),
+      Money.zero(),
+    );
     const total = incomeTotal.add(expenseTotal);
     return `
     <div class="gl-card gl-appr-stats">
@@ -141,7 +154,7 @@ export class ApprovalsPage {
           <div class="gl-appr-detail__split">
             <span>${escapeHtml(sp.fundName || "กองทุน")}</span>
             <span class="num-display">${sp.amount.format()}</span>
-          </div>`
+          </div>`,
             )
             .join("")
         : `<div class="gl-appr-detail__split" style="color: var(--muted-foreground);">ไม่มีข้อมูลกองทุน</div>`;
@@ -213,7 +226,9 @@ export class ApprovalsPage {
             .filter(Boolean)
             .join(", ")
         : "";
-    const dateStr = item.createdAt ? formatDateThai(item.createdAt.substring(0, 10)) : "";
+    const dateStr = item.createdAt
+      ? formatDateThai(item.createdAt.substring(0, 10))
+      : "";
     const refNum = item.referenceNumber ? escapeHtml(item.referenceNumber) : "";
     const iconClass =
       item.direction === "income"
@@ -262,11 +277,20 @@ export class ApprovalsPage {
     </div>`;
   }
 
-  private renderRejectionModal(item: PendingApprovalItem, type: "revision_requested" | "rejected"): string {
+  private renderRejectionModal(
+    item: PendingApprovalItem,
+    type: "revision_requested" | "rejected",
+  ): string {
     const isRevision = type === "revision_requested";
-    const title = isRevision ? "ส่งรายการกลับเพื่อขอให้แก้ไข" : "ปฏิเสธคำขอเบิกจ่าย";
-    const submitLabel = isRevision ? "ยืนยันการส่งกลับเพื่อแก้ไข" : "ยืนยันการปฏิเสธคำขอ";
-    const submitStyle = isRevision ? "" : "background: var(--expense); border-color: var(--expense);";
+    const title = isRevision
+      ? "ส่งรายการกลับเพื่อขอให้แก้ไข"
+      : "ปฏิเสธคำขอเบิกจ่าย";
+    const submitLabel = isRevision
+      ? "ยืนยันการส่งกลับเพื่อแก้ไข"
+      : "ยืนยันการปฏิเสธคำขอ";
+    const submitStyle = isRevision
+      ? ""
+      : "background: var(--expense); border-color: var(--expense);";
     return `
     <div class="gl-modal-backdrop gl-modal-backdrop--sheet">
       <div class="gl-modal-content gl-modal-content--sheet" role="dialog" aria-modal="true" aria-labelledby="gl-modal-title">
@@ -349,8 +373,12 @@ export class ApprovalsPage {
     </div>`;
 
     const cardsHtml =
-      this.items.length === 0 ? emptyHtml : this.items.map((item) => this.renderApprovalCard(item)).join("");
-    const modalHtml = this.activeModal ? this.renderRejectionModal(this.activeModal.item, this.activeModal.type) : "";
+      this.items.length === 0
+        ? emptyHtml
+        : this.items.map((item) => this.renderApprovalCard(item)).join("");
+    const modalHtml = this.activeModal
+      ? this.renderRejectionModal(this.activeModal.item, this.activeModal.type)
+      : "";
 
     return `
     <div class="gl-page gl-approvals-page-container gl-fade-in">
@@ -373,13 +401,17 @@ export class ApprovalsPage {
 
   // ─── Event Listeners ──────────────────────────────────────────────────────
 
-  public attachEventListeners(rootElement: HTMLElement, onRefreshNeeded?: () => void): void {
+  public attachEventListeners(
+    rootElement: HTMLElement,
+    onRefreshNeeded?: () => void,
+  ): void {
     const refresh = () => {
       if (onRefreshNeeded) onRefreshNeeded();
     };
 
     // 1. "ดูรายละเอียด" buttons — toggle detail panel via router
-    const detailBtns = rootElement.querySelectorAll<HTMLElement>(".gl-open-detail");
+    const detailBtns =
+      rootElement.querySelectorAll<HTMLElement>(".gl-open-detail");
     detailBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -394,42 +426,31 @@ export class ApprovalsPage {
     });
 
     // 2. Close panel button
-    const closeBtns = rootElement.querySelectorAll<HTMLElement>(".gl-sheet-close");
+    const closeBtns =
+      rootElement.querySelectorAll<HTMLElement>(".gl-sheet-close");
     closeBtns.forEach((btn) => {
       btn.addEventListener("click", () => router.navigate("/approvals"));
     });
 
     // 3. Quick-approve from list row
-    const quickApproveBtns = rootElement.querySelectorAll<HTMLButtonElement>(".gl-quick-approve");
+    const quickApproveBtns =
+      rootElement.querySelectorAll<HTMLButtonElement>(".gl-quick-approve");
     quickApproveBtns.forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute("data-id");
-        const item = this.items.find((i) => i.id === id);
-        if (!item || item.isCreator) return;
-        btn.disabled = true;
-        btn.textContent = "กำลังอนุมัติ…";
-        await this._handleApprove(item, refresh);
-      });
+      this._attachApproveWithConfirm(btn, refresh);
     });
 
     // 4. Approve button in detail panel
-    const approveBtn = rootElement.querySelector<HTMLButtonElement>(".gl-btn-approve");
+    const approveBtn =
+      rootElement.querySelector<HTMLButtonElement>(".gl-btn-approve");
     if (approveBtn) {
-      approveBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const id = approveBtn.getAttribute("data-id") || this.selectedItemId;
-        const item = this.items.find((i) => i.id === id);
-        if (!item || item.isCreator) return;
-        approveBtn.disabled = true;
-        approveBtn.textContent = "กำลังอนุมัติ…";
-        await this._handleApprove(item, refresh);
-      });
+      this._attachApproveWithConfirm(approveBtn, refresh, this.selectedItemId);
     }
 
     // 5. Revision & Reject buttons in detail panel
     const selectedItem = this.items.find((i) => i.id === this.selectedItemId);
-    const revisionBtn = rootElement.querySelector<HTMLElement>(".gl-btn-request-revision");
+    const revisionBtn = rootElement.querySelector<HTMLElement>(
+      ".gl-btn-request-revision",
+    );
     const rejectBtn = rootElement.querySelector<HTMLElement>(".gl-btn-reject");
 
     if (revisionBtn && selectedItem) {
@@ -448,20 +469,29 @@ export class ApprovalsPage {
     }
 
     // 6. Scroll expanded panel into view
-    const decisionPanel = rootElement.querySelector<HTMLElement>(".gl-decision-panel");
+    const decisionPanel =
+      rootElement.querySelector<HTMLElement>(".gl-decision-panel");
     if (decisionPanel && this.selectedItemId) {
       decisionPanel.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
 
     // 7. Modal events
     if (this.activeModal) {
-      const modalClose = rootElement.querySelector<HTMLElement>(".gl-modal-close");
-      const modalCancel = rootElement.querySelector<HTMLElement>(".gl-btn-cancel");
-      const modalSubmit = rootElement.querySelector<HTMLButtonElement>(".gl-btn-submit");
-      const reasonTextarea = rootElement.querySelector<HTMLTextAreaElement>("#gl-rejection-reason");
-      const charCountSpan = rootElement.querySelector<HTMLElement>("#gl-char-count");
-      const reasonError = rootElement.querySelector<HTMLElement>("#gl-reason-error");
-      const backdrop = rootElement.querySelector<HTMLElement>(".gl-modal-backdrop");
+      const modalClose =
+        rootElement.querySelector<HTMLElement>(".gl-modal-close");
+      const modalCancel =
+        rootElement.querySelector<HTMLElement>(".gl-btn-cancel");
+      const modalSubmit =
+        rootElement.querySelector<HTMLButtonElement>(".gl-btn-submit");
+      const reasonTextarea = rootElement.querySelector<HTMLTextAreaElement>(
+        "#gl-rejection-reason",
+      );
+      const charCountSpan =
+        rootElement.querySelector<HTMLElement>("#gl-char-count");
+      const reasonError =
+        rootElement.querySelector<HTMLElement>("#gl-reason-error");
+      const backdrop =
+        rootElement.querySelector<HTMLElement>(".gl-modal-backdrop");
 
       const closeModal = () => {
         this.activeModal = null;
@@ -510,7 +540,9 @@ export class ApprovalsPage {
     }
 
     // 8. Refresh / Retry / Stale-refresh buttons
-    const refreshBtn = rootElement.querySelector<HTMLElement>("#gl-btn-refresh-queue");
+    const refreshBtn = rootElement.querySelector<HTMLElement>(
+      "#gl-btn-refresh-queue",
+    );
     if (refreshBtn) {
       refreshBtn.addEventListener("click", async () => {
         this.staleWarning = null;
@@ -519,7 +551,9 @@ export class ApprovalsPage {
         refresh();
       });
     }
-    const staleRefreshBtn = rootElement.querySelector<HTMLElement>("#gl-btn-refresh-stale");
+    const staleRefreshBtn = rootElement.querySelector<HTMLElement>(
+      "#gl-btn-refresh-stale",
+    );
     if (staleRefreshBtn) {
       staleRefreshBtn.addEventListener("click", async () => {
         this.staleWarning = null;
@@ -537,10 +571,70 @@ export class ApprovalsPage {
     }
   }
 
+  // ─── Approve confirm-in-place ─────────────────────────────────────────────
+
+  /**
+   * Approve needs one confirmation tap, matching the deliberateness already
+   * required for Reject — but as an in-place DOM swap (not a modal or a full
+   * re-render) so it stays fast for a high-volume approval queue. First
+   * click turns the button into "ยืนยันอนุมัติ" with a sibling "ยกเลิก" to
+   * back out; the second click on the same button actually approves.
+   */
+  private _attachApproveWithConfirm(
+    btn: HTMLButtonElement,
+    refresh: () => void,
+    fallbackId?: string | null,
+  ): void {
+    const originalLabel = btn.innerHTML;
+    let cancelBtn: HTMLButtonElement | null = null;
+
+    const revert = () => {
+      btn.innerHTML = originalLabel;
+      btn.classList.remove("gl-btn--pending-confirm");
+      cancelBtn?.remove();
+      cancelBtn = null;
+    };
+
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute("data-id") || fallbackId;
+      const item = this.items.find((i) => i.id === id);
+      if (!item || item.isCreator) return;
+
+      if (!cancelBtn) {
+        // First tap: ask for confirmation in place.
+        btn.textContent = "ยืนยันอนุมัติ";
+        btn.classList.add("gl-btn--pending-confirm");
+        cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.className = "gl-btn gl-btn--ghost gl-btn--sm";
+        cancelBtn.textContent = "ยกเลิก";
+        cancelBtn.addEventListener("click", (ce) => {
+          ce.stopPropagation();
+          revert();
+        });
+        btn.insertAdjacentElement("afterend", cancelBtn);
+        return;
+      }
+
+      // Second tap on the same button: proceed with the actual approval.
+      cancelBtn.remove();
+      cancelBtn = null;
+      btn.disabled = true;
+      btn.textContent = "กำลังอนุมัติ…";
+      await this._handleApprove(item, refresh);
+    });
+  }
+
   // ─── Private Action Handlers ──────────────────────────────────────────────
 
-  private async _handleApprove(item: PendingApprovalItem, refresh: () => void): Promise<void> {
-    const res = await this.approvalsService.approveTransaction({ transactionId: item.id });
+  private async _handleApprove(
+    item: PendingApprovalItem,
+    refresh: () => void,
+  ): Promise<void> {
+    const res = await this.approvalsService.approveTransaction({
+      transactionId: item.id,
+    });
     if (res.success) {
       this.successMessage = `อนุมัติรายการ "${item.description}" แล้ว รอลงบัญชี`;
       this.selectedItemId = null;
@@ -551,13 +645,23 @@ export class ApprovalsPage {
       this.staleWarning = "รายการนี้ได้รับการพิจารณาแล้ว";
       refresh();
     } else {
-      this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถอนุมัติรายการได้");
+      this.errorMessage = toUserMessage(
+        res.error?.message,
+        "ไม่สามารถอนุมัติรายการได้",
+      );
       refresh();
     }
   }
 
-  private async _handleRevision(item: PendingApprovalItem, reason: string, refresh: () => void): Promise<void> {
-    const res = await this.approvalsService.requestRevision({ transactionId: item.id, revisionNote: reason });
+  private async _handleRevision(
+    item: PendingApprovalItem,
+    reason: string,
+    refresh: () => void,
+  ): Promise<void> {
+    const res = await this.approvalsService.requestRevision({
+      transactionId: item.id,
+      revisionNote: reason,
+    });
     if (res.success) {
       this.successMessage = "ส่งกลับให้แก้ไขแล้ว";
       this.activeModal = null;
@@ -570,13 +674,23 @@ export class ApprovalsPage {
       this.activeModal = null;
       refresh();
     } else {
-      this.errorMessage = toUserMessage(res.error?.message, "เกิดข้อผิดพลาดในการขอแก้ไข");
+      this.errorMessage = toUserMessage(
+        res.error?.message,
+        "เกิดข้อผิดพลาดในการขอแก้ไข",
+      );
       refresh();
     }
   }
 
-  private async _handleTerminalReject(item: PendingApprovalItem, reason: string, refresh: () => void): Promise<void> {
-    const res = await this.approvalsService.rejectTransactionTerminal({ transactionId: item.id, rejectionReason: reason });
+  private async _handleTerminalReject(
+    item: PendingApprovalItem,
+    reason: string,
+    refresh: () => void,
+  ): Promise<void> {
+    const res = await this.approvalsService.rejectTransactionTerminal({
+      transactionId: item.id,
+      rejectionReason: reason,
+    });
     if (res.success) {
       this.successMessage = "ปฏิเสธคำขอแล้ว";
       this.activeModal = null;
@@ -589,7 +703,10 @@ export class ApprovalsPage {
       this.activeModal = null;
       refresh();
     } else {
-      this.errorMessage = toUserMessage(res.error?.message, "เกิดข้อผิดพลาดในการปฏิเสธคำขอ");
+      this.errorMessage = toUserMessage(
+        res.error?.message,
+        "เกิดข้อผิดพลาดในการปฏิเสธคำขอ",
+      );
       refresh();
     }
   }

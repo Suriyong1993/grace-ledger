@@ -73,7 +73,7 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     const html = page.renderHtml(data);
 
-    expect(html).toContain("ยอดเงินคงเหลือทั้งหมด");
+    expect(html).toContain("ยอดคงเหลือทั้งหมด");
     expect(html).toContain("฿248,560.00");
     expect(html).toContain("+฿18,450.00");
     expect(html).toContain("−฿12,820.00");

@@ -2,7 +2,7 @@ import { escapeHtml } from "../html";
 import type { ActionProposalPayload, AiProposalAction } from "../types";
 
 const ACTION_LABELS: Readonly<Record<AiProposalAction, string>> = {
-  post_transaction: "ข้อเสนอโพสต์รายการ",
+  post_transaction: "ข้อเสนอลงบัญชีรายการ",
   fund_transfer: "ข้อเสนอโอนเงินระหว่างกองทุน",
   void_transaction: "ข้อเสนอยกเลิกรายการ",
 };
@@ -15,7 +15,9 @@ export function proposalActionLabel(action: AiProposalAction): string {
  * ACTION_PROPOSAL card — loud warning box plus the single button that opens
  * the existing ProposalConfirmationModal. The card never executes anything.
  */
-export function renderActionProposalCard(proposal: ActionProposalPayload): string {
+export function renderActionProposalCard(
+  proposal: ActionProposalPayload,
+): string {
   const amountRow = proposal.amount
     ? `<div class="gl-aid-fact"><span>จำนวนเงิน</span><strong class="num-display">${escapeHtml(proposal.amount)}</strong></div>`
     : "";

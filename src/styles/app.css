@@ -329,6 +329,13 @@ button.gl-card:active {
   background: var(--primary-dark);
 }
 
+/* Awaiting a second confirmation tap (e.g. approve-with-confirm) — reuses
+   the same amber "attention" semantic as a pending badge. */
+.gl-btn--pending-confirm.gl-btn--primary {
+  background: var(--pending);
+  color: var(--pending-foreground);
+}
+
 .gl-btn--secondary {
   background: var(--card);
   border-color: var(--border);
@@ -549,6 +556,18 @@ button.gl-card:active {
 .gl-hint {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
+}
+
+.gl-field-error {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--expense);
+}
+
+.gl-input.has-error,
+.gl-select.has-error,
+.gl-textarea.has-error {
+  border-color: var(--expense);
 }
 
 .gl-error-text {

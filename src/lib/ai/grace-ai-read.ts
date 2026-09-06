@@ -52,7 +52,7 @@ export class GraceAiReadService {
    */
   constructor(
     supabase: SupabaseClient<Database>,
-    private trustedChurchId: string
+    private trustedChurchId: string,
   ) {
     this.executor = new SecureAiToolExecutor(supabase);
   }
@@ -62,18 +62,21 @@ export class GraceAiReadService {
    */
   public async getMonthlyFinancialSummary(
     period: string,
-    promptChurchId?: string
-  ): Promise<GraceAiFinancialResponse<{
-    total_income: string;
-    total_expense: string;
-    net_cashflow: string;
-    total_funds_balance: string;
-  }>> {
+    promptChurchId?: string,
+  ): Promise<
+    GraceAiFinancialResponse<{
+      total_income: string;
+      total_expense: string;
+      net_cashflow: string;
+      total_funds_balance: string;
+    }>
+  > {
     // SECURITY: Trusted server church context STRICTLY wins over any prompt/client value
     // If promptChurchId is passed, it is intentionally disregarded in favor of this.trustedChurchId
-    const targetChurchId = (promptChurchId && promptChurchId === this.trustedChurchId)
-      ? promptChurchId
-      : this.trustedChurchId;
+    const targetChurchId =
+      promptChurchId && promptChurchId === this.trustedChurchId
+        ? promptChurchId
+        : this.trustedChurchId;
 
     const result = await this.executor.executeTool({
       toolName: "get_financial_summary",
@@ -94,7 +97,8 @@ export class GraceAiReadService {
       };
     }
 
-    const { total_income, total_expense, net_cashflow, total_funds_balance } = result.data;
+    const { total_income, total_expense, net_cashflow, total_funds_balance } =
+      result.data;
     const incomeM = Money.from(total_income);
     const expenseM = Money.from(total_expense);
     const netM = Money.from(net_cashflow);
@@ -123,7 +127,12 @@ export class GraceAiReadService {
       source_tool: "get_financial_summary",
       source_type: "POSTGRESQL_POSTED_LEDGER",
       transaction_status: "posted",
-      excluded_states: Object.freeze(["draft", "pending_approval", "rejected", "voided"]),
+      excluded_states: Object.freeze([
+        "draft",
+        "pending_approval",
+        "rejected",
+        "voided",
+      ]),
       generated_at: new Date().toISOString(),
       church_id: targetChurchId,
     };
@@ -141,11 +150,19 @@ export class GraceAiReadService {
    * 2. Query Transactions Report with Provenance
    */
   public async getTransactionsReport(filters: {
-    status?: "draft" | "pending_approval" | "approved" | "posted" | "rejected" | "voided";
+    status?:
+      | "draft"
+      | "pending_approval"
+      | "approved"
+      | "posted"
+      | "rejected"
+      | "voided";
     start_date?: string;
     end_date?: string;
     limit?: number;
-  }): Promise<GraceAiFinancialResponse<{ transactions: any[]; total_count: number }>> {
+  }): Promise<
+    GraceAiFinancialResponse<{ transactions: any[]; total_count: number }>
+  > {
     const result = await this.executor.executeTool({
       toolName: "get_transactions",
       parameters: { ...filters, church_id: this.trustedChurchId },
@@ -171,14 +188,20 @@ export class GraceAiReadService {
       success: true,
       facts: { transactions, total_count },
       analysis: `พบรายการธุรกรรมที่ตรงตามเงื่อนไขจำนวน ${total_count} รายการ`,
-      interpretation: total_count === 0 ? "ข้อสังเกต: ไม่พบรายการธุรกรรมในช่วงเวลาที่ระบุ" : null,
+      interpretation:
+        total_count === 0
+          ? "ข้อสังเกต: ไม่พบรายการธุรกรรมในช่วงเวลาที่ระบุ"
+          : null,
       provenance: {
         period: `${filters.start_date || "ต้นปี"} ถึง ${filters.end_date || "ปัจจุบัน"}`,
         source_tool: "get_transactions",
         source_type: "POSTGRESQL_POSTED_LEDGER",
         transaction_status: filters.status || "all_filtered_states",
         included_count: total_count,
-        excluded_states: filters.status === "posted" ? ["draft", "pending_approval", "rejected", "voided"] : [],
+        excluded_states:
+          filters.status === "posted"
+            ? ["draft", "pending_approval", "rejected", "voided"]
+            : [],
         generated_at: new Date().toISOString(),
         church_id: this.trustedChurchId,
       },
@@ -188,7 +211,9 @@ export class GraceAiReadService {
   /**
    * 3. Get Fund Balances with Provenance
    */
-  public async getFundBalances(fundId?: string): Promise<GraceAiFinancialResponse<{ funds: any[] }>> {
+  public async getFundBalances(
+    fundId?: string,
+  ): Promise<GraceAiFinancialResponse<{ funds: any[] }>> {
     const result = await this.executor.executeTool({
       toolName: "get_fund_balance",
       parameters: { fund_id: fundId, church_id: this.trustedChurchId },
@@ -231,7 +256,9 @@ export class GraceAiReadService {
   /**
    * 4. Get Budget vs Actual Analysis with Provenance
    */
-  public async getBudgetComparison(year: number): Promise<GraceAiFinancialResponse<{ year: number; items: any[] }>> {
+  public async getBudgetComparison(
+    year: number,
+  ): Promise<GraceAiFinancialResponse<{ year: number; items: any[] }>> {
     const result = await this.executor.executeTool({
       toolName: "get_budget_vs_actual",
       parameters: { year, church_id: this.trustedChurchId },
@@ -273,11 +300,16 @@ export class GraceAiReadService {
    * 5. Get Transaction Audit Trail with Provenance
    */
   public async getTransactionAuditTrail(
-    transactionId: string
-  ): Promise<GraceAiFinancialResponse<{ transaction_id: string; logs: any[] }>> {
+    transactionId: string,
+  ): Promise<
+    GraceAiFinancialResponse<{ transaction_id: string; logs: any[] }>
+  > {
     const result = await this.executor.executeTool({
       toolName: "get_transaction_audit_trail",
-      parameters: { transaction_id: transactionId, church_id: this.trustedChurchId },
+      parameters: {
+        transaction_id: transactionId,
+        church_id: this.trustedChurchId,
+      },
       context: { churchId: this.trustedChurchId },
     });
 
@@ -297,7 +329,7 @@ export class GraceAiReadService {
     return {
       success: true,
       facts: result.data,
-      analysis: `พบประวัติการทำธุรกรรม (Audit Trail) จำนวน ${result.data.logs.length} เหตุการณ์`,
+      analysis: `พบประวัติการตรวจสอบธุรกรรมจำนวน ${result.data.logs.length} เหตุการณ์`,
       interpretation: null,
       provenance: {
         period: "ประวัติตั้งแต่สร้างรายการ",
@@ -318,13 +350,15 @@ export class GraceAiReadService {
   public async getConfidentialMemberGiving(
     memberId: string,
     reason: string,
-    taxYear?: number
-  ): Promise<GraceAiFinancialResponse<{
-    member_id: string;
-    member_name: string;
-    records: any[];
-    total_giving: string;
-  }>> {
+    taxYear?: number,
+  ): Promise<
+    GraceAiFinancialResponse<{
+      member_id: string;
+      member_name: string;
+      records: any[];
+      total_giving: string;
+    }>
+  > {
     const result = await this.executor.executeTool({
       toolName: "get_member_giving_history",
       parameters: {
