@@ -18,7 +18,8 @@
   <a class="lab-btn" href="./option-b.html">B · Vault Pro</a>
   <a class="lab-btn is-active" href="./option-c.html">C · Glass</a>
   <span class="lab-bar__spacer"></span>
-  <button class="lab-btn" data-view-btn="desktop">เดสก์ท็อป</button>
+  <button class="lab-btn" data-view-btn="desktop">แดชบอร์ด</button>
+  <button class="lab-btn" data-view-btn="login">หน้า Login</button>
   <button class="lab-btn" data-view-btn="devices">มือถือ 390px</button>
 </div>
 
@@ -324,6 +325,118 @@
   </main>
 </div>
 
+<!-- ---------------------------------------------------------- login page -->
+<section class="login-screen">
+  <aside class="login-vault">
+    <span class="login-vault__mark">GL</span>
+    <div>
+      <h1 class="login-vault__title">ระบบการเงิน<br />คริสตจักร</h1>
+      <p class="login-vault__sub">
+        ทุกยอดเงินตรวจสอบย้อนกลับได้ นับตั้งแต่เงินถวายในซอง จนถึงรายงานประจำเดือน
+      </p>
+    </div>
+
+    <div class="login-facts">
+      <div class="login-fact">
+        <span class="login-fact__icon">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M8 1.75l5 1.9v3.6c0 3.1-2 5.3-5 6.5-3-1.2-5-3.4-5-6.5v-3.6l5-1.9z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.75 7.9l1.6 1.6 2.9-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span>
+          <span class="login-fact__title">สิทธิ์ตามบทบาท</span><br />
+          <span class="login-fact__desc">เหรัญญิก ผู้ตรวจสอบ และศิษยาภิบาล เห็นคนละระดับ</span>
+        </span>
+      </div>
+      <div class="login-fact">
+        <span class="login-fact__icon">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M2.5 4h11M2.5 8h11M2.5 12h6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M11.25 11.25l1.4 1.4 2-2.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span>
+          <span class="login-fact__title">บันทึกการตรวจสอบครบถ้วน</span><br />
+          <span class="login-fact__desc">ทุกการแก้ไขมีผู้กระทำและเวลาบันทึกไว้เสมอ</span>
+        </span>
+      </div>
+      <div class="login-fact">
+        <span class="login-fact__icon">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><circle cx="5.25" cy="8" r="2.6" stroke="currentColor" stroke-width="1.3"/><path d="M7.85 8h6.15M11.75 8v2.4M13.75 8v1.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </span>
+        <span>
+          <span class="login-fact__title">เข้าใช้งานด้วย PIN 6 หลัก</span><br />
+          <span class="login-fact__desc">สลับผู้ใช้งานได้รวดเร็วโดยไม่ต้องพิมพ์รหัสผ่านยาว</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="login-vault__foot">คริสตจักรเกรซ ร้อยเอ็ด · Grace Ledger</div>
+  </aside>
+
+  <div class="login-side">
+    <div class="login-stack">
+      <!-- step 1 -->
+      <div>
+        <p class="login-step">ขั้นที่ 1 · เลือกโปรไฟล์</p>
+        <div class="card login-card">
+          <div class="profiles">
+            <div class="profile is-selected">
+              <span class="profile__avatar" style="background:linear-gradient(150deg,#2fa36b,#14532d)">สม</span>
+              <span class="profile__name">สมชาย ใจดี</span>
+              <span class="profile__role">เหรัญญิก</span>
+            </div>
+            <div class="profile">
+              <span class="profile__avatar" style="background:linear-gradient(150deg,#d97706,#92400e)">พร</span>
+              <span class="profile__name">พรทิพย์ มั่นคง</span>
+              <span class="profile__role">ผู้ตรวจสอบ</span>
+            </div>
+            <div class="profile">
+              <span class="profile__avatar" style="background:linear-gradient(150deg,#0d9273,#10301f)">อภิ</span>
+              <span class="profile__name">อภิชาติ ยอดยิ่ง</span>
+              <span class="profile__role">ศิษยาภิบาล</span>
+            </div>
+          </div>
+          <p class="login-card__hint">แตะโปรไฟล์เพื่อเข้าใช้งานด้วย PIN</p>
+        </div>
+      </div>
+
+      <!-- step 2 -->
+      <div>
+        <p class="login-step">ขั้นที่ 2 · กรอก PIN 6 หลัก</p>
+        <div class="card login-card">
+          <div class="pin-identity">
+            <span class="pin-identity__avatar">สม</span>
+            <span class="pin-identity__pill">PIN 6 หลัก</span>
+            <span class="pin-identity__name">สมชาย ใจดี</span>
+            <span class="pin-identity__role">เหรัญญิก</span>
+          </div>
+
+          <div class="pin-dots" style="margin-top:16px">
+            <span class="pin-dot is-filled"></span>
+            <span class="pin-dot is-filled"></span>
+            <span class="pin-dot is-filled"></span>
+            <span class="pin-dot is-active"></span>
+            <span class="pin-dot"></span>
+            <span class="pin-dot"></span>
+          </div>
+          <p class="pin-status">กรอกแล้ว 3 จาก 6 หลัก</p>
+
+          <div class="pin" style="margin-top:14px">
+            <button>1</button><button>2</button><button>3</button>
+            <button>4</button><button>5</button><button>6</button>
+            <button>7</button><button>8</button><button>9</button>
+            <button style="font-size:14px">ลบ</button><button>0</button>
+            <button aria-label="ยืนยัน">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </button>
+          </div>
+
+          <p class="login-card__hint">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="vertical-align:-2px"><rect x="5" y="10.5" width="14" height="9.5" rx="1.8"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+            ข้อมูลถูกเข้ารหัส · ไม่มีการเก็บ PIN บนอุปกรณ์
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ------------------------------------------------------------- devices -->
 <div class="lab-devices">
   <!-- mobile dashboard -->
@@ -413,7 +526,7 @@
     <div class="phone__screen">
       <div class="phone__status"><span>09:41</span><span>สัญญาณ · แบตเตอรี่</span></div>
       <div class="login">
-        <div class="login__brand">
+        <div class="login__brand" style="margin-bottom:2px">
           <span class="login__mark">GL</span>
           <span>
             <span class="login__title">Grace Ledger</span><br />
@@ -421,30 +534,53 @@
           </span>
         </div>
 
-        <div class="field">
-          <label for="email">อีเมล</label>
-          <input id="email" type="email" value="somchai@grace.or.th" />
-        </div>
-        <div class="field">
-          <label for="pw">รหัสผ่าน</label>
-          <input id="pw" type="password" value="••••••••" />
-        </div>
-
-        <button class="btn-primary btn-block">เข้าสู่ระบบ</button>
-
-        <div class="field" style="margin-top:6px">
-          <label>รหัส PIN 6 หลัก</label>
-          <div class="pin">
-            <button>1</button><button>2</button><button>3</button>
-            <button>4</button><button>5</button><button>6</button>
-            <button>7</button><button>8</button><button>9</button>
-            <button style="background:transparent;border-style:dashed">ลบ</button><button>0</button><button>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </button>
+        <p class="login-step" style="margin-bottom:0">ขั้นที่ 1 · วันนี้ใครเข้าใช้งาน?</p>
+        <div class="profiles">
+          <div class="profile is-selected">
+            <span class="profile__avatar" style="background:linear-gradient(150deg,#2fa36b,#14532d)">สม</span>
+            <span class="profile__name">สมชาย</span>
+            <span class="profile__role">เหรัญญิก</span>
+          </div>
+          <div class="profile">
+            <span class="profile__avatar" style="background:linear-gradient(150deg,#d97706,#92400e)">พร</span>
+            <span class="profile__name">พรทิพย์</span>
+            <span class="profile__role">ผู้ตรวจสอบ</span>
+          </div>
+          <div class="profile">
+            <span class="profile__avatar" style="background:linear-gradient(150deg,#0d9273,#10301f)">อภิ</span>
+            <span class="profile__name">อภิชาติ</span>
+            <span class="profile__role">ศิษยาภิบาล</span>
           </div>
         </div>
 
-        <div class="login__foot">ข้อมูลการเงินถูกเข้ารหัส · ทุกยอดเงินตรวจสอบได้จากใบเสร็จ</div>
+        <p class="login-step" style="margin:6px 0 0">ขั้นที่ 2 · ระบุรหัส PIN 6 หลัก</p>
+        <div class="pin-identity">
+          <span class="pin-identity__avatar">สม</span>
+          <span class="pin-identity__name">สมชาย ใจดี</span>
+          <span class="pin-identity__role">เหรัญญิก</span>
+        </div>
+
+        <div class="pin-dots">
+          <span class="pin-dot is-filled"></span>
+          <span class="pin-dot is-filled"></span>
+          <span class="pin-dot is-filled"></span>
+          <span class="pin-dot is-active"></span>
+          <span class="pin-dot"></span>
+          <span class="pin-dot"></span>
+        </div>
+        <p class="pin-status">กรอกแล้ว 3 จาก 6 หลัก</p>
+
+        <div class="pin">
+          <button>1</button><button>2</button><button>3</button>
+          <button>4</button><button>5</button><button>6</button>
+          <button>7</button><button>8</button><button>9</button>
+          <button style="font-size:14px">ลบ</button><button>0</button>
+          <button aria-label="ยืนยัน">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </button>
+        </div>
+
+        <div class="login__foot">ข้อมูลการเงินถูกเข้ารหัส · ไม่เก็บ PIN บนอุปกรณ์</div>
       </div>
     </div>
   </div>
