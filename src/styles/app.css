@@ -3665,6 +3665,13 @@ a {
   overflow: hidden;
 }
 
+/* .gl-more-panel carries this class too — display: flex above otherwise
+   overrides the browser's default [hidden] behavior, leaving the panel
+   permanently visible regardless of the hidden attribute JS toggles. */
+.gl-attention-panel[hidden] {
+  display: none;
+}
+
 .gl-attention-panel__loading,
 .gl-attention-panel__empty,
 .gl-attention-panel__hint {
