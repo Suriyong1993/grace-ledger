@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, it, expect } from "vitest";
 import { TransactionsPage } from "../../src/pages/TransactionsPage";
 
@@ -264,6 +265,72 @@ describe("TransactionsPage UI — Unit Tests", () => {
       const html = page.renderHtml();
 
       expect(html).toContain("3 เดือนล่าสุด");
+    });
+  });
+
+  describe("URL state persistence — deep links and filters", () => {
+    const dummySupabase = {} as any;
+
+    function setLocation(hashAndQuery: string) {
+      window.history.replaceState(null, "", `/${hashAndQuery}`);
+    }
+
+    it("consumeDeepLinkActions opens the create modal from ?create=1 and strips it from the URL", () => {
+      setLocation("#/transactions?create=1");
+      const page = new TransactionsPage(dummySupabase, "church-1");
+
+      page.consumeDeepLinkActions();
+
+      expect((page as any).isCreateModalOpen).toBe(true);
+      expect(window.location.hash).not.toContain("create=1");
+    });
+
+    it("consumeDeepLinkActions restores filter/period/sort/search from the URL", () => {
+      setLocation(
+        "#/transactions?filter=expense&period=last_month&sort=amount_desc&q=%E0%B9%84%E0%B8%9F%E0%B8%9F%E0%B9%89%E0%B8%B2",
+      );
+      const page = new TransactionsPage(dummySupabase, "church-1");
+
+      page.consumeDeepLinkActions();
+
+      expect((page as any).activeFilter).toBe("expense");
+      expect((page as any).activePeriod).toBe("last_month");
+      expect((page as any).activeSort).toBe("amount_desc");
+      expect((page as any).searchQuery).toBe("ไฟฟ้า");
+    });
+
+    it("consumeDeepLinkActions ignores unrecognized filter/period/sort values", () => {
+      setLocation("#/transactions?filter=bogus&period=bogus&sort=bogus");
+      const page = new TransactionsPage(dummySupabase, "church-1");
+
+      page.consumeDeepLinkActions();
+
+      expect((page as any).activeFilter).toBe("all");
+      expect((page as any).activePeriod).toBe("this_month");
+      expect((page as any).activeSort).toBe("newest");
+    });
+
+    it("round-trips non-default state through the URL via syncUrlFromState", () => {
+      setLocation("#/transactions");
+      const page = new TransactionsPage(dummySupabase, "church-1");
+      (page as any).activeFilter = "income";
+      (page as any).activePeriod = "all";
+      (page as any).searchQuery = "test";
+
+      (page as any).syncUrlFromState();
+
+      expect(window.location.hash).toContain("filter=income");
+      expect(window.location.hash).toContain("period=all");
+      expect(window.location.hash).toContain("q=test");
+    });
+
+    it("syncUrlFromState omits default values from the query string", () => {
+      setLocation("#/transactions?filter=expense");
+      const page = new TransactionsPage(dummySupabase, "church-1");
+      // Defaults: filter=all, period=this_month, sort=newest, no search.
+      (page as any).syncUrlFromState();
+
+      expect(window.location.hash).toBe("#/transactions");
     });
   });
 });

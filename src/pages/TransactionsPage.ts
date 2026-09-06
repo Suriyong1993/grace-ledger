@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderEmptyStateHtml } from "../components/shared/EmptyState";
+import { fieldErrorHtml } from "../components/shared/FieldError";
 import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
@@ -799,13 +800,6 @@ export class TransactionsPage {
     </div>`;
   }
 
-  private fieldErrorHtml(field: string): string {
-    const msg = this.createFieldErrors[field];
-    return msg
-      ? `<p class="gl-field-error" role="alert">${escapeHtml(msg)}</p>`
-      : "";
-  }
-
   private renderCreateModalHtml(): string {
     if (!this.isCreateModalOpen) return "";
 
@@ -844,13 +838,13 @@ export class TransactionsPage {
           <div class="gl-field">
             <label class="gl-label" for="txn-description-input">รายละเอียดรายการ *</label>
             <input type="text" class="gl-input ${this.createFieldErrors.description ? "has-error" : ""}" id="txn-description-input" placeholder="เช่น ถวายทรัพย์วันอาทิตย์, ค่าไฟฟ้าประจำเดือน" />
-            ${this.fieldErrorHtml("description")}
+            ${fieldErrorHtml(this.createFieldErrors, "description")}
           </div>
 
           <div class="gl-field">
             <label class="gl-label" for="txn-amount-input">จำนวนเงิน (฿) *</label>
             <input type="number" class="gl-input ${this.createFieldErrors.amount ? "has-error" : ""}" id="txn-amount-input" placeholder="0.00" step="0.01" min="0.01" />
-            ${this.fieldErrorHtml("amount")}
+            ${fieldErrorHtml(this.createFieldErrors, "amount")}
           </div>
 
           <div class="gl-field">
@@ -859,7 +853,7 @@ export class TransactionsPage {
               <option value="">เลือกกองทุน</option>
               ${this.fundsList.map((f) => `<option value="${f.id}">${escapeHtml(f.name)}</option>`).join("")}
             </select>
-            ${this.fieldErrorHtml("fundId")}
+            ${fieldErrorHtml(this.createFieldErrors, "fundId")}
           </div>
 
           <div class="gl-field">
@@ -868,7 +862,7 @@ export class TransactionsPage {
               <option value="">เลือกหมวดหมู่</option>
               ${categoryOptions.map((c) => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("")}
             </select>
-            ${this.fieldErrorHtml("categoryId")}
+            ${fieldErrorHtml(this.createFieldErrors, "categoryId")}
           </div>
 
           <div class="gl-field">
@@ -877,13 +871,13 @@ export class TransactionsPage {
               <option value="">เลือกบัญชี</option>
               ${this.accountsList.map((a) => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join("")}
             </select>
-            ${this.fieldErrorHtml("accountId")}
+            ${fieldErrorHtml(this.createFieldErrors, "accountId")}
           </div>
 
           <div class="gl-field">
             <label class="gl-label" for="txn-date-input">วันที่ *</label>
             <input type="date" class="gl-input ${this.createFieldErrors.date ? "has-error" : ""}" id="txn-date-input" value="${todayStr}" max="${todayStr}" />
-            ${this.fieldErrorHtml("date")}
+            ${fieldErrorHtml(this.createFieldErrors, "date")}
           </div>
 
           <div class="gl-funds-modal-actions">

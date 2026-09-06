@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderEmptyStateHtml } from "../components/shared/EmptyState";
+import { fieldErrorHtml } from "../components/shared/FieldError";
 import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
@@ -329,19 +330,19 @@ export class MembersPage {
             <div class="gl-field">
               <label class="gl-label" for="member-name-input">ชื่อ-นามสกุล *</label>
               <input type="text" class="gl-input ${this.addMemberFieldErrors.name ? "has-error" : ""}" id="member-name-input" placeholder="เช่น สมเกียรติ วงศ์สว่าง" />
-              ${this.addMemberFieldErrors.name ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.name)}</p>` : ""}
+              ${fieldErrorHtml(this.addMemberFieldErrors, "name")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="member-phone-input">เบอร์โทรศัพท์</label>
               <input type="tel" class="gl-input ${this.addMemberFieldErrors.phone ? "has-error" : ""}" id="member-phone-input" placeholder="เช่น 081-234-5678" />
-              ${this.addMemberFieldErrors.phone ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.phone)}</p>` : ""}
+              ${fieldErrorHtml(this.addMemberFieldErrors, "phone")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="member-email-input">อีเมล</label>
               <input type="email" class="gl-input ${this.addMemberFieldErrors.email ? "has-error" : ""}" id="member-email-input" placeholder="เช่น somkiat@example.com" />
-              ${this.addMemberFieldErrors.email ? `<p class="gl-field-error" role="alert">${escapeHtml(this.addMemberFieldErrors.email)}</p>` : ""}
+              ${fieldErrorHtml(this.addMemberFieldErrors, "email")}
             </div>
 
             <div style="display: flex; gap: var(--space-2); margin-top: var(--space-2);">

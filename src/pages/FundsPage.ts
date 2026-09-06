@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderEmptyStateHtml } from "../components/shared/EmptyState";
+import { fieldErrorHtml } from "../components/shared/FieldError";
 import { Database } from "../lib/supabase/types";
 import { Money } from "../lib/money";
 import { FundsService } from "../lib/funds/funds-service";
@@ -88,16 +89,6 @@ export class FundsPage {
     }
   }
 
-  private fieldErrorHtml(
-    errors: Record<string, string>,
-    field: string,
-  ): string {
-    const msg = errors[field];
-    return msg
-      ? `<p class="gl-field-error" role="alert">${escapeHtml(msg)}</p>`
-      : "";
-  }
-
   public renderHtml(): string {
     if (this.isLoading) {
       return `
@@ -160,7 +151,7 @@ export class FundsPage {
               <select class="gl-select ${this.transferFieldErrors.fromFund ? "has-error" : ""}" id="from-fund">
                 ${this.funds.map((f) => `<option value="${f.id}">${escapeHtml(f.name)} (${f.balance.format()})</option>`).join("")}
               </select>
-              ${this.fieldErrorHtml(this.transferFieldErrors, "fromFund")}
+              ${fieldErrorHtml(this.transferFieldErrors, "fromFund")}
             </div>
 
             <div class="gl-field">
@@ -168,19 +159,19 @@ export class FundsPage {
               <select class="gl-select ${this.transferFieldErrors.toFund ? "has-error" : ""}" id="to-fund">
                 ${this.funds.map((f, idx) => `<option value="${f.id}" ${idx === 1 ? "selected" : ""}>${escapeHtml(f.name)}</option>`).join("")}
               </select>
-              ${this.fieldErrorHtml(this.transferFieldErrors, "toFund")}
+              ${fieldErrorHtml(this.transferFieldErrors, "toFund")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="transfer-amount">จำนวนเงิน (฿)</label>
               <input type="number" class="gl-input ${this.transferFieldErrors.amount ? "has-error" : ""}" id="transfer-amount" placeholder="0.00" step="0.01" min="1" />
-              ${this.fieldErrorHtml(this.transferFieldErrors, "amount")}
+              ${fieldErrorHtml(this.transferFieldErrors, "amount")}
             </div>
 
             <div class="gl-field">
               <label class="gl-label" for="transfer-reason">เหตุผลประกอบการโอนเงิน</label>
               <textarea class="gl-textarea ${this.transferFieldErrors.reason ? "has-error" : ""}" id="transfer-reason" placeholder="เช่น มติคณะกรรมการ หรือ สมทบโครงการพันธกิจ..."></textarea>
-              ${this.fieldErrorHtml(this.transferFieldErrors, "reason")}
+              ${fieldErrorHtml(this.transferFieldErrors, "reason")}
             </div>
 
             <div class="gl-funds-modal-actions">
@@ -212,7 +203,7 @@ export class FundsPage {
             <div class="gl-field">
               <label class="gl-label" for="fund-name-input">ชื่อกองทุน *</label>
               <input type="text" class="gl-input ${this.createFieldErrors.name ? "has-error" : ""}" id="fund-name-input" placeholder="เช่น กองทุนสร้างพระวิหาร, กองทุนสงเคราะห์" />
-              ${this.fieldErrorHtml(this.createFieldErrors, "name")}
+              ${fieldErrorHtml(this.createFieldErrors, "name")}
             </div>
 
             <div class="gl-field">
@@ -223,7 +214,7 @@ export class FundsPage {
             <div class="gl-field">
               <label class="gl-label" for="fund-target-input">เป้าหมายงบประมาณ (฿) (ถ้ามี)</label>
               <input type="number" class="gl-input ${this.createFieldErrors.target ? "has-error" : ""}" id="fund-target-input" placeholder="0.00" step="0.01" min="0" />
-              ${this.fieldErrorHtml(this.createFieldErrors, "target")}
+              ${fieldErrorHtml(this.createFieldErrors, "target")}
             </div>
 
             <div class="gl-funds-modal-actions">
