@@ -4425,6 +4425,24 @@ a {
 .gl-stat-card--feature .gl-stat-card__value {
   font-size: clamp(var(--text-4xl), 3.4vw, var(--text-5xl));
 }
+
+/* The label and hint pin --muted-foreground for the default light tile, which
+   they keep even once the tile is filled with the brand gradient: dark grey on
+   coral measures 1.45:1, so the caption under the headline figure was close to
+   unreadable. On the filled tile they defer to the card's own foreground.
+   The status palette is untouched — this is the brand fill, not income or
+   expense. */
+.gl-stat-card--feature .gl-stat-card__label,
+.gl-stat-card--feature .gl-stat-card__value,
+.gl-stat-card--feature .gl-stat-card__hint {
+  color: inherit;
+}
+
+/* Full white for the figure's own label, slightly held back for the caption so
+   the hierarchy inside the tile survives. */
+.gl-stat-card--feature .gl-stat-card__hint {
+  opacity: 0.88;
+}
 /* --- Tables --------------------------------------------------------------
    Records, not a grid. The head stripe reads as a rule rather than a fill,
    and the row hover is a coral wash faint enough to guide the eye down a
