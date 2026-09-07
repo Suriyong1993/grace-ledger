@@ -52,7 +52,10 @@ describe("UI Error & Empty States (Fail-Closed Architecture)", () => {
 
       expect(html).not.toContain("gl-notice--error");
       expect(html).toContain("gl-empty-center__msg");
-      expect(html).toContain("ไม่พบรายการที่ตรงกับเงื่อนไข");
+      // No filter is applied here, so this is an empty ledger rather than a
+      // filtered-out view. The two now read differently on purpose; see
+      // tests/unit/transactions-empty-states.test.ts.
+      expect(html).toContain("ยังไม่มีรายการเคลื่อนไหว");
     });
   });
 

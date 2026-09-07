@@ -2529,9 +2529,14 @@ a.gl-row:focus-visible {
   color: var(--muted-foreground);
 }
 
+/* Filter pills follow the same touch-target rule as every other control:
+   the documented minimum by default, with the compact box opt-in for precise
+   pointers. They were fixed at a value below that minimum, which made the
+   transaction filters the smallest tap targets on the busiest financial
+   screen. Matches the .gl-btn--sm pattern above rather than inventing one. */
 .gl-filter-pill,
 .filter-pill {
-  min-height: 40px;
+  min-height: var(--touch-target-min);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   background: var(--card);
@@ -2545,6 +2550,12 @@ a.gl-row:focus-visible {
     color var(--duration-micro) var(--ease-out);
 }
 
+@media (pointer: fine) {
+  .gl-filter-pill,
+  .filter-pill {
+    min-height: 40px;
+  }
+}
 .filter-pill:hover:not(.is-active) {
   border-color: color-mix(in srgb, var(--primary) 46%, var(--border));
   background: var(--primary-light);

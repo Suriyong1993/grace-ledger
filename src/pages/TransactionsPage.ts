@@ -511,12 +511,35 @@ export class TransactionsPage {
         </div>`;
     };
 
-    const emptyHtml = sorted.length === 0
-      ? renderEmptyStateHtml({
-          message: "ไม่พบรายการที่ตรงกับเงื่อนไข",
-          hint: "ลองเปลี่ยนตัวกรองหรือคำค้นหา",
-        })
-      : "";
+    // Two different empty states. Telling someone to "change the filters"
+    // when the ledger is simply empty sends them hunting for a filter that
+    // is not the problem; conversely, when filters *are* hiding everything
+    // the user had to undo each one by hand to get back. Only the filtered
+    // case offers the reset, and only when something is actually narrowing
+    // the list.
+    const hasNarrowedView =
+      this.activeFilter !== "all" ||
+      this.activePeriod !== "this_month" ||
+      this.searchQuery.trim() !== "";
+
+    const emptyHtml =
+      sorted.length !== 0
+        ? ""
+        : hasNarrowedView
+          ? renderEmptyStateHtml({
+              message: "ไม่พบรายการที่ตรงกับเงื่อนไข",
+              hint: "ลองเปลี่ยนตัวกรองหรือคำค้นหา",
+              action: {
+                label: "ล้างตัวกรองทั้งหมด",
+                type: "button",
+                id: "clear-filters-btn",
+                variant: "secondary",
+              },
+            })
+          : renderEmptyStateHtml({
+              message: "ยังไม่มีรายการเคลื่อนไหวในช่วงนี้",
+              hint: "เมื่อมีการบันทึกรายรับหรือรายจ่าย รายการจะแสดงที่นี่",
+            });
 
     return `
     <div class="gl-page gl-fade-in">
@@ -664,6 +687,19 @@ export class TransactionsPage {
       .querySelector<HTMLButtonElement>("#retry-load-btn")
       ?.addEventListener("click", async () => {
         await this.loadData();
+        onStateChange();
+      });
+
+    // Reset every narrowing control at once, then follow the same path as the
+    // individual filters: sync the URL so a refresh or a shared link reflects
+    // the cleared view, then re-render (which re-binds these listeners).
+    root
+      .querySelector<HTMLButtonElement>("#clear-filters-btn")
+      ?.addEventListener("click", () => {
+        this.activeFilter = "all";
+        this.activePeriod = "this_month";
+        this.searchQuery = "";
+        this.syncUrlFromState();
         onStateChange();
       });
   }
