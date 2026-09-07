@@ -805,3 +805,25 @@ Its literals were the sole reason four lint-design allowances existed, so those
 tighten with it: font-size 1 -> 0, border-radius 3 -> 2, rgb/rgba 7 -> 5,
 hex 10 -> 9. lint-design flagged all four itself by failing on FEWER than
 allowed.
+
+## D26c — The preview harness never wired event listeners
+
+Every button in the harness was inert. The harness set `innerHTML` and stopped
+there, never calling any page's `attachEventListeners`, so anything that lives
+behind an interaction — the create-fund and transfer modals, retries, tab
+switches — looked frozen. Nothing was wrong with the modals themselves.
+
+Two things were needed, and only doing one would still have looked broken:
+
+1. **A single page instance per screen, built once.** Open/closed state lives
+   on the instance, so constructing a fresh one per render discarded the very
+   state the click had just set.
+2. **Re-bind on every state change.** `paint()` re-enters itself as the page's
+   `onStateChange`: state change -> redraw -> re-attach against the new nodes.
+   Binding only once would let a modal open and leave its close button dead.
+
+Covered by `tests/unit/funds-page-modal.test.ts`, including reopening a modal
+after a close, which is the case a single non-recursive bind would fail.
+
+TransactionsPage exposes no `attachEventListeners`, so its screen stays
+markup-only for now — noted rather than papered over.

@@ -446,11 +446,37 @@ function seed<T extends object>(page: T, fields: Record<string, unknown>): T {
   return page;
 }
 
+/**
+ * Built once, not per render. These pages keep their modal open/closed state
+ * on the instance, so a fresh instance each render would throw that state away
+ * and the modal would never appear to open.
+ */
+const FUNDS_PAGE = seed(new FundsPage(NO_CLIENT, "church-abc"), {
+  funds: FUNDS,
+  isLoading: false,
+});
+
+const MEMBERS_PAGE = seed(new MembersPage(NO_CLIENT, "church-abc"), {
+  members: MEMBERS,
+  isLoading: false,
+});
+
 interface Screen {
   id: string;
   label: string;
   route: string;
   render: () => string;
+  /**
+   * Wire the page's own event listeners after its markup is in the DOM.
+   *
+   * Without this the harness was markup-only: every button rendered but
+   * nothing responded, so anything behind an interaction — the create/transfer
+   * modals, the approve confirmation, tab switches — looked frozen. The page
+   * instance has to be the *same* one that produced the markup, since that is
+   * where the open/closed state lives, so screens that need interaction build
+   * their instance once and reuse it across re-renders.
+   */
+  attach?: (root: HTMLElement, rerender: () => void) => void;
 }
 
 const SCREENS: Screen[] = [
@@ -495,21 +521,17 @@ const SCREENS: Screen[] = [
     id: "funds",
     label: "กองทุน",
     route: "/funds",
-    render: () =>
-      seed(new FundsPage(NO_CLIENT, "church-abc"), {
-        funds: FUNDS,
-        isLoading: false,
-      }).renderHtml(),
+    render: () => FUNDS_PAGE.renderHtml(),
+    attach: (root, rerender) =>
+      FUNDS_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "members",
     label: "สมาชิก",
     route: "/members",
-    render: () =>
-      seed(new MembersPage(NO_CLIENT, "church-abc"), {
-        members: MEMBERS,
-        isLoading: false,
-      }).renderHtml(),
+    render: () => MEMBERS_PAGE.renderHtml(),
+    attach: (root, rerender) =>
+      MEMBERS_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "dashboard-empty",
@@ -561,10 +583,20 @@ function render(): void {
 
   const screen = currentScreen();
   renderSwitcher(screen);
-  root.innerHTML = renderAppShellHtml(
-    { activeRoute: screen.route, user: USER, attention: ATTENTION },
-    screen.render(),
-  );
+
+  // paint() re-enters itself as the page's onStateChange: opening a modal
+  // mutates state on the page instance, so the screen must be redrawn and its
+  // listeners re-bound against the new nodes. Without the re-bind, the modal
+  // would open once and its close button would be inert.
+  const paint = (): void => {
+    root.innerHTML = renderAppShellHtml(
+      { activeRoute: screen.route, user: USER, attention: ATTENTION },
+      screen.render(),
+    );
+    screen.attach?.(root, paint);
+  };
+
+  paint();
   window.scrollTo(0, 0);
 }
 
