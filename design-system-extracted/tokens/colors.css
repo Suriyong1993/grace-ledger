@@ -184,76 +184,60 @@
 }
 
 /* --------------------------------------------------------------------------
-   Glass Ledger layer (2026-09-07 — D21, user-selected from UI Lab option C).
-   The Coral Vault palette above is untouched: every glass value is DERIVED
-   from the semantic tokens via color-mix(), so the dark theme inherits
-   matching tints with no second palette.
+   Surface layer — 2026-09-07, D27 "Premium Minimal" (supersedes the D21
+   Glass Ledger frost where stated). The user's direction brief: calm,
+   minimal, Apple-inspired surfaces — solid fills, hairline borders, soft
+   shadows, generous whitespace, and the accent used strategically.
 
-   Legibility contract:
-   - Content surfaces stay >= 78% opacity — a figure on a glass card reads on
-     near-solid paper; the frost lives behind the veil, not on the digit.
-   - Overlays (modal, sheet, popover, dropdown) stay OPAQUE --popover —
-     unchanged from D3/D15.
-   - prefers-reduced-transparency collapses all of this back to D15 solids.
+   The Coral Vault palette above is untouched and every value here derives
+   from it. Token NAMES are the public API and stay — components keep
+   compiling against --glass-*; only the values retire the frost:
+
+   - Cards, chrome and the vault are SOLID (no blur, no translucency).
+   - The workspace keeps exactly one faint coral veil, painted once on the
+     viewport (body, background-attachment: fixed) — the only ambience.
+   - The committing action is solid coral; the gradient ramp retires.
+   - Overlays (modal, sheet, popover, dropdown) stay opaque per D3.
    -------------------------------------------------------------------------- */
 :root {
-  /* surfaces */
-  --glass-card: color-mix(in srgb, var(--card) 78%, transparent);
-  --glass-hero: linear-gradient(
-    150deg,
-    color-mix(in srgb, var(--card) 94%, transparent) 0%,
-    color-mix(in srgb, var(--card) 66%, transparent) 100%
-  );
-  --glass-chrome: color-mix(in srgb, var(--card) 86%, transparent);
-  --glass-sidebar: color-mix(in srgb, var(--sidebar) 92%, transparent);
+  /* surfaces — solid */
+  --glass-card: var(--card);
+  --glass-hero: linear-gradient(165deg, var(--card) 0%, var(--secondary) 100%);
+  --glass-chrome: var(--card);
+  --glass-sidebar: var(--sidebar);
 
-  /* frost */
-  --glass-blur-surface: blur(20px) saturate(150%);
-  --glass-blur-chrome: blur(16px) saturate(140%);
+  /* frost — retired by D27; tokens kept so no consumer breaks */
+  --glass-blur-surface: none;
+  --glass-blur-chrome: none;
 
-  /* Ambient workspace glow — the only decoration the direction adds. Painted
-     once on the viewport (body, background-attachment: fixed), never inside
-     a component, so scrolling never re-samples it. Tints come from the three
-     hues the identity already owns: the coral brand ramp. */
+  /* Ambient workspace veil — one faint coral glow at the top edge, so the
+     paper canvas has direction without decoration. */
   --gl-ambient:
-    radial-gradient(920px 540px at 6% -10%, color-mix(in srgb, var(--gl-coral-500) 14%, transparent) 0%, transparent 60%),
-    radial-gradient(780px 480px at 102% -2%, color-mix(in srgb, var(--gl-coral-100) 85%, transparent) 0%, transparent 62%),
-    radial-gradient(720px 520px at 58% 112%, color-mix(in srgb, var(--gl-coral-700) 10%, transparent) 0%, transparent 60%);
+    radial-gradient(960px 520px at 100% -12%, color-mix(in srgb, var(--gl-coral-500) 8%, transparent) 0%, transparent 62%);
 
-  /* Primary action ramp (D21 §2, recoloured D25): vivid coral into deep coral
-     — the two brand corals the palette defines. The ramp darkens rightward
-     into the coral-700 anchor, which is also --primary, so the gesture ends on
-     the brand hue and white label text sits on the AA-safe end. Income emerald
-     is deliberately NOT in this ramp: brand and finance stay separate. */
-  --gl-primary-grad: linear-gradient(135deg, var(--gl-coral-500), var(--gl-coral-700));
-  --gl-primary-grad-hover: linear-gradient(135deg, var(--gl-coral-600), var(--gl-coral-800));
-  --gl-mark-grad: linear-gradient(140deg, var(--gl-coral-500), var(--gl-coral-700));
+  /* Primary action — solid coral. White label text lands on coral-700
+     (5.23:1, AA). Brand and finance stay separate: no income emerald here. */
+  --gl-primary-grad: var(--primary);
+  --gl-primary-grad-hover: var(--primary-dark);
+  --gl-mark-grad: var(--primary);
 
-  /* Vault chrome ambience (login vault) — coral glows over the near-black
-     vault gradient; same language as --gl-ambient, tuned for the dark panel. */
-  --gl-vault-grad: linear-gradient(160deg, var(--gl-black) 0%, var(--gl-coral-800) 160%);
+  /* Vault chrome (login) — near-black with one faint coral ember at the
+     lower corner, replacing the D21 double aurora fields. */
+  --gl-vault-grad: linear-gradient(165deg, var(--gl-black) 0%, color-mix(in srgb, var(--gl-coral-800) 24%, var(--gl-black)) 150%);
   --gl-vault-ambient:
-    radial-gradient(620px 380px at 10% 6%, color-mix(in srgb, var(--gl-coral-500) 30%, transparent) 0%, transparent 62%),
-    radial-gradient(520px 360px at 90% 96%, color-mix(in srgb, var(--gl-coral-700) 45%, transparent) 0%, transparent 60%);
+    radial-gradient(560px 380px at 88% 94%, color-mix(in srgb, var(--gl-coral-700) 24%, transparent) 0%, transparent 60%);
 }
 
 .dark {
   --gl-ambient:
-    radial-gradient(920px 540px at 6% -10%, color-mix(in srgb, var(--primary) 20%, transparent) 0%, transparent 60%),
-    radial-gradient(780px 480px at 102% -2%, color-mix(in srgb, var(--warning) 10%, transparent) 0%, transparent 62%),
-    radial-gradient(720px 520px at 58% 112%, color-mix(in srgb, var(--gl-coral-700) 26%, transparent) 0%, transparent 60%);
+    radial-gradient(960px 520px at 100% -12%, color-mix(in srgb, var(--primary) 16%, transparent) 0%, transparent 62%);
 }
 
-/* An explicit OS-level preference for opaque UI collapses the glass layer
-   back to D15 solids through the tokens alone — no second code path. */
+/* An explicit OS-level preference for opaque UI: every surface is already
+   solid under D27 — only the ambient veil is transparency, and this removes
+   it. No component carries a fallback branch. */
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --glass-card: var(--card);
-    --glass-hero: var(--card);
-    --glass-chrome: var(--card);
-    --glass-sidebar: var(--sidebar);
-    --glass-blur-surface: none;
-    --glass-blur-chrome: none;
     --gl-ambient: none;
   }
 }

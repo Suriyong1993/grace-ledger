@@ -10,13 +10,13 @@
 }
 
 :root{
-  /* Glass Ledger (D21) — the frosted surface gets real elevation: an inner
-     paper highlight plus a deep, warm-ink tinted ambient drop. Still no pure
-     black; the button shadow borrows the coral of the gradient above it. */
-  --shadow-glass-card:inset 0 1px 1px rgb(255 255 255 / 0.65), 0 20px 44px -32px rgb(40 22 16 / 0.45);
-  --shadow-glass-btn:0 10px 24px -12px rgb(193 63 46 / 0.42);
+  /* D27 "Premium Minimal" — soft, warm elevation instead of the D21 frost
+     drop: a hairline inner top highlight so the card edge reads against
+     paper, a crisp 1-2px contact shadow, and a long soft fall-off. */
+  --shadow-glass-card:inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 2px rgb(28 22 18 / 0.04), 0 16px 32px -24px rgb(28 22 18 / 0.14);
+  --shadow-glass-btn:0 8px 20px -12px rgb(193 63 46 / 0.45);
 }
 .dark{
-  --shadow-glass-card:inset 0 1px 1px rgb(255 255 255 / 0.05), 0 20px 44px -30px rgb(0 0 0 / 0.8);
-  --shadow-glass-btn:0 10px 26px -12px rgb(249 92 75 / 0.42);
+  --shadow-glass-card:inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 32px -24px rgb(0 0 0 / 0.7);
+  --shadow-glass-btn:0 10px 26px -12px rgb(249 92 75 / 0.45);
 }
