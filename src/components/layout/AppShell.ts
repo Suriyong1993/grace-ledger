@@ -384,7 +384,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       min-height: var(--touch-target-min);
       padding: var(--space-2) var(--space-3);
       margin-bottom: 2px;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       font-size: var(--text-sm);
       font-weight: var(--weight-medium);
       text-decoration: none;
@@ -438,7 +438,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     .gl-shell-mark {
       width: 36px;
       height: 36px;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-lg);
       background: var(--sidebar-primary);
       color: var(--sidebar-primary-foreground);
       display: flex;
@@ -507,7 +507,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       gap: var(--space-1);
       min-height: var(--touch-target-min);
       padding: 0 var(--space-4);
-      border-radius: var(--radius-full);
+      border-radius: var(--radius-button);
       text-decoration: none;
       font-size: var(--text-sm);
       font-weight: var(--weight-semibold);
@@ -727,7 +727,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
       <!-- Mobile/Desktop Top Header -->
       <header class="gl-shell-topbar" style="
         min-height: var(--gl-topbar-h);
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid var(--border-subtle);
         background: var(--card);
         display: flex;
         align-items: center;

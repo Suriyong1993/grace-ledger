@@ -37,40 +37,33 @@ const ALLOWLIST = {
   // accounted for here:
   //   font-size 0, border-radius 2 — two hairline/pill radii below the
   //     smallest radius token. R6 cleanup.
-  //   rgb/rgba 5 — two overlay scrims that need a plain black veil (2), and
-  //     three faint ink-tinted shadows written inline rather than as tokens
-  //     (3). R6 cleanup.
-  //   hex 9 — the print stylesheet, which must use pure black and white on
-  //     paper.
-  //   The dev-only HMR badge previously accounted for one of each of the
-  //     above; it was removed with its stylesheet block (see D26b).
-  //   backdrop-filter 20 — the first 4 are overlay scrims (modal backdrop pair,
-  //     sticky mobile action bar pair). The other 16 are the D21
-  //     Glass Ledger surfaces the user selected in the 2026-09-07 direction
-  //     review, each written standard + -webkit- pair: .gl-card,
-  //     .gl-card--elevated, .gl-dash-hero, .gl-shell-topbar, .gl-topbar,
-  //     .gl-mobilenav, .gl-login-card, .gl-sidebar. All blur strengths and
-  //     opacities are tokens (--glass-*) with a prefers-reduced-transparency
-  //     collapse; overlays stay opaque per D3.
-  //     Was 22 until the D26 dead-CSS sweep removed .gl-sheet-backdrop, an
-  //     unreferenced overlay pair — no markup ever rendered that class.
+  //   rgb/rgba 4 — two plain-black overlay scrims that need a pure black
+  //     veil (modal backdrop, attention panel), and two faint ink-tinted
+  //     shadows written inline rather than as tokens. R6 cleanup.
+  //   hex 9 — the print stylesheet (pure black/white/gray on paper) plus one
+  //     sky-blue mention inside a CSS comment.
+  //   backdrop-filter 2 — the modal backdrop scrim pair (blur on the *veil*,
+  //     not on any content surface). The 16 D21 Glass Ledger surfaces that
+  //     previously blurred were retired by D27 "Premium Minimal" — content
+  //     surfaces are solid again, and the frost tokens (--glass-blur-*)
+  //     remain valued `none` so no consumer breaks.
   "src/styles/app.css": {
     "literal font-size": 0,
     "literal border-radius": 2,
-    "rgba()/rgb() color literal": 5,
+    "rgba()/rgb() color literal": 4,
     "hex color literal": 9,
-    "backdrop-filter": 20,
+    "backdrop-filter": 2,
   },
 
-  // Login screen stylesheet — D21 Glass Ledger: the login card is frosted
-  // over the ambient workspace glow (standard + -webkit- pair). All glass
-  // VALUES stay in tokens; no literals enter this file (color-mix only).
+  // Login screen stylesheet — D27: the vault is a solid near-black field
+  // with one static coral ember; the login card is solid paper. No blur
+  // remains on this screen, so its D21 allowlist entry retires.
   "src/components/login/loginStyles.ts": {
     "literal font-size": 0,
     "literal border-radius": 0,
     "rgba()/rgb() color literal": 0,
     "hex color literal": 0,
-    "backdrop-filter": 2,
+    "backdrop-filter": 0,
   },
 
   // Confirmation modal uses ad-hoc semantic tints instead of --pending-muted/--expense-muted. R3/R6 cleanup.

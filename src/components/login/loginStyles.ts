@@ -1,23 +1,24 @@
 /**
- * Login-screen layout & styling — "Aurora Vault" (D24).
+ * Login-screen layout & styling — "Aurora Vault" (D24), refined by D27.
  *
  * The sign-in scene is the one screen with no data on it, so it is the one
  * place the identity may speak at full volume. The whole viewport becomes the
- * dark vault (--gl-vault-grad) lit by two slow aurora fields built from the
- * Coral Vault brand ramp; a single frosted paper card floats at the centre of
- * it. Everything inside the card is the same paper language as the app, so the
+ * dark vault (--gl-vault-grad) with a single static coral ember
+ * (--gl-vault-ambient); one solid paper card floats at the centre of it.
+ * Everything inside the card is the same paper language as the app, so the
  * handover from login to dashboard is continuous. No finance hue appears here:
  * there is no money on this screen, so income emerald would be meaningless.
  *
  * Strict design-system tokens throughout: color-mix() derives every tint from
- * a token, so no literal colour, radius, or font-size enters this file. The
- * card keeps the single frosted surface (standard + -webkit- pair) allowed by
- * scripts/lint-design.mjs; nothing else blurs.
+ * a token, so no literal colour, radius, or font-size enters this file, and
+ * nothing blurs (D27 — the D21 frosted card retired with its allowlist entry).
  */
 export function renderLoginStylesHtml(): string {
   return `<style>
     /* ---------------------------------------------------------------
-       Scene — the dark vault fills the viewport
+       Scene — the dark vault fills the viewport. D27 "Premium Minimal":
+       one static coral ember (--gl-vault-ambient) replaces the two
+       drifting aurora fields — calm ambience, no moving decoration.
        --------------------------------------------------------------- */
     .gl-login-screen {
       min-height: 100vh;
@@ -28,55 +29,13 @@ export function renderLoginStylesHtml(): string {
       justify-content: center;
       padding: var(--space-6) var(--space-4);
       background-color: var(--gl-black);
-      background-image: var(--gl-vault-grad);
+      background-image: var(--gl-vault-grad), var(--gl-vault-ambient);
+      background-attachment: fixed;
       color: var(--sidebar-foreground);
       font-family: var(--font-sans);
       position: relative;
       overflow: hidden;
       isolation: isolate;
-    }
-
-    /* Two aurora fields drift across the vault. They are pure decoration on a
-       screen with no figures, so the movement can be slow and large without
-       competing with anything the user must read. */
-    .gl-login-screen::before,
-    .gl-login-screen::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      pointer-events: none;
-      border-radius: var(--radius-full);
-      filter: blur(90px);
-    }
-
-    .gl-login-screen::before {
-      width: 68vmax;
-      height: 68vmax;
-      top: -28vmax;
-      left: -22vmax;
-      background:
-        radial-gradient(closest-side, color-mix(in srgb, var(--gl-coral-500) 58%, transparent), transparent 72%);
-      animation: gl-aurora-a 22s var(--ease-in-out) infinite alternate;
-    }
-
-    .gl-login-screen::after {
-      width: 56vmax;
-      height: 56vmax;
-      right: -20vmax;
-      bottom: -24vmax;
-      background:
-        radial-gradient(closest-side, color-mix(in srgb, var(--gl-coral-700) 55%, transparent), transparent 72%);
-      animation: gl-aurora-b 26s var(--ease-in-out) infinite alternate;
-    }
-
-    @keyframes gl-aurora-a {
-      from { transform: translate3d(0, 0, 0) scale(1); }
-      to   { transform: translate3d(8vmax, 6vmax, 0) scale(1.12); }
-    }
-
-    @keyframes gl-aurora-b {
-      from { transform: translate3d(0, 0, 0) scale(1.06); }
-      to   { transform: translate3d(-7vmax, -5vmax, 0) scale(1); }
     }
 
     /* A faint vertical rule grid gives the vault a machined texture and keeps
@@ -273,19 +232,17 @@ export function renderLoginStylesHtml(): string {
     }
 
     /* ---------------------------------------------------------------
-       Card — one frosted paper surface floating on the vault
+       Card — one solid paper surface floating on the vault (D27)
        --------------------------------------------------------------- */
     .gl-login-card {
       width: 100%;
       max-width: 460px;
-      background: color-mix(in srgb, var(--card) 92%, transparent);
+      background: var(--glass-card);
       border: 1px solid color-mix(in srgb, var(--gl-white) 60%, transparent);
       border-radius: var(--radius-sheet);
       box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--gl-white) 70%, transparent),
         var(--shadow-glass-card);
-      backdrop-filter: var(--glass-blur-surface);
-      -webkit-backdrop-filter: var(--glass-blur-surface);
       padding: var(--space-8) var(--space-6) var(--space-6);
       display: flex;
       flex-direction: column;

@@ -144,17 +144,17 @@ body {
 
 .gl-page-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
   margin-bottom: var(--space-6);
-  padding-bottom: var(--space-5);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
+  /* D27: whitespace is the separator — no hairline under the title. */
+  padding-bottom: 0;
 }
 
 .gl-page-header h1 {
   font-family: var(--font-display);
-  font-size: clamp(var(--text-xl), 2.4vw, var(--text-3xl));
+  font-size: clamp(var(--text-2xl), 2.6vw, var(--text-4xl));
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-heading);
   color: var(--foreground);
@@ -189,9 +189,9 @@ body {
 
 .gl-section__head h2 {
   font-family: var(--font-display);
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   color: var(--foreground);
   margin: 0;
 }
@@ -199,17 +199,15 @@ body {
 /* --------------------------------------------------------------------------
    Surfaces
    -------------------------------------------------------------------------- */
-/* Glass Ledger (D21): frosted paper card over the fixed ambient glow.
-   --glass-card stays >=78% opaque so figures read as on paper; the blur
-   sits behind that veil. Overlays (modal/sheet/popover) stay opaque. */
+/* D27 "Premium Minimal": solid paper cards with a hairline border and a soft
+   warm shadow — subtle depth, no frost. Overlays (modal/sheet/popover) stay
+   opaque per D3. */
 .gl-card {
   background: var(--glass-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);
   padding: var(--space-5);
   box-shadow: var(--shadow-glass-card);
-  backdrop-filter: var(--glass-blur-surface);
-  -webkit-backdrop-filter: var(--glass-blur-surface);
 }
 
 .gl-card--tight {
@@ -328,18 +326,13 @@ button.gl-card:active {
   color: var(--muted-foreground);
 }
 
-/* D21 §2 (recoloured D25): the one committing action per screen runs on the
-   direction's coral ramp with a coral-tinted lift shadow. The ramp uses only
-   brand hues — no finance colour, so a committing action can never be confused
-   with an income figure; the disabled state below still wins over it, so a
-   non-committable action never glows.
-   U1: full pill shape — the committing action is the roundest thing on
-   screen, matching the reference direction. */
 .gl-btn--primary {
   background: var(--gl-primary-grad);
   color: var(--primary-foreground);
   box-shadow: var(--shadow-glass-btn);
-  border-radius: var(--radius-full);
+  /* D27: solid coral with the same 16px corner every button carries — the
+     pill shape is reserved for floating chrome (chips, mobile nav, FAB). */
+  border-radius: var(--radius-button);
 }
 
 .gl-btn--primary:hover:not(:disabled) {
@@ -400,7 +393,7 @@ button.gl-card:active {
 .gl-btn--secondary,
 .gl-btn--ghost,
 .gl-btn--destructive {
-  box-shadow: 0 1px 2px rgb(16 32 24 / 0.025);
+  box-shadow: var(--shadow-xs);
 }
 
 /* Compact button. The touch target stays at the documented minimum by default;
@@ -947,15 +940,14 @@ button.gl-card:active {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted-foreground);
-  /* D21: 66% stone over the glass card — the head stripe stays visible
-     without blocking the frost with a fully solid patch. */
-  background: color-mix(in srgb, var(--secondary) 66%, transparent);
+  /* D27: the head is a rule, not a fill — minimal surfaces stay quiet. */
+  background: transparent;
   border-bottom: 1px solid var(--border);
 }
 
 .gl-table td {
   padding: var(--table-cell-y) var(--table-cell-x);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
   vertical-align: middle;
 }
 
@@ -981,7 +973,8 @@ button.gl-card:active {
 }
 
 .gl-table tbody tr:hover {
-  background: var(--accent);
+  /* D27: a 5% coral wash guides the eye without flashing. */
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
 }
 
 .gl-table .is-right {
@@ -1103,11 +1096,9 @@ button.gl-card:active {
     );
     z-index: 150;
     background: var(--glass-chrome);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-elevated);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
     margin: 0;
     padding: var(--space-3);
   }
@@ -1312,12 +1303,11 @@ button.gl-card:active {
     z-index: 200;
     display: flex;
     /* U2: the scrollable strip is the inner track — the pill itself keeps
-       overflow: visible so the raised centre FAB is never clipped. */
+       overflow: visible so the raised centre FAB is never clipped.
+       D27: solid card, hairline border, elevated shadow. */
     overflow: visible;
     background: var(--glass-chrome);
-    backdrop-filter: var(--glass-blur-chrome);
-    -webkit-backdrop-filter: var(--glass-blur-chrome);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-full);
     padding-bottom: 0;
     box-shadow: var(--shadow-elevated);
@@ -1352,7 +1342,7 @@ button.gl-card:active {
     place-items: center;
     background: var(--gl-primary-grad);
     color: var(--primary-foreground);
-    /* Emerald lift + a frosted halo separating the FAB from the pill. */
+    /* Coral lift + a paper halo separating the FAB from the pill. */
     box-shadow:
       var(--shadow-glass-btn),
       0 0 0 6px color-mix(in srgb, var(--background) 55%, transparent);
@@ -1898,15 +1888,12 @@ button.gl-card:active {
   display: flex;
   flex-direction: column;
   position: relative;
-  /* Glass Ledger (D21): the screen's focal card carries the fullest frost —
-     94→66% white over the ambient glow, blur beneath, glass elevation. The
-     amount itself sits on the 94% end of the ramp, unchanged in color. */
+  /* D27: the focal card carries a whisper paper→stone ramp (--glass-hero) —
+     solid, with the same hairline border and soft shadow as every card. */
   background: var(--glass-hero);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-glass-card);
-  backdrop-filter: var(--glass-blur-surface);
-  -webkit-backdrop-filter: var(--glass-blur-surface);
   overflow: hidden;
   transition:
     border-color var(--duration-micro) var(--ease-out),
@@ -2441,8 +2428,6 @@ a.gl-row:focus-visible {
   overflow: hidden;
   box-shadow: var(--shadow-glass-card);
   background: var(--glass-card);
-  backdrop-filter: var(--glass-blur-surface);
-  -webkit-backdrop-filter: var(--glass-blur-surface);
 }
 
 .gl-table tbody tr:hover {
@@ -2455,12 +2440,9 @@ a.gl-row:focus-visible {
 }
 
 .gl-sidebar {
-  /* Glass Ledger (D21): the vault chrome goes 92% translucent so the fixed
-     ambient glow breathes through the sidebar edge; the frost lives behind
-     near-black, so legibility of nav items is unaffected. */
+  /* D27: solid vault chrome (--glass-sidebar); the edge rule stays as the
+     single depth cue between the vault and the paper workspace. */
   box-shadow: 1px 0 0 var(--sidebar-border);
-  backdrop-filter: var(--glass-blur-chrome);
-  -webkit-backdrop-filter: var(--glass-blur-chrome);
 }
 
 .gl-nav-item--active {
@@ -2670,10 +2652,8 @@ a.gl-row:focus-visible {
 .gl-shell-topbar {
   padding-inline: clamp(16px, 3vw, 32px) !important;
   background: var(--glass-chrome) !important;
-  border-bottom: 1px solid var(--border) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
   box-shadow: none !important;
-  backdrop-filter: var(--glass-blur-chrome);
-  -webkit-backdrop-filter: var(--glass-blur-chrome);
 }
 
 .gl-shell-topbar__title {
@@ -3748,11 +3728,9 @@ a {
   gap: var(--space-3);
   height: var(--gl-topbar-h);
   padding: 0 var(--space-4);
-  /* Same Glass Ledger chrome as the shell bar (D21). */
+  /* D27: solid chrome like the shell bar. */
   background: var(--glass-chrome);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: var(--glass-blur-chrome);
-  -webkit-backdrop-filter: var(--glass-blur-chrome);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .gl-shell-icon-btn {
@@ -4104,8 +4082,6 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-glass-card);
-  backdrop-filter: var(--glass-blur-surface);
-  -webkit-backdrop-filter: var(--glass-blur-surface);
 }
 
 @media (max-width: 390px) {
