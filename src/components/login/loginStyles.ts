@@ -842,6 +842,21 @@ export function renderLoginStylesHtml(): string {
       animation: gl-spin 0.6s linear infinite;
     }
 
+    /* Dev-only harness notice. Deliberately loud enough to never be mistaken
+       for production chrome; it only renders on a dev build. */
+    .gl-login-devnotice {
+      width: 100%;
+      margin: 0 0 var(--space-4);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-lg);
+      border: 1px dashed var(--pending);
+      background: var(--pending-muted);
+      color: var(--on-pending-muted);
+      font-size: var(--text-2xs);
+      line-height: var(--leading-body);
+      text-align: center;
+    }
+
     .gl-pin-banner {
       width: 100%;
       padding: var(--space-3);

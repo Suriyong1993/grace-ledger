@@ -180,3 +180,21 @@ describe("verifyPin", () => {
     expect(result).toEqual({ status: "unavailable" });
   });
 });
+
+describe("dev roster fallback", () => {
+  it("only offers demo rows on a dev build, and marks them as demo ids", async () => {
+    const { isDevRosterFallbackEnabled, DEV_FALLBACK_PROFILES, isDevProfile } =
+      await import("../../src/services/devRoster");
+
+    // Vitest runs with import.meta.env.DEV true; a production bundle sets it
+    // false and Vite then drops the fallback branch entirely.
+    expect(isDevRosterFallbackEnabled()).toBe(import.meta.env.DEV === true);
+    expect(DEV_FALLBACK_PROFILES.length).toBeGreaterThan(0);
+    for (const profile of DEV_FALLBACK_PROFILES) {
+      expect(isDevProfile(profile.id)).toBe(true);
+      expect(profile.name.length).toBeGreaterThan(0);
+      expect(profile.initials.length).toBeGreaterThan(0);
+    }
+    expect(isDevProfile("f0fc6cdd-07ad-4d76-8fe6-80427525d340")).toBe(false);
+  });
+});

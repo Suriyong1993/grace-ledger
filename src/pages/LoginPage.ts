@@ -20,6 +20,7 @@ import {
   requestPinBootstrap,
   verifyPin,
 } from "../services/authPinService";
+import { isDevProfile } from "../services/devRosterMarker";
 
 type LoginView = "profiles" | "pin";
 type PinAuthHandler = (userId: string) => void;
@@ -67,6 +68,8 @@ export class LoginPage {
   private profiles: LoginProfile[] = [];
   private profilesStatus: ProfilesStatus = "loading";
   private profilesLoadStarted = false;
+  /** True while the visible roster is the dev harness, not the church's. */
+  private isDevRoster = false;
 
   private root: HTMLElement | null = null;
   private handlers: LoginPageHandlers | null = null;
@@ -94,6 +97,7 @@ export class LoginPage {
 
         <main class="gl-login-workspace">
           <div class="gl-login-card${isNarrow ? " gl-login-card--narrow" : ""}">
+            ${this.renderDevRosterNoticeHtml()}
             ${this.renderViewHtml()}
             <div class="gl-login-trust-badge">
               <span aria-hidden="true">${VAULT_LOCK_SVG}</span>
@@ -110,6 +114,17 @@ export class LoginPage {
         <p class="gl-vault-foot">ระบบบัญชีและการเงินคริสตจักร</p>
       </div>
     </div>`;
+  }
+
+  /**
+   * A demo roster must never be mistaken for the real one, so it says so on
+   * the screen for as long as it is showing.
+   */
+  private renderDevRosterNoticeHtml(): string {
+    if (!this.isDevRoster) return "";
+    return `<p class="gl-login-devnotice" role="status">
+      โหมดพัฒนา · เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กำลังแสดงรายชื่อตัวอย่างเพื่อดูหน้าจอเท่านั้น (เข้าสู่ระบบจริงไม่ได้)
+    </p>`;
   }
 
   private renderViewHtml(): string {
@@ -183,10 +198,34 @@ export class LoginPage {
     if (result.status === "ready") {
       this.profiles = result.profiles;
       this.profilesStatus = "ready";
-    } else {
-      this.profiles = [];
-      this.profilesStatus = result.status;
+      this.isDevRoster = false;
+      this.rerender();
+      return;
     }
+
+    // The roster endpoint is unreachable. On a dev build only — a preview
+    // sandbox or a machine outside the function's CORS allowlist — fall back to
+    // the demo roster so the screen can still be reviewed. Production keeps the
+    // honest error state; see services/devRoster.ts.
+    // import.meta.env.DEV is a compile-time constant, so this whole branch —
+    // and the dynamic import of the demo names with it — is dropped from a
+    // production build rather than merely being unreachable at runtime.
+    if (result.status === "error" && import.meta.env.DEV) {
+      console.warn(
+        "login-profiles unreachable — showing the dev demo roster. " +
+          "Sign-in still requires the real verify-pin endpoint.",
+      );
+      const { DEV_FALLBACK_PROFILES } = await import("../services/devRoster");
+      this.profiles = [...DEV_FALLBACK_PROFILES];
+      this.profilesStatus = "ready";
+      this.isDevRoster = true;
+      this.rerender();
+      return;
+    }
+
+    this.profiles = [];
+    this.profilesStatus = result.status;
+    this.isDevRoster = false;
     this.rerender();
   }
 
@@ -341,6 +380,18 @@ export class LoginPage {
     const profile = this.selectedProfile;
     const pin = this.pin;
     if (!profile) return;
+
+    // A demo row has no server-side identity: verify-pin would reject it after
+    // a pointless round trip (or hang, since the backend is why the fallback
+    // engaged). Say so immediately instead.
+    if (isDevProfile(profile.id)) {
+      this.pin = "";
+      this.pinLockedUntil = null;
+      this.pinStatus = "unavailable";
+      this.rerender();
+      this.shakePinGroup();
+      return;
+    }
 
     const outcome = await verifyPin(this.supabase, profile.id, pin);
     this.pin = "";
