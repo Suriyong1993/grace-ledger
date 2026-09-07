@@ -257,6 +257,21 @@ export class App {
     ].filter((entry): entry is { button: HTMLElement; panel: HTMLElement } =>
       Boolean(entry.button && entry.panel),
     );
+    // Retry wiring must happen before the popover guard below. Both popovers
+    // are conditional (attention needs read permission, "more" needs mobile
+    // overflow), so a restricted role renders neither — and an early return
+    // here used to leave the dashboard retry button dead for exactly the
+    // users most likely to hit a load error.
+    root
+      .querySelectorAll<HTMLButtonElement>(
+        "[data-attention-retry], #dash-attention-retry",
+      )
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          void this.render();
+        });
+      });
+
     if (popovers.length === 0) return;
 
     const openPopovers = () => popovers.filter(({ panel }) => !panel.hidden);
@@ -298,18 +313,6 @@ export class App {
     };
     document.addEventListener("keydown", this.shellDocumentKeydown);
 
-    // Attention panel + dashboard retry both re-render (refetching the
-    // summary) instead of partially patching.
-    root
-      .querySelector<HTMLButtonElement>("[data-attention-retry]")
-      ?.addEventListener("click", () => {
-        void this.render();
-      });
-    root
-      .querySelector<HTMLButtonElement>("#dash-attention-retry")
-      ?.addEventListener("click", () => {
-        void this.render();
-      });
   }
 
   public async render(): Promise<void> {

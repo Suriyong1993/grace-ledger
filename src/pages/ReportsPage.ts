@@ -41,6 +41,16 @@ export class ReportsPage {
   private historicalAllMonths: HistoricalMonthlySummary[] = [];
 
   private isLoading = true;
+  /**
+   * Monotonic token identifying the newest in-flight load.
+   *
+   * Rapid tab switching starts overlapping requests, and they can resolve out
+   * of order: a slow January response arriving after a fast March one used to
+   * overwrite March's data while the March tab stayed selected, showing the
+   * user numbers for a period they were no longer looking at. Every load
+   * captures the token and refuses to publish if a newer load has started.
+   */
+  private loadToken = 0;
   private errorMessage: string | null = null;
   private leadership: ChurchLeadership | null = null;
 
@@ -58,6 +68,14 @@ export class ReportsPage {
   }
 
   public async loadData(): Promise<void> {
+    const token = ++this.loadToken;
+    const isStale = (): boolean => token !== this.loadToken;
+    // Capture the period this request is for. Everything below runs after an
+    // await, so reading this.selectedPeriod later would let a request that
+    // started for August silently retarget to whatever the user picked while
+    // it was in flight, and the two requests would race for the same period.
+    const period = this.selectedPeriod;
+
     this.isLoading = true;
     this.errorMessage = null;
     this.statement = null;
@@ -69,7 +87,7 @@ export class ReportsPage {
     await this.loadLeadership();
 
     try {
-      if (this.selectedPeriod === "2026-year") {
+      if (period === "2026-year") {
         // Load Grand Totals & all historical months + live August
         const [histMonthsRes, histGrandRes, liveStmtRes] = await Promise.all([
           this.historicalService.getMonthlySummaries(this.churchId, 2569),
@@ -81,6 +99,7 @@ export class ReportsPage {
           ),
         ]);
 
+        if (isStale()) return;
         if (histMonthsRes.success && histMonthsRes.data) {
           this.historicalAllMonths = histMonthsRes.data;
         }
@@ -90,9 +109,9 @@ export class ReportsPage {
         if (liveStmtRes.success && liveStmtRes.data) {
           this.statement = liveStmtRes.data;
         }
-      } else if (HistoricalService.isHistoricalPeriod(this.selectedPeriod)) {
+      } else if (HistoricalService.isHistoricalPeriod(period)) {
         // Historical month (2026-01 to 2026-07)
-        const monthNum = parseInt(this.selectedPeriod.split("-")[1], 10);
+        const monthNum = parseInt(period.split("-")[1], 10);
         const [monthRes, weeklyRes] = await Promise.all([
           this.historicalService.getMonthlySummaryByMonth(
             this.churchId,
@@ -106,6 +125,7 @@ export class ReportsPage {
           ),
         ]);
 
+        if (isStale()) return;
         if (!monthRes.success) {
           this.errorMessage =
             monthRes.error || "ไม่สามารถโหลดข้อมูลย้อนหลังได้";
@@ -115,12 +135,12 @@ export class ReportsPage {
         }
       } else {
         // Live Accounting month (2026-08+)
-        const periodStart = `${this.selectedPeriod}-01`;
-        const [periodYear, periodMonth] = this.selectedPeriod
+        const periodStart = `${period}-01`;
+        const [periodYear, periodMonth] = period
           .split("-")
           .map(Number);
         const lastDay = new Date(periodYear, periodMonth, 0).getDate();
-        const periodEnd = `${this.selectedPeriod}-${String(lastDay).padStart(2, "0")}`;
+        const periodEnd = `${period}-${String(lastDay).padStart(2, "0")}`;
 
         const res = await this.reportsService.getStatementOfFinancialPosition(
           this.churchId,
@@ -128,6 +148,7 @@ export class ReportsPage {
           periodEnd,
         );
 
+        if (isStale()) return;
         if (!res.success) {
           this.errorMessage = res.error || "ไม่สามารถโหลดงบการเงินได้";
         } else {
@@ -135,10 +156,12 @@ export class ReportsPage {
         }
       }
     } catch {
+      if (isStale()) return;
       this.errorMessage =
         "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง";
     } finally {
-      this.isLoading = false;
+      // A superseded request must not clear the spinner the newer one owns.
+      if (!isStale()) this.isLoading = false;
     }
   }
 
