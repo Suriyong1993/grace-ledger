@@ -7,21 +7,29 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
-> **อัปเดต 2026-09-06 (Arena Agent):** ผู้ใช้ต้องการ "adapt" UI จากภาพอ้างอิงที่แนบมา (6 ภาพ) ให้เป็น **Premium UI**
-> แต่เอเจนต์ในเซสชันนี้ **ไม่มี vision capability** และไฟล์แนบไม่ปรากฏใน sandbox (`/home/user/uploads/` ไม่มีอยู่จริง)
-> → ทางออกที่ทำไว้แล้ว: สร้าง **UI Lab** (`ui-lab/`) เป็น mockup premium 3 แบบให้ผู้ใช้เลือกในเบราว์เซอร์
-> (พอร์ต 5501) + เตรียมสคริปต์วิเคราะห์ภาพ `scripts/analyze-ui-reference.py` (OCR + palette + แถบเลย์เอาต์)
-> ไว้ใช้ทันทีเมื่อได้ไฟล์ภาพจริง (เช่น ผู้ใช้ commit รูปเข้า branch นี้)
-> **สถานะ:** `WAITING_USER_PICK` — รอผู้ใช้เลือกแบบ A/B/C (หรือผสม) ก่อนลงมือแก้ `src/` จริง
+> **อัปเดต 2026-09-07 (Arena Agent, session `01a07c8e-grace-ledger`):**
+> ผู้ใช้ให้ **design-direction brief เป็นข้อความ** (Premium / Modern / Minimal —
+> Apple-inspired, มุมมน 16–24px, เงานุ่ม, ขอบบาง, accent ใช้อย่างมีวินัย)
+> ภาพแนบไม่เข้า sandbox และ agent session นี้ไม่มี vision → ทำงานตาม brief ข้อความแทน
+> ผลลัพธ์: **D27 "Premium Minimal"** ลงแล้ว 3 commits (`7596573`, `1f98c1f`, `ebb3d4e`)
+> บน branch `arena/01a07c8e-grace-ledger` (รวม 25 commits ของ session ก่อนหน้าแล้ว)
+> **สถานะ:** `DONE_PENDING_USER_REVIEW` — เปิด preview (port 5500, `/preview.html`)
+> ให้ผู้ใช้รีวิวที่ desktop + มือถือ
 
-- **เป้าหมายหลัก (Goal):** Visual Drift Fix — ลด visual drift ให้เข้า Emerald Vault identity (EmptyState component + inline style cleanup)
-- **สถานะรวม (Overall Status):** `WAITING_USER_REVIEW` (ทำเสร็จ 8/9 ขั้น, รอจับภาพ screenshot + ตรวจสอบ changelog)
-- **Agent ที่กำลังทำงาน (Active Agent):** Claude Code
-- **อัปเดตล่าสุด (Last Updated):** 2026-09-04 18:55 (Asia/Bangkok)
+- **เป้าหมายหลัก (Goal):** D27 Premium Minimal redesign — token-first, surface-second, page-by-page; ไม่แตะ business logic
+- **สถานะรวม (Overall Status):** 3/4 เฟสเสร็จ (tokens ✓ · surfaces/chrome ✓ · page pass ✓ · docs+push รอบสุดท้าย)
+- **Agent ที่กำลังทำงาน (Active Agent):** Arena Agent
+- **อัปเดตล่าสุด (Last Updated):** 2026-09-07 ~16:30 (Asia/Bangkok)
 
 ---
 
 ## 2. งานที่ทำเสร็จสิ้น (Completed Tasks)
+
+- [x] D27a — token layer: radius button 16px/input 14px; `--glass-*` → solid; ambient เหลือ 1 ชั้น; primary solid coral; vault สงบ (1 ember); shadow นุ่ม
+- [x] D27b — surface sweep: การ์ด/chrome ทึบ + `--border-subtle` + shadow ใหม่; ลบ backdrop-filter 18 จุด (เหลือ modal scrim); page-header ไร้เส้นขีด + ใหญ่ขึ้น; table head เป็น rule; login card ทึบ
+- [x] D27c — page pass: `.gl-txn-summary` ได้ CSS แรก (tiles พาสเทลเหมือน hero); **V11 fixed** (loading skeleton ทรงเดียวกับหน้าเต็ม); hover wash รวม 6 จุดเป็น `--gl-hover-wash`; funds balance เป็น neutral; profile links/offering KPI เข้า token เดียวกัน
+- [x] Verification: typecheck ✓ · lint:design ✓ (allowlist รัด: backdrop 20→2, rgb 5→4) · **721 passed / 24 skipped** ✓ · build ✓
+- [ ] เปิด PR / push รอบสุดท้าย + รอผู้ใช้รีวิว preview
 
 - [x] จัดทำเอกสาร UX/UI Audit: `docs/ONE_DAY_UX_AUDIT.md` ครอบคลุมเป้าหมาย Modern Financial Dashboard 2026
 - [x] ยกระดับการเข้าถึงและความปลอดภัย (Accessibility & Factual Indicators):

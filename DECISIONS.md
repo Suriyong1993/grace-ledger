@@ -827,3 +827,61 @@ after a close, which is the case a single non-recursive bind would fail.
 
 TransactionsPage exposes no `attachEventListeners`, so its screen stays
 markup-only for now — noted rather than papered over.
+
+## D27 — "Premium Minimal" direction (supersedes D21's frost where stated)
+
+**Decision (2026-09-07).** The user supplied a full visual-direction brief:
+premium, modern, minimal — Apple-inspired simplicity, generous whitespace,
+large rounded corners (≈16–24px), soft shadows, minimal low-contrast borders,
+a restrained palette (paper `#f6f4f1`, stone `#e4ded2`, coral `#f95c4b`,
+black), and the accent used strategically rather than everywhere. The Coral
+Vault palette (D25) already matched the brief's four base colours exactly, so
+**no hue changes** — what changes is surface language, hierarchy and
+consistency. Implemented token-first, surface-second, page-by-page, per the
+brief's own method.
+
+**What retires (D21 superseded exactly where stated):**
+
+1. **Frost.** Cards, hero, topbar, sidebar, mobilenav and the login card are
+   SOLID again: `--glass-card/--glass-chrome/--glass-sidebar` revalue to their
+   plain surfaces, `--glass-blur-*` to `none`, and the `backdrop-filter`
+   properties are removed from every content surface. Only the modal
+   backdrop's scrim blur remains (blur on the veil, not on content — D3).
+2. **Gradient ramp + drifting auroras.** `--gl-primary-grad` and
+   `--gl-mark-grad` become solid `--primary`; the login vault keeps its
+   near-black gradient but loses the two animated aurora fields in favour of
+   one static coral ember (`--gl-vault-ambient`). The workspace ambient glow
+   reduces from three radial layers to a single 8% coral veil.
+3. **Pill-shaped committing buttons** (U1/D22). `--radius-button` becomes
+   16px and `--radius-input` 14px — inside the brief's 16–24px band. The pill
+   shape stays reserved for floating chrome (chips, mobile nav pill, FAB),
+   which the brief's bottom-navigation guidance keeps.
+4. **Heavy glass shadows.** `--shadow-glass-card` revalues to a hairline
+   inner highlight + crisp contact shadow + long soft fall-off.
+
+**What the brief's "consistency sweep" caught (page-level fixes):**
+
+- `.gl-txn-summary` shipped with **no CSS at all** — three spans stacked in a
+  bare card. It now uses the dashboard hero's pastel-tile language
+  (income/expense/neutral), one system for "figures that answer the page".
+- **V11** (transactions loading layout jump) is fixed: the loading state
+  renders a skeleton of the loaded layout (summary tiles, filter bar, rows)
+  with a visually-hidden live region.
+- All six row-hover states (txn rows, gl-row links, trend columns, attention
+  panel items, table rows) unify on one `--gl-hover-wash` token (5% coral);
+  full-tint `var(--accent)` hovers retire.
+- `.gl-funds-card__balance` drops coral for neutral `--foreground` — the
+  page's single coral tile is the total-balance feature card (D26).
+- Page headers lose their hairline divider; titles step up to
+  clamp(22px→32px). Table heads are rules, not fills; row separators soften.
+- Profile quick-links and small tiles (offering KPIs, allocation rows)
+  align to the shared radius/border tokens.
+
+**Mechanical record.** `lint:design` allowlist tightens: `app.css`
+`backdrop-filter` 20 → 2 (modal scrim pair), rgb 5 → 4; `loginStyles.ts`
+`backdrop-filter` 2 → 0. No new literals anywhere; `--glass-*` token NAMES
+are unchanged so no consumer compiled differently.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-07). `npm run typecheck`,
+`npm test` (721 passed / 24 skipped — baseline), `npm run lint:design`,
+`npm run build` all green.

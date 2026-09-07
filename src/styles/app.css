@@ -1649,8 +1649,8 @@ button.gl-card:active {
 /* Larger variant — the three variance KPI figures (expected / counted /
    variance) on the resolution screen. */
 .gl-offering-kpi {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
   padding: var(--space-5);
 }
 
@@ -1663,8 +1663,8 @@ button.gl-card:active {
   align-items: center;
   padding: var(--space-3) var(--space-4);
   background: var(--secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
 }
 
 /* --------------------------------------------------------------------------

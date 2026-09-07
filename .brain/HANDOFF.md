@@ -8,6 +8,20 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-07 (D27 — Premium Minimal redesign ตาม brief ข้อความของผู้ใช้)
+
+- **ผู้ส่งมอบ (Handed off by):** Arena Agent (session `01a07c8e-grace-ledger`)
+- **บริบทงาน (Context):** ผู้ใช้ให้ design-direction brief เต็มรูปแบบ (Premium/Modern/Minimal, Apple-inspired, มุมมน 16–24px, เงานุ่ม, ขอบบาง, accent มีวินัย, ไม่ copy ดีไซน์ใด ๆ) — ภาพแนบ 9 รูปไม่เข้า sandbox และ session นี้ไม่มี vision → brief ข้อความคือสัญญาที่ใช้ทำงาน สีใน brief ตรงกับ Coral Vault (D25) พอดี = ไม่เปลี่ยน hue เปลี่ยนแค่ surface language
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work) — 3 commits บน branch นี้:**
+  1. `7596573` D27a tokens — `--radius-button` 16px / `--radius-input` 14px; `--glass-card/chrome/sidebar` → solid; `--glass-blur-*` → none; ambient 3 ชั้น → 1 ฝ้าคอรัล 8%; `--gl-primary-grad` → solid coral; vault เหลือ 1 ember นิ่ง (ถอด aurora animated); `--shadow-glass-card` → inner highlight + soft fall-off
+  2. `1f98c1f` D27b surfaces — ลบ backdrop-filter ออกจาก content surface ทั้งหมด 18 จุด (เหลือ modal scrim 2); การ์ด/hero/chrome ใช้ `--border-subtle`; page-header ไร้เส้นขีด, h1 clamp 22→32px; section h2 → text-lg; table head เป็น rule / row separator เบา / hover 5% wash; ปุ่ม primary เลิก pill → 16px; topbar border-subtle; login card ทึบ; lint allowlist รัด (backdrop 20→2, rgb 5→4, login 2→0)
+  3. `ebb3d4e` D27c page pass — `.gl-txn-summary` **เพิ่งพบว่าไม่มี CSS เลย** → tiles พาสเทล 3 ช่องเหมือน hero figures; **V11 fixed** (loading skeleton ทรงเดียวกับหน้าเต็ม + `role=status`); hover states 6 จุดรวมเป็น `--gl-hover-wash`; funds balance coral→foreground; profile links/divider/KPI เข้า token
+- **การตรวจสอบ (Verification):** typecheck ✓ · lint:design ✓ · **721 passed / 24 skipped** (baseline) · build ✓
+- **สิ่งที่ต้องระวัง (Gotchas):** `--glass-*` token NAMES คงเดิม (public API) มีแต่ค่าเปลี่ยน — อย่า "เก็บกวาด" ชื่อ token เก่าโดยไม่ตรวจ consumer; `--gl-ambient: none` ใน `prefers-reduced-transparency` คือค่าเดียวที่เหลือ; FAB กลาง nav + pill nav คงอยู่ (D22/D23 ไม่ถูกแตะ) เพราะ brief ยังสั่ง bottom nav + ปุ่มลอย
+- **สิ่งที่ต้องทำต่อ (Next Actions):** รอผู้ใช้รีวิว preview (port 5500 `/preview.html` เดสก์ท็อป+มือถือ) → แก้ตาม feedback เป็นรอบ ๆ → เปิด PR จาก `arena/01a07c8e-grace-ledger` ไป main; งานค้างเก่า: Reports populated layout, modal states (reject sheet/cash-count/add-member), disabled/pressed states ยังไม่ถูกจับภาพ (ไม่มี Chromium ใน sandbox — ใช้ preview ของผู้ใช้แทน)
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-07 รอบ 3 (U2 — FAB กลาง nav ลอย + เก็บ empty state แดชบอร์ด)
 
 - **ผู้ส่งมอบ (Handed off by):** Arena Agent (session `01a077c7-grace-ledger`) — ผู้ใช้สั่ง "ทำต่อ"
