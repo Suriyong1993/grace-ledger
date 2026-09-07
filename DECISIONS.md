@@ -722,3 +722,34 @@ rather than replaced:
 **Status:** APPROVED & IMPLEMENTED (2026-09-07). Suite 578 passed / 24 skipped;
 typecheck + lint:design + build green. Dark mode remains deferred (D4) — only its brand
 hues were repointed, its surface ramp awaits a dedicated pass.
+
+## D26 — Premium refinement pass, informed by the Finexy reference
+
+The 2026-09-07 direction review supplied a set of references: a Paper/Stone/
+Coral/Black palette card, the Finexy coral+black financial dashboard, Donezo,
+and the IMPECCABLE carousel. Finexy was selected as the primary reference.
+
+The palette in the reference card already matched Coral Vault (D25) exactly on
+all four values, so **this pass changes no hue**. What the reference actually
+contributes is hierarchy, and the changes are made to shared primitives rather
+than to individual pages, so all routes inherit them:
+
+- **Tabular figures** on `.num-display`, stat values and right-aligned table
+  cells. A ledger is read down a column; tabular numerals keep digits on a
+  common rhythm so magnitudes compare without re-reading. Highest-leverage
+  change in the pass.
+- **Stat cards**: label recedes (smaller, wider tracking), figure steps up to
+  `--text-3xl` with tighter tracking. Weight carries the hierarchy, not chrome.
+- **`.gl-stat-card--feature`**: at most one tile per screen may take the brand
+  fill. Spending coral on every tile spends it on none.
+- **Tables**: head stripe becomes a rule rather than a fill; row hover is a 4%
+  coral wash — enough to guide the eye down a long queue, not enough to flash.
+- **Card hover** gains a coral edge so the affordance reads before the cursor
+  lands.
+
+Finance status colours (income/expense/pending/approved/rejected) are untouched,
+per D25 — brand and finance remain separate systems.
+
+Also fixed here: `.hmr-indicator` was nested *inside* `.gl-card--attention`,
+scoping a dev badge to an unrelated selector and burying that card's
+`border-color`. Hoisted to the top level.

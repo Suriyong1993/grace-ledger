@@ -202,26 +202,27 @@ body {
 }
 
 .gl-card--attention {
-  /* --------------------------------------------------------------------------
-   HMR visual indicator (temporary)
-   This block is intentionally small and reversible — it shows a fixed badge
-   when the dev server is running and updates on HMR edits.
-   -------------------------------------------------------------------------- */
-  .hmr-indicator {
-    position: fixed;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(15, 23, 42, 0.85);
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    z-index: 99999;
-    pointer-events: none;
-    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35);
-  }
-
   border-color: var(--primary);
+}
+
+/* --------------------------------------------------------------------------
+   HMR visual indicator (temporary, dev only)
+   Was previously nested inside .gl-card--attention, which scoped it to a
+   selector it has nothing to do with. Hoisted to the top level so it works,
+   and so the attention card's border-color is not buried behind it.
+   -------------------------------------------------------------------------- */
+.hmr-indicator {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 99999;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35);
 }
 
 .gl-card--danger {
@@ -5216,6 +5217,110 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .gl-fundrow {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   D26 — Premium refinement pass (Finexy-informed)
+
+   Direction review of 2026-09-07 adopted the Finexy reference: a coral+black
+   financial dashboard on paper. The palette already matched Coral Vault
+   exactly (paper / stone / coral / black — see tokens/colors.css), so nothing
+   below changes a hue. What the reference actually buys us is *hierarchy*:
+   figures that carry weight, tables that read as records, and one accent that
+   is spent rather than sprinkled.
+
+   These rules refine shared primitives instead of individual pages, so all
+   ten routes inherit the pass. Finance status colours are untouched (D25).
+   ========================================================================== */
+
+/* --- Numerals ------------------------------------------------------------
+   A ledger is read down a column, not across a line. Tabular figures keep
+   every digit on the same rhythm so the eye can compare magnitudes without
+   re-reading, and the slight negative tracking stops long baht figures from
+   sprawling. This is the single highest-leverage change in the pass. */
+.num-display,
+.gl-stat-card__value,
+.gl-table td.is-right,
+.gl-table th.is-right {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* --- Stat cards ----------------------------------------------------------
+   The reference's KPI tiles earn attention through figure weight and a quiet
+   label, not through chrome. The label recedes to a small caps whisper; the
+   figure steps up and tightens. */
+.gl-stat-card {
+  gap: var(--space-1);
+  transition:
+    border-color var(--duration-micro) var(--ease-out),
+    box-shadow var(--duration-micro) var(--ease-out);
+}
+
+.gl-stat-card__label {
+  font-size: var(--text-2xs);
+  letter-spacing: 0.08em;
+}
+
+.gl-stat-card__value {
+  font-size: var(--text-3xl);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Exactly one tile per screen may carry the brand fill. In the reference it
+   is the figure the page exists to answer — here, whichever KPI the page
+   marks as primary. Spending coral on all of them spends it on none. */
+.gl-stat-card--feature {
+  background: var(--gl-primary-grad);
+  border-color: transparent;
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-glass-btn);
+}
+
+.gl-stat-card--feature .gl-stat-card__label,
+.gl-stat-card--feature .gl-stat-card__hint {
+  color: color-mix(in srgb, var(--primary-foreground) 82%, transparent);
+}
+
+.gl-stat-card--feature .gl-stat-card__value {
+  color: var(--primary-foreground);
+}
+
+/* --- Tables --------------------------------------------------------------
+   Records, not a grid. The head stripe reads as a rule rather than a fill,
+   and the row hover is a coral wash faint enough to guide the eye down a
+   long queue without flashing at it. */
+.gl-table th {
+  letter-spacing: 0.08em;
+  background: transparent;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.gl-table tbody tr:hover {
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+}
+
+/* --- Section headings ----------------------------------------------------
+   Display face at a tighter track: the reference's headings sit close and
+   confident rather than airy. */
+.gl-section__head h2 {
+  letter-spacing: -0.02em;
+}
+
+/* --- Card lift -----------------------------------------------------------
+   Navigable cards already lift on hover; the pass makes the lift a touch
+   more deliberate and adds the coral edge so the affordance reads before
+   the cursor lands. */
+a.gl-card:hover,
+button.gl-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 38%, var(--border));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-stat-card {
     transition: none;
   }
 }

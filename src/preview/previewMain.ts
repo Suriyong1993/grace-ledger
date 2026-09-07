@@ -14,6 +14,9 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderAppShellHtml, AppShellUser } from "../components/layout/AppShell";
 import { DashboardPage, DashboardData } from "../pages/DashboardPage";
+import { FundsPage, FundDetail } from "../pages/FundsPage";
+import { MembersPage, MemberRecord } from "../pages/MembersPage";
+import { TransactionsPage, TransactionItem } from "../pages/TransactionsPage";
 import { renderApprovalsQueueViewHtml } from "../components/approvals/ApprovalsQueueView";
 import { renderOfferingSessionListHtml } from "../components/offering/OfferingSessionList";
 import type { AttentionSummary } from "../services/attention-service";
@@ -267,6 +270,182 @@ const OFFERING_SESSIONS: OfferingSession[] = [
   },
 ];
 
+const FUNDS: FundDetail[] = [
+  {
+    id: "fund-1",
+    name: "กองทุนทั่วไป",
+    description: "ค่าใช้จ่ายประจำของคริสตจักร",
+    balance: Money.from(184320),
+    targetAmount: null,
+    percentageUsed: null,
+    recentActivity: [
+      {
+        description: "ถวายวันอาทิตย์",
+        amount: "฿18,450.00",
+        date: "6 ก.ย. 2026",
+        type: "in",
+      },
+      {
+        description: "ค่าไฟฟ้าเดือนสิงหาคม",
+        amount: "฿4,820.00",
+        date: "3 ก.ย. 2026",
+        type: "out",
+      },
+    ],
+  },
+  {
+    id: "fund-2",
+    name: "กองทุนอาคาร",
+    description: "เพื่อการก่อสร้างและซ่อมบำรุงอาคาร",
+    balance: Money.from(52400),
+    targetAmount: Money.from(200000),
+    percentageUsed: 26,
+    recentActivity: [
+      {
+        description: "ถวายเจาะจงกองทุนอาคาร",
+        amount: "฿12,000.00",
+        date: "6 ก.ย. 2026",
+        type: "in",
+      },
+    ],
+  },
+  {
+    id: "fund-3",
+    name: "กองทุนพันธกิจ",
+    description: "สนับสนุนงานมิชชันและการประกาศ",
+    balance: Money.from(11840),
+    targetAmount: Money.from(50000),
+    percentageUsed: 23,
+    recentActivity: [],
+  },
+];
+
+const MEMBERS: MemberRecord[] = [
+  {
+    id: "member-1",
+    code: "M-0001",
+    name: "สมชาย ใจดี",
+    email: "somchai@example.com",
+    phone: "081-234-5678",
+    group: "ผู้ใหญ่",
+  },
+  {
+    id: "member-2",
+    code: "M-0002",
+    name: "วรรณา รักธรรม",
+    email: "wanna@example.com",
+    phone: "089-876-5432",
+    group: "สตรี",
+  },
+  {
+    id: "member-3",
+    code: "M-0003",
+    name: "กิตติพงษ์ มานะกิจ",
+    email: "kittipong@example.com",
+    phone: "062-111-2233",
+    group: "ชาย",
+  },
+  {
+    id: "member-4",
+    code: "M-0004",
+    name: "ศิริพร แสงทอง",
+    email: "siriporn@example.com",
+    phone: "091-555-7788",
+    group: "เยาวชน",
+  },
+];
+
+const TRANSACTIONS: TransactionItem[] = [
+  {
+    id: "txn-1",
+    code: "TXN-000128",
+    description: "เงินถวายวันอาทิตย์",
+    categoryName: "เงินถวาย",
+    fundName: "กองทุนทั่วไป",
+    accountName: "บัญชีออมทรัพย์หลัก",
+    amount: Money.from(18450),
+    direction: "income",
+    date: new Date().toISOString(),
+    dateGroup: "today",
+    recordedBy: "สุดารัตน์ จิณเซ่ง",
+    status: "posted",
+    timeline: [
+      { title: "บันทึกรายการ", detail: "สุดารัตน์", status: "done" },
+      { title: "อนุมัติแล้ว", detail: "อ.สรรเสริญ", status: "done" },
+      { title: "ลงบัญชีแล้ว", detail: "ระบบ", status: "done" },
+    ],
+  },
+  {
+    id: "txn-2",
+    code: "TXN-000127",
+    description: "ค่าไฟฟ้าเดือนสิงหาคม",
+    categoryName: "สาธารณูปโภค",
+    fundName: "กองทุนทั่วไป",
+    accountName: "บัญชีออมทรัพย์หลัก",
+    amount: Money.from(4820),
+    direction: "expense",
+    date: new Date().toISOString(),
+    dateGroup: "today",
+    recordedBy: "วรรณา รักธรรม",
+    status: "pending_approval",
+    attachmentName: "ใบเสร็จการไฟฟ้า.pdf",
+    attachmentSize: "248 KB",
+    timeline: [
+      { title: "บันทึกรายการ", detail: "วรรณา", status: "done" },
+      { title: "รออนุมัติ", detail: "ยังไม่มีผู้อนุมัติ", status: "active" },
+      { title: "ลงบัญชี", detail: "รอขั้นก่อนหน้า", status: "pending" },
+    ],
+  },
+  {
+    id: "txn-3",
+    code: "TXN-000126",
+    description: "ถวายเจาะจงกองทุนอาคาร",
+    categoryName: "เงินถวาย",
+    fundName: "กองทุนอาคาร",
+    accountName: "บัญชีออมทรัพย์หลัก",
+    amount: Money.from(12000),
+    direction: "income",
+    date: new Date(Date.now() - 86400000).toISOString(),
+    dateGroup: "yesterday",
+    recordedBy: "สุดารัตน์ จิณเซ่ง",
+    status: "posted",
+    timeline: [
+      { title: "บันทึกรายการ", detail: "สุดารัตน์", status: "done" },
+      { title: "ลงบัญชีแล้ว", detail: "ระบบ", status: "done" },
+    ],
+  },
+  {
+    id: "txn-4",
+    code: "TXN-000125",
+    description: "ค่าเช่าสถานที่จัดค่ายเยาวชน",
+    categoryName: "กิจกรรม",
+    fundName: "กองทุนพันธกิจ",
+    accountName: "บัญชีออมทรัพย์หลัก",
+    amount: Money.from(8500),
+    direction: "expense",
+    date: new Date(Date.now() - 86400000).toISOString(),
+    dateGroup: "yesterday",
+    recordedBy: "กิตติพงษ์ มานะกิจ",
+    status: "approved",
+    timeline: [
+      { title: "บันทึกรายการ", detail: "กิตติพงษ์", status: "done" },
+      { title: "อนุมัติแล้ว", detail: "อ.สรรเสริญ", status: "done" },
+      { title: "ลงบัญชี", detail: "รอดำเนินการ", status: "active" },
+    ],
+  },
+];
+
+/**
+ * These pages hold their rows in private state that only loadData() fills,
+ * and loadData() needs Supabase. Seeding the field directly is the same
+ * approach the unit tests take, and it keeps the sample data here in the
+ * dev-only entry rather than adding a production seam to the page.
+ */
+function seed<T extends object>(page: T, fields: Record<string, unknown>): T {
+  Object.assign(page, fields);
+  return page;
+}
+
 interface Screen {
   id: string;
   label: string;
@@ -301,6 +480,36 @@ const SCREENS: Screen[] = [
         isLoading: false,
         errorMessage: null,
       }),
+  },
+  {
+    id: "transactions",
+    label: "รายการเงิน",
+    route: "/transactions",
+    render: () =>
+      seed(new TransactionsPage(NO_CLIENT, "church-abc"), {
+        transactions: TRANSACTIONS,
+        isLoading: false,
+      }).renderHtml(USER),
+  },
+  {
+    id: "funds",
+    label: "กองทุน",
+    route: "/funds",
+    render: () =>
+      seed(new FundsPage(NO_CLIENT, "church-abc"), {
+        funds: FUNDS,
+        isLoading: false,
+      }).renderHtml(),
+  },
+  {
+    id: "members",
+    label: "สมาชิก",
+    route: "/members",
+    render: () =>
+      seed(new MembersPage(NO_CLIENT, "church-abc"), {
+        members: MEMBERS,
+        isLoading: false,
+      }).renderHtml(),
   },
   {
     id: "dashboard-empty",
