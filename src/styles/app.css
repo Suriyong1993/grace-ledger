@@ -211,26 +211,6 @@ body {
   border-color: var(--primary);
 }
 
-/* --------------------------------------------------------------------------
-   HMR visual indicator (temporary, dev only)
-   Was previously nested inside .gl-card--attention, which scoped it to a
-   selector it has nothing to do with. Hoisted to the top level so it works,
-   and so the attention card's border-color is not buried behind it.
-   -------------------------------------------------------------------------- */
-.hmr-indicator {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(15, 23, 42, 0.85);
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  z-index: 99999;
-  pointer-events: none;
-  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35);
-}
-
 .gl-card--danger {
   border-color: var(--expense);
 }

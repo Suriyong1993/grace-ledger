@@ -35,13 +35,15 @@ const ALLOWLIST = {
   // pass; before that only .ts files were scanned, which is how the "2026
   // Evolved Glassmorphism" layer landed unnoticed. Every remaining literal is
   // accounted for here:
-  //   font-size 1, border-radius 3 — dev-only HMR badge (1 of each) and two
-  //     hairline/pill radii below the smallest radius token. R6 cleanup.
-  //   rgb/rgba 7 — dev-only HMR badge (2), two overlay scrims that need a plain
-  //     black veil (2), and three faint ink-tinted shadows written inline
-  //     rather than as tokens (3). R6 cleanup.
-  //   hex 10 — dev-only HMR badge (1) and the print stylesheet (9), which must
-  //     use pure black and white on paper.
+  //   font-size 0, border-radius 2 — two hairline/pill radii below the
+  //     smallest radius token. R6 cleanup.
+  //   rgb/rgba 5 — two overlay scrims that need a plain black veil (2), and
+  //     three faint ink-tinted shadows written inline rather than as tokens
+  //     (3). R6 cleanup.
+  //   hex 9 — the print stylesheet, which must use pure black and white on
+  //     paper.
+  //   The dev-only HMR badge previously accounted for one of each of the
+  //     above; it was removed with its stylesheet block (see D26b).
   //   backdrop-filter 20 — the first 4 are overlay scrims (modal backdrop pair,
   //     sticky mobile action bar pair). The other 16 are the D21
   //     Glass Ledger surfaces the user selected in the 2026-09-07 direction
@@ -53,10 +55,10 @@ const ALLOWLIST = {
   //     Was 22 until the D26 dead-CSS sweep removed .gl-sheet-backdrop, an
   //     unreferenced overlay pair — no markup ever rendered that class.
   "src/styles/app.css": {
-    "literal font-size": 1,
-    "literal border-radius": 3,
-    "rgba()/rgb() color literal": 7,
-    "hex color literal": 10,
+    "literal font-size": 0,
+    "literal border-radius": 2,
+    "rgba()/rgb() color literal": 5,
+    "hex color literal": 9,
     "backdrop-filter": 20,
   },
 

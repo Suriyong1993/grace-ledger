@@ -786,3 +786,22 @@ overlay pair no markup ever rendered.
 Not done here: ~600 inline `style="..."` declarations remain across the pages.
 That is a real inconsistency but too large to sweep safely in one pass without
 visual review of each screen.
+
+## D26b — Remove the HMR demo badge (regression I introduced in D26)
+
+A dark pill reading "HMR DEMO: <time>" was covering the bottom-right corner of
+every screen. I caused it. The badge's stylesheet block had been written
+*nested inside* `.gl-card--attention`, and plain CSS does not support nesting
+that way, so the browser discarded the rule and the badge had never actually
+been visible. In D26 I "fixed" that nesting by hoisting the rule to the top
+level — which made a dev demo artifact appear on all ten routes for the first
+time.
+
+The right fix is not to restore the broken nesting but to delete the badge: it
+was a temporary HMR demonstration (`src/hmr-indicator.ts`, its script tag in
+index.html, and its stylesheet block), never a feature.
+
+Its literals were the sole reason four lint-design allowances existed, so those
+tighten with it: font-size 1 -> 0, border-radius 3 -> 2, rgb/rgba 7 -> 5,
+hex 10 -> 9. lint-design flagged all four itself by failing on FEWER than
+allowed.
