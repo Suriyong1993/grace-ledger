@@ -24,7 +24,7 @@ import {
   AccountOption,
   renderVarianceResolutionViewHtml,
 } from "../components/offering/VarianceResolutionView";
-import { formatDateThai, toUserMessage } from "../lib/format";
+import { escapeHtml, formatDateThai, toUserMessage } from "../lib/format";
 
 export type OfferingPageMode = "list" | "new" | "detail";
 export type OfferingFormStep = "entry" | "review";
@@ -380,8 +380,18 @@ export class OfferingPage {
           >${label}${badge}</button>`;
         };
 
+        // Every other route opens with an h1; the detail view went straight to
+        // its tablist, so the only statement of which session you are looking
+        // at was the topbar. That left the page with no document heading for
+        // screen readers and no visual anchor above the tabs.
         const tabHeaderHtml = `
         <div class="gl-page gl-page--flush-bottom">
+          <div class="gl-page-header">
+            <div>
+              <h1>${escapeHtml(session.serviceName)}</h1>
+              <p>${formatDateThai(session.serviceDate)}</p>
+            </div>
+          </div>
           <div class="gl-tablist" role="tablist" aria-label="รายละเอียดรอบเงินถวาย">
             ${tab("btn-tab-overview", "overview", "ภาพรวม")}
             ${tab("btn-tab-count", "count", "ตรวจนับเงินสด")}

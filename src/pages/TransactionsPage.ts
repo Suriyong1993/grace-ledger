@@ -569,7 +569,7 @@ export class TransactionsPage {
 
       <!-- Filters -->
       <div class="gl-card gl-txn-filters">
-        <div class="gl-txn-filters__search">
+        <div class="gl-input-group gl-txn-filters__search">
           <span class="gl-input-icon" aria-hidden="true">${ICON_SEARCH}</span>
           <input type="text" class="gl-input gl-txn-filters__input" placeholder="ค้นหารายการ..." value="${escapeHtml(this.searchQuery)}" data-action="search">
         </div>

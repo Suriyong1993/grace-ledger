@@ -426,26 +426,14 @@ export class MembersPage {
       ${successNoticeHtml}
 
       <!-- Search Bar -->
-      <section class="gl-section" style="margin-bottom: var(--space-4);">
-        <div style="
-          display: flex;
-          align-items: center;
-          gap: var(--space-2);
-          padding: 0 var(--space-3);
-          min-height: var(--touch-target-min);
-          border: 1px solid var(--input);
-          border-radius: var(--radius-input);
-          background: var(--card);
-        ">
-          <span style="color: var(--muted-foreground);">${ICON_SEARCH}</span>
-          <input id="member-search-input" type="text" aria-label="ค้นหาสมาชิก" value="${this.searchQuery}" placeholder="ค้นหาชื่อสมาชิก รหัส หรือกลุ่มแคร์..." style="
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-size: var(--text-sm);
-            color: var(--foreground);
-            /* Keep the global :focus-visible ring — the one field users must type in. */
-          " />
+      <!-- Uses the shared search-field pattern rather than a bespoke inline
+           copy of it: the hand-rolled version reset border and background but
+           not font-family, so this input fell back to the UA default (Arial)
+           and rendered Thai in a different face from every other field. -->
+      <section class="gl-section gl-members-search">
+        <div class="gl-searchfield">
+          <span class="gl-searchfield__icon" aria-hidden="true">${ICON_SEARCH}</span>
+          <input id="member-search-input" class="gl-searchfield__input" type="text" aria-label="ค้นหาสมาชิก" value="${this.searchQuery}" placeholder="ค้นหาชื่อสมาชิก รหัส หรือกลุ่มแคร์..." />
         </div>
       </section>
 

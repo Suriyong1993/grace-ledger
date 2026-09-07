@@ -40,6 +40,15 @@
   box-sizing: border-box;
 }
 
+/* The UA rule for [hidden] is `display: none`, but it loses to any class that
+   sets `display` itself. Panels toggled through the `hidden` property (the
+   attention and overflow popovers) therefore stayed painted on screen while
+   reporting themselves as hidden to assistive tech. Restoring the intent at
+   the top of the cascade keeps `hidden` authoritative for every component. */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   margin: 0;
@@ -3986,10 +3995,20 @@ a {
   flex-direction: column;
   gap: var(--space-1);
 }
+/* The child rules below assume a horizontal flex row, but the container rule
+   itself was missing, so addons stacked above their field instead of sitting
+   flush beside it. */
+.gl-input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
 .gl-input-group > .gl-input,
 .gl-input-group > .gl-select {
   border-radius: 0;
   flex: 1;
+  min-width: 0;
 }
 
 .gl-input-group > .gl-input:first-child,
@@ -4440,4 +4459,99 @@ button.gl-card:hover {
   .gl-stat-card {
     transition: none;
   }
+}
+
+/* ==========================================================================
+   Transactions filter bar
+
+   The markup for this bar shipped without matching rules, so the search addon,
+   the filter pills and the period select each fell back to block layout and
+   stacked down the card. These rules restore the intended arrangement — one
+   search row, then a wrapping row of controls — using existing tokens only.
+   ========================================================================== */
+
+.gl-txn-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.gl-txn-filters__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  /* Narrow viewports wrap the controls instead of overflowing the card. */
+  flex-wrap: wrap;
+}
+
+.gl-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* The period select sizes to its content rather than eating the whole row. */
+.gl-txn-filters__period {
+  width: auto;
+  min-width: 160px;
+}
+
+/* Push the export button to the end of the row when there is space, so it
+   reads as a separate affordance from the filters themselves. */
+.gl-txn-filters__actions > .gl-btn {
+  margin-inline-start: auto;
+}
+
+@media (max-width: 640px) {
+  /* Once the row wraps, an auto margin would strand the button mid-row. */
+  .gl-txn-filters__actions > .gl-btn {
+    margin-inline-start: 0;
+  }
+  .gl-txn-filters__period {
+    flex: 1;
+  }
+}
+
+/* ==========================================================================
+   Search field
+
+   An icon sitting inside a bordered field. Previously open-coded inline on the
+   members page, which is how that copy drifted (no font-family, so the control
+   fell back to the UA font). Defined once here so every search box matches.
+   ========================================================================== */
+
+.gl-searchfield {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  min-height: var(--touch-target-min);
+  border: 1px solid var(--input);
+  border-radius: var(--radius-input);
+  background: var(--card);
+}
+
+.gl-searchfield__icon {
+  display: flex;
+  align-items: center;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.gl-searchfield__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  /* Inputs do not inherit typography from the page by default. */
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--foreground);
+  /* Keep the global :focus-visible ring — the one field users must type in. */
+}
+
+.gl-members-search {
+  margin-bottom: var(--space-4);
 }

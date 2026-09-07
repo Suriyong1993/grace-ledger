@@ -16,8 +16,47 @@
  * to notice it in an image.
  */
 import { chromium } from "playwright";
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Google Fonts is outside the egress allowlist and the container has no Thai
+ * system font, so unpatched shots render Thai as tofu boxes — which makes any
+ * judgement about wrapping, truncation or line length worthless. The real
+ * families are vendored from npm (@fontsource) and inlined as base64 so the
+ * captures use the same typefaces production serves. Audit-only: nothing here
+ * is imported by the app.
+ */
+const buildFontCss = () => {
+  const faces = [
+    ["Anuphan", "anuphan-thai-400-normal.woff2", 400],
+    ["Anuphan", "anuphan-thai-600-normal.woff2", 600],
+    ["Anuphan", "anuphan-thai-700-normal.woff2", 700],
+    ["Anuphan", "anuphan-latin-400-normal.woff2", 400],
+    ["Anuphan", "anuphan-latin-600-normal.woff2", 600],
+    ["Anuphan", "anuphan-latin-700-normal.woff2", 700],
+    ["Space Grotesk", "space-grotesk-latin-400-normal.woff2", 400],
+    ["Space Grotesk", "space-grotesk-latin-600-normal.woff2", 600],
+    ["Space Grotesk", "space-grotesk-latin-700-normal.woff2", 700],
+  ];
+  // Faces of one family at the same weight fully replace each other unless
+  // unicode-range scopes them. Without this the Latin file shadowed the Thai
+  // one and Thai text rendered as tofu in some elements but not others.
+  const THAI_RANGE = "U+0E01-0E5B, U+200C-200D, U+25CC";
+  let css = "";
+  for (const [family, file, weight] of faces) {
+    const p = join(HERE, "audit-fonts", file);
+    if (!existsSync(p)) continue;
+    const b64 = readFileSync(p).toString("base64");
+    const range = file.includes("-thai-") ? `unicode-range:${THAI_RANGE};` : "";
+    css += `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};`
+      + `font-display:block;${range}src:url(data:font/woff2;base64,${b64}) format("woff2");}\n`;
+  }
+  return css;
+};
 
 const BASE = process.env.BASE_URL || "http://localhost:5500";
 const EXEC = process.env.CHROMIUM_PATH || "/tmp/chromium";
@@ -37,6 +76,7 @@ const SCREENS = [
 
 const run = async () => {
   mkdirSync(OUT, { recursive: true });
+  mkdirSync(join(OUT, "viewport"), { recursive: true });
 
   const browser = await chromium.launch({
     executablePath: EXEC,
@@ -44,6 +84,7 @@ const run = async () => {
     env: { ...process.env, LD_LIBRARY_PATH: LIBS },
   });
 
+  const fontCss = buildFontCss();
   const findings = [];
   const consoleErrors = [];
 
@@ -57,6 +98,17 @@ const run = async () => {
       hasTouch: vp.name !== "desktop",
       isMobile: vp.name === "mobile",
     });
+    // Applies to every document this context opens, before first paint.
+    if (fontCss) await ctx.addInitScript((css) => {
+      const inject = () => {
+        const el = document.createElement("style");
+        el.textContent = css;
+        document.head.appendChild(el);
+      };
+      if (document.head) inject();
+      else document.addEventListener("DOMContentLoaded", inject, { once: true });
+    }, fontCss);
+
     const page = await ctx.newPage();
 
     page.on("console", (m) => {
@@ -79,6 +131,8 @@ const run = async () => {
       // The harness renders synchronously on hashchange; this settles fonts
       // and any entry animation before the shot.
       await page.waitForTimeout(700);
+      // Thai glyphs must be rasterised before the shot or the review is moot.
+      await page.evaluate(() => document.fonts.ready).catch(() => {});
 
       const metrics = await page.evaluate(() => {
         const doc = document.documentElement;
@@ -122,6 +176,12 @@ const run = async () => {
       await page.screenshot({
         path: join(OUT, `${screen}-${vp.name}.png`),
         fullPage: true,
+      });
+      // A fullPage shot repaints position:fixed chrome at every scroll band,
+      // which reads as broken layout when it is not. The viewport-only shot is
+      // the honest view of what a user actually sees above the fold.
+      await page.screenshot({
+        path: join(OUT, "viewport", `${screen}-${vp.name}.png`),
       });
 
       findings.push({ screen, viewport: vp.name, ...metrics });
