@@ -532,6 +532,9 @@ export class MembersPage {
       root.querySelector<HTMLFormElement>("#add-member-form");
     addMemberForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
+      // Re-entry guard: a double click fires submit twice before the redraw
+      // can disable the button, creating the member twice.
+      if (this.isSubmitting) return;
       const nameInput =
         root.querySelector<HTMLInputElement>("#member-name-input");
       const phoneInput = root.querySelector<HTMLInputElement>(

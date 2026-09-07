@@ -381,6 +381,10 @@ export class FundsPage {
     const transferForm = root.querySelector<HTMLFormElement>("#transfer-form");
     transferForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
+      // Re-entry guard: a double click fires submit twice before the redraw
+      // can disable the button, which for a transfer means moving the money
+      // twice. isSubmitting is already the state the redraw uses.
+      if (this.isSubmitting) return;
       const fromFundSelect =
         root.querySelector<HTMLSelectElement>("#from-fund");
       const toFundSelect = root.querySelector<HTMLSelectElement>("#to-fund");
@@ -437,6 +441,10 @@ export class FundsPage {
     const createForm = root.querySelector<HTMLFormElement>("#create-fund-form");
     createForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
+      // Re-entry guard: a double click fires submit twice before the redraw
+      // can disable the button, which for a transfer means moving the money
+      // twice. isSubmitting is already the state the redraw uses.
+      if (this.isSubmitting) return;
       const nameInput =
         root.querySelector<HTMLInputElement>("#fund-name-input");
       const descInput =

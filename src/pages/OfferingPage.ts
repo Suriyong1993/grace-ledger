@@ -854,6 +854,12 @@ export class OfferingPage {
   }
 
   private async handlePostToLedger(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     if (!this.selectedSession) return;
 
     if (!this.selectedCashAccountId) {
@@ -898,6 +904,12 @@ export class OfferingPage {
   }
 
   private async handleSaveVarianceExplanation(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     if (!this.selectedSession) return;
 
     if (!this.varianceExplanation || this.varianceExplanation.trim().length < 5) {
@@ -932,6 +944,12 @@ export class OfferingPage {
   }
 
   private async handleVarianceRecount(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     if (!this.selectedSession) return;
 
     this.isSubmitting = true;
@@ -960,6 +978,12 @@ export class OfferingPage {
   }
 
   private async handleConfirmSession(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     if (!this.selectedSession) return;
 
     this.isSubmitting = true;
@@ -984,6 +1008,12 @@ export class OfferingPage {
   }
 
   private async handleStartCounting(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     if (!this.selectedSession) return;
     this.isSubmitting = true;
     this.errorMessage = null;
@@ -1011,6 +1041,12 @@ export class OfferingPage {
   }
 
   private async handleSaveCashCount(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     if (!this.selectedSession) return;
 
     if (!this.cashCountState.counter1Id || !this.cashCountState.counter2Id) {
@@ -1113,6 +1149,12 @@ export class OfferingPage {
   }
 
   private async handleSaveDraft(onStateChange: () => void): Promise<void> {
+    // Re-entry guard. The button renders disabled while submitting, but that
+    // only takes effect after the next redraw, so two clicks in the same tick
+    // both reach here and fire two writes — a duplicate ledger post or a
+    // double-counted session. isSubmitting is the state the redraw already
+    // relies on; checking it here closes the window before the await.
+    if (this.isSubmitting) return;
     this.isSubmitting = true;
     this.errorMessage = null;
     onStateChange();
