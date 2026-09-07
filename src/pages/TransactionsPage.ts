@@ -575,4 +575,96 @@ export class TransactionsPage {
       ${renderGroup("ไม่ระบุวันที่", undatedItems)}
     </div>`;
   }
+
+  /**
+   * Wire the filter/period/sort/search controls.
+   *
+   * All of the filtering logic already existed in renderHtml — what was
+   * missing was anything listening, so every pill and the period select were
+   * decorative. Each handler mutates state, mirrors it into the URL so the
+   * view survives a refresh (see syncUrlFromState), then asks the caller to
+   * redraw.
+   *
+   * Search is debounced: re-rendering the whole list on every keystroke also
+   * destroys and recreates the input, which would drop focus mid-word.
+   * Instead the input keeps focus and its caret position is restored after
+   * the redraw.
+   */
+  public attachEventListeners(
+    root: HTMLElement,
+    onStateChange: () => void,
+  ): void {
+    const commit = () => {
+      this.syncUrlFromState();
+      onStateChange();
+    };
+
+    root.querySelectorAll<HTMLButtonElement>('[data-action="filter"]').forEach(
+      (btn) => {
+        btn.addEventListener("click", () => {
+          const value = btn.dataset.value;
+          if (
+            value === "all" ||
+            value === "income" ||
+            value === "expense" ||
+            value === "transfer" ||
+            value === "pending"
+          ) {
+            this.activeFilter = value;
+            commit();
+          }
+        });
+      },
+    );
+
+    const period = root.querySelector<HTMLSelectElement>(
+      '[data-action="period"]',
+    );
+    period?.addEventListener("change", () => {
+      const value = period.value;
+      if (
+        value === "this_month" ||
+        value === "last_month" ||
+        value === "last_3_months" ||
+        value === "all"
+      ) {
+        this.activePeriod = value;
+        commit();
+      }
+    });
+
+    const search = root.querySelector<HTMLInputElement>(
+      '[data-action="search"]',
+    );
+    if (search) {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      search.addEventListener("input", () => {
+        const caret = search.selectionStart;
+        this.searchQuery = search.value;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          commit();
+          // The redraw replaced this input; put the user back where they were.
+          const next = root.querySelector<HTMLInputElement>(
+            '[data-action="search"]',
+          );
+          if (next) {
+            next.focus();
+            if (caret !== null) next.setSelectionRange(caret, caret);
+          }
+        }, 200);
+      });
+    }
+
+    root
+      .querySelector<HTMLButtonElement>('[data-action="export"]')
+      ?.addEventListener("click", () => this.exportCsv());
+
+    root
+      .querySelector<HTMLButtonElement>("#retry-load-btn")
+      ?.addEventListener("click", async () => {
+        await this.loadData();
+        onStateChange();
+      });
+  }
 }

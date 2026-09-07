@@ -17,7 +17,7 @@ import { DashboardPage, DashboardData } from "../pages/DashboardPage";
 import { FundsPage, FundDetail } from "../pages/FundsPage";
 import { MembersPage, MemberRecord } from "../pages/MembersPage";
 import { TransactionsPage, TransactionItem } from "../pages/TransactionsPage";
-import { renderApprovalsQueueViewHtml } from "../components/approvals/ApprovalsQueueView";
+import { ApprovalsPage } from "../pages/ApprovalsPage";
 import { renderOfferingSessionListHtml } from "../components/offering/OfferingSessionList";
 import type { AttentionSummary } from "../services/attention-service";
 import type { PendingApprovalItem } from "../lib/transactions/types";
@@ -461,6 +461,16 @@ const MEMBERS_PAGE = seed(new MembersPage(NO_CLIENT, "church-abc"), {
   isLoading: false,
 });
 
+const TRANSACTIONS_PAGE = seed(new TransactionsPage(NO_CLIENT, "church-abc"), {
+  transactions: TRANSACTIONS,
+  isLoading: false,
+});
+
+const APPROVALS_PAGE = seed(new ApprovalsPage(NO_CLIENT, "church-abc", "u-1"), {
+  items: PENDING_APPROVALS,
+  isLoading: false,
+});
+
 interface Screen {
   id: string;
   label: string;
@@ -491,10 +501,11 @@ const SCREENS: Screen[] = [
     id: "approvals",
     label: "คิวอนุมัติ",
     route: "/approvals",
-    render: () =>
-      `<div class="gl-page">${renderApprovalsQueueViewHtml({
-        items: PENDING_APPROVALS,
-      })}</div>`,
+    // The full page rather than the queue component alone, so the two-tap
+    // approve confirmation and the detail panel are reachable here.
+    render: () => APPROVALS_PAGE.renderHtml(USER),
+    attach: (root, rerender) =>
+      APPROVALS_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "offerings",
@@ -511,11 +522,9 @@ const SCREENS: Screen[] = [
     id: "transactions",
     label: "รายการเงิน",
     route: "/transactions",
-    render: () =>
-      seed(new TransactionsPage(NO_CLIENT, "church-abc"), {
-        transactions: TRANSACTIONS,
-        isLoading: false,
-      }).renderHtml(USER),
+    render: () => TRANSACTIONS_PAGE.renderHtml(USER),
+    attach: (root, rerender) =>
+      TRANSACTIONS_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "funds",
