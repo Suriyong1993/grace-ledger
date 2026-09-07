@@ -395,9 +395,21 @@ export class OfferingPage {
         </div>
         `;
 
+        // A session that has not been counted yet has exactly one sensible
+        // next step, and the overview alone does not say what it is. The hint
+        // names the tab rather than duplicating its action, so there is still
+        // one route to counting.
+        const needsCounting =
+          session.status === "draft" || session.status === "counting";
+        const nextStepHintHtml = needsCounting
+          ? `<div class="gl-notice gl-notice--info gl-notice--nextstep" role="status">
+              <div class="gl-notice__body">รอบนี้ยังไม่ได้ตรวจนับเงินสด — เริ่มที่แท็บ "ตรวจนับเงินสด"</div>
+            </div>`
+          : "";
+
         let panelHtml = "";
         if (this.detailTab === "overview") {
-          panelHtml = `<div class="gl-page gl-fade-in">${renderOfferingDetailOverviewHtml({ session })}</div>`;
+          panelHtml = `<div class="gl-page gl-fade-in">${nextStepHintHtml}${renderOfferingDetailOverviewHtml({ session })}</div>`;
         } else if (this.detailTab === "count") {
           panelHtml = renderCashCountViewHtml({
             session,

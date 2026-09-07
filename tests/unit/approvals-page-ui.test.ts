@@ -1,8 +1,9 @@
+// @vitest-environment jsdom
 /**
  * Unit tests for ApprovalsPage (page-level orchestrator)
  * Tests the public renderHtml(user?) output and event wiring logic.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ApprovalsPage } from "../../src/pages/ApprovalsPage";
 import { Money } from "../../src/lib/money";
 
@@ -301,5 +302,82 @@ describe("ApprovalsPage", () => {
     page.setSelectedItem("item-001");
     // Same id — no change, modal preserved
     expect((page as any).activeModal).not.toBeNull();
+  });
+
+  // ─── Two-tap approve confirm ──────────────────────────────────────────────
+
+  describe("quick-approve two-tap confirm", () => {
+    let item: ReturnType<typeof makeItem>;
+    let approveTransaction: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      item = makeItem();
+      (page as any).isLoading = false;
+      (page as any).items = [item];
+      approveTransaction = vi.fn().mockResolvedValue({ success: true });
+      (page as any).approvalsService = { approveTransaction };
+    });
+
+    function renderAndAttach(): {
+      root: HTMLElement;
+      refresh: ReturnType<typeof vi.fn>;
+    } {
+      const root = document.createElement("div");
+      root.innerHTML = page.renderHtml(dummyUser);
+      const refresh = vi.fn();
+      page.attachEventListeners(root, refresh);
+      return { root, refresh };
+    }
+
+    it("first tap swaps the button to a confirmation state without approving", async () => {
+      const { root } = renderAndAttach();
+      const btn = root.querySelector<HTMLButtonElement>(".gl-quick-approve")!;
+
+      btn.click();
+      // Allow the async click handler's microtask queue to settle.
+      await Promise.resolve();
+
+      expect(btn.textContent).toContain("ยืนยันอนุมัติ");
+      expect(btn.classList.contains("gl-btn--pending-confirm")).toBe(true);
+      expect(root.querySelector(".gl-btn--ghost")).not.toBeNull();
+      expect(approveTransaction).not.toHaveBeenCalled();
+    });
+
+    it("second tap on the same button approves exactly once", async () => {
+      const { root } = renderAndAttach();
+      const btn = root.querySelector<HTMLButtonElement>(".gl-quick-approve")!;
+
+      btn.click();
+      await Promise.resolve();
+      btn.click();
+      await Promise.resolve();
+
+      expect(approveTransaction).toHaveBeenCalledTimes(1);
+      expect(approveTransaction).toHaveBeenCalledWith({
+        transactionId: item.id,
+      });
+    });
+
+    it("cancel reverts to the original label without approving", async () => {
+      const { root } = renderAndAttach();
+      const btn = root.querySelector<HTMLButtonElement>(".gl-quick-approve")!;
+      const originalLabel = btn.innerHTML;
+
+      btn.click();
+      await Promise.resolve();
+      const cancelBtn = root.querySelector<HTMLButtonElement>(".gl-btn--ghost")!;
+      cancelBtn.click();
+
+      expect(btn.innerHTML).toBe(originalLabel);
+      expect(btn.classList.contains("gl-btn--pending-confirm")).toBe(false);
+      expect(root.querySelector(".gl-btn--ghost")).toBeNull();
+      expect(approveTransaction).not.toHaveBeenCalled();
+
+      // A tap after cancelling starts the confirmation flow over, not approve.
+      btn.click();
+      await Promise.resolve();
+      expect(approveTransaction).not.toHaveBeenCalled();
+      expect(btn.textContent).toContain("ยืนยันอนุมัติ");
+    });
   });
 });

@@ -355,6 +355,20 @@ button.gl-card:active {
   box-shadow: none;
 }
 
+/* Awaiting a second confirmation tap (approve-with-confirm). It drops the
+   coral brand ramp for the amber "attention" semantic a pending badge already
+   uses: while the button is armed it is no longer the committing action, it is
+   a question. Flat fill, no lift shadow — the gesture is paused, not ready. */
+.gl-btn--pending-confirm.gl-btn--primary {
+  background: var(--pending);
+  color: var(--pending-foreground);
+  box-shadow: none;
+}
+
+.gl-btn--pending-confirm.gl-btn--primary:hover:not(:disabled) {
+  background: var(--pending);
+}
+
 .gl-btn--secondary {
   background: var(--card);
   border-color: var(--border);
@@ -5138,6 +5152,12 @@ a {
   background: var(--secondary);
   border-color: var(--info);
   color: var(--info);
+}
+
+/* A next-step hint sits above the panel it introduces, so it owns the gap to
+   that panel rather than relying on an inline style at the call site. */
+.gl-notice--nextstep {
+  margin-bottom: var(--space-4);
 }
 
 /* ==========================================================================

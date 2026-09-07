@@ -81,10 +81,18 @@ export class TransactionsPage {
   private searchQuery = "";
 
   /**
-   * One-shot deep-link actions, consumed before render:
-   * `#/transactions?create=1` (shell "บันทึกรายการ" action) opens the
-   * existing create form. The query is cleaned from the URL afterwards so a
-   * later back/refresh does not replay the action.
+   * Deep-link entry points, consumed before render.
+   *
+   * Two different kinds of query parameter live in the same hash:
+   * `create=1` (shell "บันทึกรายการ" action) is a one-shot action, dropped
+   * from the URL afterwards so a later back/refresh does not replay it —
+   * while `filter`/`period`/`sort`/`q` describe a *view*, and are kept in the
+   * URL (via syncUrlFromState) so a refresh, a shared link, or a back
+   * navigation restores the same filtered list instead of silently snapping
+   * back to defaults.
+   *
+   * Unknown or misspelled values are ignored rather than applied, so a
+   * hand-edited URL degrades to the default view instead of an empty one.
    */
   public consumeDeepLinkActions(): void {
     if (typeof window === "undefined") return;
@@ -92,15 +100,69 @@ export class TransactionsPage {
     const queryIndex = hash.indexOf("?");
     if (queryIndex === -1) return;
     const params = new URLSearchParams(hash.slice(queryIndex + 1));
+
     if (params.get("create") === "1") {
       // create action handled by URL detection
     }
+
+    const filterParam = params.get("filter");
+    if (
+      filterParam === "all" ||
+      filterParam === "income" ||
+      filterParam === "expense" ||
+      filterParam === "transfer" ||
+      filterParam === "pending"
+    ) {
+      this.activeFilter = filterParam;
+    }
+
+    const periodParam = params.get("period");
+    if (
+      periodParam === "this_month" ||
+      periodParam === "last_month" ||
+      periodParam === "last_3_months" ||
+      periodParam === "all"
+    ) {
+      this.activePeriod = periodParam;
+    }
+
+    const sortParam = params.get("sort");
+    if (
+      sortParam === "newest" ||
+      sortParam === "oldest" ||
+      sortParam === "amount_desc" ||
+      sortParam === "amount_asc"
+    ) {
+      this.activeSort = sortParam;
+    }
+
+    const searchParam = params.get("q");
+    if (searchParam) this.searchQuery = searchParam;
+
+    this.syncUrlFromState();
+  }
+
+  /**
+   * Reflects the current filter/period/sort/search state into the URL query
+   * string via replaceState — no new history entry, no hashchange event, so
+   * it never fights the render triggered by the caller. Defaults are omitted
+   * so the common case stays a clean `#/transactions`.
+   */
+  public syncUrlFromState(): void {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams();
+    if (this.activeFilter !== "all") params.set("filter", this.activeFilter);
+    if (this.activePeriod !== "this_month")
+      params.set("period", this.activePeriod);
+    if (this.activeSort !== "newest") params.set("sort", this.activeSort);
+    if (this.searchQuery) params.set("q", this.searchQuery);
+
+    const query = params.toString();
+    const hash = "#/transactions" + (query ? `?${query}` : "");
     window.history.replaceState(
       null,
       "",
-      window.location.pathname +
-        window.location.search +
-        hash.slice(0, queryIndex),
+      window.location.pathname + window.location.search + hash,
     );
   }
 
