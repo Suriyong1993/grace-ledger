@@ -101,7 +101,7 @@ export class ProfilePage {
               <span>การยืนยันตัวตน</span>
               <span style="color: var(--income); font-weight: var(--weight-medium);">PIN 6 หลักพร้อมใช้งาน</span>
             </div>
-            <div style="height: 1px; background: var(--border); margin: var(--space-1) 0;"></div>
+            <hr class="gl-divider">
             <button type="button" class="gl-btn gl-btn--secondary gl-profile__logout" data-logout>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
                 <path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/>

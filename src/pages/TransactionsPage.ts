@@ -370,14 +370,46 @@ export class TransactionsPage {
       : "";
 
     if (this.isLoading) {
+      // V11 fix: the skeleton mirrors the loaded layout (summary tiles,
+      // filter bar, list rows) so the page does not jump when data lands.
+      const skeletonRows = [0, 1, 2, 3, 4]
+        .map(
+          () => `
+          <div class="gl-txn-skeleton-row" aria-hidden="true">
+            <span class="gl-skeleton"></span>
+            <span class="gl-skeleton"></span>
+          </div>`,
+        )
+        .join("");
       return `
       <div class="gl-page gl-fade-in">
         <div class="gl-page-header">
           <h1>รายการเงิน</h1>
           <p>บันทึกรายรับ รายจ่าย และประวัติธุรกรรมทั้งหมดของคริสตจักร</p>
         </div>
-        <div class="gl-card gl-loading-center">
-          <p>กำลังโหลดข้อมูลรายการเงิน...</p>
+        <div role="status" aria-live="polite">
+          <span class="gl-visually-hidden">กำลังโหลดข้อมูลรายการเงิน...</span>
+        </div>
+        <div class="gl-txn-summary" aria-hidden="true">
+          <div class="gl-txn-summary__item gl-txn-summary__item--income">
+            <span class="gl-skeleton" style="height: 12px; width: 64px; display: block;"></span>
+            <span class="gl-skeleton" style="height: 24px; width: 72%; display: block; margin-top: 6px;"></span>
+          </div>
+          <div class="gl-txn-summary__item gl-txn-summary__item--expense">
+            <span class="gl-skeleton" style="height: 12px; width: 64px; display: block;"></span>
+            <span class="gl-skeleton" style="height: 24px; width: 72%; display: block; margin-top: 6px;"></span>
+          </div>
+          <div class="gl-txn-summary__item">
+            <span class="gl-skeleton" style="height: 12px; width: 64px; display: block;"></span>
+            <span class="gl-skeleton" style="height: 24px; width: 72%; display: block; margin-top: 6px;"></span>
+          </div>
+        </div>
+        <div class="gl-card gl-txn-filters" aria-hidden="true">
+          <span class="gl-skeleton" style="height: 46px; display: block;"></span>
+          <span class="gl-skeleton" style="height: 44px; display: block;"></span>
+        </div>
+        <div class="gl-card gl-txn-skeleton-list" aria-hidden="true">
+          ${skeletonRows}
         </div>
       </div>`;
     }
@@ -556,12 +588,12 @@ export class TransactionsPage {
       </div>
 
       <!-- Summary Stats -->
-      <div class="gl-card gl-txn-summary">
-        <div class="gl-txn-summary__item">
+      <div class="gl-txn-summary">
+        <div class="gl-txn-summary__item gl-txn-summary__item--income">
           <span class="gl-txn-summary__label">รายรับ</span>
           <span class="num-display gl-txn-summary__value gl-income">+${incomeSum.format()}</span>
         </div>
-        <div class="gl-txn-summary__item">
+        <div class="gl-txn-summary__item gl-txn-summary__item--expense">
           <span class="gl-txn-summary__label">รายจ่าย</span>
           <span class="num-display gl-txn-summary__value gl-expense">−${expenseSum.format()}</span>
         </div>
