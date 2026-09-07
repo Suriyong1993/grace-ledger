@@ -486,7 +486,11 @@ export class TransactionsPage {
                   : isExpense
                     ? "var(--expense)"
                     : "var(--foreground)";
-                const amountPrefix = isIncome ? "+" : isExpense ? "−" : "";
+                // Money.format() already carries its own minus for negative
+                // values, so an expense holding a negative amount (a reversal
+                // or a correction) would otherwise print two signs: "− -฿45".
+                const amountPrefix =
+                  item.amount.isNegative() ? "" : isIncome ? "+" : isExpense ? "−" : "";
                 const statusInfo = TXN_STATUS[item.status];
 
                 return `

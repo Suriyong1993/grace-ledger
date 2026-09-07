@@ -462,6 +462,41 @@ const MEMBERS_PAGE = seed(new MembersPage(NO_CLIENT, "church-abc"), {
   isLoading: false,
 });
 
+/**
+ * Audit fixture only — deliberately hostile data used to prove the list holds
+ * up: a description far longer than the column, an amount in the hundreds of
+ * millions, and a negative figure. Not representative of real records; it
+ * exists so overflow and truncation show up in a capture instead of in
+ * production.
+ */
+const TRANSACTIONS_STRESS: TransactionItem[] = [
+  {
+    ...TRANSACTIONS[0]!,
+    id: "txn-stress-1",
+    code: "TXN-999001",
+    description:
+      "เงินถวายพิเศษสำหรับโครงการก่อสร้างอาคารอเนกประสงค์และศูนย์ฝึกอบรมผู้นำคริสตจักรประจำภูมิภาคภาคเหนือตอนบน ประจำปีงบประมาณ 2569",
+    fundName: "กองทุนก่อสร้างอาคารอเนกประสงค์และศูนย์ฝึกอบรมผู้นำ",
+    categoryName: "เงินถวายเพื่อการก่อสร้างและพัฒนาอาคารสถานที่",
+    recordedBy: "ศาสนาจารย์ ดร. สรรเสริญ ดวงจิตรมงคลชัยวัฒน์",
+    amount: Money.from(187654321.55),
+  },
+  {
+    ...TRANSACTIONS[1]!,
+    id: "txn-stress-2",
+    code: "TXN-999002",
+    description: "ปรับปรุงยอดยกมา (รายการติดลบ)",
+    amount: Money.from(-45280.75),
+    direction: "expense",
+  },
+  // A long tail, to check grouping and rhythm rather than a two-row list.
+  ...Array.from({ length: 24 }, (_, i) => ({
+    ...TRANSACTIONS[i % TRANSACTIONS.length]!,
+    id: `txn-stress-bulk-${i}`,
+    code: `TXN-9990${String(i + 10).padStart(2, "0")}`,
+  })),
+];
+
 const TRANSACTIONS_PAGE = seed(new TransactionsPage(NO_CLIENT, "church-abc"), {
   transactions: TRANSACTIONS,
   isLoading: false,
@@ -471,6 +506,18 @@ const APPROVALS_PAGE = seed(new ApprovalsPage(NO_CLIENT, "church-abc", "u-1"), {
   items: PENDING_APPROVALS,
   isLoading: false,
 });
+
+/** Same page, parked in its loading state so the skeleton can be captured. */
+const TRANSACTIONS_LOADING_PAGE = seed(
+  new TransactionsPage(NO_CLIENT, "church-abc"),
+  { transactions: [], isLoading: true },
+);
+
+/** Same page, fed the hostile fixture above. */
+const TRANSACTIONS_STRESS_PAGE = seed(
+  new TransactionsPage(NO_CLIENT, "church-abc"),
+  { transactions: TRANSACTIONS_STRESS, isLoading: false },
+);
 
 const OFFERING_LIST_PAGE = seed(
   new OfferingPage(NO_CLIENT, "church-abc", "u-1"),
@@ -588,6 +635,20 @@ const SCREENS: Screen[] = [
     render: () => REPORTS_PAGE.renderHtml(),
     attach: (root, rerender) =>
       REPORTS_PAGE.attachEventListeners(root, rerender),
+  },
+  {
+    id: "transactions-loading",
+    label: "รายการเงิน (กำลังโหลด)",
+    route: "/transactions",
+    render: () => TRANSACTIONS_LOADING_PAGE.renderHtml(USER),
+  },
+  {
+    id: "transactions-stress",
+    label: "รายการเงิน (ข้อมูลสุดขีด)",
+    route: "/transactions",
+    render: () => TRANSACTIONS_STRESS_PAGE.renderHtml(USER),
+    attach: (root, rerender) =>
+      TRANSACTIONS_STRESS_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "dashboard-empty",

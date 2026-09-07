@@ -564,7 +564,14 @@ export class DashboardPage {
                   : isExpense
                     ? "var(--expense)"
                     : "var(--foreground)";
-                const sign = isIncome ? "+" : isExpense ? "−" : "";
+                // Negative amounts format their own minus sign.
+                const sign = item.amount.isNegative()
+                  ? ""
+                  : isIncome
+                    ? "+"
+                    : isExpense
+                      ? "−"
+                      : "";
                 const statusLabel =
                   item.status === "approved"
                     ? "อนุมัติแล้ว"
@@ -675,8 +682,14 @@ export class DashboardPage {
       can(userRole, "create", "fund_transfers")
         ? `<a href="#/funds" class="gl-icon-btn" aria-label="โอนเงินกองทุน" title="โอนเงินกองทุน">${ICON_TRANSFER}</a>`
         : "",
+      // Labelled rather than icon-only: this is the one hero action available
+      // to every role that can read, so for a pastor it renders alone, and a
+      // single unlabelled icon under the balance gives no clue where it goes.
       can(userRole, "read", "transactions")
-        ? `<a href="#/transactions" class="gl-icon-btn" aria-label="รายการทั้งหมด" title="รายการทั้งหมด">${ICON_LIST}</a>`
+        ? `<a href="#/transactions" class="gl-btn gl-btn--secondary">
+            ${ICON_LIST}
+            <span>รายการทั้งหมด</span>
+          </a>`
         : "",
     ]
       .filter(Boolean)

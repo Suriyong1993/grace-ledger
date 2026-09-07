@@ -186,11 +186,13 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).toContain('class="gl-btn gl-btn--primary"');
     expect(html).toContain("บันทึกเงินถวาย");
 
-    // The rest are icon-only — never four identical rectangles — but each
-    // still carries an accessible name for a screen reader.
+    // The create shortcuts stay icon-only — never four identical rectangles —
+    // but each still carries an accessible name for a screen reader.
     expect(html).toContain('aria-label="บันทึกรายจ่าย"');
     expect(html).toContain('aria-label="โอนเงินกองทุน"');
-    expect(html).toContain('aria-label="รายการทั้งหมด"');
+    // "All transactions" is the one action every reading role gets, so it is
+    // labelled: for a pastor it would otherwise render as a lone bare icon.
+    expect(html).toContain("รายการทั้งหมด");
 
     // Labels wrap naturally; a hard <br> inside a label breaks at 390px.
     expect(html).not.toContain("<br>");
@@ -208,7 +210,7 @@ describe("DashboardPage UI — Unit Tests", () => {
     expect(html).not.toContain('aria-label="บันทึกรายจ่าย"');
     expect(html).not.toContain('aria-label="โอนเงินกองทุน"');
     // Read-only navigation stays available.
-    expect(html).toContain('aria-label="รายการทั้งหมด"');
+    expect(html).toContain("รายการทั้งหมด");
   });
 
   it("shows fund progress only for funds that actually have a target", () => {

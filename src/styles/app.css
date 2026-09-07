@@ -4555,3 +4555,10 @@ button.gl-card:hover {
 .gl-members-search {
   margin-bottom: var(--space-4);
 }
+
+/* Top-aligned variant of the page header, for headers whose trailing content
+   is taller than the title block. Replaces an inline style that also pinned
+   flex-direction and so defeated the stacked layout below 768px. */
+.gl-page-header--start {
+  align-items: flex-start;
+}

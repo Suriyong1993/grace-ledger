@@ -87,8 +87,10 @@ export function renderApprovalsQueueViewHtml(
 
   const itemsHtml = items
     .map((item) => {
-      const sign =
-        item.direction === "expense"
+      // Negative amounts format their own minus sign.
+      const sign = item.amount.isNegative()
+        ? ""
+        : item.direction === "expense"
           ? "−"
           : item.direction === "income"
             ? "+"

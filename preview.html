@@ -7,7 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/styles/app.css">
+  <!-- app.css is imported by previewMain.ts. Linking it here as well loaded
+       the sheet twice, and the second copy's unconditional rules re-applied
+       after the first copy's media queries — so responsive rules silently lost
+       at the exact breakpoint and the harness misrepresented tablet layout. -->
   <style>
     /* Chrome for the harness itself — not part of the product surface. */
     .gl-preview-bar {

@@ -1,0 +1,173 @@
+[
+  {
+    "screen": "dashboard",
+    "name": "primary-button",
+    "selector": ".gl-dash-hero__actions .gl-btn--primary",
+    "status": "not-found"
+  },
+  {
+    "screen": "dashboard",
+    "name": "secondary-button",
+    "selector": ".gl-dash-hero__actions .gl-btn--secondary",
+    "status": "ok",
+    "size": {
+      "w": 148,
+      "h": 46
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": null,
+    "outlineWidth": "2px",
+    "cursor": "pointer"
+  },
+  {
+    "screen": "transactions",
+    "name": "search-input",
+    "selector": ".gl-txn-filters__input",
+    "status": "ok",
+    "size": {
+      "w": 883,
+      "h": 46
+    },
+    "hoverChanges": false,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "3px",
+    "cursor": "text"
+  },
+  {
+    "screen": "transactions",
+    "name": "filter-pill-inactive",
+    "selector": ".filter-pill[data-value=\"income\"]",
+    "status": "ok",
+    "size": {
+      "w": 46,
+      "h": 40
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "default"
+  },
+  {
+    "screen": "transactions",
+    "name": "filter-pill-active",
+    "selector": ".filter-pill[data-value=\"all\"]",
+    "status": "ok",
+    "size": {
+      "w": 51,
+      "h": 40
+    },
+    "hoverChanges": false,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "default"
+  },
+  {
+    "screen": "transactions",
+    "name": "period-select",
+    "selector": ".gl-txn-filters__period",
+    "status": "ok",
+    "size": {
+      "w": 160,
+      "h": 46
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "3px",
+    "cursor": "default"
+  },
+  {
+    "screen": "offerings",
+    "name": "offering-primary",
+    "selector": ".gl-btn--primary",
+    "status": "ok",
+    "size": {
+      "w": 132,
+      "h": 46
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": null,
+    "outlineWidth": "2px",
+    "cursor": "pointer"
+  },
+  {
+    "screen": "offering-detail",
+    "name": "tab-inactive",
+    "selector": "#btn-tab-count",
+    "status": "ok",
+    "size": {
+      "w": 80,
+      "h": 44
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "pointer"
+  },
+  {
+    "screen": "offering-detail",
+    "name": "tab-active",
+    "selector": "#btn-tab-overview",
+    "status": "ok",
+    "size": {
+      "w": 46,
+      "h": 44
+    },
+    "hoverChanges": false,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "pointer"
+  },
+  {
+    "screen": "approvals",
+    "name": "approve-button",
+    "selector": ".gl-btn--primary",
+    "status": "ok",
+    "size": {
+      "w": 80,
+      "h": 44
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "pointer"
+  },
+  {
+    "screen": "approvals",
+    "name": "detail-button",
+    "selector": ".gl-btn--secondary",
+    "status": "ok",
+    "size": {
+      "w": 79,
+      "h": 34
+    },
+    "hoverChanges": true,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "pointer"
+  },
+  {
+    "screen": "members",
+    "name": "member-search",
+    "selector": "#member-search-input",
+    "status": "ok",
+    "size": {
+      "w": 917,
+      "h": 23
+    },
+    "hoverChanges": false,
+    "focusChanges": true,
+    "disabled": false,
+    "outlineWidth": "2px",
+    "cursor": "text"
+  }
+]

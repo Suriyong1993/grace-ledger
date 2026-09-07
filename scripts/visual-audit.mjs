@@ -72,6 +72,7 @@ const VIEWPORTS = [
 const SCREENS = [
   "dashboard", "transactions", "approvals", "offerings",
   "offering-detail", "funds", "members", "reports", "dashboard-empty",
+  "transactions-loading", "transactions-stress",
 ];
 
 const run = async () => {

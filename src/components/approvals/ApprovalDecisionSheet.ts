@@ -22,8 +22,14 @@ export function renderApprovalDecisionSheetHtml(
 ): string {
   const { item, projections, isStaleState } = props;
 
-  const sign =
-    item.direction === "expense" ? "−" : item.direction === "income" ? "+" : "";
+  // Negative amounts format their own minus sign.
+  const sign = item.amount.isNegative()
+    ? ""
+    : item.direction === "expense"
+      ? "−"
+      : item.direction === "income"
+        ? "+"
+        : "";
   const formattedAmount = `${sign}${item.amount.format({ currency: "THB", showSign: false })}`;
   const statusBadge = renderStatusBadgeHtml({ status: item.status });
 

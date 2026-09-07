@@ -95,7 +95,11 @@ export function renderCashCountViewHtml(props: CashCountViewProps): string {
       </a>
     </div>
 
-    <div class="gl-page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-3);">
+    <!-- Same reason as the session list: inline flex properties outrank the
+         class's own responsive override and pin the desktop row at every
+         width. align-items differs from the class default only on desktop,
+         which the stacked layout does not need. -->
+    <div class="gl-page-header gl-page-header--start">
       <div style="min-width: 0;">
         <div class="kicker">${formatDateThai(session.serviceDate)} · <span class="num-display">${session.id.substring(0, 8)}</span></div>
         <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-1);">

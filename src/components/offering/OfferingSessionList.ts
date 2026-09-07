@@ -151,7 +151,10 @@ export function renderOfferingSessionListHtml(props: OfferingSessionListProps): 
 
   return `
   <div class="gl-page gl-offering-list-container gl-fade-in">
-    <div class="gl-page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-4);">
+    <!-- The inline copy of these flex properties duplicated .gl-page-header
+         while outranking its own responsive override, so the header kept the
+         desktop row at tablet widths and the title drifted right. -->
+    <div class="gl-page-header">
       <div>
         <h1>เงินถวายวันอาทิตย์</h1>
         <p>บันทึกยอดแยกช่องทาง แล้วตรวจนับด้วยผู้ตรวจ 2 คน</p>

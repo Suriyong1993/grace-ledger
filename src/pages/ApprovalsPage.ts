@@ -205,7 +205,13 @@ export class ApprovalsPage {
         : item.direction === "expense"
           ? "var(--expense)"
           : "var(--muted-foreground)";
-    const amountSign = item.direction === "expense" ? "−" : "+";
+    // A negative amount already formats with its own minus; adding the
+    // direction sign on top of it prints "− -฿45".
+    const amountSign = item.amount.isNegative()
+      ? ""
+      : item.direction === "expense"
+        ? "−"
+        : "+";
     const fundNames =
       item.splits && item.splits.length > 0
         ? item.splits
