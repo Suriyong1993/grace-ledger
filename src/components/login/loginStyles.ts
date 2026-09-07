@@ -16,7 +16,10 @@ export function renderLoginStylesHtml(): string {
       align-items: center;
       justify-content: center;
       padding: var(--space-6) var(--space-4);
-      background: var(--background);
+      /* Glass Ledger (D21): same fixed ambient glow as the app shell. */
+      background-color: var(--background);
+      background-image: var(--gl-ambient);
+      background-attachment: fixed;
       color: var(--foreground);
       font-family: var(--font-sans);
       position: relative;
@@ -35,12 +38,30 @@ export function renderLoginStylesHtml(): string {
     }
 
     .gl-vault-panel {
-      background: var(--sidebar);
+      /* Glass Ledger (D21): vault gradient + emerald/brass corner glows,
+         matching the option-C login mock. Content paints above the glows. */
+      background: var(--gl-vault-grad);
       color: var(--sidebar-foreground);
       border-right: 1px solid color-mix(in srgb, var(--sidebar-primary) 22%, transparent);
       padding: var(--space-7) var(--space-6);
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gl-vault-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: var(--gl-vault-ambient);
+      pointer-events: none;
+    }
+
+    .gl-vault-panel > * {
+      position: relative;
+      z-index: 1;
     }
 
     .gl-vault-panel__inner {
@@ -62,12 +83,13 @@ export function renderLoginStylesHtml(): string {
       width: 56px;
       height: 56px;
       border-radius: var(--radius-lg);
-      background: var(--sidebar-accent);
-      color: var(--sidebar-primary);
+      /* D21: the direction's brand ramp with a frost ring. */
+      background: var(--gl-mark-grad);
+      color: var(--sidebar-primary-foreground);
       display: grid;
       place-items: center;
       flex-shrink: 0;
-      border: 1px solid color-mix(in srgb, var(--sidebar-primary) 30%, transparent);
+      border: 1px solid color-mix(in srgb, var(--sidebar-foreground) 18%, transparent);
     }
 
     .gl-vault-brandtext {
@@ -211,10 +233,13 @@ export function renderLoginStylesHtml(): string {
     .gl-login-card {
       width: 100%;
       max-width: 480px;
-      background: var(--card);
+      /* Glass Ledger (D21): frosted card over the ambient workspace glow. */
+      background: var(--glass-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-card);
-      box-shadow: var(--shadow-elevated);
+      box-shadow: var(--shadow-glass-card);
+      backdrop-filter: var(--glass-blur-surface);
+      -webkit-backdrop-filter: var(--glass-blur-surface);
       padding: var(--space-7) var(--space-6);
       display: flex;
       flex-direction: column;
@@ -317,7 +342,8 @@ export function renderLoginStylesHtml(): string {
       width: 100%;
       min-height: var(--touch-target-min);
       padding: var(--space-3) var(--space-4);
-      background: var(--card);
+      /* D21: 60% porcelain chip on the frosted login card (option-C mock). */
+      background: color-mix(in srgb, var(--card) 60%, transparent);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       cursor: pointer;
@@ -569,7 +595,8 @@ export function renderLoginStylesHtml(): string {
       min-height: 56px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
-      background: var(--card);
+      /* D21: frosted key over the glass card, same 60% tint as the mock. */
+      background: color-mix(in srgb, var(--card) 62%, transparent);
       color: var(--foreground);
       font-family: var(--font-display);
       font-size: var(--text-xl);

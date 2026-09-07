@@ -554,3 +554,117 @@ single remaining `scale(0.99)` in the product is the login card's entrance keyfr
 not a press.
 
 **Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D17.
+
+## 2026-09-07 — Premium direction adoption (user-selected from UI Lab)
+
+### D21 — The "Glass Ledger" direction is adopted as the workspace theme (supersedes D15 exactly where stated)
+
+**Decision:** the product adopts UI Lab option C ("Glass Ledger") as its visual direction. Frosted
+surfaces return **by user selection**, not by drift: the user compared the three desktop directions in
+`ui-lab/` (A Porcelain Executive, B Vault Pro, C Glass Ledger) after the 2026-09-06 session and chose C.
+
+**Scope — every glass value is a token derived from the existing palette via `color-mix()`; nothing is
+retyped and no hue the identity does not own is introduced:**
+
+| Surface | Token(s) | Value |
+| --- | --- | --- |
+| Workspace | `--gl-ambient` | Three fixed radial glows (emerald / brass / evergreen) painted once on `body`, `background-attachment: fixed` |
+| `.gl-card`, `.gl-card--elevated`, `.gl-login-card` | `--glass-card` + `--glass-blur-surface` + `--shadow-glass-card` | card 78% opaque, `blur(20px) saturate(150%)`, inner porcelain highlight + deep ink drop |
+| `.gl-dash-hero` | `--glass-hero` | 94%→66% white ramp — full frost on the screen's focal card |
+| `.gl-shell-topbar`, `.gl-topbar`, `.gl-mobilenav` | `--glass-chrome` + `--glass-blur-chrome` | card 86% opaque, `blur(16px) saturate(140%)` |
+| `.gl-sidebar` | `--glass-sidebar` | vault 92% opaque + chrome frost; the glow breathes around its edge |
+| `.gl-btn--primary`, `.gl-shell-primary-action` | `--gl-primary-grad` / `--gl-primary-grad-hover` + `--shadow-glass-btn` | `#0D9273 → #14532D` ramp with an emerald-tinted lift shadow |
+| `.gl-shell-mark`, `.gl-vault-mark` | `--gl-mark-grad` | the same ramp on the brand mark |
+| Login vault panel | `--gl-vault-grad` + `--gl-vault-ambient` | vault-950→evergreen-900 gradient with emerald/brass corner glows |
+| `.gl-table th`, `.gl-profile-item`, `.gl-pin-key` | `color-mix` tints | stone/porcelain strips go 60-66% so they sit *in* the frost instead of patching over it |
+
+**Why this is not the layer D15 retired:**
+
+1. **D15's ruling was against an unjustified drift, not against frost forever.** Its first reason was
+   "nothing in the depth system justified it." The justification now exists and is written down here —
+   the user's explicit direction choice. The D15 wording stays correct about *that* layer (black shadows,
+   an off-palette hex, an invisible white border), all of which remain eliminated.
+2. **D15's failures are each designed out.** Shadows are ink/emerald-tinted tokens, never `rgba(0,0,0,.25)`;
+   every glass edge keeps `var(--border)` (D15's 9%-white invisible border happened precisely because the
+   old layer invented `--gl-glass-border`); and figures sit on **78–94%** opacity, with the blur *behind*
+   the veil — a digit on a glass card has the same contrast as on porcelain.
+3. **Overlays stay opaque (D3).** Modal, sheet, popover, dropdown, toast: untouched. Glass is a property
+   of the workspace and its chrome, not of anything that floats above a decision.
+4. **`prefers-reduced-transparency: reduce` collapses every glass token to its D15 solid.** One media
+   query in `tokens/colors.css`; no component carries a fallback branch.
+
+**Why the primary action moved to the emerald ramp:** the ramp runs emerald (`--gl-emerald-600`,
+income) into evergreen (`--gl-evergreen-800`, brand). Finance hues keep their fixed meaning — a green
+*figure* still means income, the red expense — while the committing button carries the brand ramp the
+option-C mock specified. This is the "documented reason" `CLAUDE.md` requires for an accent.
+
+**Mechanical record:** `lint:design` keeps guarding by exact count — `app.css` `backdrop-filter` moves
+5 → 21 (5 overlay scrims + 16 glass rules, all standard + `-webkit-` pairs), `loginStyles.ts` gains an
+entry (2, the login card). Zero new `rgb()`/hex/font-size/radius literals in `src/**`: all values live in
+`design-system-extracted/tokens/`, so the lint's literal counts did not move.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-07). `npm run typecheck` clean; `npm test` 575 passed /
+24 skipped (baseline unchanged); `npm run lint:design` passed; `npm run build` clean. Browser rendering
+could not be screenshotted in the sandbox (no Chromium, network-restricted) — visual confirmation is by
+the live dev-server preview at desktop and 390px.
+
+### D22 — U1 ultra-modern pass: floating pill chrome, pastel metric tiles, pill CTA (user reference set)
+
+**Decision:** after D21 (Glass Ledger), the user supplied four mobile-app reference posts (2026-09-07:
+property/finance, garden, mindfulness, home-design showcases) and directed: apply that ultra-modern
+language across the app. Their shared DNA was extracted and mapped onto existing structures — nothing
+structural moved, no money/lifecycle/RLS surface was touched:
+
+| Reference cue | Where it landed | Change |
+| --- | --- | --- |
+| Floating bottom tab bar (detached, stadium-round) | `.gl-mobilenav` ≤768px | edge-pinned bar → floating glass pill (`--space-3` insets, `border-radius: var(--radius-full)`, full border + `--shadow-elevated`) |
+| Floating rounded toolbars stacked above nav | `.gl-actionbar--sticky` ≤768px | full-width hairline bar → floating frosted tile (`--radius-2xl`, full border, elevated shadow); bottom offset recomputed for the floating nav |
+| Large card corners even on phones | `.gl-card` ≤768px / ≤390px, `.gl-login-card` ≤390px | 12px/10px → `--radius-card` (20px) / `--radius-2xl` (18px); small screens no longer get a crisper radius exemption |
+| Filled segmented chips | `.filter-pill.is-active` (Transactions) | tinted outline → the D21 emerald ramp, filled, white label — one filled pill per row, visually junior to the one primary action per screen (D11 §3) |
+| Pill committing buttons | `.gl-btn--primary`, `.gl-shell-primary-action` | 12px → `--radius-full`, carrying the existing ramp + emerald shadow |
+| Pastel metric cards | `.gl-dash-hero__figure{--income,--expense}` (Dashboard) | bare figures under a hairline → soft tiles: `--income-muted`, `--expense-muted`, stone `--secondary` for the net figure; the hairline rule above the row is retired (the tint band is the separator); ≤768px figures step down to `--text-md` so a baht amount never crushes |
+
+**What was deliberately NOT done** (candidates for the next phases after user review):
+
+- **Centre FAB inside the mobile nav pill** — every reference has one, but our global primary action lives
+  in the topbar by role (D11 §3) and D13 just restored the "เพิ่มเติม" overflow item; inserting a FAB is a
+  structure change that needs correct per-role destination logic, so it is its own pass.
+- **Borderless/shadowless cards, per-card accent colours** (garden app) — each would break a documented
+  contract (border-is-depth, fixed finance hues).
+- Photo-hero backgrounds — not a fit for a ledger's trust surface.
+
+**Mechanical record:** the sticky action bar's scrim gained its `-webkit-` twin (allowlist 21 → 22,
+comment updated). Zero literals touched otherwise. Tests: the two dashboard hero assertions were updated
+*deliberately* to the new class strings (same text, stronger selector) — every other assertion unchanged.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-07). `npm run typecheck`, `npm test` (575 passed, 24 skipped —
+baseline), `npm run lint:design`, `npm run build` all green. Visual confirmation: live preview at 390px and
+desktop (sandbox has no Chromium).
+
+### D23 — U2: centre FAB in the floating mobile nav; sticky action flows exempt it
+
+**Decision:** the references' raised centre FAB is adopted: the global create action
+(`#/transactions?create=1`) moves into the floating mobile pill as a 56px ramp FAB at
+`left:50%` for roles with `create:transactions`; the labelled `.gl-shell-primary-action`
+is hidden ≤768px (the same affordance is not rendered twice in 390px).
+
+Structural consequences, recorded for the next agent:
+
+1. `.gl-mobilenav` keeps `overflow: visible`; scrolling moved into `.gl-mobilenav__track`
+   (a pill-shaped inner scroller) — otherwise the overflow clip would amputate the raised FAB.
+2. A transparent `.gl-mobilenav__fabgap` (72px) is spliced into the middle of the track's
+   items so no destination slides under the FAB; it appears iff the FAB appears.
+3. The FAB's `transform` is positional (`translate(-50%,-60%)`), so `prefers-reduced-motion`
+   kills only its transition — `transform: none` would un-centre it.
+4. While a page pins `.gl-actionbar--sticky` (cash count screen), the FAB and its gap hide
+   via `.gl-app-container:has(.gl-actionbar--sticky)` — a mid-count committing flow owns the
+   centre-bottom strip.
+5. The "เพิ่มเติม" sheet re-anchors 12px higher to clear the floating pill (was 8px above an
+   edge-pinned bar).
+
+**Also in this sweep slice:** the dashboard recent-activity empty state normalized onto
+`renderEmptyStateHtml` (last outlier of the shared helper; message text unchanged), and trend
+bars go pill-top (`--radius-full` tops); chart axis bases stay square.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-07). Two new navigation tests lock the FAB
+presence/absence by role; suite 577 passed / 24 skipped, typecheck + lint:design + build green.

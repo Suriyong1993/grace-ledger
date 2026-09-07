@@ -167,3 +167,77 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-icon: oklch(0.66 0.015 160);
 }
+
+/* --------------------------------------------------------------------------
+   Glass Ledger layer (2026-09-07 — D21, user-selected from UI Lab option C).
+   The Emerald Vault palette above is untouched: every glass value is DERIVED
+   from the semantic tokens via color-mix(), so the dark theme inherits
+   matching tints with no second palette.
+
+   Legibility contract:
+   - Content surfaces stay >= 78% opacity — a figure on a glass card reads on
+     near-solid porcelain; the frost lives behind the veil, not on the digit.
+   - Overlays (modal, sheet, popover, dropdown) stay OPAQUE --popover —
+     unchanged from D3/D15.
+   - prefers-reduced-transparency collapses all of this back to D15 solids.
+   -------------------------------------------------------------------------- */
+:root {
+  /* surfaces */
+  --glass-card: color-mix(in srgb, var(--card) 78%, transparent);
+  --glass-hero: linear-gradient(
+    150deg,
+    color-mix(in srgb, var(--card) 94%, transparent) 0%,
+    color-mix(in srgb, var(--card) 66%, transparent) 100%
+  );
+  --glass-chrome: color-mix(in srgb, var(--card) 86%, transparent);
+  --glass-sidebar: color-mix(in srgb, var(--sidebar) 92%, transparent);
+
+  /* frost */
+  --glass-blur-surface: blur(20px) saturate(150%);
+  --glass-blur-chrome: blur(16px) saturate(140%);
+
+  /* Ambient workspace glow — the only decoration the direction adds. Painted
+     once on the viewport (body, background-attachment: fixed), never inside
+     a component, so scrolling never re-samples it. Tints come from the three
+     hues the identity already owns: emerald income, brass accent, evergreen. */
+  --gl-ambient:
+    radial-gradient(920px 540px at 6% -10%, color-mix(in srgb, var(--gl-emerald-600) 16%, transparent) 0%, transparent 60%),
+    radial-gradient(780px 480px at 102% -2%, color-mix(in srgb, var(--gl-brass-100) 95%, transparent) 0%, transparent 62%),
+    radial-gradient(720px 520px at 58% 112%, color-mix(in srgb, var(--gl-evergreen-800) 12%, transparent) 0%, transparent 60%);
+
+  /* Primary action ramp (D21 §2): emerald into evergreen — the two brand
+     greens the palette already defines. The ramp darkens rightward into the
+     evergreen anchor, so the brand hue still ends the gesture. */
+  --gl-primary-grad: linear-gradient(135deg, var(--gl-emerald-600), var(--gl-evergreen-800));
+  --gl-primary-grad-hover: linear-gradient(135deg, var(--gl-evergreen-600), var(--gl-evergreen-900));
+  --gl-mark-grad: linear-gradient(140deg, var(--gl-emerald-600), var(--gl-evergreen-800));
+
+  /* Vault chrome ambience (login vault panel) — emerald + brass glows over
+     the vault gradient; same language as --gl-ambient, tuned for the dark
+     panel. */
+  --gl-vault-grad: linear-gradient(160deg, var(--gl-vault-950) 0%, var(--gl-evergreen-900) 100%);
+  --gl-vault-ambient:
+    radial-gradient(620px 380px at 10% 6%, color-mix(in srgb, var(--gl-emerald-600) 32%, transparent) 0%, transparent 62%),
+    radial-gradient(520px 360px at 90% 96%, color-mix(in srgb, var(--gl-brass-100) 60%, transparent) 0%, transparent 60%);
+}
+
+.dark {
+  --gl-ambient:
+    radial-gradient(920px 540px at 6% -10%, color-mix(in srgb, var(--primary) 20%, transparent) 0%, transparent 60%),
+    radial-gradient(780px 480px at 102% -2%, color-mix(in srgb, var(--warning) 10%, transparent) 0%, transparent 62%),
+    radial-gradient(720px 520px at 58% 112%, color-mix(in srgb, var(--gl-evergreen-800) 30%, transparent) 0%, transparent 60%);
+}
+
+/* An explicit OS-level preference for opaque UI collapses the glass layer
+   back to D15 solids through the tokens alone — no second code path. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-card: var(--card);
+    --glass-hero: var(--card);
+    --glass-chrome: var(--card);
+    --glass-sidebar: var(--sidebar);
+    --glass-blur-surface: none;
+    --glass-blur-chrome: none;
+    --gl-ambient: none;
+  }
+}

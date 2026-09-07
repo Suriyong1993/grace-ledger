@@ -323,6 +323,42 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
   const activeSidebar = sidebarDestinations.find((d) => d.isActive(props.activeRoute));
   const activePageLabel = activeSidebar ? activeSidebar.label : "Grace Ledger";
 
+  // U2 — mobile pill gets a raised centre FAB mirroring the topbar's global
+  // create action (same target, only for roles allowed to create); a
+  // transparent gap spliced into the middle of the track keeps items from
+  // sliding beneath it. The FAB stays in the pill's coordinate space but
+  // outside the scrolling track, so the raise is never clipped.
+  const mobileItemHtml: string[] = mobileTabs.map((d) =>
+    renderMobileNavLink(d, d.isActive(props.activeRoute)),
+  );
+  const mobileMoreButtonHtml =
+    mobileOverflow.length > 0
+      ? `<button type="button" id="gl-more-btn" class="gl-mobilenav__item" aria-haspopup="dialog" aria-expanded="false" aria-controls="gl-more-panel" aria-label="เพิ่มเติม${mobileOverflowCount > 0 ? ` (${mobileOverflowCount} รายการ)` : ""}">
+          <span style="position: relative; display: inline-flex;">
+            ${icon(ICON_MORE, 22)}
+            ${mobileOverflowCount > 0 ? `<span class="gl-mobilenav__badge num-display">${mobileOverflowCount > 99 ? "99+" : mobileOverflowCount}</span>` : ""}
+          </span>
+          <span>เพิ่มเติม</span>
+        </button>`
+      : "";
+  if (mobileMoreButtonHtml) mobileItemHtml.push(mobileMoreButtonHtml);
+  const mobileMorePanelHtml =
+    mobileOverflow.length > 0
+      ? `<div id="gl-more-panel" class="gl-attention-panel gl-more-panel" role="dialog" aria-modal="false" aria-label="เมนูเพิ่มเติม" hidden>
+          ${mobileOverflow.map((d) => renderMoreSheetLink(d)).join("")}
+        </div>`
+      : "";
+  const mobileFabHtml = canCreateTransactions
+    ? `<a href="#/transactions?create=1" class="gl-mobilenav__fab" title="บันทึกรายการรับ-จ่ายใหม่" aria-label="บันทึกรายการรับ-จ่ายใหม่">${icon(ICON_PLUS, 26)}</a>`
+    : "";
+  if (mobileFabHtml) {
+    mobileItemHtml.splice(
+      Math.floor(mobileItemHtml.length / 2),
+      0,
+      `<span class="gl-mobilenav__fabgap" aria-hidden="true"></span>`,
+    );
+  }
+
   const groups: string[] = [];
   let lastGroup = "";
   for (const dest of sidebarDestinations) {
@@ -609,21 +645,13 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
          anchor it above the bar instead of below the header. */
       .gl-more-panel {
         top: auto;
-        bottom: calc(var(--gl-mobilenav-h) + env(safe-area-inset-bottom, 0px) + 8px);
+        bottom: calc(var(--gl-mobilenav-h) + env(safe-area-inset-bottom, 0px) + var(--space-4));
         max-height: min(420px, 60vh);
       }
-      .gl-shell-primary-action {
-        /* Narrower padding and the short label buy the width; the touch target
-           itself stays at the 44px minimum. It was 40px, which compacted the
-           app's most-tapped control below the size the design system sets for
-           every other one. The room came back when the topbar's percentage
-           cap was removed. */
-        min-height: var(--touch-target-min);
-        padding: 0 var(--space-3);
-        font-size: var(--text-xs);
-      }
-      .gl-shell-primary-action__full { display: none; }
-      .gl-shell-primary-action__short { display: inline; }
+      /* U2: on phones the create action moves to the floating nav pill's
+         centre FAB — keeping the labelled pill in the topbar as well would
+         duplicate the same affordance twice in 390px. Desktop is unchanged. */
+      .gl-shell-primary-action { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
       .gl-attention-panel { transition: none; }
@@ -633,7 +661,6 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
   <div class="gl-app-container" style="
     display: flex;
     min-height: 100vh;
-    background: var(--background);
     color: var(--foreground);
   ">
     <!-- Accessible Skip Link for Keyboard & Assistive Technology -->
@@ -643,7 +670,7 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
     <aside class="gl-sidebar" style="
       width: var(--gl-sidebar-w);
       flex-shrink: 0;
-      background: var(--sidebar);
+      background: var(--glass-sidebar);
       border-right: 1px solid var(--sidebar-border);
       display: flex;
       flex-direction: column;
@@ -770,21 +797,11 @@ export function renderAppShellHtml(props: AppShellProps, contentHtml: string): s
 
     <!-- Role-aware Mobile Bottom Navigation -->
     <nav class="gl-mobilenav" aria-label="เมนูหลัก">
-      ${mobileTabs.map((d) => renderMobileNavLink(d, d.isActive(props.activeRoute))).join("")}
-      ${
-        mobileOverflow.length > 0
-          ? `<button type="button" id="gl-more-btn" class="gl-mobilenav__item" aria-haspopup="dialog" aria-expanded="false" aria-controls="gl-more-panel" aria-label="เพิ่มเติม${mobileOverflowCount > 0 ? ` (${mobileOverflowCount} รายการ)` : ""}">
-              <span style="position: relative; display: inline-flex;">
-                ${icon(ICON_MORE, 22)}
-                ${mobileOverflowCount > 0 ? `<span class="gl-mobilenav__badge num-display">${mobileOverflowCount > 99 ? "99+" : mobileOverflowCount}</span>` : ""}
-              </span>
-              <span>เพิ่มเติม</span>
-            </button>
-            <div id="gl-more-panel" class="gl-attention-panel gl-more-panel" role="dialog" aria-modal="false" aria-label="เมนูเพิ่มเติม" hidden>
-              ${mobileOverflow.map((d) => renderMoreSheetLink(d)).join("")}
-            </div>`
-          : ""
-      }
+      <div class="gl-mobilenav__track">
+        ${mobileItemHtml.join("")}
+      </div>
+      ${mobileMorePanelHtml}
+      ${mobileFabHtml}
     </nav>
   </div>
   `;

@@ -99,8 +99,8 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     // Income/expense are typography inside the hero card, never their own
     // bordered card.
-    expect(html).toContain('class="gl-dash-hero__figure">รายรับเดือนนี้');
-    expect(html).toContain('class="gl-dash-hero__figure">รายจ่ายเดือนนี้');
+    expect(html).toContain('class="gl-dash-hero__figure gl-dash-hero__figure--income">รายรับเดือนนี้');
+    expect(html).toContain('class="gl-dash-hero__figure gl-dash-hero__figure--expense">รายจ่ายเดือนนี้');
     expect(html).not.toContain('class="gl-stats"');
 
     // Sign and colour stay attached to the figure they describe.

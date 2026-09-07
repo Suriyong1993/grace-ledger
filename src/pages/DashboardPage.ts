@@ -540,9 +540,10 @@ export class DashboardPage {
     // 3. Recent Transactions Feed
     const recentHtml =
       recent.length === 0
-        ? `<p class="gl-empty-center__msg">
-             ยังไม่มีรายการล่าสุด รายการที่บันทึกจะแสดงที่นี่
-           </p>`
+        ? renderEmptyStateHtml({
+            message: "ยังไม่มีรายการล่าสุด",
+            hint: "รายการที่บันทึกจะแสดงที่นี่",
+          })
         : `<div class="gl-card gl-txn-list">
             ${recent
               .map((item) => {
@@ -724,8 +725,8 @@ export class DashboardPage {
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 
             <div class="gl-dash-hero__figures">
-              <span class="gl-dash-hero__figure">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong>${incomeDeltaHtml}</span>
-              <span class="gl-dash-hero__figure">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong>${expenseDeltaHtml}</span>
+              <span class="gl-dash-hero__figure gl-dash-hero__figure--income">รายรับเดือนนี้<strong class="num-display gl-income">+${data.monthlyIncome || "฿0.00"}</strong>${incomeDeltaHtml}</span>
+              <span class="gl-dash-hero__figure gl-dash-hero__figure--expense">รายจ่ายเดือนนี้<strong class="num-display gl-expense">−${data.monthlyExpense || "฿0.00"}</strong>${expenseDeltaHtml}</span>
               <span class="gl-dash-hero__figure">ส่วนต่างสุทธิ<strong class="num-display ${netIsPositive ? "gl-income" : netMoney.isNegative() ? "gl-expense" : "gl-net"}">${netIsPositive ? `+${netMoney.format()}` : netMoney.format()}</strong></span>
             </div>
 

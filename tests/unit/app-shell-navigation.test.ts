@@ -141,6 +141,35 @@ describe("Authenticated App Shell & Navigation", () => {
     expect(html).toContain('href="#/reports"');
   });
 
+  it("centres the global create action as a raised FAB in the mobile pill (U2) — with a track gap keeping items clear", () => {
+    const html = renderAppShellHtml(treasurerProps, "<div>Content</div>");
+
+    // The FAB is the same affordance as the topbar's primary action: same
+    // target, only rendered for roles allowed to create transactions.
+    expect(html).toContain('href="#/transactions?create=1" class="gl-mobilenav__fab"');
+    expect(html).toContain('aria-label="บันทึกรายการรับ-จ่ายใหม่"');
+    // The transparent centre gap is spliced into the scrolling track so no
+    // destination slides under the raised FAB.
+    expect(html).toContain('class="gl-mobilenav__fabgap"');
+    // Items scroll inside the inner track; the pill itself must stay
+    // overflow-visible so the raised FAB is not clipped.
+    expect(html).toContain('class="gl-mobilenav__track"');
+  });
+
+  it("omits the centre FAB when the role cannot create transactions", () => {
+    const html = renderAppShellHtml(
+      {
+        ...treasurerProps,
+        user: { ...treasurerProps.user!, role: "counter" },
+        attention: attentionFixture({ groups: [], totalCount: 0 }),
+      },
+      "<div>Content</div>",
+    );
+
+    expect(html).not.toContain("gl-mobilenav__fab");
+    expect(html).not.toContain("gl-mobilenav__fabgap");
+  });
+
   it("hides the เพิ่มเติม overflow entirely when every reachable destination already fits as a tab", () => {
     // Counter only reads 2 content destinations (offerings, funds) — both
     // fit as tabs, so there is nothing left to overflow.

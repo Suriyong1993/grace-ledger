@@ -103,7 +103,37 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 
 - Border-based depth over shadow
 - No glow, no heavy shadow
-- Cards: `border: 1px solid var(--border)` + optional `--shadow-sm-card`
+- Cards: `border: 1px solid var(--border)` + `--shadow-glass-card` (the D21 glass lift)
+
+---
+
+## Surfaces — Glass Ledger layer (D21, 2026-09-07)
+
+The workspace direction the user selected in the UI Lab review (option C). Frosted
+porcelain over three fixed ambient glows; the Emerald Vault palette is untouched —
+every value derives from existing tokens via `color-mix()`.
+
+| Token                                    | Use                                          |
+| ---------------------------------------- | -------------------------------------------- |
+| `--gl-ambient`                           | Fixed emerald/brass/evergreen glows, `body` only |
+| `--glass-card`                           | Card/login-card fill — 78% porcelain         |
+| `--glass-hero`                           | Dashboard hero — 94%→66% white ramp          |
+| `--glass-chrome`                         | Top bars + mobile nav — 86% porcelain        |
+| `--glass-sidebar`                        | Vault sidebar — 92% dark                     |
+| `--glass-blur-surface`                   | `blur(20px) saturate(150%)` on content cards |
+| `--glass-blur-chrome`                    | `blur(16px) saturate(140%)` on chrome        |
+| `--shadow-glass-card`                    | Inner highlight + deep ink drop              |
+| `--shadow-glass-btn`                     | Emerald-tinted lift on the primary action    |
+| `--gl-primary-grad` / `-hover` / `--gl-mark-grad` | Emerald→evergreen ramp: committing actions, brand mark |
+| `--gl-vault-grad` / `--gl-vault-ambient` | Login vault panel gradient + corner glows    |
+
+**Contract (supersedes D15 only here):**
+
+- Content surfaces stay ≥78% opaque — blur sits *behind* the veil, never on the figure
+- Overlays (modal, sheet, popover, dropdown) stay opaque — D3 is unchanged
+- Edges stay `1px solid var(--border)` — no invented glass borders
+- `prefers-reduced-transparency: reduce` collapses every `--glass-*` token to the D15 solid
+- New glass is **token-only**: a hand-rolled `backdrop-filter`, translucent `rgba()`, or local gradient is still slop and fails `lint:design`
 
 ---
 
@@ -142,6 +172,8 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 | `.gl-btn--destructive` | Delete, void, danger                        |
 | `.gl-btn--sm`          | Compact (34px on fine pointers, 44px touch) |
 | `.gl-btn--block`       | Full width                                  |
+
+Since D22 (U1): the primary/action button is a full pill (`--radius-full`) carrying the D21 ramp; secondary, ghost and destructive stay 12px so the committing action is unmistakable by silhouette alone. On ≤768px the bottom nav is a floating glass pill and sticky action bars float as frosted tiles above it; dashboard hero figures are pastel tiles (`--income-muted` / `--expense-muted` / stone), hairline-free.
 
 **Rules:**
 
@@ -352,11 +384,14 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 
 ### Universal
 
-- No decorative gradients on KPI/stat cards
-- No glassmorphism on a content or chrome surface. Blur is for overlay scrims
-  only (modal/sheet backdrop), at 2-6px behind a veil. Depth on a surface comes
-  from the border and the surface step; the token shadow only confirms it. See
-  D15 — a 14px glass layer on the topbar and bottom bar was retired for this.
+- No decorative gradients on KPI/stat cards. Exception, user-directed: the
+  fixed `--gl-ambient` workspace glows and the `--gl-primary-grad` action ramp
+  (D21) — tokenised, derived from the brand palette, and nowhere else.
+- No hand-rolled glassmorphism. Frost exists only as the documented
+  `--glass-*` token layer (D21, surfaces ≥78% opaque, overlays excluded);
+  blur outside that layer remains for overlay scrims only (modal/sheet
+  backdrop), at 2-6px behind a veil. See D15 for the unmaintained drift layer
+  that failed because it broke every one of these constraints.
 - No bounce/spring animations on business UI
 - No animation > 300ms (except entrance)
 - No decorative SVG illustrations

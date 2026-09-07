@@ -42,14 +42,31 @@ const ALLOWLIST = {
   //     rather than as tokens (3). R6 cleanup.
   //   hex 10 — dev-only HMR badge (1) and the print stylesheet (9), which must
   //     use pure black and white on paper.
-  //   backdrop-filter 5 — overlay scrims only: modal backdrop, sheet backdrop,
-  //     sticky mobile action bar. No content surface may blur.
+  //   backdrop-filter 22 — the first 6 are overlay scrims (modal backdrop pair,
+  //     sheet backdrop pair, sticky mobile action bar pair). The other 16 are the D21
+  //     Glass Ledger surfaces the user selected in the 2026-09-07 direction
+  //     review, each written standard + -webkit- pair: .gl-card,
+  //     .gl-card--elevated, .gl-dash-hero, .gl-shell-topbar, .gl-topbar,
+  //     .gl-mobilenav, .gl-login-card, .gl-sidebar. All blur strengths and
+  //     opacities are tokens (--glass-*) with a prefers-reduced-transparency
+  //     collapse; overlays stay opaque per D3.
   "src/styles/app.css": {
     "literal font-size": 1,
     "literal border-radius": 3,
     "rgba()/rgb() color literal": 7,
     "hex color literal": 10,
-    "backdrop-filter": 5,
+    "backdrop-filter": 22,
+  },
+
+  // Login screen stylesheet — D21 Glass Ledger: the login card is frosted
+  // over the ambient workspace glow (standard + -webkit- pair). All glass
+  // VALUES stay in tokens; no literals enter this file (color-mix only).
+  "src/components/login/loginStyles.ts": {
+    "literal font-size": 0,
+    "literal border-radius": 0,
+    "rgba()/rgb() color literal": 0,
+    "hex color literal": 0,
+    "backdrop-filter": 2,
   },
 
   // Confirmation modal uses ad-hoc semantic tints instead of --pending-muted/--expense-muted. R3/R6 cleanup.

@@ -51,7 +51,7 @@ If a UI or refactor task requires one of these, **stop and report**: problem, im
 - Mobile target is 390px. No horizontal overflow in a core workflow. Touch targets ≥44px (`--touch-target-min`).
 - Accessibility: keyboard focus, visible focus ring, real `<label for>`, semantic buttons, contrast, error announcement, decorative SVG `aria-hidden`.
 
-Do not add an AI-looking design system on top of the existing one. Banned: generic glass cards, gradients-for-decoration, glowing borders, giant hero sections, fake charts, decorative metrics, emoji as UI iconography.
+Do not add an AI-looking design system on top of the existing one. Banned: generic glass cards, gradients-for-decoration, glowing borders, giant hero sections, fake charts, decorative metrics, emoji as UI iconography. The single sanctioned exception is the D21 "Glass Ledger" layer (user-selected, tokenised as `--glass-*`/`--gl-ambient` in `design-system-extracted/tokens/`) — everything frosted goes through those tokens; hand-rolled glass or gradients remain banned.
 
 ## Writing (Thai UI copy)
 

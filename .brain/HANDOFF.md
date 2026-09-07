@@ -8,6 +8,67 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-07 รอบ 3 (U2 — FAB กลาง nav ลอย + เก็บ empty state แดชบอร์ด)
+
+- **ผู้ส่งมอบ (Handed off by):** Arena Agent (session `01a077c7-grace-ledger`) — ผู้ใช้สั่ง "ทำต่อ"
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. **FAB กลาง nav ลอย (D23)** — ปุ่ม create `#/transactions?create=1` 56px ลอยกลาง pill สำหรับ role ที่สร้างรายการได้; topbar ซ่อนปุ่มเดิมบน ≤768px (ไม่ซ้ำ affordance); restructure: scroll ย้ายเข้า `.gl-mobilenav__track` (pill ใช้ overflow:visible เพื่อไม่ตัด FAB), มี `.gl-mobilenav__fabgap` 72px กันชนกลาง, FAB หลบเมื่อมี `.gl-actionbar--sticky` (จอนับเงิน) ผ่าน `:has()`, sheet "เพิ่มเติม" เลื่อนสมอร์ up, reduced-motion ห้าม transform:none กับ FAB (translate เป็นตำแหน่ง)
+  2. **Test ใหม่ 2 ตัว** ใน `app-shell-navigation.test.ts` — FAB มี/ไม่มีตามสิทธิ์ create (treasurer มี / counter ไม่มี)
+  3. Dashboard recent-activity empty state → `renderEmptyStateHtml` (ตัวสุดท้ายที่ยังไม่ใช้ helper กลาง — ข้อความเดิม แยก message/hint)
+  4. แท่งกราฟ trend หัวมน pill-top
+- **การตรวจสอบ (Verification):** test **577 ผ่าน / 24 skip** · typecheck ✓ · lint:design ✓ · build ✓
+- **หมายเหตุสภาพแวดล้อม (สำคัญสำหรับรอบถัดไป):** `node_modules` **ไม่ persist ข้ามเทิร์น** — ต้อง `npm install` ใหม่ทุกรอบ (ใช้ ~4 วิ) ถ้า `tsc/vitest: not found` ให้ install ก่อนอย่าตกใจ
+- **สิ่งที่ต้องทำต่อ (Next Actions):** ไล่เก็บทีละหน้าต่อ — Transactions (สรุปยอดท็อป), Funds (การ์ดกองทุนให้พรีเมียม), Offering detail, Approvals queue, Members, Reports, Profile + desktop topbar grouping (P2 เก่า) — ส่งผลเป็นเฟสละครั้งเพื่อให้ user ดูทัน
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-07 รอบ 2 (U1 — Ultra-modern pass ตาม reference มือถือที่ผู้ใช้ส่ง)
+
+- **ผู้ส่งมอบ (Handed off by):** Arena Agent (session `01a077c7-grace-ledger`)
+- **บริบทงาน (Context):** ผู้ใช้แนบภาพ reference 4 ดีไซน์มือถือ (โพสต์ "Mobile App Ideas") + สั่ง "ทำหน้าแอพทั้งหมดแบบ Ultra modern UI และช่วยไล่เก็บ UI" — **ข้อแตกต่างจากรอบก่อน: session นี้อ่านภาพแนบได้** (ไฟล์ลงที่ `/home/user/uploads/` จริง และ agent มี vision) — ไม่ต้องใช้ pipeline OCR อีก
+- **DNA ที่สกัดจาก reference:** bottom nav ลอยได้มุมมนเต็ม, การ์ดมุมมนใหญ่บนจอเล็ก, CTA เป็น pill, ชิป active เติมสีเต็ม, ชิปตัวเลขพาสเทล — ลงเป็น **D22** ใน DECISIONS.md
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work) — แตะเฉพาะ surface ไม่แตะ logic:**
+  1. `.gl-mobilenav` (≤768px) → pill ลอยจากขอบจอ (insets 12px, radius-full, border เต็ม + shadow-elevated) — รวม rule ที่ซ้ำกัน 2 จุดให้เหลือจุดเดียว
+  2. `.gl-actionbar--sticky` → tile ลอย (radius-2xl + glass) ชิดเหนือ pill nav; คำนวณ bottom offset ใหม่
+  3. `.gl-card` บน ≤768/≤390px และ `.gl-login-card` ≤390px → มุมมนเต็ม (20/18px) ไม่หดแล้ว
+  4. `.gl-btn--primary` + `.gl-shell-primary-action` → pill (radius-full)
+  5. `.filter-pill.is-active` → เติม ramp เขียวเต็มเม็ด (hover ที่ไม่ active ยังเป็น tint เดิม)
+  6. Dashboard hero figures → pastel tiles: `--income` = income-muted, `--expense` = expense-muted, net = stone; เลิกเส้น hairline เหนือแถว; ตัวเลขหดเป็น text-md บนจอเล็ก
+  7. markup: เพิ่ม variant class `--income/--expense` ให้ figure ทั้งสองใน `DashboardPage.ts` + **อัปเดต test 2 บรรทัดแบบเจาะจง** (assertion แน่นกว่าเดิม ไม่ได้หละหลวม)
+  8. lint allowlist backdrop-filter 21 → 22 (actionbar ได้คู่ `-webkit-`)
+- **การตรวจสอบ (Verification):** typecheck ผ่าน · test 575 ผ่าน/24 skip ตาม baseline · lint:design ผ่าน · build ผ่าน
+- **สิ่งที่ยังไม่ทำ โดยตั้งใจ (รอ user ดูผลก่อน):**
+  1. **FAB กลาง nav ล่าง** (reference มีทุกดีไซน์ แต่ชน D11 §3 + D13 ที่เพิ่งคง overflow "เพิ่มเติม" — ต้องคิด destination ตาม role ให้ถูก เป็นงานแยก)
+  2. การ์ดไร้ขอบ / สี accent รายการ์ด / photo hero — ฝ่าฝืนสัญญาเดิมของ repo (border-is-depth, สีการเงินความหมายตายตัว) ไม่ทำ
+  3. Phase ต่อไป: ไล่เก็บทีละหน้า (Transactions → Funds → Offering → Approvals → Members → Reports → Profile) = hero/empty state/spacing ให้เข้าระบบเดียวกัน
+- **คำเตือน (Gotchas):** `.gl-mobilenav` ยังมี `display:none` base นอก media query (ปกติ) — อย่าแตะ; spacers ใช้ `--gl-mobilenav-h` เหมือนเดิม (68px) ความสูง pill ไม่เปลี่ยน เลยไม่ต้องแก้ที่อื่น
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-07 (Glass Ledger — ผู้ใช้เลือกแนวทาง C → ลงโค้ดจริงแบบ token-first)
+
+- **ผู้ส่งมอบ (Handed off by):** Arena Agent (session `01a077c7-grace-ledger`)
+- **บริบทงาน (Context):** ผู้ใช้ตอบ "C" หลัง review 3 แนวทางใน UI Lab → adopt **Glass Ledger** ลงแอปจริง ทำตามแผน handoff รอบก่อน: ธีมผ่านโทเค็นก่อน ไม่แตะ money/lifecycle/RLS
+- **การตัดสินใจสำคัญ — ทับกฎเดิม:** ธีมนี้ชนกับ D15 (retire glass) + anti-slop rule ที่ห้าม blur บน content surface → บันทึกเป็น **D21** ใน `DECISIONS.md` อย่างเป็นทางการ (supersedes D15 เฉพาะจุดที่ระบุ) พร้อม legibility contract: content surface ทึบ ≥78%, overlay ยังทึบตาม D3, และ `prefers-reduced-transparency` ยุบกลับเป็น solid ผ่าน token ตัวเดียว
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. `design-system-extracted/tokens/colors.css` — ชุดโทเค็นใหม่ `--glass-card/--glass-hero/--glass-chrome/--glass-sidebar/--glass-blur-*` (ทุกค่า derive จาก token เดิมด้วย `color-mix()` → `.dark` ได้เฉดถูกอัตโนมัติ), `--gl-ambient` (glow 3 จุด fixed ที่ body), `--gl-primary-grad*/--gl-mark-grad` (ramp emerald→evergreen), `--gl-vault-*`
+  2. `tokens/shadows.css` — `--shadow-glass-card` (inner highlight + ink drop) / `--shadow-glass-btn` (emerald tint) + dark variants
+  3. `src/styles/app.css` — body ambient, `.gl-card`/`--elevated`/`.gl-dash-hero`/`.gl-login-card` เป็นแก้ว, topbar/mobilenav/sidebar เป็น frosted chrome, ปุ่ม primary + brand mark เป็น ramp, `th` โปร่ง 66%
+  4. `src/components/layout/AppShell.ts` — sidebar inline `var(--sidebar)` → `var(--glass-sidebar)`, เอา `background: var(--background)` ออกจาก `.gl-app-container` เพื่อให้ ambient ทะลุ
+  5. `src/components/login/loginStyles.ts` — vault panel เป็น gradient + glows ตาม mock C, login card/profile item/pin key เป็นแก้ว/ชิปโปร่ง
+  6. `scripts/lint-design.mjs` — allowlist `app.css` backdrop-filter 5 → **21** (5 scrim เดิม + 16 glass ของ D21), เพิ่ม entry `loginStyles.ts` (2) — สนาม literal อื่นไม่ขยับเพราะค่าใหม่ทั้งหมดอยู่ใน tokens
+- **การตรวจสอบ (Verification):** `npm run typecheck` ผ่าน · `npm test` **575 ผ่าน / 24 skip (ตาม baseline)** · `npm run lint:design` ผ่าน · `npm run build` ผ่าน · dist CSS มี `--glass-card`/`--gl-ambient`/`--gl-primary-grad` + media `prefers-reduced-transparency` ครบ — **ยังไม่ได้ screenshot จริง** (sandbox ไม่มี Chromium, network จำกัด) → ยืนยันสายตาผ่าน dev server :5500
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  1. **ผู้ใช้ review สายตา** desktop + 390px ผ่าน live preview — ถ้า frost ของการ์ดบาง/หนาไป ปรับที่ `--glass-card`/ opacity เดียว (token เดียว ไม่ไล่แก้หลายจุด)
+  2. ถ้า OK ค่อย Phase 2: โครงสร้าง (เช่น hero layout/topbar grouping ตาม mock) — แยกเป็นงานใหม่ และระวัง hard stop: ห้ามแตะ money/lifecycle/RLS
+  3. `ui-lab/` ยังอยู่เพื่อเทียบ mock ↔ จริง จนกว่าจะปิดงาน premium นี้ — หลังยืนยันแล้วควรลบหรือย้ายออกจาก repo ตาม gotcha เดิม
+- **คำเตือน (Gotchas):**
+  1. `main` บน origin เป็น commit คนละ root (`5223351`, ไม่มี `ui-lab/`) — ถ้าจะรวม branch นี้เข้า main ต้อง `merge --allow-unrelated-histories` หรือ snapshot ทับ แจ้งผู้ใช้ก่อนทำเสมอ
+  2. `backdrop-filter` ใน app.css ถูกล็อกด้วย exact count — ใครเพิ่ม/ลบ glass surface ต้องอัปเดต ALLOWLIST + comment และถ้าไม่ผ่าน D21-contract ให้ถือว่าเป็น slop
+  3. Playwright install ล้มเหลวใน sandbox นี้ (ทั้ง CDN + apt) — อย่าเสียเวลาลองใหม่; ใช้ live preview ให้ผู้ใช้ดูเอง
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-06 12:20 (UI Lab — Premium Directions + Vision-less Reference Pipeline)
 
 - **ผู้ส่งมอบ (Handed off by):** Arena Agent (no-vision session)

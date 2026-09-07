@@ -47,7 +47,12 @@ body {
   height: 100%;
   font-family: var(--font-sans);
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
+  /* Glass Ledger (D21): the direction's fixed ambient glows live here, once,
+     on the viewport — never inside a component, so scroll never re-samples
+     them and print can drop the whole layer with the next line. */
+  background-image: var(--gl-ambient);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -179,11 +184,17 @@ body {
 /* --------------------------------------------------------------------------
    Surfaces
    -------------------------------------------------------------------------- */
+/* Glass Ledger (D21): frosted porcelain card over the fixed ambient glow.
+   --glass-card stays >=78% opaque so figures read as on porcelain; the blur
+   sits behind that veil. Overlays (modal/sheet/popover) stay opaque. */
 .gl-card {
-  background: var(--card);
+  background: var(--glass-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   padding: var(--space-5);
+  box-shadow: var(--shadow-glass-card);
+  backdrop-filter: var(--glass-blur-surface);
+  -webkit-backdrop-filter: var(--glass-blur-surface);
 }
 
 .gl-card--tight {
@@ -321,13 +332,26 @@ button.gl-card:active {
   color: var(--muted-foreground);
 }
 
+/* D21 §2: the one committing action per screen runs on the direction's
+   emerald→evergreen ramp with an emerald-tinted lift shadow. The ramp uses
+   only palette hues (income emerald + brand evergreen); the disabled state
+   below still wins over it, so a non-committable action never glows.
+   U1: full pill shape — the committing action is the roundest thing on
+   screen, matching the reference direction. */
 .gl-btn--primary {
-  background: var(--primary);
+  background: var(--gl-primary-grad);
   color: var(--primary-foreground);
+  box-shadow: var(--shadow-glass-btn);
+  border-radius: var(--radius-full);
 }
 
 .gl-btn--primary:hover:not(:disabled) {
-  background: var(--primary-dark);
+  background: var(--gl-primary-grad-hover);
+}
+
+.gl-btn--primary:disabled,
+.gl-btn--primary[aria-disabled="true"] {
+  box-shadow: none;
 }
 
 .gl-btn--secondary {
@@ -1057,7 +1081,9 @@ button.gl-card:active {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted-foreground);
-  background: var(--secondary);
+  /* D21: 66% stone over the glass card — the head stripe stays visible
+     without blocking the frost with a fully solid patch. */
+  background: color-mix(in srgb, var(--secondary) 66%, transparent);
   border-bottom: 1px solid var(--border);
 }
 
@@ -1199,19 +1225,23 @@ button.gl-card:active {
 @media (max-width: 768px) {
   /* Fixed, not sticky: #main-content declares overflow-y:auto but never becomes
      a scrollport (the document scrolls instead), so position:sticky inside it
-     never pins. Pin to the viewport above the bottom nav instead. */
+     never pins. Pin to the viewport clear of the floating nav pill.
+     U1: the bar floats as a frosted tile, same language as the nav pill. */
   .gl-actionbar--sticky {
     position: fixed;
-    left: 0;
-    right: 0;
-    /* Nav total = item min-height + its 1px top border + the safe-area inset. */
+    left: var(--space-3);
+    right: var(--space-3);
+    /* Nav total = pill height + its 8px float + another 8px of air. */
     bottom: calc(
-      var(--gl-mobilenav-h) + 1px + env(safe-area-inset-bottom, 0px)
+      var(--gl-mobilenav-h) + var(--space-4) + env(safe-area-inset-bottom, 0px)
     );
     z-index: 150;
-    background: color-mix(in srgb, var(--background) 94%, transparent);
+    background: var(--glass-chrome);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-elevated);
     backdrop-filter: blur(6px);
-    border-top: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(6px);
     margin: 0;
     padding: var(--space-3);
   }
@@ -1404,23 +1434,88 @@ button.gl-card:active {
   }
 
   /* Bottom navigation replaces the sidebar. Without it the offering module
-     is unreachable on a phone. Scrollable for smooth navigation across all modules. */
+     is unreachable on a phone. Scrollable for smooth navigation across all modules.
+     U1 (2026-09-07, user direction from mobile-app references): the bar floats
+     as a glass stadium pill, clear of the screen edge — the strongest single
+     "ultra modern" cue in the references. */
   .gl-mobilenav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-2));
+    left: var(--space-3);
+    right: var(--space-3);
     z-index: 200;
     display: flex;
-    overflow-x: auto;
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* U2: the scrollable strip is the inner track — the pill itself keeps
+       overflow: visible so the raised centre FAB is never clipped. */
+    overflow: visible;
+    background: var(--glass-chrome);
+    backdrop-filter: var(--glass-blur-chrome);
+    -webkit-backdrop-filter: var(--glass-blur-chrome);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding-bottom: 0;
+    box-shadow: var(--shadow-elevated);
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
 
-  .gl-mobilenav::-webkit-scrollbar {
+  /* The track is the pill-shaped scroller; items never slide under the FAB
+     because a fixed gap holds the centre open (spliced in by AppShell). */
+  .gl-mobilenav__track {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-radius: inherit;
+  }
+
+  .gl-mobilenav__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gl-mobilenav__fab {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -60%);
+    z-index: 5;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+    background: var(--gl-primary-grad);
+    color: var(--primary-foreground);
+    /* Emerald lift + a frosted halo separating the FAB from the pill. */
+    box-shadow:
+      var(--shadow-glass-btn),
+      0 0 0 6px color-mix(in srgb, var(--background) 55%, transparent);
+    text-decoration: none;
+    transition: transform var(--duration-micro) var(--ease-out);
+  }
+
+  .gl-mobilenav__fab:hover {
+    transform: translate(-50%, -64%);
+  }
+
+  .gl-mobilenav__fab:active {
+    transform: translate(-50%, -60%) scale(0.97);
+  }
+
+  .gl-mobilenav__fab:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .gl-mobilenav__fabgap {
+    flex: 0 0 72px;
+    pointer-events: none;
+  }
+
+  /* While a committing flow pins its action bar over centre-bottom, the FAB
+     steps aside instead of overlapping it. */
+  .gl-app-container:has(.gl-actionbar--sticky) .gl-mobilenav__fab,
+  .gl-app-container:has(.gl-actionbar--sticky) .gl-mobilenav__fabgap {
     display: none;
   }
 
@@ -2006,10 +2101,15 @@ button.gl-card:active {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: var(--card);
+  /* Glass Ledger (D21): the screen's focal card carries the fullest frost —
+     94→66% white over the ambient glow, blur beneath, glass elevation. The
+     amount itself sits on the 94% end of the ramp, unchanged in color. */
+  background: var(--glass-hero);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-glass-card);
+  backdrop-filter: var(--glass-blur-surface);
+  -webkit-backdrop-filter: var(--glass-blur-surface);
   overflow: hidden;
   transition:
     border-color var(--duration-micro) var(--ease-out),
@@ -2056,15 +2156,30 @@ button.gl-card:active {
 .gl-dash-hero__figures {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-6);
+  gap: var(--space-3);
   margin-top: var(--space-5);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
 }
 
 .gl-dash-hero__figure {
+  /* U1: pastel metric tile, per the reference direction — the tint IS the
+     container, so the old hairline divider above this row is retired. Colour
+     keeps its fixed finance meaning: soft emerald = income, soft red =
+     expense, stone = neutral context figure. */
+  flex: 1 1 0;
+  min-width: 104px;
   font-size: var(--text-xs);
   color: var(--muted-foreground);
+  background: var(--secondary);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-3) var(--space-4);
+}
+
+.gl-dash-hero__figure--income {
+  background: var(--income-muted);
+}
+
+.gl-dash-hero__figure--expense {
+  background: var(--expense-muted);
 }
 
 .gl-dash-hero__figure strong {
@@ -2347,7 +2462,9 @@ a.gl-row:focus-visible {
 
 .gl-trend__bar {
   width: 9px;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  /* U1/U2 reference language: pill-top bars read as one family with the
+     floating pill chrome. Bases stay square so the axis line stays honest. */
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
   /* Height stays in the markup; only the paint is animated, so a bar whose
      animation never runs is still drawn at its correct value. */
   transform-origin: bottom;
@@ -2541,15 +2658,16 @@ a.gl-row:focus-visible {
    near the top of this file with the correct token-driven shadow — that
    copy lost the cascade to the .gl-card duplicate that used to sit here,
    which set its own non-token box-shadow at equal specificity but later in
-   source order). Consolidated here, after where that duplicate was, so it
-   resolves to the design system's own faint --shadow-card rule instead of a
-   heavy hand-rolled one. Emerald Vault: flat card + faint shadow — the old
-   decorative radial tint is gone. */
+   source order). Consolidated here, after where that duplicate was. Since
+   D21 (Glass Ledger) the elevated card rides the same frosted surface and
+   glass shadow as .gl-card — the old decorative radial tint stays gone. */
 .gl-card--elevated {
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
-  background: var(--card);
+  box-shadow: var(--shadow-glass-card);
+  background: var(--glass-card);
+  backdrop-filter: var(--glass-blur-surface);
+  -webkit-backdrop-filter: var(--glass-blur-surface);
 }
 
 .gl-table tbody tr:hover {
@@ -2562,7 +2680,12 @@ a.gl-row:focus-visible {
 }
 
 .gl-sidebar {
+  /* Glass Ledger (D21): the vault chrome goes 92% translucent so the fixed
+     ambient glow breathes through the sidebar edge; the frost lives behind
+     near-black, so legibility of nav items is unaffected. */
   box-shadow: 1px 0 0 var(--sidebar-border);
+  backdrop-filter: var(--glass-blur-chrome);
+  -webkit-backdrop-filter: var(--glass-blur-chrome);
 }
 
 .gl-nav-item--active {
@@ -2600,8 +2723,15 @@ a.gl-row:focus-visible {
     flex: 1;
   }
 
+  /* U1: phone cards keep the full 20px radius — the reference direction's
+     generous corners — instead of shrinking crisper on small screens. */
   .gl-card {
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-card);
+  }
+
+  /* Tiles squeeze to two per row sooner than they crush a baht figure. */
+  .gl-dash-hero__figure strong {
+    font-size: var(--text-md);
   }
 
   .gl-table {
@@ -2649,11 +2779,20 @@ a.gl-row:focus-visible {
     color var(--duration-micro) var(--ease-out);
 }
 
-.filter-pill:hover,
-.filter-pill.is-active {
+.filter-pill:hover:not(.is-active) {
   border-color: color-mix(in srgb, var(--primary) 46%, var(--border));
   background: var(--primary-light);
   color: var(--accent-foreground);
+}
+
+/* U1: the active filter is a filled emerald pill (the references' segmented
+   chips), not a tinted outline — one filled pill per row, so it cannot be
+   mistaken for a committing action (that role stays with .gl-btn--primary). */
+.filter-pill.is-active {
+  border-color: transparent;
+  background: var(--gl-primary-grad);
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-glass-btn);
 }
 
 .gl-offering-overview,
@@ -2735,18 +2874,20 @@ a.gl-row:focus-visible {
   }
 }
 
-/* Shell — top bar.
-
-   The bar is an opaque content surface with one hairline under it. It carries
-   no blur and no shadow: a shadow here floats the whole page, and a blur makes
-   the figures scrolling under it unreadable while costing frame time on a
-   phone. `!important` is still required because AppShell.ts sets the base
-   background and border as inline style attributes. */
+/* Shell — top bar. Glass Ledger chrome (D21 supersedes the D15 opacity here):
+   86% porcelain over a 16px frost — figures scrolling beneath read as a soft
+   wash, never as smeared digits, and the `--shadow` stays off (a shadow would
+   float the whole page). The hairline stays var(--border) — D15's invisible
+   white edge was the defect there, not the translucency. `!important` is still
+   required on background/border because AppShell.ts sets those two as inline
+   style attributes; the blur is class-level only. */
 .gl-shell-topbar {
   padding-inline: clamp(16px, 3vw, 32px) !important;
-  background: var(--card) !important;
+  background: var(--glass-chrome) !important;
   border-bottom: 1px solid var(--border) !important;
   box-shadow: none !important;
+  backdrop-filter: var(--glass-blur-chrome);
+  -webkit-backdrop-filter: var(--glass-blur-chrome);
 }
 
 .gl-shell-topbar__title {
@@ -3619,16 +3760,8 @@ a {
   background: color-mix(in srgb, var(--muted) 70%, transparent) !important;
 }
 
-/* Mobile bottom bar — opaque, so a figure scrolling behind it stays legible.
-   The top hairline separates it from the page; the shadow only confirms the
-   separation and uses the ink-tinted ramp, not pure black. */
-@media (max-width: 768px) {
-  .gl-mobilenav {
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    box-shadow: var(--shadow-elevated);
-  }
-}
+/* (U1) The mobile bottom bar's surface and shadow now live in the floating
+   pill rule above — nothing is restated here. */
 
 /* ==========================================================================
    Attention Panel — grouped pending-work list with loading/empty/hint states
@@ -3847,8 +3980,11 @@ a {
   gap: var(--space-3);
   height: var(--gl-topbar-h);
   padding: 0 var(--space-4);
-  background: var(--card);
+  /* Same Glass Ledger chrome as the shell bar (D21). */
+  background: var(--glass-chrome);
   border-bottom: 1px solid var(--border);
+  backdrop-filter: var(--glass-blur-chrome);
+  -webkit-backdrop-filter: var(--glass-blur-chrome);
 }
 
 .gl-shell-icon-btn {
@@ -3892,9 +4028,11 @@ a {
   min-height: var(--touch-target-min);
   padding: 0 var(--space-4);
   border: 0;
-  border-radius: var(--radius-button);
-  background: var(--primary);
+  /* D21 ramp + U1 pill — identical voice to .gl-btn--primary. */
+  border-radius: var(--radius-full);
+  background: var(--gl-primary-grad);
   color: var(--primary-foreground);
+  box-shadow: var(--shadow-glass-btn);
   font-family: inherit;
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
@@ -3906,7 +4044,7 @@ a {
 }
 
 .gl-shell-primary-action:hover {
-  background: var(--primary-dark);
+  background: var(--gl-primary-grad-hover);
 }
 
 .gl-shell-primary-action:active {
@@ -3943,7 +4081,8 @@ a {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  background: var(--sidebar-primary);
+  /* D21: brand mark carries the direction's emerald→evergreen ramp. */
+  background: var(--gl-mark-grad);
   color: var(--sidebar-primary-foreground);
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
@@ -3996,7 +4135,8 @@ a {
   .gl-shell-icon-btn,
   .gl-shell-primary-action,
   .gl-shell-avatar,
-  .gl-sidebar__dim {
+  .gl-sidebar__dim,
+  .gl-mobilenav__fab {
     transition: none;
   }
 }
@@ -4701,16 +4841,18 @@ a {
   width: 100%;
   max-width: 400px;
   padding: var(--space-6);
-  background: var(--card);
+  background: var(--glass-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-glass-card);
+  backdrop-filter: var(--glass-blur-surface);
+  -webkit-backdrop-filter: var(--glass-blur-surface);
 }
 
 @media (max-width: 390px) {
   .gl-login-card {
     padding: var(--space-5);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-2xl);
   }
 }
 
@@ -4805,7 +4947,7 @@ a {
 
   .gl-card {
     padding: var(--space-4);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-2xl);
   }
 
   .gl-input,
@@ -4852,6 +4994,10 @@ a {
     transform: none !important;
   }
 }
+
+/* The FAB's transform is positional (translate keeps it centred), so it is
+   guarded by transition:none only, in the shell reduce block above — never
+   by transform:none. */
 
 /* ==========================================================================
    Nav item — sidebar navigation entry
