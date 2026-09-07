@@ -38,7 +38,7 @@ If a UI or refactor task requires one of these, **stop and report**: problem, im
 
 ## Design
 
-`design-system-extracted/` is the visual source of truth. **Identity: "Emerald Vault" (2026-09)** — porcelain surfaces, deep-evergreen brand, dark vault sidebar, brass accents. Upgrade the craft, do not replace the identity.
+`design-system-extracted/` is the visual source of truth. **Identity: "Coral Vault" (2026-09, D25; supersedes "Emerald Vault")** — paper surfaces, coral brand, near-black vault sidebar, warm stone neutrals. Finance hues are a separate system and are NOT part of the brand palette: emerald = income, red = expense, amber = pending/offering. Upgrade the craft, do not replace the identity.
 
 - Reuse existing tokens: color, typography, spacing, radius, shadow, motion. No new palette, no new framework, no new component library.
 - Color carries fixed meaning: neutral = structure, emerald/`--income` = positive, amber/`--pending` = attention, red/`--expense` = error. No accent color without a documented reason.

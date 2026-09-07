@@ -1,6 +1,6 @@
 # Grace Ledger — Design System
 
-Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, brass accents. Church financial OS. Thai-first. Money is the product — every UI decision protects the number.
+Coral Vault — paper surfaces, coral brand, near-black vault sidebar, warm stone neutrals. Church financial OS. Thai-first. Money is the product — every UI decision protects the number.
 
 ## Governing Principle
 
@@ -110,7 +110,7 @@ Emerald Vault — porcelain surfaces, deep-evergreen brand, dark vault sidebar, 
 ## Surfaces — Glass Ledger layer (D21, 2026-09-07)
 
 The workspace direction the user selected in the UI Lab review (option C). Frosted
-porcelain over three fixed ambient glows; the Emerald Vault palette is untouched —
+paper over three fixed ambient glows; the Coral Vault palette is untouched —
 every value derives from existing tokens via `color-mix()`.
 
 | Token                                    | Use                                          |

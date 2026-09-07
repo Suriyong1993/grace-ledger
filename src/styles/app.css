@@ -184,8 +184,8 @@ body {
 /* --------------------------------------------------------------------------
    Surfaces
    -------------------------------------------------------------------------- */
-/* Glass Ledger (D21): frosted porcelain card over the fixed ambient glow.
-   --glass-card stays >=78% opaque so figures read as on porcelain; the blur
+/* Glass Ledger (D21): frosted paper card over the fixed ambient glow.
+   --glass-card stays >=78% opaque so figures read as on paper; the blur
    sits behind that veil. Overlays (modal/sheet/popover) stay opaque. */
 .gl-card {
   background: var(--glass-card);
@@ -332,10 +332,11 @@ button.gl-card:active {
   color: var(--muted-foreground);
 }
 
-/* D21 §2: the one committing action per screen runs on the direction's
-   emerald→evergreen ramp with an emerald-tinted lift shadow. The ramp uses
-   only palette hues (income emerald + brand evergreen); the disabled state
-   below still wins over it, so a non-committable action never glows.
+/* D21 §2 (recoloured D25): the one committing action per screen runs on the
+   direction's coral ramp with a coral-tinted lift shadow. The ramp uses only
+   brand hues — no finance colour, so a committing action can never be confused
+   with an income figure; the disabled state below still wins over it, so a
+   non-committable action never glows.
    U1: full pill shape — the committing action is the roundest thing on
    screen, matching the reference direction. */
 .gl-btn--primary {
@@ -622,7 +623,7 @@ button.gl-card:active {
   position: fixed;
   inset: 0;
   z-index: 900;
-  background: color-mix(in srgb, var(--gl-vault-950) 45%, transparent);
+  background: color-mix(in srgb, var(--gl-black) 45%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   display: flex;
@@ -1983,7 +1984,7 @@ button.gl-card:active {
    content beside it, not a twin stat card. Figures inside the balance card
    are typography (label + value), never boxed into a third equal card. */
 /* Dashboard — user identity card. Owns what the renderer used to restate
-   inline. Flat card: the Emerald Vault swap removed the decorative gradient
+   inline. Flat card: the vault identity swap removed the decorative gradient
    and the avatar glow; the avatar is solid --primary. */
 .gl-dash-user-card {
   display: flex;
@@ -2123,13 +2124,13 @@ button.gl-card:active {
   left: 0;
   right: 0;
   height: 3px;
-  /* Evergreen into brass — the two accents the Emerald Vault identity owns.
-     The previous ramp ended in sky blue (#0ea5e9), which is outside the
-     palette and read as a second brand colour on the hero. */
+  /* Deep coral into vivid coral — the two accents the Coral Vault identity
+     owns (D25). The pre-D21 ramp ended in sky blue (#0ea5e9), which is outside
+     the palette and read as a second brand colour on the hero. */
   background: linear-gradient(
     90deg,
     var(--primary) 0%,
-    var(--gl-brass-500) 100%
+    var(--gl-coral-500) 100%
   );
 }
 
@@ -2785,7 +2786,7 @@ a.gl-row:focus-visible {
   color: var(--accent-foreground);
 }
 
-/* U1: the active filter is a filled emerald pill (the references' segmented
+/* U1: the active filter is a filled coral pill (the references' segmented
    chips), not a tinted outline — one filled pill per row, so it cannot be
    mistaken for a committing action (that role stays with .gl-btn--primary). */
 .filter-pill.is-active {
@@ -2875,7 +2876,7 @@ a.gl-row:focus-visible {
 }
 
 /* Shell — top bar. Glass Ledger chrome (D21 supersedes the D15 opacity here):
-   86% porcelain over a 16px frost — figures scrolling beneath read as a soft
+   86% paper over a 16px frost — figures scrolling beneath read as a soft
    wash, never as smeared digits, and the `--shadow` stays off (a shadow would
    float the whole page). The hairline stays var(--border) — D15's invisible
    white edge was the defect there, not the translucency. `!important` is still
@@ -3277,7 +3278,7 @@ a {
 
 /* --------------------------------------------------------------------------
    Approvals — queue cards, profile strip, summary stats, decision sheet.
-   Consolidates what the page used to restate inline (Emerald Vault pass).
+   Consolidates what the page used to restate inline (vault identity pass).
    -------------------------------------------------------------------------- */
 .gl-approval-card {
   background: var(--card);
@@ -3735,7 +3736,7 @@ a {
 }
 
 /* ==========================================================================
-   2026 UI Trends Architecture Enhancements (Grace Ledger "Emerald Vault")
+   2026 UI Trends Architecture Enhancements (Grace Ledger "Coral Vault")
    Bolder Typography · Smarter AI Greeting · Evolved Glass · Crisp Borders
    ========================================================================== */
 
@@ -4081,7 +4082,7 @@ a {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  /* D21: brand mark carries the direction's emerald→evergreen ramp. */
+  /* D21/D25: brand mark carries the direction's coral ramp. */
   background: var(--gl-mark-grad);
   color: var(--sidebar-primary-foreground);
   font-weight: var(--weight-bold);

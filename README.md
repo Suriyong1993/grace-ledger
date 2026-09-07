@@ -46,11 +46,11 @@ npm run build
 
 | เอกสาร | วัตถุประสงค์ |
 | :--- | :--- |
-| [`CLAUDE.md`](./CLAUDE.md) | **Working Agreement หลัก**: 5 Quality Gates, Financial Safety Rules, Design Tokens ("Emerald Vault"), Thai Copy Style |
+| [`CLAUDE.md`](./CLAUDE.md) | **Working Agreement หลัก**: 5 Quality Gates, Financial Safety Rules, Design Tokens ("Coral Vault"), Thai Copy Style |
 | [`AGENTS.md`](./AGENTS.md) | **คู่มือสำหรับ AI Agents**: สรุปข้อจำกัดสำคัญ กฎเหล็ก และคำสั่งที่ใช้ตรวจสอบ |
 | [`CONTEXT.md`](./CONTEXT.md) | **พจนานุกรมการเงิน (Domain Vocabulary)**: คำศัพท์ทางการเงินและกฎความสมดุลที่ห้ามละเมิด |
 | [`DECISIONS.md`](./DECISIONS.md) | **บันทึกการตัดสินใจ (Decision Log)**: บันทึกการตัดสินใจด้านการออกแบบและโทเคนระบบ |
-| [`DESIGN.md`](./DESIGN.md) | **Design System สเปก**: สเปกโทเคนการออกแบบ (Emerald Vault Identity) |
+| [`DESIGN.md`](./DESIGN.md) | **Design System สเปก**: สเปกโทเคนการออกแบบ (Coral Vault Identity) |
 | [`COMPONENTS.md`](./COMPONENTS.md) | **UI Components Inventory**: บัญชีรายการและคลาสของ UI components ในระบบ |
 | [`docs/adr/`](./docs/adr/) | **Architecture Decision Records**: ข้อตกลงสถาปัตยกรรมทางเทคนิค (ADR 0001–0005) |
 

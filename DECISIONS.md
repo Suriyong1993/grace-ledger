@@ -668,3 +668,57 @@ bars go pill-top (`--radius-full` tops); chart axis bases stay square.
 
 **Status:** APPROVED & IMPLEMENTED (2026-09-07). Two new navigation tests lock the FAB
 presence/absence by role; suite 577 passed / 24 skipped, typecheck + lint:design + build green.
+
+---
+
+## 2026-09-07 — D25: Coral Vault identity (supersedes Emerald Vault)
+
+**Decision.** The brand palette moves from Emerald Vault (porcelain / ink-green /
+evergreen / brass) to **Coral Vault**: Paper `#f6f4f1`, warm ink `#1c1a17`, stone
+neutrals, a coral brand ramp, and a near-black `#0a0a09` vault chrome. Ported from
+the `claude/grace-ledger-ui-audit-3olr48` exploration at the user's request.
+
+**Brand and finance stay separate systems.** Only `--primary`, `--accent`, `--ring`,
+`--primary-*`, `--chart-1` and the `--sidebar-*` family move. The finance hues are
+untouched — emerald = income, red = expense, amber = pending/offering — so an amount's
+colour still means exactly what it has always meant on the ledger. This is the whole
+reason the rebrand is safe to make: no figure changes meaning.
+
+**Why `--primary` is coral-700, not the vivid coral-500 swatch.** White text on
+coral-500 measures **3.15:1**, below the 4.5:1 AA floor for normal-weight button and
+link text. `--primary` therefore takes coral-700 (**5.23:1** under white), and
+coral-500 stays the ring / accent / hero / aurora colour, always on dark text or large
+bold figures. Verified pairs at adoption:
+
+| pair | ratio | floor |
+|---|---|---|
+| white on `--primary` (coral-700) | 5.23 | 4.5 |
+| `--primary` on paper background | 4.76 | 4.5 |
+| `--muted-foreground` on paper | 5.27 | 4.5 |
+| `--accent-foreground` on `--accent` | 4.60 | 4.5 |
+| `--sidebar-foreground` on vault black | 17.27 | 4.5 |
+| black chip text on coral-500 | 6.28 | 4.5 |
+| coral-500 on vault black (large/bold only) | 6.28 | 3.0 |
+
+**Port notes — this is not the original commit.** The source commit (`076ee35`) predates
+the Glass Ledger layer (D21) and would have reverted it. Only the palette was carried
+across; the D21 glass/gradient/ambient token structure is intact and was recoloured
+rather than replaced:
+
+1. The old `--gl-evergreen-*`, `--gl-brass-*`, and `--gl-vault-950` base-ramp steps are
+   **removed**, not aliased. They were internal ramp steps, never part of the semantic
+   API components consume, and every reference was repointed to the coral ramp.
+2. `--gl-primary-grad` / `--gl-mark-grad` were emerald→evergreen, i.e. they mixed a
+   *finance* hue into the *brand* ramp. They are now coral-500→coral-700, ending on
+   `--primary` so white label text lands on the AA-safe end. A committing action can no
+   longer be mistaken for an income figure.
+3. `--gl-ambient` and `--gl-vault-ambient` recoloured onto coral; the vault gradient runs
+   near-black → coral-800.
+4. Shadow tints moved from ink-green to warm ink; `--shadow-glass-btn` borrows coral.
+5. The D24 Aurora Vault login was recoloured with it — its two aurora fields were emerald
+   and brass, now coral-500 and coral-700. Deliberate: there is no money on the sign-in
+   screen, so a finance hue there was always meaningless decoration.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-07). Suite 578 passed / 24 skipped;
+typecheck + lint:design + build green. Dark mode remains deferred (D4) — only its brand
+hues were repointed, its surface ramp awaits a dedicated pass.

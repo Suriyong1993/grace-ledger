@@ -4,9 +4,10 @@
  * The sign-in scene is the one screen with no data on it, so it is the one
  * place the identity may speak at full volume. The whole viewport becomes the
  * dark vault (--gl-vault-grad) lit by two slow aurora fields built from the
- * emerald and brass the palette already owns; a single frosted porcelain card
- * floats at the centre of it. Everything inside the card is the same porcelain
- * language as the app, so the handover from login to dashboard is continuous.
+ * Coral Vault brand ramp; a single frosted paper card floats at the centre of
+ * it. Everything inside the card is the same paper language as the app, so the
+ * handover from login to dashboard is continuous. No finance hue appears here:
+ * there is no money on this screen, so income emerald would be meaningless.
  *
  * Strict design-system tokens throughout: color-mix() derives every tint from
  * a token, so no literal colour, radius, or font-size enters this file. The
@@ -26,7 +27,7 @@ export function renderLoginStylesHtml(): string {
       align-items: center;
       justify-content: center;
       padding: var(--space-6) var(--space-4);
-      background-color: var(--gl-vault-950);
+      background-color: var(--gl-black);
       background-image: var(--gl-vault-grad);
       color: var(--sidebar-foreground);
       font-family: var(--font-sans);
@@ -54,7 +55,7 @@ export function renderLoginStylesHtml(): string {
       top: -28vmax;
       left: -22vmax;
       background:
-        radial-gradient(closest-side, color-mix(in srgb, var(--gl-emerald-600) 62%, transparent), transparent 72%);
+        radial-gradient(closest-side, color-mix(in srgb, var(--gl-coral-500) 58%, transparent), transparent 72%);
       animation: gl-aurora-a 22s var(--ease-in-out) infinite alternate;
     }
 
@@ -64,7 +65,7 @@ export function renderLoginStylesHtml(): string {
       right: -20vmax;
       bottom: -24vmax;
       background:
-        radial-gradient(closest-side, color-mix(in srgb, var(--gl-brass-500) 48%, transparent), transparent 72%);
+        radial-gradient(closest-side, color-mix(in srgb, var(--gl-coral-700) 55%, transparent), transparent 72%);
       animation: gl-aurora-b 26s var(--ease-in-out) infinite alternate;
     }
 
@@ -272,7 +273,7 @@ export function renderLoginStylesHtml(): string {
     }
 
     /* ---------------------------------------------------------------
-       Card — one frosted porcelain surface floating on the vault
+       Card — one frosted paper surface floating on the vault
        --------------------------------------------------------------- */
     .gl-login-card {
       width: 100%;
@@ -295,8 +296,8 @@ export function renderLoginStylesHtml(): string {
       animation: gl-login-card-in var(--duration-page) var(--ease-out) both;
     }
 
-    /* Emerald hairline along the top edge: the card is a lit panel set into
-       the vault door. */
+    /* Coral hairline along the top edge: the card is a lit panel set into the
+       vault door. */
     .gl-login-card::before {
       content: "";
       position: absolute;
@@ -307,7 +308,7 @@ export function renderLoginStylesHtml(): string {
       background: linear-gradient(
         to right,
         transparent,
-        color-mix(in srgb, var(--income) 70%, transparent),
+        color-mix(in srgb, var(--gl-coral-500) 80%, transparent),
         transparent
       );
       pointer-events: none;
@@ -384,8 +385,8 @@ export function renderLoginStylesHtml(): string {
       width: 6px;
       height: 6px;
       border-radius: var(--radius-full);
-      background: var(--income);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--income) 18%, transparent);
+      background: var(--gl-coral-500);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--gl-coral-500) 20%, transparent);
     }
 
     .gl-login-heading {
@@ -440,7 +441,7 @@ export function renderLoginStylesHtml(): string {
         box-shadow var(--duration-micro) var(--ease-out);
     }
 
-    /* Emerald rail on the leading edge grows in on hover — the row announces
+    /* Coral rail on the leading edge grows in on hover — the row announces
        which identity is about to be taken without moving any text. */
     .gl-profile-item::before {
       content: "";
@@ -663,7 +664,7 @@ export function renderLoginStylesHtml(): string {
       background: var(--gl-primary-grad);
       border-color: transparent;
       animation: gl-pin-pop var(--duration-micro) var(--ease-out);
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--income) 14%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--gl-coral-500) 16%, transparent);
     }
 
     @keyframes gl-pin-pop {
@@ -805,7 +806,7 @@ export function renderLoginStylesHtml(): string {
     }
 
     .gl-login-trust-badge svg {
-      color: var(--income);
+      color: var(--primary);
       flex-shrink: 0;
     }
 
