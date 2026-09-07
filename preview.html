@@ -48,17 +48,36 @@
       color: var(--sidebar-primary-foreground);
       font-weight: var(--weight-semibold);
     }
+    .gl-preview-screens {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .gl-preview-back {
+      color: inherit;
+      opacity: 0.7;
+      text-decoration: none;
+      font-size: var(--text-2xs);
+      padding: var(--space-1) var(--space-2);
+    }
+    .gl-preview-back:hover { opacity: 1; text-decoration: underline; }
     .gl-preview-note {
       margin-left: auto;
-      opacity: 0.65;
+      opacity: 0.6;
+      font-size: var(--text-2xs);
     }
-    #app { padding-top: 44px; }
+    /* Clears the fixed bar. Two lines' worth on narrow screens, where the
+       buttons wrap. */
+    #app { padding-top: 52px; }
+    @media (max-width: 700px) { #app { padding-top: 84px; } }
   </style>
 </head>
 <body>
   <div class="gl-preview-bar" id="preview-bar">
     <strong>Preview</strong>
-    <span class="gl-preview-note">dev harness · ข้อมูลตัวอย่าง ไม่ได้ต่อฐานข้อมูล</span>
+    <span id="preview-screens" class="gl-preview-screens"></span>
+    <a class="gl-preview-back" href="/">← หน้าเข้าสู่ระบบ</a>
+    <span class="gl-preview-note">ข้อมูลตัวอย่าง · ไม่ได้ต่อฐานข้อมูล</span>
   </div>
   <div id="app"></div>
   <script type="module" src="/src/preview/previewMain.ts"></script>

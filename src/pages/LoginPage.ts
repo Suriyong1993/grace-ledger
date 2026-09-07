@@ -111,6 +111,7 @@ export class LoginPage {
           <li>${VAULT_FACT_ICONS.audit}ตรวจสอบย้อนหลังได้</li>
           <li>${VAULT_FACT_ICONS.pin}PIN 6 หลัก</li>
         </ul>
+        ${renderDevPreviewLinkHtml()}
         <p class="gl-vault-foot">ระบบบัญชีและการเงินคริสตจักร</p>
       </div>
     </div>`;
@@ -476,6 +477,21 @@ export class LoginPage {
     this.root.innerHTML = this.renderHtml();
     this.attachEventListeners(this.root, this.handlers);
   }
+}
+
+/**
+ * Dev-only way through to the screen harness.
+ *
+ * Sign-in needs a backend, so on a machine that cannot reach one the login
+ * screen is a dead end and none of the app behind it can be looked at. This
+ * link is the way through. `import.meta.env.DEV` is a compile-time constant,
+ * so the whole thing is dropped from a production build.
+ */
+function renderDevPreviewLinkHtml(): string {
+  if (!import.meta.env.DEV) return "";
+  return `<a class="gl-login-devlink" href="/preview.html">
+    เปิดหน้าตัวอย่าง (โหมดพัฒนา) →
+  </a>`;
 }
 
 function prefersReducedMotion(): boolean {

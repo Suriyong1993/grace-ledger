@@ -207,6 +207,36 @@ export function renderLoginStylesHtml(): string {
       flex-shrink: 0;
     }
 
+    /* Dev-only escape hatch to the screen harness. Reads as a utility link on
+       the vault, never as a product action. */
+    .gl-login-devlink {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      border: 1px dashed color-mix(in srgb, var(--sidebar-primary) 55%, transparent);
+      background: color-mix(in srgb, var(--sidebar-accent) 55%, transparent);
+      color: var(--sidebar-primary);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      text-decoration: none;
+      transition:
+        background var(--duration-micro) var(--ease-out),
+        border-color var(--duration-micro) var(--ease-out);
+    }
+
+    .gl-login-devlink:hover {
+      background: var(--sidebar-accent);
+      border-color: var(--sidebar-primary);
+      color: var(--sidebar-foreground);
+    }
+
+    .gl-login-devlink:focus-visible {
+      outline: 2px solid var(--sidebar-primary);
+      outline-offset: 2px;
+    }
+
     .gl-vault-foot {
       margin: 0;
       font-size: var(--text-2xs);
