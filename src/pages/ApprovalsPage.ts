@@ -356,8 +356,13 @@ export class ApprovalsPage {
     <div class="gl-page gl-approvals-page-container gl-fade-in">
       <div class="gl-page-header">
         <h1>คิวรออนุมัติ</h1>
+        <!-- No inline min-height: gl-btn--sm already resolves to the touch
+             minimum on coarse pointers and the compact 34px box on fine ones.
+             Hardcoding 36px here defeated that and left the queue's only
+             refresh control below the touch target on mobile (measured at
+             375px in Chromium). -->
         <button type="button" id="gl-btn-refresh-queue" class="gl-btn gl-btn--secondary gl-btn--sm"
-          aria-label="รีเฟรชรายการ" style="min-height: 36px;">
+          aria-label="รีเฟรชรายการ">
           <span aria-hidden="true">${ICON_REFRESH}</span> รีเฟรช
         </button>
       </div>
