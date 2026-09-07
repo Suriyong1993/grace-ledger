@@ -50,7 +50,7 @@ const submitTwice = async (form: HTMLFormElement) => {
 
 describe("fund transfer is not submitted twice", () => {
   it("moves the money once for a double click", async () => {
-    const page: any = new FundsPage(null as any, "church-abc");
+    const page: any = new FundsPage(null as any, "church-abc", "treasurer");
     Object.assign(page, {
       isLoading: false,
       isTransferModalOpen: true,
@@ -66,6 +66,11 @@ describe("fund transfer is not submitted twice", () => {
     (root.querySelector("#from-fund") as HTMLSelectElement).value = "f1";
     (root.querySelector("#to-fund") as HTMLSelectElement).value = "f2";
     (root.querySelector("#transfer-amount") as HTMLInputElement).value = "100";
+    // The transfer form validates a reason of >= 5 chars before it will call
+    // the service. Without one the submit never reaches the double-submit
+    // guard this test exists to prove.
+    (root.querySelector("#transfer-reason") as HTMLTextAreaElement).value =
+      "มติคณะกรรมการ";
 
     await submitTwice(form);
 
@@ -79,7 +84,7 @@ describe("fund transfer is not submitted twice", () => {
   // on the field being required and on the redraw being synchronous. The
   // guard makes it explicit, and this test pins the observable behaviour.
   it("creates a fund once for a double click", async () => {
-    const page: any = new FundsPage(null as any, "church-abc");
+    const page: any = new FundsPage(null as any, "church-abc", "treasurer");
     Object.assign(page, {
       isLoading: false,
       isCreateModalOpen: true,
@@ -91,8 +96,12 @@ describe("fund transfer is not submitted twice", () => {
 
     const root = mount(page);
     const form = root.querySelector<HTMLFormElement>("#create-fund-form")!;
-    expect(form, "create-fund form must render for this test to mean anything").not.toBeNull();
-    (root.querySelector("#fund-name-input") as HTMLInputElement).value = "กองทุนใหม่";
+    expect(
+      form,
+      "create-fund form must render for this test to mean anything",
+    ).not.toBeNull();
+    (root.querySelector("#fund-name-input") as HTMLInputElement).value =
+      "กองทุนใหม่";
 
     await submitTwice(form);
 
@@ -117,8 +126,12 @@ describe("member creation is not submitted twice", () => {
 
     const root = mount(page);
     const form = root.querySelector<HTMLFormElement>("#add-member-form")!;
-    expect(form, "add-member form must render for this test to mean anything").not.toBeNull();
-    (root.querySelector("#member-name-input") as HTMLInputElement).value = "สมาชิกใหม่";
+    expect(
+      form,
+      "add-member form must render for this test to mean anything",
+    ).not.toBeNull();
+    (root.querySelector("#member-name-input") as HTMLInputElement).value =
+      "สมาชิกใหม่";
 
     await submitTwice(form);
 

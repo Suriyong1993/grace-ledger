@@ -27,7 +27,10 @@ describe("FundsPage — modal wiring", () => {
   let paint: () => void;
 
   beforeEach(() => {
-    page = new FundsPage(null as any, "church-abc");
+    // The create/transfer buttons are RBAC-gated, so the page needs a role
+    // that actually holds create:funds and create:fund_transfers — otherwise
+    // there is no button to click and this tests nothing.
+    page = new FundsPage(null as any, "church-abc", "treasurer");
     Object.assign(page, {
       isLoading: false,
       funds: [makeFund("f1", "กองทุนทั่วไป"), makeFund("f2", "กองทุนอาคาร")],

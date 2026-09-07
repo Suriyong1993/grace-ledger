@@ -193,12 +193,15 @@ export class App {
     this.transactionsPage = new TransactionsPage(
       this.supabase,
       churchId,
+      userId,
+      userRole,
     );
-    this.fundsPage = new FundsPage(this.supabase, churchId);
+    this.fundsPage = new FundsPage(this.supabase, churchId, userRole);
     this.membersPage = new MembersPage(
       this.supabase,
       churchId,
       this.session.user.churchName ?? CHURCH_NAME_TH,
+      userRole,
     );
     this.reportsPage = new ReportsPage(
       this.supabase,
@@ -312,7 +315,6 @@ export class App {
       open[0].button.focus();
     };
     document.addEventListener("keydown", this.shellDocumentKeydown);
-
   }
 
   public async render(): Promise<void> {

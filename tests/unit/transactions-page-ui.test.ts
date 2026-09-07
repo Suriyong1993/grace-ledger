@@ -275,6 +275,16 @@ describe("TransactionsPage UI — Unit Tests", () => {
       window.history.replaceState(null, "", `/${hashAndQuery}`);
     }
 
+    it("consumeDeepLinkActions opens the create modal from ?create=1 and strips it from the URL", () => {
+      setLocation("#/transactions?create=1");
+      const page = new TransactionsPage(dummySupabase, "church-1");
+
+      page.consumeDeepLinkActions();
+
+      expect((page as any).isCreateModalOpen).toBe(true);
+      expect(window.location.hash).not.toContain("create=1");
+    });
+
     it("consumeDeepLinkActions restores filter/period/sort/search from the URL", () => {
       setLocation(
         "#/transactions?filter=expense&period=last_month&sort=amount_desc&q=%E0%B9%84%E0%B8%9F%E0%B8%9F%E0%B9%89%E0%B8%B2",

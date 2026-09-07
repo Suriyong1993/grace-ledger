@@ -2,7 +2,11 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { renderEmptyStateHtml } from "../components/shared/EmptyState";
 import { Database } from "../lib/supabase/types";
 import { OfferingService } from "../lib/offering/offering-service";
-import { OfferingSession, OfferingPaymentChannel, CashDenominations } from "../lib/offering/types";
+import {
+  OfferingSession,
+  OfferingPaymentChannel,
+  CashDenominations,
+} from "../lib/offering/types";
 import { Money } from "../lib/money";
 import { DenominationEngine } from "../lib/offering/denomination-engine";
 import { VarianceEngine } from "../lib/offering/variance-engine";
@@ -62,7 +66,7 @@ export class OfferingPage {
     private supabase: SupabaseClient<Database>,
     private churchId: string,
     _currentUserId?: string,
-    private currentUserName: string = "ไม่ระบุผู้บันทึก"
+    private currentUserName: string = "ไม่ระบุผู้บันทึก",
   ) {
     this.offeringService = new OfferingService(supabase);
   }
@@ -115,7 +119,7 @@ export class OfferingPage {
 
   public setMode(mode: OfferingPageMode, sessionId?: string): void {
     this.mode = mode;
-    this.activeSessionId = mode === "detail" ? sessionId ?? null : null;
+    this.activeSessionId = mode === "detail" ? (sessionId ?? null) : null;
     this.errorMessage = null;
     this.validationErrors = [];
     if (mode === "new") {
@@ -131,8 +135,9 @@ export class OfferingPage {
    * Returns true when the route changed or the first data load is still needed.
    */
   public syncRoute(mode: OfferingPageMode, sessionId?: string): boolean {
-    const nextSessionId = mode === "detail" ? sessionId ?? null : null;
-    const routeChanged = this.mode !== mode || this.activeSessionId !== nextSessionId;
+    const nextSessionId = mode === "detail" ? (sessionId ?? null) : null;
+    const routeChanged =
+      this.mode !== mode || this.activeSessionId !== nextSessionId;
     if (routeChanged) this.setMode(mode, sessionId);
     return routeChanged || !this.initialDataLoaded;
   }
@@ -144,7 +149,10 @@ export class OfferingPage {
     }
   }
 
-  public async init(mode: OfferingPageMode = "list", sessionId?: string): Promise<void> {
+  public async init(
+    mode: OfferingPageMode = "list",
+    sessionId?: string,
+  ): Promise<void> {
     this.setMode(mode, sessionId);
     await this.loadInitialData(sessionId);
   }
@@ -156,15 +164,18 @@ export class OfferingPage {
     try {
       // 1. Fetch live active funds
       if (this.funds.length === 0) {
-        const { data: fundsData, error: fundsError } = await (this.supabase
-          .from("funds") as any)
+        const { data: fundsData, error: fundsError } = await (
+          this.supabase.from("funds") as any
+        )
           .select("id, name, description, current_balance")
           .eq("church_id", this.churchId)
           .eq("is_active", true)
           .order("name", { ascending: true });
 
         if (fundsError) {
-          throw new Error("ไม่สามารถโหลดรายชื่อกองทุนได้: " + fundsError.message);
+          throw new Error(
+            "ไม่สามารถโหลดรายชื่อกองทุนได้: " + fundsError.message,
+          );
         }
 
         this.funds = ((fundsData as any[]) || []).map((f) => ({
@@ -181,8 +192,9 @@ export class OfferingPage {
 
       // 2. Fetch live church profiles (for Dual Custody counters)
       if (this.profiles.length === 0) {
-        const { data: profilesData, error: profilesError } = await (this.supabase
-          .from("profiles") as any)
+        const { data: profilesData, error: profilesError } = await (
+          this.supabase.from("profiles") as any
+        )
           .select("id, full_name, email, is_active")
           .eq("church_id", this.churchId)
           .eq("is_active", true)
@@ -199,8 +211,9 @@ export class OfferingPage {
 
       // 3. Fetch live church accounts (Cash Drawer & Operating Bank)
       if (this.accounts.length === 0) {
-        const { data: accountsData, error: accountsError } = await (this.supabase
-          .from("accounts") as any)
+        const { data: accountsData, error: accountsError } = await (
+          this.supabase.from("accounts") as any
+        )
           .select("id, name, type, account_number")
           .eq("church_id", this.churchId)
           .eq("is_active", true)
@@ -216,13 +229,18 @@ export class OfferingPage {
 
           if (!this.selectedCashAccountId) {
             const firstCash = this.accounts.find(
-              (a) => a.accountType === "cash_drawer" || a.accountType === "cash" || a.accountType === "petty_cash"
+              (a) =>
+                a.accountType === "cash_drawer" ||
+                a.accountType === "cash" ||
+                a.accountType === "petty_cash",
             );
             if (firstCash) this.selectedCashAccountId = firstCash.id;
           }
           if (!this.selectedBankAccountId) {
             const firstBank = this.accounts.find(
-              (a) => a.accountType === "bank" || a.accountType === "electronic_wallet"
+              (a) =>
+                a.accountType === "bank" ||
+                a.accountType === "electronic_wallet",
             );
             if (firstBank) this.selectedBankAccountId = firstBank.id;
           }
@@ -235,7 +253,10 @@ export class OfferingPage {
         if (res.success && res.data) {
           this.sessions = res.data;
         } else {
-          this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถโหลดรายการเงินถวายได้");
+          this.errorMessage = toUserMessage(
+            res.error?.message,
+            "ไม่สามารถโหลดรายการเงินถวายได้",
+          );
         }
       } else if (this.mode === "detail" && sessionId) {
         const res = await this.offeringService.getSession(sessionId);
@@ -243,7 +264,10 @@ export class OfferingPage {
           this.selectedSession = res.data;
           this.populateCashCountStateFromSession(res.data);
         } else {
-          this.errorMessage = toUserMessage(res.error?.message, "ไม่พบข้อมูลเงินถวายรอบนี้");
+          this.errorMessage = toUserMessage(
+            res.error?.message,
+            "ไม่พบข้อมูลเงินถวายรอบนี้",
+          );
         }
       }
     } catch (err: any) {
@@ -261,7 +285,11 @@ export class OfferingPage {
     // mid-count.
     if (session.status === "variance_review") {
       this.detailTab = "resolution";
-    } else if (session.status === "confirmed" || session.status === "posted" || session.status === "voided") {
+    } else if (
+      session.status === "confirmed" ||
+      session.status === "posted" ||
+      session.status === "voided"
+    ) {
       this.detailTab = "overview";
     } else {
       this.detailTab = "count";
@@ -312,7 +340,8 @@ export class OfferingPage {
     }
 
     // Success Notification Banner
-    const successBannerHtml = this.successMessage ? `
+    const successBannerHtml = this.successMessage
+      ? `
       <div class="gl-toast">
         <div class="gl-toast__body">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -320,7 +349,8 @@ export class OfferingPage {
         </div>
         <button id="btn-dismiss-toast" class="gl-toast__close" aria-label="ปิดการแจ้งเตือน"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
-    ` : "";
+    `
+      : "";
 
     let contentHtml = "";
 
@@ -365,7 +395,7 @@ export class OfferingPage {
           id: string,
           key: "overview" | "count" | "resolution",
           label: string,
-          badge = ""
+          badge = "",
         ) => {
           const isActive = this.detailTab === key;
           return `
@@ -399,7 +429,9 @@ export class OfferingPage {
               "btn-tab-resolution",
               "resolution",
               "ผลต่างและการยืนยัน",
-              needsVariance ? '<span class="gl-badge gl-badge--rejected gl-badge--inline" aria-label="มีผลต่างรอจัดการ">1</span>' : ""
+              needsVariance
+                ? '<span class="gl-badge gl-badge--rejected gl-badge--inline" aria-label="มีผลต่างรอจัดการ">1</span>'
+                : "",
             )}
           </div>
         </div>
@@ -451,7 +483,10 @@ export class OfferingPage {
     return successBannerHtml + contentHtml;
   }
 
-  public attachEventListeners(rootElement: HTMLElement, onStateChange: () => void): void {
+  public attachEventListeners(
+    rootElement: HTMLElement,
+    onStateChange: () => void,
+  ): void {
     // Toast dismiss
     const dismissToastBtn = rootElement.querySelector("#btn-dismiss-toast");
     if (dismissToastBtn) {
@@ -479,16 +514,23 @@ export class OfferingPage {
     }
   }
 
-  private attachEntryFormListeners(rootElement: HTMLElement, onStateChange: () => void): void {
+  private attachEntryFormListeners(
+    rootElement: HTMLElement,
+    onStateChange: () => void,
+  ): void {
     // Date & Service Name
-    const dateInput = rootElement.querySelector("#input-service-date") as HTMLInputElement;
+    const dateInput = rootElement.querySelector(
+      "#input-service-date",
+    ) as HTMLInputElement;
     if (dateInput) {
       dateInput.addEventListener("change", (e) => {
         this.formState.serviceDate = (e.target as HTMLInputElement).value;
       });
     }
 
-    const serviceSelect = rootElement.querySelector("#input-service-name") as HTMLSelectElement;
+    const serviceSelect = rootElement.querySelector(
+      "#input-service-name",
+    ) as HTMLSelectElement;
     if (serviceSelect) {
       serviceSelect.addEventListener("change", (e) => {
         this.formState.serviceName = (e.target as HTMLSelectElement).value;
@@ -496,7 +538,9 @@ export class OfferingPage {
     }
 
     // Channel Expected Amounts
-    const cashInput = rootElement.querySelector("#input-expected-cash") as HTMLInputElement;
+    const cashInput = rootElement.querySelector(
+      "#input-expected-cash",
+    ) as HTMLInputElement;
     if (cashInput) {
       cashInput.addEventListener("input", (e) => {
         const target = e.target as HTMLInputElement;
@@ -506,7 +550,9 @@ export class OfferingPage {
       });
     }
 
-    const transferInput = rootElement.querySelector("#input-expected-transfer") as HTMLInputElement;
+    const transferInput = rootElement.querySelector(
+      "#input-expected-transfer",
+    ) as HTMLInputElement;
     if (transferInput) {
       transferInput.addEventListener("input", (e) => {
         const target = e.target as HTMLInputElement;
@@ -516,7 +562,9 @@ export class OfferingPage {
       });
     }
 
-    const qrInput = rootElement.querySelector("#input-expected-qr") as HTMLInputElement;
+    const qrInput = rootElement.querySelector(
+      "#input-expected-qr",
+    ) as HTMLInputElement;
     if (qrInput) {
       qrInput.addEventListener("input", (e) => {
         const target = e.target as HTMLInputElement;
@@ -527,7 +575,9 @@ export class OfferingPage {
     }
 
     // Notes
-    const notesInput = rootElement.querySelector("#input-session-notes") as HTMLTextAreaElement;
+    const notesInput = rootElement.querySelector(
+      "#input-session-notes",
+    ) as HTMLTextAreaElement;
     if (notesInput) {
       notesInput.addEventListener("input", (e) => {
         this.formState.notes = (e.target as HTMLTextAreaElement).value;
@@ -602,10 +652,14 @@ export class OfferingPage {
 
     rootElement.querySelectorAll(".btn-remove-row").forEach((el) => {
       el.addEventListener("click", (e) => {
-        const btn = (e.target as HTMLElement).closest(".btn-remove-row") as HTMLElement;
+        const btn = (e.target as HTMLElement).closest(
+          ".btn-remove-row",
+        ) as HTMLElement;
         const rowId = btn?.dataset.rowId;
         if (rowId && this.formState.allocations.length > 1) {
-          this.formState.allocations = this.formState.allocations.filter((r) => r.id !== rowId);
+          this.formState.allocations = this.formState.allocations.filter(
+            (r) => r.id !== rowId,
+          );
           onStateChange();
         }
       });
@@ -628,14 +682,19 @@ export class OfferingPage {
     }
   }
 
-  private attachReviewSheetListeners(rootElement: HTMLElement, onStateChange: () => void): void {
-    rootElement.querySelectorAll("#btn-back-to-entry, #btn-back-to-edit").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        this.formStep = "entry";
-        this.errorMessage = null;
-        onStateChange();
+  private attachReviewSheetListeners(
+    rootElement: HTMLElement,
+    onStateChange: () => void,
+  ): void {
+    rootElement
+      .querySelectorAll("#btn-back-to-entry, #btn-back-to-edit")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          this.formStep = "entry";
+          this.errorMessage = null;
+          onStateChange();
+        });
       });
-    });
 
     const confirmBtn = rootElement.querySelector("#btn-confirm-save-draft");
     if (confirmBtn) {
@@ -645,9 +704,14 @@ export class OfferingPage {
     }
   }
 
-  private attachCashCountListeners(rootElement: HTMLElement, onStateChange: () => void): void {
+  private attachCashCountListeners(
+    rootElement: HTMLElement,
+    onStateChange: () => void,
+  ): void {
     // Counter 1 selection
-    const c1Select = rootElement.querySelector("#select-counter-1") as HTMLSelectElement;
+    const c1Select = rootElement.querySelector(
+      "#select-counter-1",
+    ) as HTMLSelectElement;
     if (c1Select) {
       c1Select.addEventListener("change", (e) => {
         this.cashCountState.counter1Id = (e.target as HTMLSelectElement).value;
@@ -656,7 +720,9 @@ export class OfferingPage {
     }
 
     // Counter 2 selection
-    const c2Select = rootElement.querySelector("#select-counter-2") as HTMLSelectElement;
+    const c2Select = rootElement.querySelector(
+      "#select-counter-2",
+    ) as HTMLSelectElement;
     if (c2Select) {
       c2Select.addEventListener("change", (e) => {
         this.cashCountState.counter2Id = (e.target as HTMLSelectElement).value;
@@ -682,7 +748,9 @@ export class OfferingPage {
           const cleanVal = isNaN(val) || val < 0 ? 0 : val;
           (this.cashCountState.denominations as any)[key] = cleanVal;
           const rowEl = target.closest(".gl-denom-row");
-          const minusBtn = rowEl?.querySelector<HTMLButtonElement>('.btn-denom-step[data-action="minus"]');
+          const minusBtn = rowEl?.querySelector<HTMLButtonElement>(
+            '.btn-denom-step[data-action="minus"]',
+          );
           if (minusBtn) {
             minusBtn.disabled = cleanVal <= 0;
           }
@@ -694,7 +762,9 @@ export class OfferingPage {
     // Denomination Steppers
     rootElement.querySelectorAll(".btn-denom-step").forEach((el) => {
       el.addEventListener("click", (e) => {
-        const btn = (e.target as HTMLElement).closest(".btn-denom-step") as HTMLElement;
+        const btn = (e.target as HTMLElement).closest(
+          ".btn-denom-step",
+        ) as HTMLElement;
         const action = btn?.dataset.action;
         const key = btn?.dataset.denom as keyof CashDenominations;
         if (key && key !== "coins") {
@@ -707,11 +777,15 @@ export class OfferingPage {
           }
           (this.cashCountState.denominations as any)[key] = next;
           const rowEl = btn.closest(".gl-denom-row");
-          const inputEl = rowEl?.querySelector<HTMLInputElement>(`.input-denom-count[data-denom="${key}"]`);
+          const inputEl = rowEl?.querySelector<HTMLInputElement>(
+            `.input-denom-count[data-denom="${key}"]`,
+          );
           if (inputEl) {
             inputEl.value = next > 0 ? String(next) : "";
           }
-          const minusBtn = rowEl?.querySelector<HTMLButtonElement>('.btn-denom-step[data-action="minus"]');
+          const minusBtn = rowEl?.querySelector<HTMLButtonElement>(
+            '.btn-denom-step[data-action="minus"]',
+          );
           if (minusBtn) {
             minusBtn.disabled = next <= 0;
           }
@@ -721,7 +795,9 @@ export class OfferingPage {
     });
 
     // Coins Input
-    const coinsInput = rootElement.querySelector("#input-coins") as HTMLInputElement;
+    const coinsInput = rootElement.querySelector(
+      "#input-coins",
+    ) as HTMLInputElement;
     if (coinsInput) {
       coinsInput.addEventListener("input", (e) => {
         const val = (e.target as HTMLInputElement).value;
@@ -748,8 +824,14 @@ export class OfferingPage {
     }
 
     // Roving focus: left/right move between tabs, as the tablist pattern expects.
-    const tabButtons = Array.from(rootElement.querySelectorAll<HTMLElement>('[role="tab"]'));
-    const tabKeys: Array<"overview" | "count" | "resolution"> = ["overview", "count", "resolution"];
+    const tabButtons = Array.from(
+      rootElement.querySelectorAll<HTMLElement>('[role="tab"]'),
+    );
+    const tabKeys: Array<"overview" | "count" | "resolution"> = [
+      "overview",
+      "count",
+      "resolution",
+    ];
     tabButtons.forEach((btn, index) => {
       btn.addEventListener("keydown", (e) => {
         const key = (e as KeyboardEvent).key;
@@ -795,21 +877,30 @@ export class OfferingPage {
     }
 
     // Variance Explanation Input
-    const explanationInput = rootElement.querySelector("#input-variance-explanation") as HTMLTextAreaElement;
+    const explanationInput = rootElement.querySelector(
+      "#input-variance-explanation",
+    ) as HTMLTextAreaElement;
     if (explanationInput) {
       explanationInput.addEventListener("input", (e) => {
         this.varianceExplanation = (e.target as HTMLTextAreaElement).value;
         const len = this.varianceExplanation.trim().length;
         const counterEl = rootElement.querySelector("#label-char-counter");
         if (counterEl) {
-          counterEl.textContent = len < 5 ? `กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${len}/5)` : `ความยาวคำชี้แจงถูกต้อง (${len} ตัวอักษร)`;
-          (counterEl as HTMLElement).style.color = len < 5 ? 'var(--expense)' : 'var(--income)';
+          counterEl.textContent =
+            len < 5
+              ? `กรุณากรอกอย่างน้อย 5 ตัวอักษร (ปัจจุบัน ${len}/5)`
+              : `ความยาวคำชี้แจงถูกต้อง (${len} ตัวอักษร)`;
+          (counterEl as HTMLElement).style.color =
+            len < 5 ? "var(--expense)" : "var(--income)";
         }
-        const explainBtn = rootElement.querySelector("#btn-variance-explain") as HTMLButtonElement;
+        const explainBtn = rootElement.querySelector(
+          "#btn-variance-explain",
+        ) as HTMLButtonElement;
         if (explainBtn) {
           explainBtn.disabled = len < 5;
-          explainBtn.style.background = len < 5 ? 'var(--muted-foreground)' : 'var(--info)';
-          explainBtn.style.cursor = len < 5 ? 'not-allowed' : 'pointer';
+          explainBtn.style.background =
+            len < 5 ? "var(--muted-foreground)" : "var(--info)";
+          explainBtn.style.cursor = len < 5 ? "not-allowed" : "pointer";
         }
       });
     }
@@ -839,7 +930,9 @@ export class OfferingPage {
     }
 
     // Cash Account Selector for Posting
-    const cashAcctSelect = rootElement.querySelector("#select-posting-cash-account") as HTMLSelectElement;
+    const cashAcctSelect = rootElement.querySelector(
+      "#select-posting-cash-account",
+    ) as HTMLSelectElement;
     if (cashAcctSelect) {
       cashAcctSelect.addEventListener("change", (e) => {
         this.selectedCashAccountId = (e.target as HTMLSelectElement).value;
@@ -847,7 +940,9 @@ export class OfferingPage {
     }
 
     // Bank Account Selector for Posting
-    const bankAcctSelect = rootElement.querySelector("#select-posting-bank-account") as HTMLSelectElement;
+    const bankAcctSelect = rootElement.querySelector(
+      "#select-posting-bank-account",
+    ) as HTMLSelectElement;
     if (bankAcctSelect) {
       bankAcctSelect.addEventListener("change", (e) => {
         this.selectedBankAccountId = (e.target as HTMLSelectElement).value;
@@ -878,7 +973,8 @@ export class OfferingPage {
       return;
     }
 
-    const transfer = this.selectedSession.expectedTransferAmount || Money.zero();
+    const transfer =
+      this.selectedSession.expectedTransferAmount || Money.zero();
     const qr = this.selectedSession.expectedQrAmount || Money.zero();
     if ((!transfer.isZero() || !qr.isZero()) && !this.selectedBankAccountId) {
       this.errorMessage = "กรุณาระบุบัญชีธนาคารสำหรับยอดเงินโอนและ QR";
@@ -903,7 +999,10 @@ export class OfferingPage {
           ? "รอบเงินถวายนี้ได้รับการบันทึกเข้าสมุดบัญชีแยกประเภทแล้ว (สถานะ: posted)"
           : "บันทึกเข้าสมุดบัญชีแยกประเภทเรียบร้อยแล้ว (สถานะ: posted)";
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถบันทึกลงสมุดบัญชีได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถบันทึกลงสมุดบัญชีได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -922,7 +1021,10 @@ export class OfferingPage {
     if (this.isSubmitting) return;
     if (!this.selectedSession) return;
 
-    if (!this.varianceExplanation || this.varianceExplanation.trim().length < 5) {
+    if (
+      !this.varianceExplanation ||
+      this.varianceExplanation.trim().length < 5
+    ) {
       this.errorMessage = "กรุณาระบุคำอธิบายผลต่างอย่างน้อย 5 ตัวอักษร";
       onStateChange();
       return;
@@ -941,9 +1043,13 @@ export class OfferingPage {
 
       if (res.success && res.data) {
         await this.loadInitialData(this.selectedSession.id);
-        this.successMessage = "บันทึกคำชี้แจงผลต่างเรียบร้อยแล้ว (สถานะ: explained)";
+        this.successMessage =
+          "บันทึกคำชี้แจงผลต่างเรียบร้อยแล้ว (สถานะ: explained)";
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถบันทึกคำชี้แจงผลต่างได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถบันทึกคำชี้แจงผลต่างได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -975,9 +1081,13 @@ export class OfferingPage {
       if (res.success && res.data) {
         await this.loadInitialData(this.selectedSession.id);
         this.detailTab = "count";
-        this.successMessage = "ส่งกลับสู่ขั้นตอนตรวจนับเงินใหม่แล้ว (สถานะ: counting)";
+        this.successMessage =
+          "ส่งกลับสู่ขั้นตอนตรวจนับเงินใหม่แล้ว (สถานะ: counting)";
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถสั่งนับใหม่ได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถสั่งนับใหม่ได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -1001,13 +1111,19 @@ export class OfferingPage {
     onStateChange();
 
     try {
-      const res = await this.offeringService.confirmSession(this.selectedSession.id);
+      const res = await this.offeringService.confirmSession(
+        this.selectedSession.id,
+      );
 
       if (res.success && res.data) {
         await this.loadInitialData(this.selectedSession.id);
-        this.successMessage = "ยืนยันความถูกต้องรอบเงินถวายเรียบร้อยแล้ว (สถานะ: confirmed)";
+        this.successMessage =
+          "ยืนยันความถูกต้องรอบเงินถวายเรียบร้อยแล้ว (สถานะ: confirmed)";
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถยืนยันรอบเงินถวายได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถยืนยันรอบเงินถวายได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -1033,14 +1149,17 @@ export class OfferingPage {
       const res = await this.offeringService.startCashCount(
         this.selectedSession.id,
         this.cashCountState.counter1Id,
-        this.cashCountState.counter2Id
+        this.cashCountState.counter2Id,
       );
 
       if (res.success && res.data) {
         await this.loadInitialData(this.selectedSession.id);
         this.successMessage = "เริ่มต้นขั้นตอนการตรวจนับเงินแล้ว";
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถเริ่มต้นขั้นตอนการตรวจนับเงินได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถเริ่มต้นขั้นตอนการตรวจนับเงินได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -1066,7 +1185,8 @@ export class OfferingPage {
     }
 
     if (this.cashCountState.counter1Id === this.cashCountState.counter2Id) {
-      this.errorMessage = "ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกันตามหลัก Dual Custody";
+      this.errorMessage =
+        "ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกันตามหลัก Dual Custody";
       onStateChange();
       return;
     }
@@ -1085,10 +1205,15 @@ export class OfferingPage {
 
       if (res.success && res.data) {
         await this.loadInitialData(this.selectedSession.id);
-        const actualCash = this.selectedSession?.cashCount?.totalCashCounted || res.data.totalCash;
+        const actualCash =
+          this.selectedSession?.cashCount?.totalCashCounted ||
+          res.data.totalCash;
         this.successMessage = `บันทึกผลการตรวจนับเงินสดเรียบร้อยแล้ว (ยอดที่นับได้: ${actualCash.format()})`;
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถบันทึกผลการตรวจนับเงินสดได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถบันทึกผลการตรวจนับเงินสดได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -1128,19 +1253,19 @@ export class OfferingPage {
 
     if (!allocCash.equals(this.formState.channels.cash)) {
       errors.push(
-        `ยอดจัดสรรเงินสด (${allocCash.format()}) ไม่ตรงกับยอดเงินสดที่คาดหวัง (${this.formState.channels.cash.format()})`
+        `ยอดจัดสรรเงินสด (${allocCash.format()}) ไม่ตรงกับยอดเงินสดที่คาดหวัง (${this.formState.channels.cash.format()})`,
       );
     }
 
     if (!allocTransfer.equals(this.formState.channels.transfer)) {
       errors.push(
-        `ยอดจัดสรรเงินโอน (${allocTransfer.format()}) ไม่ตรงกับยอดเงินโอนที่คาดหวัง (${this.formState.channels.transfer.format()})`
+        `ยอดจัดสรรเงินโอน (${allocTransfer.format()}) ไม่ตรงกับยอดเงินโอนที่คาดหวัง (${this.formState.channels.transfer.format()})`,
       );
     }
 
     if (!allocQr.equals(this.formState.channels.qr)) {
       errors.push(
-        `ยอดจัดสรร QR Code (${allocQr.format()}) ไม่ตรงกับยอด QR Code ที่คาดหวัง (${this.formState.channels.qr.format()})`
+        `ยอดจัดสรร QR Code (${allocQr.format()}) ไม่ตรงกับยอด QR Code ที่คาดหวัง (${this.formState.channels.qr.format()})`,
       );
     }
 
@@ -1194,7 +1319,10 @@ export class OfferingPage {
         this.resetFormState();
         router.navigate("/offerings");
       } else {
-        this.errorMessage = toUserMessage(res.error?.message, "ไม่สามารถบันทึกร่างเงินถวายได้");
+        this.errorMessage = toUserMessage(
+          res.error?.message,
+          "ไม่สามารถบันทึกร่างเงินถวายได้",
+        );
       }
     } catch (err: any) {
       this.errorMessage = toUserMessage(err, "เกิดข้อผิดพลาดในการเชื่อมต่อ");
@@ -1203,7 +1331,6 @@ export class OfferingPage {
       onStateChange();
     }
   }
-
 
   private updateEntryFormCalculations(rootElement: HTMLElement): void {
     const grandExpected = this.formState.channels.cash
@@ -1225,7 +1352,9 @@ export class OfferingPage {
     const totalAllocated = allocCash.add(allocTransfer).add(allocQr);
 
     const diffCash = allocCash.subtract(this.formState.channels.cash);
-    const diffTransfer = allocTransfer.subtract(this.formState.channels.transfer);
+    const diffTransfer = allocTransfer.subtract(
+      this.formState.channels.transfer,
+    );
     const diffQr = allocQr.subtract(this.formState.channels.qr);
 
     const isCashMatch = diffCash.isZero();
@@ -1234,36 +1363,63 @@ export class OfferingPage {
     const isAllAllocMatched =
       isCashMatch && isTransferMatch && isQrMatch && !grandExpected.isZero();
 
-    const grandExpectedEl = rootElement.querySelector<HTMLElement>('[data-entry="grand-expected"]');
+    const grandExpectedEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="grand-expected"]',
+    );
     if (grandExpectedEl) {
       grandExpectedEl.textContent = grandExpected.format();
     }
 
-    const cashStatusEl = rootElement.querySelector<HTMLElement>('[data-entry="alloc-cash-status"]');
+    const cashStatusEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="alloc-cash-status"]',
+    );
     if (cashStatusEl) {
       cashStatusEl.textContent = `${allocCash.format()}${allocCash.isZero() ? "" : !isCashMatch ? ` · ต่าง ${diffCash.format()}` : ""}`;
-      cashStatusEl.style.color = allocCash.isZero() ? "var(--muted-foreground)" : isCashMatch ? "var(--income)" : "var(--pending)";
+      cashStatusEl.style.color = allocCash.isZero()
+        ? "var(--muted-foreground)"
+        : isCashMatch
+          ? "var(--income)"
+          : "var(--pending)";
     }
 
-    const transferStatusEl = rootElement.querySelector<HTMLElement>('[data-entry="alloc-transfer-status"]');
+    const transferStatusEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="alloc-transfer-status"]',
+    );
     if (transferStatusEl) {
       transferStatusEl.textContent = `${allocTransfer.format()}${allocTransfer.isZero() ? "" : !isTransferMatch ? ` · ต่าง ${diffTransfer.format()}` : ""}`;
-      transferStatusEl.style.color = allocTransfer.isZero() ? "var(--muted-foreground)" : isTransferMatch ? "var(--income)" : "var(--pending)";
+      transferStatusEl.style.color = allocTransfer.isZero()
+        ? "var(--muted-foreground)"
+        : isTransferMatch
+          ? "var(--income)"
+          : "var(--pending)";
     }
 
-    const qrStatusEl = rootElement.querySelector<HTMLElement>('[data-entry="alloc-qr-status"]');
+    const qrStatusEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="alloc-qr-status"]',
+    );
     if (qrStatusEl) {
       qrStatusEl.textContent = `${allocQr.format()}${allocQr.isZero() ? "" : !isQrMatch ? ` · ต่าง ${diffQr.format()}` : ""}`;
-      qrStatusEl.style.color = allocQr.isZero() ? "var(--muted-foreground)" : isQrMatch ? "var(--income)" : "var(--pending)";
+      qrStatusEl.style.color = allocQr.isZero()
+        ? "var(--muted-foreground)"
+        : isQrMatch
+          ? "var(--income)"
+          : "var(--pending)";
     }
 
-    const noticeEl = rootElement.querySelector<HTMLElement>('[data-entry="summary-notice"]');
-    const noticeBodyEl = rootElement.querySelector<HTMLElement>('[data-entry="summary-notice-body"]');
-    const noticeAmountEl = rootElement.querySelector<HTMLElement>('[data-entry="summary-notice-amount"]');
+    const noticeEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="summary-notice"]',
+    );
+    const noticeBodyEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="summary-notice-body"]',
+    );
+    const noticeAmountEl = rootElement.querySelector<HTMLElement>(
+      '[data-entry="summary-notice-amount"]',
+    );
     if (noticeEl && noticeBodyEl && noticeAmountEl) {
       if (totalAllocated.isZero() && grandExpected.isZero()) {
         noticeEl.className = "gl-notice";
-        noticeBodyEl.textContent = "กรอกยอดตามช่องทาง แล้วจัดสรรเข้ากองทุนให้ครบ";
+        noticeBodyEl.textContent =
+          "กรอกยอดตามช่องทาง แล้วจัดสรรเข้ากองทุนให้ครบ";
         noticeAmountEl.style.display = "none";
       } else {
         noticeEl.className = `gl-notice ${isAllAllocMatched ? "gl-notice--success" : "gl-notice--warning"}`;
@@ -1306,18 +1462,32 @@ export class OfferingPage {
         ? { head: "ยอดเงินสดตรวจนับขาด" }
         : { head: "ยอดเงินสดตรวจนับเกิน" };
 
-    const keys: Array<"b1000" | "b500" | "b100" | "b50" | "b20"> = ["b1000", "b500", "b100", "b50", "b20"];
+    const keys: Array<"b1000" | "b500" | "b100" | "b50" | "b20"> = [
+      "b1000",
+      "b500",
+      "b100",
+      "b50",
+      "b20",
+    ];
     keys.forEach((k) => {
-      const el = rootElement.querySelector<HTMLElement>(`[data-denom-total="${k}"]`);
+      const el = rootElement.querySelector<HTMLElement>(
+        `[data-denom-total="${k}"]`,
+      );
       if (el) el.textContent = denomResult.breakdown[k].total.format();
     });
-    const coinsEl = rootElement.querySelector<HTMLElement>('[data-denom-total="coins"]');
+    const coinsEl = rootElement.querySelector<HTMLElement>(
+      '[data-denom-total="coins"]',
+    );
     if (coinsEl) coinsEl.textContent = denomResult.coinTotal.format();
 
-    const topKickerEl = rootElement.querySelector<HTMLElement>('[data-cashcount="top-kicker"]');
+    const topKickerEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="top-kicker"]',
+    );
     if (topKickerEl) topKickerEl.textContent = varianceStat.head;
 
-    const topVarianceEl = rootElement.querySelector<HTMLElement>('[data-cashcount="top-variance"]');
+    const topVarianceEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="top-variance"]',
+    );
     if (topVarianceEl) {
       topVarianceEl.textContent = varianceAmount.format({ showSign: true });
       topVarianceEl.style.color = isMatch
@@ -1327,21 +1497,34 @@ export class OfferingPage {
           : "var(--pending)";
     }
 
-    const topActualEl = rootElement.querySelector<HTMLElement>('[data-cashcount="top-actual"]');
+    const topActualEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="top-actual"]',
+    );
     if (topActualEl) topActualEl.textContent = actualCash.format();
 
-    const bottomActualEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-actual"]');
+    const bottomActualEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="bottom-actual"]',
+    );
     if (bottomActualEl) bottomActualEl.textContent = actualCash.format();
 
-    const bottomNoticeEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-notice"]');
+    const bottomNoticeEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="bottom-notice"]',
+    );
     if (bottomNoticeEl) {
       bottomNoticeEl.className = `gl-notice ${isMatch ? "gl-notice--success" : isShortage ? "gl-notice--error" : "gl-notice--warning"}`;
     }
-    const bottomHeadEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-notice-head"]');
+    const bottomHeadEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="bottom-notice-head"]',
+    );
     if (bottomHeadEl) bottomHeadEl.textContent = varianceStat.head;
 
-    const bottomNoticeAmountEl = rootElement.querySelector<HTMLElement>('[data-cashcount="bottom-notice-amount"]');
-    if (bottomNoticeAmountEl) bottomNoticeAmountEl.textContent = varianceAmount.format({ showSign: true });
+    const bottomNoticeAmountEl = rootElement.querySelector<HTMLElement>(
+      '[data-cashcount="bottom-notice-amount"]',
+    );
+    if (bottomNoticeAmountEl)
+      bottomNoticeAmountEl.textContent = varianceAmount.format({
+        showSign: true,
+      });
   }
 
   /**

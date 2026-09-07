@@ -7,7 +7,7 @@ import { ReportsService } from "../lib/reports/reports-service";
 import { Money } from "../lib/money";
 import { escapeHtml, formatDateThai } from "../lib/format";
 import { monthBounds } from "../lib/period";
-import { can, toUserRole, type UserRole } from "../lib/rbac";
+import { can, roleLabelTh, toUserRole, type UserRole } from "../lib/rbac";
 import type { AppShellUser } from "../components/layout/AppShell";
 import type { AttentionSummary } from "../services/attention-service";
 
@@ -364,6 +364,10 @@ export class DashboardPage {
         <span class="gl-attention-row__chevron" aria-hidden="true">${ICON_ARROW}</span>
       </a>`;
 
+    const attentionTotal = attention
+      ? attention.totalCount
+      : data.pendingApprovalsCount;
+
     let attentionBodyHtml: string;
     if (attention === undefined) {
       // Fallback for callers/tests without a loaded summary: derive the one
@@ -453,6 +457,15 @@ export class DashboardPage {
             : `<p class="gl-dash-context__note">ยังไม่มีข้อมูลเดือนก่อนสำหรับเปรียบเทียบ — สุทธิเดือนนี้ <span class="num-display">${netIsPositive ? "+" : ""}${netMoney.format()}</span></p>`
         }
         <a href="#/reports" class="gl-dash-context__link">ดูรายงานเต็ม →</a>
+        ${
+          attentionTotal > 0
+            ? `<div class="gl-dash-context__attention-chip">
+                <a href="#gl-command-center" class="gl-badge gl-badge--pending" style="text-decoration: none;">
+                  <span>ต้องดำเนินการ ${attentionTotal} รายการ ↓</span>
+                </a>
+              </div>`
+            : ""
+        }
       </div>`;
 
     // Per-figure month-over-month delta for the hero's income/expense lines —
@@ -664,10 +677,6 @@ export class DashboardPage {
         </div>
       </section>`;
 
-    const attentionTotal = attention
-      ? attention.totalCount
-      : data.pendingApprovalsCount;
-
     // Role-gated hero quick actions — each opens the existing workflow.
     const heroActionsHtml = [
       can(userRole, "create", "offering_sessions")
@@ -696,16 +705,7 @@ export class DashboardPage {
       .join("");
 
     const displayName = activeUser?.name || "";
-    const userRoleLabel =
-      activeUser?.role === "pastor"
-        ? "ศิษยาภิบาล"
-        : activeUser?.role === "treasurer"
-          ? "เหรัญญิก"
-          : activeUser?.role === "counter"
-            ? "ผู้นับเงิน"
-            : activeUser?.role === "super_admin"
-              ? "ผู้ตรวจสอบบัญชี"
-              : "";
+    const userRoleLabel = activeUser?.role ? roleLabelTh(activeUser.role) : "";
 
     const greetingTitle = displayName
       ? `สวัสดีครับ ${escapeHtml(displayName)}${userRoleLabel ? ` · ${escapeHtml(userRoleLabel)}` : ""}`
@@ -733,7 +733,7 @@ export class DashboardPage {
         <h2 class="gl-visually-hidden">สุขภาพการเงิน</h2>
         <div class="gl-dash-hero-row">
           <div class="gl-card gl-dash-hero gl-rise">
-            <div class="kicker">ยอดเงินคงเหลือทั้งหมด</div>
+            <div class="kicker">ยอดคงเหลือทั้งหมด</div>
             <div class="num-display gl-dash-hero__value gl-total-rule" data-testid="total-balance">${data.totalFundsBalance || "฿0.00"}</div>
             <div class="gl-dash-hero__foot">${funds.length} กองทุน · ${data.activeAccountsCount || 0} บัญชีธนาคาร + เงินสดในมือ</div>
 
@@ -750,22 +750,7 @@ export class DashboardPage {
         </div>
       </section>
 
-      <!-- งานสัปดาห์นี้: required action, one step down from financial
-           position — still fully visible, not the page's dominant surface.
-           Aggregated from the same source as the shell bell, deep-linked to
-           each workflow. -->
-      <section class="gl-command-center" aria-label="งานสัปดาห์นี้">
-        <div class="gl-command-center__head">
-          <h2 class="gl-command-center__title">
-            <span>งานสัปดาห์นี้</span>
-          </h2>
-          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}">
-            ${attentionTotal > 0 ? `ต้องดำเนินการ ${attentionTotal} รายการ` : "ไม่มีงานค้าง"}
-          </span>
-        </div>
-        ${attentionBodyHtml}
-      </section>
-
+      <!-- Explanation & Context: 12-Month Trend and Split (Recent + Funds) -->
       ${trendHtml}
 
       <div class="gl-dash-split">
@@ -789,6 +774,21 @@ export class DashboardPage {
           </section>
         </div>
       </div>
+
+      <!-- Required Actions: operational clearinghouse placed as Tier 4.
+           Aggregated from the same source as the shell bell, deep-linked to
+           each workflow. Critical items remain visible via the hero context chip above. -->
+      <section class="gl-command-center" id="gl-command-center" aria-label="งานสัปดาห์นี้">
+        <div class="gl-command-center__head">
+          <h2 class="gl-command-center__title">
+            <span>งานสัปดาห์นี้</span>
+          </h2>
+          <span class="gl-badge ${attentionTotal > 0 ? "gl-badge--pending" : "gl-badge--neutral"}">
+            ${attentionTotal > 0 ? `ต้องดำเนินการ ${attentionTotal} รายการ` : "ไม่มีงานค้าง"}
+          </span>
+        </div>
+        ${attentionBodyHtml}
+      </section>
     </div>
     `;
   }

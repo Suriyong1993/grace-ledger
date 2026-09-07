@@ -367,20 +367,20 @@ skips), `npm run lint:design`, `npm run build` all green.
 **Decision:** the glass treatment on the three shell/content surfaces is replaced by opaque surfaces with a
 hairline border and, where a surface really overlaps, an ink-tinted token shadow.
 
-| Surface | Was | Now |
-| --- | --- | --- |
-| `.gl-shell-topbar` | `card 80%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.25)` shadow + a **white** 9% bottom border | `var(--card)`, `1px solid var(--border)`, `box-shadow: none` |
-| `.gl-shell-topbar` inline style (`AppShell.ts`) | `card 88%` + `blur(10px)` | `var(--card)` |
-| `.gl-mobilenav` (≤768px) | `card 85%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.3)` shadow | `var(--card)`, `1px solid var(--border)`, `var(--shadow-elevated)` |
-| `.gl-glass-surface` | glass utility, **zero consumers** in `src/` or `tests/` | deleted |
-| `--gl-glass-blur`, `--gl-glass-border` | tokens read only by the four rules above | deleted |
+| Surface                                         | Was                                                                                                | Now                                                                |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `.gl-shell-topbar`                              | `card 80%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.25)` shadow + a **white** 9% bottom border | `var(--card)`, `1px solid var(--border)`, `box-shadow: none`       |
+| `.gl-shell-topbar` inline style (`AppShell.ts`) | `card 88%` + `blur(10px)`                                                                          | `var(--card)`                                                      |
+| `.gl-mobilenav` (≤768px)                        | `card 85%` + `blur(14px) saturate(140%)` + `rgba(0,0,0,.3)` shadow                                 | `var(--card)`, `1px solid var(--border)`, `var(--shadow-elevated)` |
+| `.gl-glass-surface`                             | glass utility, **zero consumers** in `src/` or `tests/`                                            | deleted                                                            |
+| `--gl-glass-blur`, `--gl-glass-border`          | tokens read only by the four rules above                                                           | deleted                                                            |
 
 **Why:**
 
 1. **It violated a rule this repo had already written down.** `DESIGN.md` § Anti-AI-Slop Rules: "No
    glassmorphism unless justified by depth system." Nothing in the depth system justified it — `shadows.css`
-   states the opposite contract: *"Border beats shadow — these are intentionally faint … Shadows are
-   ink-green tinted to sit inside the porcelain palette."* The retired rules used pure black at 25–30%.
+   states the opposite contract: _"Border beats shadow — these are intentionally faint … Shadows are
+   ink-green tinted to sit inside the porcelain palette."_ The retired rules used pure black at 25–30%.
 2. **It was the surviving half of a known drift.** The layer arrived in the 2026-09-04 00:22 session, the
    same session that added the "2026 Sunset Orange" CTA system. D12 removed the CTA half and left the glass
    half. This completes that cleanup; it is not a new direction.
@@ -417,16 +417,16 @@ stylesheet in the product and the one every screen loads — and it was never sc
 how the D15 layer landed with black shadows, an off-palette hex, and a white border, while `lint:design`
 reported "passed". The design source of truth cannot be guarded by a check that does not read it.
 
-**What the allowlist now pins in `app.css`** (a count that moves in *either* direction fails the lint, which
+**What the allowlist now pins in `app.css`** (a count that moves in _either_ direction fails the lint, which
 is this script's existing convention):
 
-| Pattern | Count | What they are |
-| --- | --- | --- |
-| literal `font-size` | 1 | dev-only HMR badge |
-| literal `border-radius` | 3 | dev-only HMR badge (1), two hairline/pill radii below the smallest token (2) |
-| `rgb()`/`rgba()` | 7 | dev-only HMR badge (2), overlay scrim veils (2), faint ink-tinted shadows written inline instead of as tokens (3) |
-| hex | 10 | dev-only HMR badge (1), print stylesheet (9) — paper needs true black and white |
-| `backdrop-filter` | 5 | overlay scrims only |
+| Pattern                 | Count | What they are                                                                                                     |
+| ----------------------- | ----- | ----------------------------------------------------------------------------------------------------------------- |
+| literal `font-size`     | 1     | dev-only HMR badge                                                                                                |
+| literal `border-radius` | 3     | dev-only HMR badge (1), two hairline/pill radii below the smallest token (2)                                      |
+| `rgb()`/`rgba()`        | 7     | dev-only HMR badge (2), overlay scrim veils (2), faint ink-tinted shadows written inline instead of as tokens (3) |
+| hex                     | 10    | dev-only HMR badge (1), print stylesheet (9) — paper needs true black and white                                   |
+| `backdrop-filter`       | 5     | overlay scrims only                                                                                               |
 
 Each is R6 cleanup except the print block and the scrims, which are correct as they are.
 
@@ -443,12 +443,12 @@ Each is R6 cleanup except the print block and the scrims, which are correct as t
 Changed — the complete set at or above 32px, found by pairing every `--weight-bold` declaration with its
 `font-size`:
 
-| Selector | Size | Was | Now |
-| --- | --- | --- | --- |
-| `.gl-dash-hero__value` | 40-52px | bold | semibold |
-| `.gl-cashcount-summary__value` | 32px | bold | semibold |
-| `.gl-approval-amount__value` | 32px | bold | semibold |
-| `.gl-reports-hero__value` | 32px | bold | semibold |
+| Selector                       | Size    | Was  | Now      |
+| ------------------------------ | ------- | ---- | -------- |
+| `.gl-dash-hero__value`         | 40-52px | bold | semibold |
+| `.gl-cashcount-summary__value` | 32px    | bold | semibold |
+| `.gl-approval-amount__value`   | 32px    | bold | semibold |
+| `.gl-reports-hero__value`      | 32px    | bold | semibold |
 
 `.gl-page-header h1` tops out at `--text-3xl` (26px), below the line, and keeps bold. Bold usage across
 `app.css` falls from 37 declarations to 33.
@@ -517,11 +517,11 @@ suite. Catching it needs a real browser; see the follow-up note in D19.
 
 **Decision:** three controls that fell below `--touch-target-min` on a 390px viewport are raised to it.
 
-| Control | Was | Why it mattered |
-| --- | --- | --- |
+| Control                             | Was  | Why it mattered                                                                                                                                                                                                                                                                                       |
+| ----------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `.gl-shell-primary-action` (≤768px) | 40px | The app's global primary action (D11 §3) and its most-tapped control. It had been compacted in an inline `<style>` in `AppShell.ts` to fit the crowded top bar; the room came back when D18 removed the cap. The short label and narrower padding stay — they buy width without shrinking the target. |
-| `.gl-attention-panel__group-head` | 37px | Tappable row in the bell panel; it had padding but no `min-height`. |
-| `.gl-attention-panel__more-link` | 31px | Same. |
+| `.gl-attention-panel__group-head`   | 37px | Tappable row in the bell panel; it had padding but no `min-height`.                                                                                                                                                                                                                                   |
+| `.gl-attention-panel__more-link`    | 31px | Same.                                                                                                                                                                                                                                                                                                 |
 
 Measured before and after by walking every focusable element at 390px. Only `.gl-skip-link` (133×37) now
 sits under 44px, and it is left alone: it is revealed on keyboard focus and is never a touch target.
@@ -531,16 +531,16 @@ sits under 44px, and it is left alone: it is revealed on keyboard focus and is n
 ### D20 — Press states are brought inside the documented 0.97-0.98 range
 
 **Decision:** six press states outside the contract are corrected. `design-system-extracted/readme.md`
-states it: *"Press = `scale(0.97-0.98)` only, no color flash."*
+states it: _"Press = `scale(0.97-0.98)` only, no color flash."_
 
-| Control | Was | Now |
-| --- | --- | --- |
-| `.gl-logout-btn:active` | 0.96 | 0.97 |
-| `.gl-shell-icon-btn:active` | 0.96 | 0.97 |
-| `.gl-modal-close:active` | 0.96 | 0.97 |
-| `.gl-txn-row:active` | 0.995 | 0.98 |
-| `a.gl-row:active` | 0.99 | 0.98 |
-| `.gl-profile-item:active` (login) | 0.99 | 0.98 |
+| Control                           | Was   | Now  |
+| --------------------------------- | ----- | ---- |
+| `.gl-logout-btn:active`           | 0.96  | 0.97 |
+| `.gl-shell-icon-btn:active`       | 0.96  | 0.97 |
+| `.gl-modal-close:active`          | 0.96  | 0.97 |
+| `.gl-txn-row:active`              | 0.995 | 0.98 |
+| `a.gl-row:active`                 | 0.99  | 0.98 |
+| `.gl-profile-item:active` (login) | 0.99  | 0.98 |
 
 Small chrome controls take 0.97; full-width rows take 0.98, the gentle end, which suits their size. Half of
 the product's fourteen press states were off-contract before this — three snapping harder than allowed,
@@ -555,9 +555,100 @@ not a press.
 
 **Status:** APPROVED & IMPLEMENTED (2026-09-05). Same green gates as D17.
 
+---
+
+## 2026-09-06 — Brand identity rebrand
+
+### D21 — "Coral Vault" identity supersedes "Emerald Vault" (user-directed)
+
+**Decision:** the deep-evergreen/brass identity (D8) is replaced with a new palette — paper, stone, coral,
+near-black — supplied directly by the user (Paper `#F6F4F1`, Stone `#E4DED2`, Coral `#F95C4B`, Black
+`#000000`, adapted). Applied to `design-system-extracted/tokens/colors.css` (the single source of truth) and
+the three consumers that referenced the old identity's tokens directly rather than through a semantic alias:
+`src/styles/app.css` (hero gradient `--gl-brass-500` → `--gl-coral-500`; sheet-backdrop scrim `--gl-vault-950`
+→ `--gl-black`) and `src/components/login/loginStyles.ts` (vault-hero rule `--gl-brass-500` → `--gl-coral-500`).
+Token **names** did not change except for the base ramp itself (`--gl-evergreen-*`, `--gl-vault-950`,
+`--gl-brass-*` → `--gl-coral-*`, `--gl-black`); every semantic token (`--primary`, `--accent`, `--sidebar-*`,
+`--ring`, `--chart-1`) kept its name and was repointed to the new ramp, so no page-level consumer needed a
+change — this is the same propagation mechanism D8 used.
+
+**What did NOT change — the finance-status colors are a separate system from brand:** `--income` (emerald),
+`--expense` (red), `--pending`/`--offering` (amber), `--approved`, `--rejected`, `--success`, `--warning`,
+`--info`, and `--chart-2..5` are untouched. This was flagged to the user before implementation: Coral
+(`#F95C4B`) sits close in hue to `--expense`'s red (`#D92D20`), and making it the _brand_ color while also
+repurposing it for ledger amounts would let a treasurer misread an expense figure as brand chrome. The user
+confirmed the rebrand should proceed with status colors held fixed. `--destructive` also stays `--gl-red-600`
+(unchanged) rather than moving toward coral, for the same reason — a danger-dialog button and a primary
+button now sit in the same warm-red family, which is an accepted, monitored trade-off: they don't appear
+adjacent in any current screen (destructive actions are dialog-confined; primary buttons are page-level), but
+if real usage shows confusion, `--destructive` should move toward crimson/magenta rather than `--primary`
+moving toward orange, to keep the ledger's red-family for danger/expense reserved.
+
+**Accessibility correction made during adaptation, not asked for verbatim:** the reference swatch pairs
+white text on the vivid coral swatch (`#F95C4B`). Computed contrast, white on `#F95C4B` ≈ 3.15:1 — below the
+4.5:1 AA floor for normal-weight text (it clears 3:1, the large-text/UI-component floor, which is why it
+reads fine on the reference's own bold display labels). `--primary` is therefore the deeper `--gl-coral-700`
+(`#C13F2E`, ≈5.23:1 with white) so small button and link labels stay AA-compliant everywhere; the vivid
+`--gl-coral-500` remains available as `--accent`/`--ring`/hero-gradient/large-figure color, where either the
+text is large/bold or the surface is paired with dark text (`--accent-foreground: var(--gl-coral-700)`).
+
+**Glassmorphism — deliberately not reintroduced:** one of the three reference images (a "UI Trends 2026"
+moodboard) included evolved glassmorphism as a general 2026 trend. This codebase removed glass surfaces once
+already (D15) because blur over scrolling money figures cost legibility on the one screen class where
+legibility matters most. The rebrand changes color only; no `backdrop-filter` was added back.
+
+**Sidebar:** `--sidebar` moves from vault-green `#0B1F17` to near-black `#0A0A09` (not pure `#000000`, to
+avoid banding on a large flat fill), `--sidebar-primary` becomes vivid coral `#F95C4B` (high-contrast against
+the near-black fill, ≈6.66:1), with `--sidebar-primary-foreground` set to near-black (not white) for the same
+small-text-contrast reason as `--primary` above.
+
+**Dark mode:** no product toggle exists yet (D4, still deferred). Only the literal brand hex values inside
+`.dark` (`--primary`, `--ring`, `--chart-1`, `--sidebar-primary`) were repointed to coral for consistency; the
+oklch-based surface ramp (background/card/popover, hue 160) was left as-is — a full dark-mode reskin is a
+separate, dedicated pass, not part of this rebrand, and is currently unreachable by any user.
+
+**Verification:** `npm run lint:design` passed. `npm run build` passed (`tsc --noEmit && vite build`).
+`npm test` — 575 passed / 24 skipped (same pre-existing skip set as baseline: the two real-Postgres
+integration suites unavailable in this sandbox). Confirmed via `grep` on the built `dist/assets/*.css`: old
+brand hex (`#14532d`, `#b45309`, `#0b1f17`, `#2fa36b`) is absent; new brand hex (`#f95c4b`, `#c13f2e`,
+`#f6f4f1`) is present.
+
+**Not done in this pass (would need a dedicated, separately-verified pass if desired):** a from-scratch
+screen-by-screen visual pass to hand-tune anything that assumed the old palette's specific darkness/lightness
+balance beyond what the token swap already carries — the token architecture means every `.gl-*` class picks
+up the new palette automatically, but a human visual check across all 10 routes at desktop + 390px has not
+been performed by this agent (no browser available in this pass); the user should spot-check before
+considering this fully verified per CLAUDE.md's UX review gate.
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-06), pending user visual confirmation.
+
+---
+
+## 2026-09-05 — Dashboard hierarchy & topbar grouping
+
+### D22 — Dashboard 4-Tier Information Hierarchy & Topbar 4-Cluster Grouping (2026-09-05)
+
+**Decision:** The dashboard information hierarchy is explicitly standardized into four distinct tiers:
+
+1. **Financial Position** (`.gl-dash-hero-row`): Anchor card with total cash balance, income/expense figures, and month-over-month delta context.
+2. **Financial Movement** (`trendHtml`): 12-Month income vs expense trend bar chart.
+3. **Explanation / Context** (`.gl-dash-split`): Recent activity ledger stream + fund breakdown cards.
+4. **Required Actions** (`#gl-command-center`): Operational clearinghouse for pending tasks/approvals.
+
+**Action Visibility Rule:** While the operational clearinghouse (`gl-command-center`) sits at Tier 4, critical pending actions remain instantly discoverable at the top of the viewport via a compact attention badge/chip (`.gl-dash-context__attention-chip`) within the hero context card that deep-links directly down to `#gl-command-center`.
+
+**Topbar Micro-architecture:** The global shell topbar is structured into 4 distinct semantic clusters with subtle dividers:
+
+- Context Cluster: Page Title (`.gl-shell-topbar__title`)
+- Primary Action Cluster: Quick Record (`.gl-topbar-cluster--action`)
+- Utility Cluster: Church badge + Notification bell (`.gl-topbar-cluster--utility`)
+- Identity Cluster: User Avatar + Logout button (`.gl-topbar-cluster--identity`)
+
+**Status:** APPROVED & IMPLEMENTED (2026-09-05).
+
 ## 2026-09-07 — Premium direction adoption (user-selected from UI Lab)
 
-### D21 — The "Glass Ledger" direction is adopted as the workspace theme (supersedes D15 exactly where stated)
+### D23 — The "Glass Ledger" direction is adopted as the workspace theme (supersedes D15 exactly where stated)
 
 **Decision:** the product adopts UI Lab option C ("Glass Ledger") as its visual direction. Frosted
 surfaces return **by user selection**, not by drift: the user compared the three desktop directions in
@@ -608,7 +699,7 @@ entry (2, the login card). Zero new `rgb()`/hex/font-size/radius literals in `sr
 could not be screenshotted in the sandbox (no Chromium, network-restricted) — visual confirmation is by
 the live dev-server preview at desktop and 390px.
 
-### D22 — U1 ultra-modern pass: floating pill chrome, pastel metric tiles, pill CTA (user reference set)
+### D24 — U1 ultra-modern pass: floating pill chrome, pastel metric tiles, pill CTA (user reference set)
 
 **Decision:** after D21 (Glass Ledger), the user supplied four mobile-app reference posts (2026-09-07:
 property/finance, garden, mindfulness, home-design showcases) and directed: apply that ultra-modern
@@ -641,7 +732,7 @@ comment updated). Zero literals touched otherwise. Tests: the two dashboard hero
 baseline), `npm run lint:design`, `npm run build` all green. Visual confirmation: live preview at 390px and
 desktop (sandbox has no Chromium).
 
-### D23 — U2: centre FAB in the floating mobile nav; sticky action flows exempt it
+### D25 — U2: centre FAB in the floating mobile nav; sticky action flows exempt it
 
 **Decision:** the references' raised centre FAB is adopted: the global create action
 (`#/transactions?create=1`) moves into the floating mobile pill as a 56px ramp FAB at
@@ -671,7 +762,7 @@ presence/absence by role; suite 577 passed / 24 skipped, typecheck + lint:design
 
 ---
 
-## 2026-09-07 — D25: Coral Vault identity (supersedes Emerald Vault)
+## 2026-09-07 — D21a: Coral Vault rollout detail (addendum to D21)
 
 **Decision.** The brand palette moves from Emerald Vault (porcelain / ink-green /
 evergreen / brass) to **Coral Vault**: Paper `#f6f4f1`, warm ink `#1c1a17`, stone
@@ -729,7 +820,7 @@ The 2026-09-07 direction review supplied a set of references: a Paper/Stone/
 Coral/Black palette card, the Finexy coral+black financial dashboard, Donezo,
 and the IMPECCABLE carousel. Finexy was selected as the primary reference.
 
-The palette in the reference card already matched Coral Vault (D25) exactly on
+The palette in the reference card already matched Coral Vault (D21) exactly on
 all four values, so **this pass changes no hue**. What the reference actually
 contributes is hierarchy, and the changes are made to shared primitives rather
 than to individual pages, so all routes inherit them:
@@ -748,7 +839,7 @@ than to individual pages, so all routes inherit them:
   lands.
 
 Finance status colours (income/expense/pending/approved/rejected) are untouched,
-per D25 — brand and finance remain separate systems.
+per D21 — brand and finance remain separate systems.
 
 Also fixed here: `.hmr-indicator` was nested *inside* `.gl-card--attention`,
 scoping a dev badge to an unrelated selector and burying that card's
@@ -828,14 +919,14 @@ after a close, which is the case a single non-recursive bind would fail.
 TransactionsPage exposes no `attachEventListeners`, so its screen stays
 markup-only for now — noted rather than papered over.
 
-## D27 — "Premium Minimal" direction (supersedes D21's frost where stated)
+## D27 — "Premium Minimal" direction (supersedes D23's frost where stated)
 
 **Decision (2026-09-07).** The user supplied a full visual-direction brief:
 premium, modern, minimal — Apple-inspired simplicity, generous whitespace,
 large rounded corners (≈16–24px), soft shadows, minimal low-contrast borders,
 a restrained palette (paper `#f6f4f1`, stone `#e4ded2`, coral `#f95c4b`,
 black), and the accent used strategically rather than everywhere. The Coral
-Vault palette (D25) already matched the brief's four base colours exactly, so
+Vault palette (D21) already matched the brief's four base colours exactly, so
 **no hue changes** — what changes is surface language, hierarchy and
 consistency. Implemented token-first, surface-second, page-by-page, per the
 brief's own method.

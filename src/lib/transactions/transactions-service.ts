@@ -499,7 +499,7 @@ export class TransactionsService {
     } catch (err: any) {
       return {
         success: false,
-        error: err.message || "เกิดข้อผิดพลาดในการโพสต์รายการลงบัญชี",
+        error: err.message || "เกิดข้อผิดพลาดในการลงบัญชีรายการ",
       };
     }
   }
@@ -530,7 +530,7 @@ export class TransactionsService {
     } catch (err: any) {
       return {
         success: false,
-        error: err.message || "เกิดข้อผิดพลาดในการยกเลิกรายการ (Void)",
+        error: err.message || "เกิดข้อผิดพลาดในการยกเลิกรายการ",
       };
     }
   }
@@ -612,7 +612,7 @@ export class TransactionsService {
     } catch (err: any) {
       return {
         success: false,
-        error: err.message || "เกิดข้อผิดพลาดในการดึง Audit Trail",
+        error: err.message || "เกิดข้อผิดพลาดในการดึงประวัติการตรวจสอบ",
       };
     }
   }

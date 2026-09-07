@@ -51,7 +51,7 @@ export class OfferingLifecycle {
    */
   public static canTransition(
     from: OfferingSessionStatus,
-    to: OfferingSessionStatus
+    to: OfferingSessionStatus,
   ): boolean {
     if (from === to) return true;
     const allowed = ALLOWED_OFFERING_TRANSITIONS[from];
@@ -64,7 +64,7 @@ export class OfferingLifecycle {
    */
   public static validateDualCounters(
     counter1Id?: string | null,
-    counter2Id?: string | null
+    counter2Id?: string | null,
   ): { isValid: boolean; error?: string } {
     if (!counter1Id || !counter1Id.trim()) {
       return { isValid: false, error: "กรุณาระบุผู้ตรวจนับคนที่ 1" };
@@ -75,7 +75,8 @@ export class OfferingLifecycle {
     if (counter1Id.trim() === counter2Id.trim()) {
       return {
         isValid: false,
-        error: "ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกัน (Dual-counter principle)",
+        error:
+          "ผู้ตรวจนับคนที่ 1 และคนที่ 2 ต้องเป็นคนละคนกัน (Dual-counter principle)",
       };
     }
     return { isValid: true };
@@ -87,7 +88,7 @@ export class OfferingLifecycle {
   public static validateRevisionInput(
     reason: string,
     previousAmount: MoneyInput,
-    newAmount: MoneyInput
+    newAmount: MoneyInput,
   ): { isValid: boolean; error?: string } {
     if (!reason || reason.trim().length < 5) {
       return {
@@ -121,19 +122,19 @@ export class OfferingLifecycle {
       explanationReason?: string | null;
       cashAccountId?: string | null;
       bankAccountId?: string | null;
-    }
+    },
   ): { isValid: boolean; error?: string } {
     // 1. Immutability
     if (session.status === "posted") {
       return {
         isValid: false,
-        error: "เซสชันยอดถวายนี้ถูกบันทึกลงสมุดบัญชีแล้ว (Posted) และไม่สามารถเปลี่ยนแปลงได้",
+        error: "เซสชันยอดถวายนี้ลงบัญชีแล้ว ไม่สามารถเปลี่ยนแปลงได้",
       };
     }
     if (session.status === "voided") {
       return {
         isValid: false,
-        error: "เซสชันยอดถวายนี้ถูกยกเลิกแล้ว (Voided) และไม่สามารถเปลี่ยนแปลงได้",
+        error: "เซสชันยอดถวายนี้ถูกยกเลิกแล้ว ไม่สามารถเปลี่ยนแปลงได้",
       };
     }
 
@@ -149,7 +150,7 @@ export class OfferingLifecycle {
     if (nextStatus === "counting" && session.status === "draft") {
       const dualCheck = this.validateDualCounters(
         context?.counter1Id ?? session.counter1Id,
-        context?.counter2Id ?? session.counter2Id
+        context?.counter2Id ?? session.counter2Id,
       );
       if (!dualCheck.isValid) {
         return dualCheck;
@@ -159,18 +160,22 @@ export class OfferingLifecycle {
     // 4. Confirmation checks
     if (nextStatus === "confirmed") {
       // Must have dual counters
-      const dualCheck = this.validateDualCounters(session.counter1Id, session.counter2Id);
+      const dualCheck = this.validateDualCounters(
+        session.counter1Id,
+        session.counter2Id,
+      );
       if (!dualCheck.isValid) {
         return dualCheck;
       }
 
       // Must have zero variance OR valid explanation
       if (session.cashVarianceAmount && !session.cashVarianceAmount.isZero()) {
-        const varianceCheck = VarianceEngine.isVarianceAcceptableForConfirmation(
-          session.cashVarianceAmount,
-          session.varianceStatus,
-          context?.explanationReason ?? session.varianceReason
-        );
+        const varianceCheck =
+          VarianceEngine.isVarianceAcceptableForConfirmation(
+            session.cashVarianceAmount,
+            session.varianceStatus,
+            context?.explanationReason ?? session.varianceReason,
+          );
         if (!varianceCheck.canConfirm) {
           return { isValid: false, error: varianceCheck.reason };
         }
@@ -182,17 +187,18 @@ export class OfferingLifecycle {
       if (session.status !== "confirmed") {
         return {
           isValid: false,
-          error: "เซสชันต้องได้รับการยืนยัน (Confirmed) ก่อนบันทึกลงสมุดบัญชี",
+          error: "เซสชันต้องได้รับการยืนยันก่อนจึงจะลงบัญชีได้",
         };
       }
       if (!context?.cashAccountId) {
         return {
           isValid: false,
-          error: "กรุณาระบุบัญชี Cash Drawer สำหรับรับเงินสด",
+          error: "กรุณาระบุบัญชีเงินสดสำหรับรับเงินสด",
         };
       }
       const hasElectronic =
-        (session.expectedTransferAmount && session.expectedTransferAmount.isPositive()) ||
+        (session.expectedTransferAmount &&
+          session.expectedTransferAmount.isPositive()) ||
         (session.expectedQrAmount && session.expectedQrAmount.isPositive());
 
       if (hasElectronic && !context?.bankAccountId) {

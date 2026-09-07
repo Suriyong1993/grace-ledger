@@ -362,6 +362,13 @@ button.gl-card:active {
   background: var(--pending);
 }
 
+/* Awaiting a second confirmation tap (e.g. approve-with-confirm) — reuses
+   the same amber "attention" semantic as a pending badge. */
+.gl-btn--pending-confirm.gl-btn--primary {
+  background: var(--pending);
+  color: var(--pending-foreground);
+}
+
 .gl-btn--secondary {
   background: var(--card);
   border-color: var(--border);
@@ -577,6 +584,18 @@ button.gl-card:active {
 .gl-hint {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
+}
+
+.gl-field-error {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--expense);
+}
+
+.gl-input.has-error,
+.gl-select.has-error,
+.gl-textarea.has-error {
+  border-color: var(--expense);
 }
 
 .gl-error-text {
@@ -872,6 +891,11 @@ button.gl-card:active {
 .gl-dash-context__link:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+.gl-dash-context__attention-chip {
+  margin-top: auto;
+  padding-top: var(--space-2);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1911,8 +1935,8 @@ button.gl-card:active {
   right: 0;
   height: 3px;
   /* Deep coral into vivid coral — the two accents the Coral Vault identity
-     owns (D25). The pre-D21 ramp ended in sky blue (#0ea5e9), which is outside
-     the palette and read as a second brand colour on the hero. */
+     owns (see D21). The previous ramp ended in sky blue (#0ea5e9), which is
+     outside the palette and read as a second brand colour on the hero. */
   background: linear-gradient(
     90deg,
     var(--primary) 0%,
@@ -3544,6 +3568,13 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+}
+
+/* .gl-more-panel carries this class too — display: flex above otherwise
+   overrides the browser's default [hidden] behavior, leaving the panel
+   permanently visible regardless of the hidden attribute JS toggles. */
+.gl-attention-panel[hidden] {
+  display: none;
 }
 
 .gl-attention-panel__loading,

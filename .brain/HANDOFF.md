@@ -11,13 +11,13 @@
 ## 📋 บันทึกส่งมอบ: 2026-09-07 (D27 — Premium Minimal redesign ตาม brief ข้อความของผู้ใช้)
 
 - **ผู้ส่งมอบ (Handed off by):** Arena Agent (session `01a07c8e-grace-ledger`)
-- **บริบทงาน (Context):** ผู้ใช้ให้ design-direction brief เต็มรูปแบบ (Premium/Modern/Minimal, Apple-inspired, มุมมน 16–24px, เงานุ่ม, ขอบบาง, accent มีวินัย, ไม่ copy ดีไซน์ใด ๆ) — ภาพแนบ 9 รูปไม่เข้า sandbox และ session นี้ไม่มี vision → brief ข้อความคือสัญญาที่ใช้ทำงาน สีใน brief ตรงกับ Coral Vault (D25) พอดี = ไม่เปลี่ยน hue เปลี่ยนแค่ surface language
+- **บริบทงาน (Context):** ผู้ใช้ให้ design-direction brief เต็มรูปแบบ (Premium/Modern/Minimal, Apple-inspired, มุมมน 16–24px, เงานุ่ม, ขอบบาง, accent มีวินัย, ไม่ copy ดีไซน์ใด ๆ) — ภาพแนบ 9 รูปไม่เข้า sandbox และ session นี้ไม่มี vision → brief ข้อความคือสัญญาที่ใช้ทำงาน สีใน brief ตรงกับ Coral Vault (D21) พอดี = ไม่เปลี่ยน hue เปลี่ยนแค่ surface language
 - **สิ่งที่ทำเสร็จแล้ว (Completed Work) — 3 commits บน branch นี้:**
   1. `7596573` D27a tokens — `--radius-button` 16px / `--radius-input` 14px; `--glass-card/chrome/sidebar` → solid; `--glass-blur-*` → none; ambient 3 ชั้น → 1 ฝ้าคอรัล 8%; `--gl-primary-grad` → solid coral; vault เหลือ 1 ember นิ่ง (ถอด aurora animated); `--shadow-glass-card` → inner highlight + soft fall-off
   2. `1f98c1f` D27b surfaces — ลบ backdrop-filter ออกจาก content surface ทั้งหมด 18 จุด (เหลือ modal scrim 2); การ์ด/hero/chrome ใช้ `--border-subtle`; page-header ไร้เส้นขีด, h1 clamp 22→32px; section h2 → text-lg; table head เป็น rule / row separator เบา / hover 5% wash; ปุ่ม primary เลิก pill → 16px; topbar border-subtle; login card ทึบ; lint allowlist รัด (backdrop 20→2, rgb 5→4, login 2→0)
   3. `ebb3d4e` D27c page pass — `.gl-txn-summary` **เพิ่งพบว่าไม่มี CSS เลย** → tiles พาสเทล 3 ช่องเหมือน hero figures; **V11 fixed** (loading skeleton ทรงเดียวกับหน้าเต็ม + `role=status`); hover states 6 จุดรวมเป็น `--gl-hover-wash`; funds balance coral→foreground; profile links/divider/KPI เข้า token
 - **การตรวจสอบ (Verification):** typecheck ✓ · lint:design ✓ · **721 passed / 24 skipped** (baseline) · build ✓
-- **สิ่งที่ต้องระวัง (Gotchas):** `--glass-*` token NAMES คงเดิม (public API) มีแต่ค่าเปลี่ยน — อย่า "เก็บกวาด" ชื่อ token เก่าโดยไม่ตรวจ consumer; `--gl-ambient: none` ใน `prefers-reduced-transparency` คือค่าเดียวที่เหลือ; FAB กลาง nav + pill nav คงอยู่ (D22/D23 ไม่ถูกแตะ) เพราะ brief ยังสั่ง bottom nav + ปุ่มลอย
+- **สิ่งที่ต้องระวัง (Gotchas):** `--glass-*` token NAMES คงเดิม (public API) มีแต่ค่าเปลี่ยน — อย่า "เก็บกวาด" ชื่อ token เก่าโดยไม่ตรวจ consumer; `--gl-ambient: none` ใน `prefers-reduced-transparency` คือค่าเดียวที่เหลือ; FAB กลาง nav + pill nav คงอยู่ (D24/D25 ไม่ถูกแตะ) เพราะ brief ยังสั่ง bottom nav + ปุ่มลอย
 - **สิ่งที่ต้องทำต่อ (Next Actions):** รอผู้ใช้รีวิว preview (port 5500 `/preview.html` เดสก์ท็อป+มือถือ) → แก้ตาม feedback เป็นรอบ ๆ → เปิด PR จาก `arena/01a07c8e-grace-ledger` ไป main; งานค้างเก่า: Reports populated layout, modal states (reject sheet/cash-count/add-member), disabled/pressed states ยังไม่ถูกจับภาพ (ไม่มี Chromium ใน sandbox — ใช้ preview ของผู้ใช้แทน)
 
 ---
@@ -102,6 +102,79 @@
   1. รอผู้ใช้เลือกแบบ (A/B/C/ผสม) หรือส่งภาพอ้างอิงเข้ามาทาง git → รัน `python3 scripts/analyze-ui-reference.py <ภาพ>` แล้วค่อย adapt ลง `src/`
   2. เมื่อถึงขั้นลงโค้ดจริง ให้ทำเป็นธีม/โทเค็นก่อน (เพิ่มชุดโทเค็นใหม่ใน `design-system-extracted/tokens/` หรือ `src/styles/app.css`) แล้วค่อยย้ายโครงสร้าง — **ห้าม**แตะ money/lifecycle/RLS ตาม hard stops ใน `CLAUDE.md`
 - **คำเตือน (Gotchas):** `ui-lab/` เป็นของชั่วคราวสำหรับรีวิว — ควรลบหรือย้ายออกจาก repo หลังผู้ใช้ตัดสินใจเลือกแบบแล้ว
+
+## 📋 บันทึกส่งมอบ: 2026-09-06 (Brand rebrand — "Emerald Vault" → "Coral Vault", D21)
+
+- **ผู้ส่งมอบ (Handed off by):** Claude Code
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex ในรอบถัดไป
+- **บริบทงาน (Context):** ผู้ใช้ส่งภาพอ้างอิง 3 ภาพ (palette Paper/Stone/Coral/Black, dashboard Finexy สีส้ม, poster "UI Trends 2026") และยืนยันชัดเจนว่าต้องการ **เปลี่ยนอัตลักษณ์ทั้งหมด** เป็นโทนนี้ ไม่ใช่แค่หยิบบาง pattern มาปรับ
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. เปลี่ยนโทนสี identity ทั้งชุดใน `design-system-extracted/tokens/colors.css` (single source of truth): evergreen/brass/vault-green → coral/stone/paper/near-black
+  2. **ไม่แตะสีความหมายทางการเงิน** — `--income`/`--expense`/`--pending`/`--offering`/`--approved`/`--rejected`/`--success`/`--warning`/`--info` คงเดิมทั้งหมด (แจ้งผู้ใช้ก่อนแล้วว่า Coral ใกล้เคียงสี error/expense เดิม จึงแยกระบบสีแบรนด์ออกจากสีสถานะทางบัญชีเด็ดขาด)
+  3. แก้ contrast: `--primary` ใช้ coral-700 เข้ม (`#C13F2E`, ขาวบนพื้น ≈5.23:1) แทน coral-500 สดใส (`#F95C4B`, ขาวบนพื้นแค่ ≈3.15:1 — ไม่ผ่าน AA text ปกติ) coral-500 สงวนไว้สำหรับ ring/hero-gradient/ตัวเลขใหญ่เท่านั้น
+  4. **ไม่ใส่ glassmorphism กลับมา** แม้ภาพอ้างอิงหนึ่งภาพจะมี — เพราะเคยถอดออกไปแล้วโดยตั้งใจ (D15) ด้วยเหตุผลเรื่อง legibility ของตัวเลขเงิน
+  5. แก้ไฟล์ที่ reference token เดิมตรงๆ นอก colors.css: `src/styles/app.css` (hero gradient, sheet-backdrop scrim), `src/components/login/loginStyles.ts` (vault-hero accent bar)
+  6. อัปเดต `CLAUDE.md`, `DESIGN.md` (identity table + contrast note), `DECISIONS.md` (D21 — บันทึกละเอียดครบทุกเหตุผล/trade-off)
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `design-system-extracted/tokens/colors.css` (MODIFY — full rewrite of brand ramp, semantic tokens unchanged in name)
+  - `src/styles/app.css` (MODIFY — 2 token references)
+  - `src/components/login/loginStyles.ts` (MODIFY — 1 token reference)
+  - `CLAUDE.md`, `DESIGN.md`, `DECISIONS.md` (MODIFY — identity docs + D21)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm install` (node_modules ไม่เคยถูกติดตั้งในเซสชันนี้มาก่อน — ติดตั้งใหม่)
+  - `npm run lint:design`: **ผ่าน**
+  - `npm run build` (`tsc --noEmit && vite build`): **ผ่าน**
+  - `npm test`: **575 passed / 24 skipped** (เท่า baseline เดิม — 2 real-Postgres suite skip เพราะ sandbox ไม่มี privilege, ไม่เกี่ยวกับงานนี้)
+  - `grep` บน `dist/assets/*.css`: hex เดิม (`#14532d`/`#b45309`/`#0b1f17`/`#2fa36b`) หายไปหมด, hex ใหม่ (`#f95c4b`/`#c13f2e`/`#f6f4f1`) มีอยู่จริง
+  - **Visual (จริง ไม่ใช่เดา):** รัน `npm run dev` + Playwright เปิดหน้า Login จริงที่ desktop (1280px) และ mobile (390px) — ยืนยันด้วยตา: vault sidebar สีดำเข้ม, coral accent bar/logo/eyebrow, พื้นหลัง paper, การ์ดขาว, ไม่มี horizontal overflow ที่ 390px, error state ของ profile list (ไม่มี Supabase ใน sandbox) render สวยด้วยสี error ปกติไม่ใช่ coral
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  - **ผู้ใช้ต้องตรวจหน้าอื่นๆ ด้วยตาจริง** (Dashboard, Transactions, Approvals ฯลฯ) — เซสชันนี้ตรวจได้แค่ Login เพราะไม่มี Supabase credential ใน sandbox ให้ login ผ่านได้จริง แม้ token architecture จะ cascade สีไปทุกหน้าอัตโนมัติ (ทุกหน้าใช้ `.gl-*` class ที่อ้าง token เดียวกัน ไม่มี hardcoded color เดิมหลงเหลือตาม `lint:design`)
+  - ถ้าผู้ใช้เห็นแล้วรู้สึกว่า `--destructive` (แดง) กับ `--primary` (coral) ใกล้กันเกินไปในบริบทจริง ให้ปรับ `--destructive` ไปทาง crimson/magenta แทนที่จะย้าย `--primary` ออกจากโทนส้ม (ดูเหตุผลใน D21)
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  1. **node_modules ไม่เคยถูกติดตั้งมาก่อนใน environment นี้** — `npm run build`/`npm test` จะ fail ด้วย `ERR_MODULE_NOT_FOUND` จนกว่าจะรัน `npm install` ก่อน (ใช้เวลา ~4 วินาที มี dependency แค่ 121 packages)
+  2. `tsc --noEmit` เจอ `TS5101` (baseUrl deprecated) เป็น pre-existing warning ของ environment/TypeScript version นี้ ไม่เกี่ยวกับงานนี้ — ยืนยันแล้วด้วย `git stash` ว่าเกิดก่อนแก้โค้ดด้วย
+  3. ห้ามลืม: token names (`--primary`, `--sidebar-*` ฯลฯ) ต้องคงเดิมเสมอเวลาเปลี่ยน identity — เปลี่ยนแค่ value ที่ base ramp แล้ว repoint semantic token ไปหา — ห้ามแก้ชื่อ semantic token เพราะจะพังทุก consumer ทันที
+
+---
+
+## 📋 บันทึกส่งมอบ: 2026-09-05 20:05 (Premium UI/UX Transformation Phases 1–6 Complete & Verified)
+
+- **ผู้ส่งมอบ (Handed off by):** Antigravity
+- **ผู้รับมอบ (Next Agent):** Claude Code / Gemini / Codex / Antigravity ในรอบถัดไป
+- **บริบทงาน (Context):** ดำเนินการตาม Master Engineering Task: Premium UI/UX Transformation ครบทั้ง 6 เฟส (Dashboard 4-tier hierarchy, Topbar 4-cluster micro-architecture, Sidebar & Mobile Navigation refinement, 15-question Red-Team review) ภายใต้ Emerald Vault identity โดยไม่แตะต้อง financial math (`decimal.js`), Supabase RLS หรือ RBAC
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. **Phase 1: Dashboard Information Hierarchy & Composition**:
+     - ปรับลำดับ 4 ลำดับขั้น: FINANCIAL POSITION (`.gl-dash-hero-row`) → FINANCIAL MOVEMENT (`trendHtml`) → EXPLANATION / CONTEXT (`.gl-dash-split`) → REQUIRED ACTIONS (`#gl-command-center`)
+     - เพิ่ม compact attention chip (`.gl-dash-context__attention-chip`) ภายใน context card เพื่อให้งานค้างถูกค้นพบได้ทันทีโดยไม่ต้อง scroll ลึก พร้อม deep-link (`#gl-command-center`)
+  2. **Phase 2: Top Bar Visual Grouping & Micro-architecture**:
+     - จัดกลุ่ม Top Bar เป็น 4 semantic clusters พร้อม visual dividers: Context (`.gl-shell-topbar__title`), Primary Action (`.gl-topbar-cluster--action`), Utility (`.gl-topbar-cluster--utility`), Identity (`.gl-topbar-cluster--identity`)
+  3. **Phase 3: Sidebar Refinement (Vault Navigation)**:
+     - ปรับปรุง typography kicker (`text-transform: uppercase`, subtle contrast), ปรับ geometry active pill ให้ประณีต สอดรับกับ Vault dark tokens
+  4. **Phase 4: Mobile Navigation (390px Viewport)**:
+     - ตรวจสอบ touch targets ≥ 44px, safe area insets, ไม่มี horizontal overflow
+  5. **Phase 5: Login Visual Refinement (Vault Terminal)**:
+     - ตรวจสอบ terminal styling tokens, zero raw hex, focus state และ accessible markup
+  6. **Phase 6: Cross-Page Consistency & Visual Red-Team Review**:
+     - รัน visual regression capture ผ่าน Playwright บันทึกภาพทั้ง 1440px, 1024px, 390px ใน `docs/screenshots/phase6/`
+     - ทำการตรวจสอบ 15-Question Visual Red-Team Audit ผ่านครบทุกมิติ
+     - บันทึก Decision D22 ใน `DECISIONS.md`
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - `src/pages/DashboardPage.ts` (MODIFY — 4-tier hierarchy + context attention chip)
+  - `src/components/layout/AppShell.ts` (MODIFY — Top Bar 4 clusters)
+  - `src/styles/app.css` (MODIFY — styling สำหรับ attention chip & top bar clusters)
+  - `tests/unit/dashboard-page-ui.test.ts` (MODIFY — update assertion ตาม 4-tier hierarchy & attention chip)
+  - `DECISIONS.md` (MODIFY — เพิ่ม D22)
+  - `.brain/WORKING_CONTEXT.md` (MODIFY — สถานะปัจจุบัน)
+  - `.brain/HANDOFF.md` (MODIFY — บันทึกส่งมอบฉบับนี้)
+- **หลักฐานการทดสอบ (Verification Evidence):**
+  - `npm run typecheck`: **ผ่าน (0 errors)**
+  - `npm test`: **ผ่านครบ 65 test suites / 599 tests (100% PASS)**
+  - `npm run lint:design`: **ผ่าน (0 token violations)**
+  - `npm run build`: **ผ่านสมบูรณ์ (Production bundle generated)**
+  - Automated screenshots captured across viewports (1440px, 1024px, 390px)
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  - ใน `DashboardPage.ts` ตัวแปร `attentionTotal` ต้องถูกคำนวณก่อนสร้าง `contextCardHtml` (line 367) เพื่อหลีกเลี่ยง TDZ `ReferenceError`.
+  - เมื่อ push deploy Vercel โปรดจำ gotcha เรื่อง remote (`old-origin` หรือ `origin` ตาม config ปัจจุบัน).
 
 ---
 

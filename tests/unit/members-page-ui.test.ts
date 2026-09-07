@@ -39,7 +39,9 @@ describe("MembersPage UI — Unit Tests", () => {
     const html = page.renderHtml();
 
     expect(html).toContain("<h1>สมาชิกและการถวาย</h1>");
-    expect(html).toContain("ทะเบียนสมาชิก ประวัติการถวายสิบลด และการออกหนังสือรับรองภาษี");
+    expect(html).toContain(
+      "ทะเบียนสมาชิก ประวัติการถวายสิบลด และการออกหนังสือรับรองภาษี",
+    );
     expect(html).toContain('id="member-search-input"');
     expect(html).toContain("ค้นหาชื่อสมาชิก รหัส หรือกลุ่มแคร์...");
   });
@@ -73,16 +75,31 @@ describe("MembersPage UI — Unit Tests", () => {
     expect(html).toContain("วนิดา เกียรติสกุล");
     // Giving data loaded via RPC; mock doesn't provide it → loading state
     expect(html).toContain("กำลังโหลดประวัติการถวาย...");
-    expect(html).toContain("พิมพ์เอกสาร / ดาวน์โหลด PDF");
+    expect(html).toContain("พิมพ์เอกสาร");
   });
 });
 
 describe("MembersPage — interaction honesty fixes", () => {
   const mockMembers = [
-    { id: "mem-1", full_name: "วนิดา เกียรติสกุล", email: "w@x.org", phone: "", is_active: true, created_at: "2026-08-14T00:00:00Z" },
+    {
+      id: "mem-1",
+      full_name: "วนิดา เกียรติสกุล",
+      email: "w@x.org",
+      phone: "",
+      is_active: true,
+      created_at: "2026-08-14T00:00:00Z",
+    },
   ];
   const baseSupabase = {
-    from: () => ({ select: () => ({ eq: () => ({ eq: () => ({ order: () => Promise.resolve({ data: mockMembers, error: null }) }) }) }) }),
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          eq: () => ({
+            order: () => Promise.resolve({ data: mockMembers, error: null }),
+          }),
+        }),
+      }),
+    }),
   } as any;
 
   it("search with no match says ไม่พบสมาชิกที่ค้นหา — never claims the registry is empty", async () => {
@@ -113,7 +130,14 @@ describe("MembersPage — interaction honesty fixes", () => {
   it("an RPC rejection is a genuine permission denial", async () => {
     const deniedSupabase = {
       ...baseSupabase,
-      rpc: () => Promise.resolve({ data: null, error: { message: "Access Denied: Only Pastors or designated Finance Leaders may view confidential member giving records." } }),
+      rpc: () =>
+        Promise.resolve({
+          data: null,
+          error: {
+            message:
+              "Access Denied: Only Pastors or designated Finance Leaders may view confidential member giving records.",
+          },
+        }),
     } as any;
     const page = new MembersPage(deniedSupabase, "church-1");
     await page.loadData();

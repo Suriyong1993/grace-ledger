@@ -204,6 +204,8 @@ export class LoginPage {
       return;
     }
 
+    console.error("Login profiles load failed:", result.status);
+
     // The roster endpoint is unreachable. On a dev build only — a preview
     // sandbox or a machine outside the function's CORS allowlist — fall back to
     // the demo roster so the screen can still be reviewed. Production keeps the

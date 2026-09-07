@@ -34,32 +34,45 @@ async function callFunction(
   name: string,
   body?: Record<string, unknown>,
 ): Promise<FunctionCallResult> {
-  const { data, error } = await supabase.functions.invoke(name, {
-    ...(body ? { body } : {}),
-    timeout: FUNCTION_CALL_TIMEOUT_MS,
-  });
-
-  if (!error) return { ok: true, status: 200, body: data };
-
-  const response: Response | undefined = (error as { context?: Response })
-    .context;
-  if (!response) return { ok: false, status: 0, body: null };
-
-  let parsedBody: unknown = null;
   try {
-    parsedBody = await response.clone().json();
-  } catch {
-    parsedBody = null;
-  }
+    const { data, error } = await supabase.functions.invoke(name, {
+      ...(body ? { body } : {}),
+      timeout: FUNCTION_CALL_TIMEOUT_MS,
+    });
 
-  return { ok: false, status: response.status, body: parsedBody };
+    if (!error) return { ok: true, status: 200, body: data };
+
+    console.error(`callFunction ${name} error:`, error);
+
+    const response: Response | undefined = (error as { context?: Response })
+      .context;
+    if (!response) {
+      console.error(`callFunction ${name}: no response context in error`);
+      return { ok: false, status: 0, body: { error: String(error) } };
+    }
+
+    let parsedBody: unknown = null;
+    try {
+      parsedBody = await response.clone().json();
+    } catch {
+      parsedBody = null;
+    }
+
+    return { ok: false, status: response.status, body: parsedBody };
+  } catch (err) {
+    console.error(`callFunction ${name} exception:`, err);
+    return { ok: false, status: 0, body: { error: String(err) } };
+  }
 }
 
 export async function fetchLoginProfiles(
   supabase: SupabaseClient,
 ): Promise<LoginProfilesResult> {
   const result = await callFunction(supabase, "login-profiles");
-  if (!result.ok) return { status: "error" };
+  if (!result.ok) {
+    console.error("fetchLoginProfiles failed:", result.status, result.body);
+    return { status: "error" };
+  }
 
   const body = result.body as { profiles?: RawLoginProfile[] } | null;
   const profiles = (body?.profiles ?? []).map((row): LoginProfile => ({

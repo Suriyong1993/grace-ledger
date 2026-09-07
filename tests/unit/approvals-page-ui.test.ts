@@ -36,9 +36,12 @@ const makeItem = (overrides: Partial<any> = {}) => ({
   ...overrides,
 });
 
+// user.role holds the raw RBAC enum value (as it does in production,
+// straight from the profiles/user_roles tables) — the page must map it
+// to a Thai label via roleLabelTh(), never print it verbatim.
 const dummyUser = {
   name: "อาจารย์สรรเสริญ ดวงจิตร",
-  role: "ศิษยาภิบาล",
+  role: "pastor",
   initials: "สด",
   churchName: "คริสตจักรชีวิตสุขสันต์กาฬสินธุ์",
 };
@@ -161,7 +164,10 @@ describe("ApprovalsPage", () => {
   });
 
   it("shows receipt indicator when hasReceipt is true", () => {
-    const item = makeItem({ hasReceipt: true, receiptUrl: "https://example.com/receipt.pdf" });
+    const item = makeItem({
+      hasReceipt: true,
+      receiptUrl: "https://example.com/receipt.pdf",
+    });
     (page as any).isLoading = false;
     (page as any).items = [item];
     const html = page.renderHtml(dummyUser);

@@ -26,7 +26,9 @@ export const FinancialActionExecutionRequestSchema = z.object({
   idempotency_key: z.string().min(8).optional(),
 });
 
-export type FinancialActionExecutionRequest = z.infer<typeof FinancialActionExecutionRequestSchema>;
+export type FinancialActionExecutionRequest = z.infer<
+  typeof FinancialActionExecutionRequestSchema
+>;
 
 export type ExecutionResultCode =
   | "SUCCESS"
@@ -55,7 +57,7 @@ export class FinancialActionExecutionService {
    * Execute confirmed financial action via the atomic orchestration boundary
    */
   public async executeAction(
-    request: FinancialActionExecutionRequest
+    request: FinancialActionExecutionRequest,
   ): Promise<FinancialActionExecutionResponse> {
     // 1. Validate Input Schema
     const parseRes = FinancialActionExecutionRequestSchema.safeParse(request);
@@ -68,10 +70,16 @@ export class FinancialActionExecutionService {
       };
     }
 
-    const { confirmation_id, nonce, payload_hash, idempotency_key: providedIdempKey } = parseRes.data;
+    const {
+      confirmation_id,
+      nonce,
+      payload_hash,
+      idempotency_key: providedIdempKey,
+    } = parseRes.data;
 
     // 2. Authenticate User from Trusted Server Session
-    const { data: authData, error: authErr } = await this.supabase.auth.getUser();
+    const { data: authData, error: authErr } =
+      await this.supabase.auth.getUser();
     if (authErr || !authData?.user) {
       await this.logExecutionAudit({
         actor_id: "00000000-0000-0000-0000-000000000000",
@@ -93,8 +101,9 @@ export class FinancialActionExecutionService {
     const userId = authData.user.id;
 
     // 3. Resolve Profile, Church, and Role
-    const { data: profile, error: profileErr } = await (this.supabase
-      .from("profiles") as any)
+    const { data: profile, error: profileErr } = await (
+      this.supabase.from("profiles") as any
+    )
       .select("id, church_id, role")
       .eq("id", userId)
       .single();
@@ -136,16 +145,15 @@ export class FinancialActionExecutionService {
     const idempotencyKey = providedIdempKey || `idemp_conf_${confirmation_id}`;
 
     // 6. Execute Single Atomic Database Orchestrator RPC
-    const { data: execResult, error: execErr } = await (this.supabase.rpc as any)(
-      "execute_confirmed_financial_action",
-      {
-        p_confirmation_id: confirmation_id,
-        p_church_id: churchId,
-        p_expected_payload_hash: payload_hash,
-        p_expected_nonce: nonce,
-        p_idempotency_key: idempotencyKey,
-      }
-    );
+    const { data: execResult, error: execErr } = await (
+      this.supabase.rpc as any
+    )("execute_confirmed_financial_action", {
+      p_confirmation_id: confirmation_id,
+      p_church_id: churchId,
+      p_expected_payload_hash: payload_hash,
+      p_expected_nonce: nonce,
+      p_idempotency_key: idempotencyKey,
+    });
 
     if (execErr || !execResult) {
       const errMsg = execErr?.message || "Execution failed";
@@ -155,22 +163,31 @@ export class FinancialActionExecutionService {
       if (errMsg.includes("Expired") || errMsg.includes("inactive")) {
         code = "EXPIRED";
         userMsg = "ข้อเสนอนี้หมดอายุแล้ว กรุณาขอให้ Grace AI สร้างข้อเสนอใหม่";
-      } else if (errMsg.includes("Cross-Tenant") || errMsg.includes("Cross-User") || errMsg.includes("Access Denied")) {
+      } else if (
+        errMsg.includes("Cross-Tenant") ||
+        errMsg.includes("Cross-User") ||
+        errMsg.includes("Access Denied")
+      ) {
         code = "DENIED";
         userMsg = "ไม่อนุญาตให้ยืนยันข้อเสนอของผู้อื่นหรือข้ามคริสตจักร";
       } else if (errMsg.includes("Mismatch") || errMsg.includes("tampered")) {
         code = "DENIED";
-        userMsg = "ข้อมูลข้อเสนอถูกแก้ไขหรือถูกดัดแปลง (Tamper Detected)";
+        userMsg = "ข้อมูลข้อเสนอถูกแก้ไขหรือถูกดัดแปลง";
       } else if (errMsg.includes("Insufficient Funds")) {
         code = "FINANCIAL_INVARIANT_VIOLATION";
         userMsg = "ยอดเงินในกองทุนไม่เพียงพอสำหรับการโอน";
       } else if (errMsg.includes("Already Consumed")) {
         code = "INVALID_CONFIRMATION";
-        userMsg = "ข้อเสนอนี้ถูกดำเนินการไปเรียบร้อยแล้ว ไม่สามารถดำเนินการซ้ำได้";
+        userMsg =
+          "ข้อเสนอนี้ถูกดำเนินการไปเรียบร้อยแล้ว ไม่สามารถดำเนินการซ้ำได้";
       } else if (errMsg.includes("Idempotency Conflict")) {
         code = "CONFLICT";
-        userMsg = "คำขอนี้กำลังอยู่ในระหว่างการประมวลผลหรือมีข้อมูลไม่ตรงกับคีย์เดิม";
-      } else if (errMsg.includes("State Transition") || errMsg.includes("Not Found")) {
+        userMsg =
+          "คำขอนี้กำลังอยู่ในระหว่างการประมวลผลหรือมีข้อมูลไม่ตรงกับคีย์เดิม";
+      } else if (
+        errMsg.includes("State Transition") ||
+        errMsg.includes("Not Found")
+      ) {
         code = "INVALID_RESOURCE_STATE";
         userMsg = "สถานะของรายการหรือกองทุนในระบบเปลี่ยนแปลงไปแล้ว";
       }
@@ -197,7 +214,9 @@ export class FinancialActionExecutionService {
     return {
       success: true,
       code: "SUCCESS",
-      message: execResult.message || "ดำเนินการทางการเงินเรียบร้อยแล้วและบันทึกลงบัญชีแยกประเภทสมบูรณ์",
+      message:
+        execResult.message ||
+        "ดำเนินการทางการเงินเรียบร้อยแล้วและบันทึกลงบัญชีแยกประเภทสมบูรณ์",
       action: execResult.action,
       resource_id: execResult.resource_id,
       is_replay: execResult.is_replay || false,

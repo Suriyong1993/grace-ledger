@@ -73,7 +73,7 @@ describe("DashboardPage UI — Unit Tests", () => {
 
     const html = page.renderHtml(data);
 
-    expect(html).toContain("ยอดเงินคงเหลือทั้งหมด");
+    expect(html).toContain("ยอดคงเหลือทั้งหมด");
     expect(html).toContain("฿248,560.00");
     expect(html).toContain("+฿18,450.00");
     expect(html).toContain("−฿12,820.00");
@@ -932,7 +932,7 @@ describe("DashboardPage UI — Unit Tests", () => {
       expect(html).not.toContain("ดูงานค้าง →");
     });
 
-    it("orders the page financial-position-first: hero row before the command center (D12, supersedes D11 §5)", () => {
+    it("orders the page strictly according to 4-tier hierarchy: Financial Position -> Explanation/Trend -> Activity Split -> Required Actions (D12/D13)", () => {
       const html = page.renderHtml(
         { pendingApprovalsCount: 3 },
         { name: "ทดสอบ", role: "treasurer", initials: "ท" },
@@ -940,10 +940,25 @@ describe("DashboardPage UI — Unit Tests", () => {
       );
 
       const heroAt = html.indexOf('class="gl-dash-hero-row"');
+      const trendAt = html.indexOf('รายรับและรายจ่ายรายเดือน');
+      const splitAt = html.indexOf('class="gl-dash-split"');
       const commandCenterAt = html.indexOf('class="gl-command-center"');
+
       expect(heroAt).toBeGreaterThan(-1);
+      expect(trendAt).toBeGreaterThan(-1);
+      expect(splitAt).toBeGreaterThan(-1);
       expect(commandCenterAt).toBeGreaterThan(-1);
-      expect(heroAt).toBeLessThan(commandCenterAt);
+
+      // Financial Position leads
+      expect(heroAt).toBeLessThan(trendAt);
+      // Explanation & Context follows
+      expect(trendAt).toBeLessThan(splitAt);
+      // Required Actions (Operational Clearinghouse) sits at the bottom tier
+      expect(splitAt).toBeLessThan(commandCenterAt);
+
+      // And verify the compact attention chip is present in the context area
+      expect(html).toContain('class="gl-dash-context__attention-chip"');
+      expect(html).toContain("ต้องดำเนินการ 6 รายการ ↓");
     });
   });
 });

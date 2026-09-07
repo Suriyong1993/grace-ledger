@@ -70,6 +70,7 @@ async function insertTransaction(
   status: "draft" | "pending_approval",
 ) {
   const c = lab.client!;
+  await c.query("SELECT set_config('request.jwt.claims', '{}', false)");
   await c.query(
     `INSERT INTO transactions (id, church_id, account_id, amount, direction, status, description, created_by, reference_number)
      VALUES ($1,$2,$3,1000.00,'income','${status}','SoD bypass attempt',$4,'T-SOD-1')`,

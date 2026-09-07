@@ -65,16 +65,17 @@
   --ring: var(--gl-coral-600);
 
   --destructive: var(--gl-red-600);
-  --destructive-foreground:#ffffff;
+  --destructive-foreground: #ffffff;
 
-  /* semantic — finance & workflow status (fixed meaning, never reused elsewhere) */
+  /* semantic — finance & workflow status (fixed meaning, never reused elsewhere,
+     unchanged by the Coral Vault rebrand — see D21) */
   --income: var(--gl-emerald-600);
   --income-foreground: oklch(0.99 0 0);
   --income-muted: oklch(0.95 0.04 165);
   --expense: var(--gl-red-600);
   --expense-foreground: oklch(0.99 0 0);
   --expense-muted: oklch(0.95 0.03 25);
-  --offering: #B54708;
+  --offering: #b54708;
   --offering-foreground: oklch(0.99 0 0);
   --offering-muted: oklch(0.96 0.045 80);
   --pending: var(--offering);
@@ -88,17 +89,17 @@
   --rejected-muted: var(--expense-muted);
 
   --success: var(--gl-emerald-600);
-  --success-foreground:#ffffff;
+  --success-foreground: #ffffff;
   --warning: var(--gl-amber-500);
-  --warning-foreground:#451a03;
+  --warning-foreground: #451a03;
   --info: var(--gl-blue-600);
-  --info-foreground:#ffffff;
+  --info-foreground: #ffffff;
 
   --chart-1: var(--primary);
   --chart-2: var(--gl-emerald-600);
   --chart-3: var(--gl-red-600);
   --chart-4: var(--gl-amber-500);
-  --chart-5:#0d9488;
+  --chart-5: #0d9488;
 
   /* sidebar — the "vault": near-black chrome over a paper workspace */
   --sidebar: var(--gl-black);
@@ -111,7 +112,7 @@
   --sidebar-icon:#a69c8f;
 }
 
-.dark{
+.dark {
   --background: oklch(0.16 0.012 160);
   --foreground: oklch(0.95 0.008 160);
   --card: oklch(0.2 0.014 160);

@@ -573,7 +573,7 @@ export class ReportsPage {
                   <th class="is-right">เงินโอน</th>
                   <th class="is-right">รายรับรวม</th>
                   <th class="is-right">รายจ่าย</th>
-                  <th class="is-right">คงเหลือยกไป</th>
+                  <th class="is-right">ยกยอดไป</th>
                 </tr>
               </thead>
               <tbody>
