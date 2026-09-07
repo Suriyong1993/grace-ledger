@@ -166,6 +166,30 @@ export class ReportsPage {
     }
   }
 
+  /**
+   * The period tab bar, extracted so the loading state can keep it on screen.
+   * Blanking the whole page while a period loads hides the control the user
+   * just used and loses their place in a nine-tab scroller.
+   */
+  private renderPeriodTabsHtml(): string {
+    const tab = (period: string, label: string) =>
+      `<button class="gl-tab ${this.selectedPeriod === period ? "is-active" : ""}" data-period="${period}">${label}</button>`;
+    return `
+      <section class="gl-section no-print" style="margin-bottom: var(--space-4);">
+        <div class="gl-tablist" style="overflow-x: auto; white-space: nowrap; padding-bottom: 4px;">
+          ${tab("2026-08", "ส.ค. 2569")}
+          ${tab("2026-07", "ก.ค. 2569 (ย้อนหลัง)")}
+          ${tab("2026-06", "มิ.ย. 2569")}
+          ${tab("2026-05", "พ.ค. 2569")}
+          ${tab("2026-04", "เม.ย. 2569")}
+          ${tab("2026-03", "มี.ค. 2569 (ตรวจทาน)")}
+          ${tab("2026-02", "ก.พ. 2569")}
+          ${tab("2026-01", "ม.ค. 2569")}
+          ${tab("2026-year", "ภาพรวมทั้งปี 2569")}
+        </div>
+      </section>`;
+  }
+
   public renderHtml(): string {
     if (this.isLoading) {
       return `
@@ -174,6 +198,7 @@ export class ReportsPage {
           <h1>รายงานการเงิน</h1>
           <p>กำลังประมวลผลข้อมูลทางบัญชี...</p>
         </div>
+        ${this.renderPeriodTabsHtml()}
         <div class="gl-card gl-skeleton" style="height: 300px; display: flex; align-items: center; justify-content: center;">
           <span style="color: var(--muted-foreground);">กำลังโหลดข้อมูลรายงาน...</span>
         </div>
@@ -233,20 +258,7 @@ export class ReportsPage {
         </div>
       </div>
 
-      <!-- Month Selector Tabs -->
-      <section class="gl-section no-print" style="margin-bottom: var(--space-4);">
-        <div class="gl-tablist" style="overflow-x: auto; white-space: nowrap; padding-bottom: 4px;">
-          <button class="gl-tab ${this.selectedPeriod === "2026-08" ? "is-active" : ""}" data-period="2026-08">ส.ค. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-07" ? "is-active" : ""}" data-period="2026-07">ก.ค. 2569 (ย้อนหลัง)</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-06" ? "is-active" : ""}" data-period="2026-06">มิ.ย. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-05" ? "is-active" : ""}" data-period="2026-05">พ.ค. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-04" ? "is-active" : ""}" data-period="2026-04">เม.ย. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-03" ? "is-active" : ""}" data-period="2026-03">มี.ค. 2569 (ตรวจทาน)</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-02" ? "is-active" : ""}" data-period="2026-02">ก.พ. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-01" ? "is-active" : ""}" data-period="2026-01">ม.ค. 2569</button>
-          <button class="gl-tab ${this.selectedPeriod === "2026-year" ? "is-active" : ""}" data-period="2026-year">ภาพรวมทั้งปี 2569</button>
-        </div>
-      </section>
+      ${this.renderPeriodTabsHtml()}
 
       ${isYearView ? this.renderYearView() : isHistorical ? this.renderHistoricalMonthView() : this.renderLiveMonthView()}
 
@@ -851,10 +863,27 @@ export class ReportsPage {
     const tabs = root.querySelectorAll<HTMLButtonElement>(".gl-tab");
     tabs.forEach((tab) => {
       tab.addEventListener("click", async () => {
-        this.selectedPeriod = tab.getAttribute("data-period") || "2026-08";
+        this.selectPeriod(tab.getAttribute("data-period") || "2026-08");
+        // Redraw before awaiting: the tab must look selected and the skeleton
+        // must appear the moment it is clicked, not after the round trip.
+        onStateChange();
         await this.loadData();
         onStateChange();
       });
     });
+  }
+
+  /**
+   * Period selection, separated from fetching it.
+   *
+   * Selecting a period is page state and is synchronous; loading the data for
+   * it is a network concern. Fusing the two meant the selected tab could not
+   * change without Supabase, which made the whole page untestable at the page
+   * level and left the UI unresponsive during the fetch.
+   */
+  public selectPeriod(period: string): void {
+    this.selectedPeriod = period;
+    this.isLoading = true;
+    this.errorMessage = null;
   }
 }

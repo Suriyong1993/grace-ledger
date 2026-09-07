@@ -483,8 +483,12 @@ export class App {
         this.render(),
       );
     } else if (this.currentRoute.pattern === "/transactions") {
-      // TransactionsPage uses HTML attributes for interactivity (data-action)
-      // No attachEventListeners needed
+      // data-action attributes are selectors for the page's own listeners,
+      // not behaviour on their own — without this call every filter pill,
+      // the period select and the search box render but do nothing.
+      this.transactionsPage?.attachEventListeners(this.rootElement, () =>
+        this.render(),
+      );
     } else if (this.currentRoute.pattern === "/funds") {
       this.fundsPage?.attachEventListeners(this.rootElement, () =>
         this.render(),

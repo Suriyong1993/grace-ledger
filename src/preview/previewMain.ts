@@ -18,7 +18,8 @@ import { FundsPage, FundDetail } from "../pages/FundsPage";
 import { MembersPage, MemberRecord } from "../pages/MembersPage";
 import { TransactionsPage, TransactionItem } from "../pages/TransactionsPage";
 import { ApprovalsPage } from "../pages/ApprovalsPage";
-import { renderOfferingSessionListHtml } from "../components/offering/OfferingSessionList";
+import { OfferingPage } from "../pages/OfferingPage";
+import { ReportsPage } from "../pages/ReportsPage";
 import type { AttentionSummary } from "../services/attention-service";
 import type { PendingApprovalItem } from "../lib/transactions/types";
 import type { OfferingSession } from "../lib/offering/types";
@@ -471,6 +472,37 @@ const APPROVALS_PAGE = seed(new ApprovalsPage(NO_CLIENT, "church-abc", "u-1"), {
   isLoading: false,
 });
 
+const OFFERING_LIST_PAGE = seed(
+  new OfferingPage(NO_CLIENT, "church-abc", "u-1"),
+  { isLoading: false, mode: "list", sessions: OFFERING_SESSIONS },
+);
+
+/**
+ * A second instance parked on the detail view. The detail tabs and the
+ * counting flow are only reachable once a session is selected, and selecting
+ * one goes through the service, so the harness seeds the selection directly.
+ */
+const OFFERING_DETAIL_PAGE = seed(
+  new OfferingPage(NO_CLIENT, "church-abc", "u-1"),
+  {
+    isLoading: false,
+    mode: "detail",
+    detailTab: "overview",
+    selectedSession: OFFERING_SESSIONS[0],
+    profiles: [],
+  },
+);
+
+/**
+ * Reports parked on its error state. Every populated view needs a live
+ * statement from Supabase, but the period tabs, the retry control and the
+ * error presentation are all real UI worth being able to click.
+ */
+const REPORTS_PAGE = seed(new ReportsPage(NO_CLIENT, "church-abc"), {
+  isLoading: false,
+  errorMessage: "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (โหมดตัวอย่าง)",
+});
+
 interface Screen {
   id: string;
   label: string;
@@ -511,12 +543,19 @@ const SCREENS: Screen[] = [
     id: "offerings",
     label: "เงินถวาย",
     route: "/offerings",
-    render: () =>
-      renderOfferingSessionListHtml({
-        sessions: OFFERING_SESSIONS,
-        isLoading: false,
-        errorMessage: null,
-      }),
+    // The real page, not the list component alone: the component cannot reach
+    // the detail view, so the tabs and the counting flow were unreachable.
+    render: () => OFFERING_LIST_PAGE.renderHtml(),
+    attach: (root, rerender) =>
+      OFFERING_LIST_PAGE.attachEventListeners(root, rerender),
+  },
+  {
+    id: "offering-detail",
+    label: "เงินถวาย (รายละเอียด)",
+    route: "/offerings",
+    render: () => OFFERING_DETAIL_PAGE.renderHtml(),
+    attach: (root, rerender) =>
+      OFFERING_DETAIL_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "transactions",
@@ -541,6 +580,14 @@ const SCREENS: Screen[] = [
     render: () => MEMBERS_PAGE.renderHtml(),
     attach: (root, rerender) =>
       MEMBERS_PAGE.attachEventListeners(root, rerender),
+  },
+  {
+    id: "reports",
+    label: "รายงาน",
+    route: "/reports",
+    render: () => REPORTS_PAGE.renderHtml(),
+    attach: (root, rerender) =>
+      REPORTS_PAGE.attachEventListeners(root, rerender),
   },
   {
     id: "dashboard-empty",
