@@ -516,7 +516,7 @@ export class DashboardPage {
                     )
                   : null;
                 return `
-                <div>
+                <a href="#/funds" class="gl-fundrow">
                   <div class="gl-fundrow__head">
                     <span class="gl-fundrow__name">${escapeHtml(f.name)}</span>
                     <span class="num-display ${f.balance.isNegative() ? "gl-expense" : "gl-net"}">${f.balance.format()}</span>
@@ -532,7 +532,7 @@ export class DashboardPage {
                         </div>`
                       : `<div class="gl-fundrow__foot"><span>ยังไม่ได้ตั้งเป้าหมายกองทุนนี้</span></div>`
                   }
-                </div>`;
+                </a>`;
               })
               .join("")}
           </div>`;

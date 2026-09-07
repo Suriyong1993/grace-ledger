@@ -753,3 +753,36 @@ per D25 — brand and finance remain separate systems.
 Also fixed here: `.hmr-indicator` was nested *inside* `.gl-card--attention`,
 scoping a dev badge to an unrelated selector and burying that card's
 `border-color`. Hoisted to the top level.
+
+## D26a — Make D26 real, and sweep the dead CSS
+
+D26 was reported as done when three of its six claims had no effect: the
+rules were written against classes no markup rendered. Corrected here.
+
+**Claims made real.** `.gl-stat-card` and `.gl-kpi-grid` had zero usages in
+the whole codebase — they were dead before D26 touched them. The feature tile
+is now used where it was always meant to go: the total-fund-balance figure on
+FundsPage, the one number that page exists to answer. It replaces a hand-rolled
+card carrying four inline style declarations.
+
+`.gl-fundrow` was the same story in reverse: a complete rule set including a
+hover state, against markup that rendered a bare `<div>`. The dashboard fund
+rows now render as `<a href="#/funds" class="gl-fundrow">`, which makes them
+keyboard-reachable and announced as links — a summary of somewhere you can go
+should be somewhere you can go.
+
+**Dead CSS sweep.** 97 of 404 `gl-` classes (24%) had no reference in any
+markup. Removing their rules took the stylesheet from 5,346 to 4,424 lines and
+the built CSS from 91.19 kB to 77.45 kB (-15%). Dynamically composed names
+(`gl-badge--${variant}`) were resolved to their concrete values first so live
+variants like `gl-badge--info` were not swept; the sweep then ran a reverse
+check — every class appearing in markup must still resolve in the stylesheet —
+which caught two rules the sweep had taken and the FundsPage change had just
+started using.
+
+The `backdrop-filter` allowlist drops 22 -> 20: `.gl-sheet-backdrop` was an
+overlay pair no markup ever rendered.
+
+Not done here: ~600 inline `style="..."` declarations remain across the pages.
+That is a real inconsistency but too large to sweep safely in one pass without
+visual review of each screen.

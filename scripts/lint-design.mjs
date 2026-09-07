@@ -42,20 +42,22 @@ const ALLOWLIST = {
   //     rather than as tokens (3). R6 cleanup.
   //   hex 10 — dev-only HMR badge (1) and the print stylesheet (9), which must
   //     use pure black and white on paper.
-  //   backdrop-filter 22 — the first 6 are overlay scrims (modal backdrop pair,
-  //     sheet backdrop pair, sticky mobile action bar pair). The other 16 are the D21
+  //   backdrop-filter 20 — the first 4 are overlay scrims (modal backdrop pair,
+  //     sticky mobile action bar pair). The other 16 are the D21
   //     Glass Ledger surfaces the user selected in the 2026-09-07 direction
   //     review, each written standard + -webkit- pair: .gl-card,
   //     .gl-card--elevated, .gl-dash-hero, .gl-shell-topbar, .gl-topbar,
   //     .gl-mobilenav, .gl-login-card, .gl-sidebar. All blur strengths and
   //     opacities are tokens (--glass-*) with a prefers-reduced-transparency
   //     collapse; overlays stay opaque per D3.
+  //     Was 22 until the D26 dead-CSS sweep removed .gl-sheet-backdrop, an
+  //     unreferenced overlay pair — no markup ever rendered that class.
   "src/styles/app.css": {
     "literal font-size": 1,
     "literal border-radius": 3,
     "rgba()/rgb() color literal": 7,
     "hex color literal": 10,
-    "backdrop-filter": 22,
+    "backdrop-filter": 20,
   },
 
   // Login screen stylesheet — D21 Glass Ledger: the login card is frosted

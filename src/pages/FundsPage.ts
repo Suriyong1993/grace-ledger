@@ -285,17 +285,13 @@ export class FundsPage {
       ${errorNoticeHtml}
       ${noticeHtml}
 
-      <!-- Total Fund Balance Card -->
-      <section class="gl-section" style="margin-bottom: var(--space-5);">
-        <div class="gl-card gl-card--elevated">
-          <div class="kicker" style="margin: 0;">ยอดคงเหลือรวมทุกกองทุน</div>
-          <div class="num-display" style="
-            font-size: var(--text-5xl);
-            font-weight: var(--weight-bold);
-            letter-spacing: var(--tracking-heading);
-            margin: var(--space-2) 0 4px;
-          ">${totalAll.format()}</div>
-          <div style="font-size: var(--text-xs); color: var(--muted-foreground);">
+      <!-- Total Fund Balance — the one figure this page exists to answer, so
+           it takes the single brand-filled tile the pass allows per screen. -->
+      <section class="gl-section gl-section--tight">
+        <div class="gl-stat-card gl-stat-card--feature">
+          <div class="gl-stat-card__label">ยอดคงเหลือรวมทุกกองทุน</div>
+          <div class="gl-stat-card__value num-display">${totalAll.format()}</div>
+          <div class="gl-stat-card__hint">
             แบ่งออกเป็น ${this.funds.length} กองทุนเฉพาะกิจ · สัดส่วนตรงตามผังบัญชี
           </div>
         </div>

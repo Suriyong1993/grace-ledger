@@ -164,6 +164,12 @@ body {
   margin-bottom: clamp(var(--space-6), 3vw, var(--space-10));
 }
 
+/* A section that introduces the one below it (a hero figure over the grid it
+   summarises) sits closer than two unrelated sections would. */
+.gl-section--tight {
+  margin-bottom: var(--space-5);
+}
+
 .gl-section__head {
   display: flex;
   align-items: baseline;
@@ -425,11 +431,6 @@ button.gl-card:active {
     min-width: 34px;
   }
 }
-
-.gl-btn--block {
-  width: 100%;
-}
-
 .gl-actions {
   display: flex;
   align-items: center;
@@ -630,31 +631,6 @@ button.gl-card:active {
   border-radius: var(--radius-dialog);
   box-shadow: var(--shadow-elevated);
 }
-
-/* --------------------------------------------------------------------------
-   Contextual Sheet (Desktop Right Drawer / Mobile Bottom Sheet)
-   -------------------------------------------------------------------------- */
-.gl-sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-  background: color-mix(in srgb, var(--gl-black) 45%, transparent);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  display: flex;
-  justify-content: flex-end;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity var(--duration-component) var(--ease-out),
-    visibility var(--duration-component) var(--ease-out);
-}
-
-.gl-sheet-backdrop.is-open {
-  opacity: 1;
-  visibility: visible;
-}
-
 .gl-sheet {
   width: 100%;
   max-width: 480px;
@@ -673,45 +649,6 @@ button.gl-card:active {
 .gl-sheet-backdrop.is-open .gl-sheet {
   transform: translateX(0);
 }
-
-.gl-sheet__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--card);
-  z-index: 10;
-}
-
-.gl-sheet__title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-bold);
-  margin: 0;
-}
-
-.gl-sheet__body {
-  padding: var(--space-6);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-.gl-sheet__footer {
-  padding: var(--space-4) var(--space-6);
-  border-top: 1px solid var(--border);
-  background: var(--card);
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-3);
-}
-
 @media (max-width: 640px) {
   .gl-sheet-backdrop {
     align-items: flex-end;
@@ -785,82 +722,6 @@ button.gl-card:active {
   align-items: center;
   gap: var(--space-2);
 }
-
-.gl-command-center__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-3);
-}
-
-.gl-command-card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  text-decoration: none;
-  color: inherit;
-  transition: all var(--duration-micro) var(--ease-out);
-}
-
-.gl-command-card:hover {
-  border-color: var(--ring);
-  background: var(--muted);
-  transform: translateY(-1px);
-}
-
-.gl-command-card--attention {
-  border-color: color-mix(in srgb, var(--pending) 40%, var(--border));
-  background: color-mix(in srgb, var(--pending) 4%, var(--card));
-}
-
-.gl-command-card__icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  background: var(--muted);
-  color: var(--muted-foreground);
-}
-
-.gl-command-card--attention .gl-command-card__icon {
-  background: var(--pending-muted);
-  color: var(--pending);
-}
-
-.gl-command-card__body {
-  flex: 1;
-  min-width: 0;
-}
-
-.gl-command-card__title {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  margin: 0 0 2px;
-  color: var(--foreground);
-}
-
-.gl-command-card__desc {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-  margin: 0;
-  line-height: var(--leading-body);
-}
-
-.gl-command-card__action {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  color: var(--primary);
-  margin-top: var(--space-2);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
 /* --------------------------------------------------------------------------
    Phase A — "งานสัปดาห์นี้" attention rows + month-over-month context card.
    The attention section carries the user's pending work; the context card
@@ -2008,62 +1869,6 @@ button.gl-card:active {
   padding: var(--space-4) var(--space-5);
   margin-bottom: var(--space-4);
 }
-
-.gl-dash-user-card__avatar-link {
-  text-decoration: none;
-  flex-shrink: 0;
-}
-
-.gl-dash-user-card__avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-full);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
-}
-
-.gl-dash-user-card__body {
-  min-width: 0;
-  flex: 1;
-}
-
-.gl-dash-user-card__idrow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.gl-dash-user-card__name {
-  font-weight: var(--weight-bold);
-  font-size: var(--text-base);
-  color: var(--foreground);
-  line-height: 1.2;
-}
-
-.gl-dash-user-card__role {
-  background: var(--muted);
-  color: var(--foreground);
-  font-size: var(--text-2xs);
-  padding: 1px 7px;
-  border-radius: var(--radius-full);
-  font-weight: var(--weight-semibold);
-}
-
-.gl-dash-user-card__church {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-  margin-top: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* Row-icon variants shared by the dashboard lists — semantic colors only. */
 .gl-row__icon--income {
   background: var(--income-muted);
@@ -2079,19 +1884,6 @@ button.gl-card:active {
   background: var(--secondary);
   color: var(--muted-foreground);
 }
-
-/* Attention-state icon/row (pending queue) — amber family only. */
-.gl-row__icon--attention {
-  background: var(--pending-muted);
-  color: var(--on-pending-muted);
-}
-
-.gl-dash-review__row--attention {
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--pending-muted) 45%, transparent);
-  border: 1px solid var(--pending);
-}
-
 /* "ดูทั้งหมด / ดูรายงานเต็ม" links in section heads. */
 .gl-section__link {
   font-size: var(--text-xs);
@@ -2262,28 +2054,6 @@ button.gl-card:active {
 .gl-icon-btn:active {
   transform: scale(0.97);
 }
-
-.gl-dash-review {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  overflow: hidden;
-}
-
-.gl-dash-review__head {
-  padding: var(--space-4) var(--space-4) 0;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
-.gl-dash-review__head h2 {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  margin: 0;
-}
-
 /* Entrance for the summary rail. Short, one direction, and staggered only far
    enough to read as one group arriving rather than three separate events. */
 .gl-rise {
@@ -3968,24 +3738,6 @@ a {
   box-shadow: var(--shadow-elevated);
   overflow: hidden;
 }
-
-.gl-more-panel__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--border);
-  background: var(--secondary);
-}
-
-.gl-more-panel__head h3 {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  margin: 0;
-  color: var(--foreground);
-}
-
 /* ==========================================================================
    Shell — topbar, icon buttons, primary action, bell badge, mark, avatar
    ========================================================================== */
@@ -4156,37 +3908,6 @@ a {
     transition: none;
   }
 }
-
-/* ==========================================================================
-   Avatar — circular identity mark
-   ========================================================================== */
-.gl-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
-  flex-shrink: 0;
-  object-fit: cover;
-}
-
-.gl-avatar--sm {
-  width: 32px;
-  height: 32px;
-  font-size: var(--text-xs);
-}
-
-.gl-avatar--lg {
-  width: 56px;
-  height: 56px;
-  font-size: var(--text-xl);
-}
-
 /* ==========================================================================
    Modal — container + close button
    ========================================================================== */
@@ -4235,236 +3956,6 @@ a {
   outline: 2px solid var(--ring);
   outline-offset: -2px;
 }
-
-/* ==========================================================================
-   Dropdown — popup menu container and items
-   ========================================================================== */
-.gl-dropdown {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-  padding: var(--space-1);
-  background: var(--popover);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-elevated);
-}
-
-.gl-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--foreground);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color var(--duration-micro) var(--ease-out);
-}
-
-.gl-dropdown-item:hover {
-  background: var(--accent);
-}
-
-.gl-dropdown-item:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-}
-
-.gl-dropdown-item[aria-disabled="true"] {
-  color: var(--muted-foreground);
-  cursor: not-allowed;
-}
-
-/* ==========================================================================
-   Table — header + row variants
-   ========================================================================== */
-.gl-table-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--secondary);
-  border-bottom: 1px solid var(--border);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-}
-
-.gl-table-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--border);
-  transition: background-color var(--duration-micro) var(--ease-out);
-}
-
-.gl-table-row:hover {
-  background: var(--accent);
-}
-
-.gl-table-row:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-}
-
-/* ==========================================================================
-   Pagination
-   ========================================================================== */
-.gl-pagination {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-3) 0;
-}
-
-.gl-pagination__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--touch-target-min);
-  height: var(--touch-target-min);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  color: var(--foreground);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition:
-    background-color var(--duration-micro) var(--ease-out),
-    border-color var(--duration-micro) var(--ease-out),
-    transform var(--duration-micro) var(--ease-out);
-}
-
-.gl-pagination__btn:hover:not(:disabled) {
-  background: var(--secondary);
-  border-color: var(--primary);
-}
-
-.gl-pagination__btn:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-.gl-pagination__btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-.gl-pagination__btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.gl-pagination__btn.is-active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-foreground);
-}
-
-/* ==========================================================================
-   Tabs — tab container
-   ========================================================================== */
-.gl-tabs {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-/* ==========================================================================
-   Accordion
-   ========================================================================== */
-.gl-accordion {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.gl-accordion__item + .gl-accordion__item {
-  border-top: 1px solid var(--border);
-}
-
-.gl-accordion__trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border: 0;
-  background: var(--card);
-  color: var(--foreground);
-  font-family: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  text-align: left;
-  cursor: pointer;
-  transition: background-color var(--duration-micro) var(--ease-out);
-}
-
-.gl-accordion__trigger:hover {
-  background: var(--secondary);
-}
-
-.gl-accordion__trigger:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
-}
-
-.gl-accordion__panel {
-  padding: var(--space-3) var(--space-4);
-  background: var(--background);
-  border-top: 1px solid var(--border);
-}
-
-/* ==========================================================================
-   Tooltip
-   ========================================================================== */
-.gl-tooltip {
-  position: relative;
-}
-
-.gl-tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + var(--space-2));
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  padding: var(--space-1) var(--space-2);
-  background: var(--foreground);
-  color: var(--background);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  white-space: nowrap;
-  border-radius: var(--radius-sm);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity var(--duration-micro) var(--ease-out),
-    transform var(--duration-micro) var(--ease-out),
-    visibility var(--duration-micro) var(--ease-out);
-  pointer-events: none;
-  z-index: 100;
-}
-
-.gl-tooltip:hover::after,
-.gl-tooltip:focus-visible::after {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .gl-tooltip::after {
     transition: none;
@@ -4480,24 +3971,6 @@ a {
   border-radius: var(--radius-full);
   overflow: hidden;
 }
-
-.gl-progress-bar__fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: var(--gl-progress-fill, var(--primary));
-  transform-origin: left center;
-  animation: glFillGrow var(--duration-page) var(--ease-out) both;
-}
-
-/* ==========================================================================
-   Button group
-   ========================================================================== */
-.gl-btn-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-}
-
 .gl-btn-group > .gl-btn {
   border-radius: 0;
 }
@@ -4522,24 +3995,6 @@ a {
   flex-direction: column;
   gap: var(--space-1);
 }
-
-.gl-form-error {
-  font-size: var(--text-xs);
-  color: var(--destructive);
-  font-weight: var(--weight-medium);
-}
-
-.gl-form-hint {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-}
-
-.gl-input-group {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-}
-
 .gl-input-group > .gl-input,
 .gl-input-group > .gl-select {
   border-radius: 0;
@@ -4555,11 +4010,6 @@ a {
 .gl-input-group > .gl-select:last-child {
   border-radius: 0 var(--radius-input) var(--radius-input) 0;
 }
-
-.gl-input-group > * + * {
-  border-left: 0;
-}
-
 .gl-input-icon {
   display: flex;
   align-items: center;
@@ -4578,42 +4028,6 @@ a {
 .gl-input-icon:last-child {
   border-radius: 0 var(--radius-input) var(--radius-input) 0;
 }
-
-/* ==========================================================================
-   Status badge — semantic status indicator
-   ========================================================================== */
-.gl-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 3px var(--space-2);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  line-height: 1.35;
-  white-space: nowrap;
-}
-
-.gl-status-badge--income {
-  background: var(--income-muted);
-  color: var(--on-income-muted);
-}
-
-.gl-status-badge--expense {
-  background: var(--expense-muted);
-  color: var(--on-expense-muted);
-}
-
-.gl-status-badge--pending {
-  background: var(--pending-muted);
-  color: var(--on-pending-muted);
-}
-
-.gl-status-badge--neutral {
-  background: var(--muted);
-  color: var(--muted-foreground);
-}
-
 /* ==========================================================================
    Empty state — icon, title, description, action
    ========================================================================== */
@@ -4625,38 +4039,6 @@ a {
   padding: var(--space-8) var(--space-4);
   text-align: center;
 }
-
-.gl-empty-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-full);
-  background: var(--muted);
-  color: var(--muted-foreground);
-  font-size: var(--text-2xl);
-}
-
-.gl-empty-title {
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--foreground);
-  margin: 0;
-}
-
-.gl-empty-description {
-  font-size: var(--text-sm);
-  color: var(--muted-foreground);
-  max-width: 40ch;
-  line-height: var(--leading-body);
-  margin: 0;
-}
-
-.gl-empty-action {
-  margin-top: var(--space-2);
-}
-
 /* ==========================================================================
    Card — header, body, footer
    ========================================================================== */
@@ -4668,89 +4050,6 @@ a {
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--border);
 }
-
-.gl-card-header h3 {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  margin: 0;
-  color: var(--foreground);
-}
-
-.gl-card-body {
-  padding: var(--space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.gl-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
-  border-top: 1px solid var(--border);
-  background: var(--secondary);
-}
-
-/* ==========================================================================
-   Stat card — KPI display with semantic variants
-   ========================================================================== */
-.gl-stat-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-5);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.gl-stat-card__label {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-}
-
-.gl-stat-card__value {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-heading);
-  color: var(--foreground);
-}
-
-.gl-stat-card__hint {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-}
-
-.gl-stat-card--income .gl-stat-card__value {
-  color: var(--income);
-}
-
-.gl-stat-card--expense .gl-stat-card__value {
-  color: var(--expense);
-}
-
-.gl-stat-card--pending .gl-stat-card__value {
-  color: var(--pending);
-}
-
-.gl-stat-card--neutral .gl-stat-card__value {
-  color: var(--foreground);
-}
-
-/* ==========================================================================
-   KPI grid
-   ========================================================================== */
-.gl-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-4);
-}
-
 @media (max-width: 768px) {
   .gl-kpi-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -4762,16 +4061,6 @@ a {
     grid-template-columns: 1fr;
   }
 }
-
-/* ==========================================================================
-   Fund grid
-   ========================================================================== */
-.gl-fund-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-4);
-}
-
 @media (max-width: 768px) {
   .gl-fund-grid {
     grid-template-columns: 1fr;
@@ -4786,67 +4075,11 @@ a {
   flex-direction: column;
   gap: var(--space-2);
 }
-
-/* ==========================================================================
-   Approval queue
-   ========================================================================== */
-.gl-approval-queue {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-/* ==========================================================================
-   Offering session
-   ========================================================================== */
-.gl-offering-session {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-/* ==========================================================================
-   Member directory
-   ========================================================================== */
-.gl-member-directory {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-4);
-}
-
 @media (max-width: 768px) {
   .gl-member-directory {
     grid-template-columns: 1fr;
   }
 }
-
-/* ==========================================================================
-   Report chart
-   ========================================================================== */
-.gl-report-chart {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-/* ==========================================================================
-   Profile form
-   ========================================================================== */
-.gl-profile-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  max-width: 560px;
-}
-
 /* ==========================================================================
    Login card
    ========================================================================== */
@@ -4871,68 +4104,12 @@ a {
     border-radius: var(--radius-2xl);
   }
 }
-
-/* ==========================================================================
-   PIN pad — numeric entry for authentication
-   ========================================================================== */
-.gl-pin-pad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3);
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-.gl-pin-digit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 56px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  color: var(--foreground);
-  transition:
-    border-color var(--duration-micro) var(--ease-out),
-    background-color var(--duration-micro) var(--ease-out);
-}
-
-.gl-pin-digit--filled {
-  border-color: var(--primary);
-  background: var(--primary-light);
-}
-
 @media (max-width: 390px) {
   .gl-pin-digit {
     height: 48px;
     font-size: var(--text-xl);
   }
 }
-
-/* ==========================================================================
-   Onboarding — first-run experience
-   ========================================================================== */
-.gl-onboarding {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-6);
-  max-width: 480px;
-  margin: 0 auto;
-  padding: var(--space-6) var(--space-4);
-  text-align: center;
-}
-
-/* ==========================================================================
-   Rise stagger — entrance animation with delay
-   ========================================================================== */
-.gl-rise-stagger {
-  animation: glRiseIn var(--duration-component) var(--ease-out) both;
-  animation-delay: calc(var(--gl-rise-delay, 0ms) * var(--gl-rise-index, 1));
-}
-
 @media (prefers-reduced-motion: reduce) {
   .gl-rise-stagger {
     animation-delay: 0ms !important;
@@ -5079,65 +4256,6 @@ a {
     transition: none;
   }
 }
-
-/* ==========================================================================
-   Tag — semantic color variants
-   ========================================================================== */
-.gl-tag--success {
-  background: var(--income-muted);
-  border-color: var(--income);
-  color: var(--on-income-muted);
-}
-
-.gl-tag--warning {
-  background: var(--pending-muted);
-  border-color: var(--pending);
-  color: var(--on-pending-muted);
-}
-
-.gl-tag--danger {
-  background: var(--expense-muted);
-  border-color: var(--expense);
-  color: var(--on-expense-muted);
-}
-
-.gl-tag--info {
-  background: var(--secondary);
-  border-color: var(--info);
-  color: var(--info);
-}
-
-.gl-tag--neutral {
-  background: var(--muted);
-  border-color: var(--border);
-  color: var(--muted-foreground);
-}
-
-/* ==========================================================================
-   Spinner — loading indicator
-   ========================================================================== */
-.gl-spinner {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: var(--radius-full);
-  animation: glSpin 1s linear infinite;
-}
-
-.gl-spinner--sm {
-  width: 16px;
-  height: 16px;
-  border-width: 1.5px;
-}
-
-.gl-spinner--lg {
-  width: 32px;
-  height: 32px;
-  border-width: 3px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .gl-spinner {
     animation: none;
@@ -5160,21 +4278,13 @@ a {
 .gl-notice--nextstep {
   margin-bottom: var(--space-4);
 }
-
-/* ==========================================================================
-   Divider — vertical and horizontal
-   ========================================================================== */
-.gl-divider--vertical {
-  width: 1px;
-  height: auto;
-  margin: 0 var(--space-3);
-  border: 0;
-  background: var(--border);
-}
-
 /* ==========================================================================
    Fund row — progress variant
    ========================================================================== */
+/* Rendered as an <a> to /funds: a fund row on the dashboard is a summary of
+   somewhere you can go, so it should be reachable by keyboard and announce
+   itself as a link. Inherits ink and drops the underline — the border and
+   hover carry the affordance instead. */
 .gl-fundrow {
   display: flex;
   flex-direction: column;
@@ -5183,6 +4293,8 @@ a {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
   transition:
     border-color var(--duration-micro) var(--ease-out),
     background-color var(--duration-micro) var(--ease-out);
@@ -5190,6 +4302,7 @@ a {
 
 .gl-fundrow:hover {
   border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  background: color-mix(in srgb, var(--primary) 3%, var(--card));
 }
 
 .gl-fundrow__head {
@@ -5253,7 +4366,13 @@ a {
    label, not through chrome. The label recedes to a small caps whisper; the
    figure steps up and tightens. */
 .gl-stat-card {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-1);
+  padding: var(--space-5);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   transition:
     border-color var(--duration-micro) var(--ease-out),
     box-shadow var(--duration-micro) var(--ease-out);
@@ -5261,13 +4380,23 @@ a {
 
 .gl-stat-card__label {
   font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
   letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }
 
 .gl-stat-card__value {
   font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
   line-height: 1.1;
   letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.gl-stat-card__hint {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
 }
 
 /* Exactly one tile per screen may carry the brand fill. In the reference it
@@ -5278,17 +4407,14 @@ a {
   border-color: transparent;
   color: var(--primary-foreground);
   box-shadow: var(--shadow-glass-btn);
+  padding: var(--space-6);
 }
 
-.gl-stat-card--feature .gl-stat-card__label,
-.gl-stat-card--feature .gl-stat-card__hint {
-  color: color-mix(in srgb, var(--primary-foreground) 82%, transparent);
-}
-
+/* The feature tile is a page's hero figure, not one of a row of KPIs, so it
+   takes the hero step of the scale rather than the tile step. */
 .gl-stat-card--feature .gl-stat-card__value {
-  color: var(--primary-foreground);
+  font-size: clamp(var(--text-4xl), 3.4vw, var(--text-5xl));
 }
-
 /* --- Tables --------------------------------------------------------------
    Records, not a grid. The head stripe reads as a rule rather than a fill,
    and the row hover is a coral wash faint enough to guide the eye down a
