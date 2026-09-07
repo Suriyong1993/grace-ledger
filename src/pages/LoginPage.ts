@@ -76,29 +76,22 @@ export class LoginPage {
   public renderHtml(): string {
     const isNarrow = this.view === "pin";
     return `${renderLoginStylesHtml()}<div class="gl-login-screen gl-login-screen--vault">
+      <div class="gl-login-vault-grid" aria-hidden="true"></div>
       <div class="gl-login-vault">
-        <aside class="gl-vault-panel">
-          <div class="gl-vault-panel__inner">
-            <div class="gl-vault-brand">
-              <span class="gl-vault-mark" aria-hidden="true">${VAULT_DIAL_SVG}</span>
-              <span class="gl-vault-brandtext">
-                <span class="gl-vault-wordmark" translate="no">Grace Ledger</span>
-                <span class="gl-vault-church">${escapeHtml(CHURCH_NAME_TH)}</span>
-              </span>
-            </div>
-            <div class="gl-vault-hero">
-              <p class="gl-vault-eyebrow">ระบบการเงินคริสตจักร</p>
-              <h2 class="gl-vault-title">ตู้เซฟการเงินของคริสตจักร</h2>
-              <p class="gl-vault-sub">บันทึกโปร่งใส ตรวจสอบย้อนหลังได้ทุกรายการ</p>
-            </div>
-            <ul class="gl-vault-facts">
-              <li>${VAULT_FACT_ICONS.roles}สิทธิ์เข้าถึงแยกตามบทบาทผู้รับผิดชอบ</li>
-              <li>${VAULT_FACT_ICONS.audit}บันทึกตรวจสอบย้อนหลังทุกรายการ</li>
-              <li>${VAULT_FACT_ICONS.pin}รหัส PIN 6 หลักปกป้องทุกบัญชี</li>
-            </ul>
-            <p class="gl-vault-foot">ระบบบัญชีและการเงินคริสตจักร</p>
-          </div>
-        </aside>
+        <div class="gl-vault-brand">
+          <span class="gl-vault-mark" aria-hidden="true">${VAULT_DIAL_SVG}</span>
+          <span class="gl-vault-brandtext">
+            <span class="gl-vault-wordmark" translate="no">Grace Ledger</span>
+            <span class="gl-vault-church">${escapeHtml(CHURCH_NAME_TH)}</span>
+          </span>
+        </div>
+
+        <div class="gl-vault-hero">
+          <p class="gl-vault-eyebrow">ระบบการเงินคริสตจักร</p>
+          <h2 class="gl-vault-title">ตู้เซฟการเงินของคริสตจักร</h2>
+          <p class="gl-vault-sub">บันทึกโปร่งใส ตรวจสอบย้อนหลังได้ทุกรายการ</p>
+        </div>
+
         <main class="gl-login-workspace">
           <div class="gl-login-card${isNarrow ? " gl-login-card--narrow" : ""}">
             ${this.renderViewHtml()}
@@ -108,6 +101,13 @@ export class LoginPage {
             </div>
           </div>
         </main>
+
+        <ul class="gl-vault-facts">
+          <li>${VAULT_FACT_ICONS.roles}แยกสิทธิ์ตามบทบาท</li>
+          <li>${VAULT_FACT_ICONS.audit}ตรวจสอบย้อนหลังได้</li>
+          <li>${VAULT_FACT_ICONS.pin}PIN 6 หลัก</li>
+        </ul>
+        <p class="gl-vault-foot">ระบบบัญชีและการเงินคริสตจักร</p>
       </div>
     </div>`;
   }
