@@ -2,9 +2,23 @@
 
 Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — paper/stone surfaces, coral brand, near-black vault sidebar. Church financial OS. Thai-first. Money is the product — every UI decision protects the number.
 
+> **Modern UI direction:** This document owns identity, tokens, component semantics, and visual constraints. Read `DESIGN_MODERN.md` for hierarchy, responsive composition, information density, and modern-pattern rules. `COMPONENTS.md` remains the implementation catalogue.
+
 ## Governing Principle
 
 **"เรียบ สุขุม, แม่นยำ"** (Calm, Refined, Exact) — three words that define every choice. No decoration serves the eye at the expense of the number. If a screen shows money, the money is the most legible thing on it. The interface recedes; the work surfaces.
+
+## Design hierarchy
+
+When documents appear to overlap, resolve them in this order:
+
+1. `DECISIONS.md` — explicit product/design decisions
+2. `DESIGN.md` — identity, tokens, semantics, constraints
+3. `DESIGN_MODERN.md` — composition and contemporary UI patterns
+4. `COMPONENTS.md` — reusable markup/classes and implementation rules
+5. route-local styles — only where an existing documented owner requires them
+
+A modern pattern must adapt to Coral Vault; it must never silently replace it.
 
 ---
 
@@ -70,6 +84,7 @@ Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — pap
 - Page padding: `--gl-page-pad-x` (clamp 16-40px), `--gl-page-pad-top` (clamp 20-32px)
 - Card padding: `--space-5`
 - Table cells: `--table-cell-x: --space-5`, `--table-cell-y: --space-3`
+- Do not increase whitespace merely to make a business screen look premium; use space to clarify grouping and scanning.
 
 ---
 
@@ -106,6 +121,7 @@ Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — pap
 - Border-based depth over shadow
 - No glow, no heavy shadow
 - Cards: `border: 1px solid var(--border)` + optional `--shadow-sm-card`
+- Not every grouped section is a card; use canvas, spacing, and dividers before adding another surface.
 
 ---
 
@@ -128,6 +144,7 @@ Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — pap
 - No bounce/spring on business UI
 - Stagger: 30-80ms between items
 - `prefers-reduced-motion`: collapse durations, zero delays
+- Motion must explain transition, hierarchy, confirmation, or state change; never add motion as decoration.
 
 ---
 
@@ -210,6 +227,8 @@ Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — pap
 | `.gl-td-lead`      | Lead cell (full-width on mobile) |
 | `.gl-td-actions`   | Actions row                      |
 
+**Responsive rule:** Preserve the task hierarchy, not the desktop column structure. On mobile, lead with title/category and amount; metadata follows.
+
 ### Navigation
 
 | Class                  | Use                                                                                                      |
@@ -276,6 +295,8 @@ Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — pap
 | `.gl-dash-split`              | Two-column layout                                                      |
 | `.gl-dash-hero-row`           | Hero row                                                               |
 
+**Dashboard rule:** Build a decision surface, not a widget gallery. A chart requires real data and a clear decision question.
+
 ### Funds
 
 | Class                        | Use              |
@@ -324,113 +345,22 @@ Coral Vault (2026-09, supersedes Emerald Vault — see DECISIONS.md D21) — pap
 | `.gl-projbal__result`          | Projected balance |
 | `.gl-projbal__result--deficit` | Deficit state     |
 
-### Offering
+---
 
-| Class                          | Use             |
-| ------------------------------ | --------------- |
-| `.gl-offering-backlink`        | Back link       |
-| `.gl-offering-step`            | Step indicator  |
-| `.gl-offering-step__badge`     | Step badge      |
-| `.gl-offering-step__label`     | Step label      |
-| `.gl-offering-chip`            | Info chip       |
-| `.gl-offering-kpi`             | KPI card        |
-| `.gl-allocation-row`           | Allocation row  |
-| `.gl-cashcount-summary__value` | Cash count hero |
+## Status semantics
 
-### Reports
-
-| Class                        | Use            |
-| ---------------------------- | -------------- |
-| `.gl-reports-pagehead`       | Page header    |
-| `.gl-reports-hero`           | Hero card      |
-| `.gl-reports-hero__value`    | Hero figure    |
-| `.gl-reports-hero__figures`  | Figure row     |
-| `.gl-reports-table-head`     | Table header   |
-| `.gl-reports-leadership-row` | Leadership row |
+Status meaning is domain information, not decoration. Use one canonical status-to-label/color mapping in the implementation. A status should not be repeated as text, icon, badge, and color unless each representation adds necessary information.
 
 ---
 
-## Anti-AI-Slop Rules
+## Modern UI guardrails
 
-### Universal
+Before adding visual complexity, read `DESIGN_MODERN.md` and answer:
 
-- No decorative gradients on KPI/stat cards
-- No glassmorphism on a content or chrome surface. Blur is for overlay scrims
-  only (modal/sheet backdrop), at 2-6px behind a veil. Depth on a surface comes
-  from the border and the surface step; the token shadow only confirms it. See
-  D15 — a 14px glass layer on the topbar and bottom bar was retired for this.
-- No bounce/spring animations on business UI
-- No animation > 300ms (except entrance)
-- No decorative SVG illustrations
-- No emoji as UI iconography
-- No hover scale-110 on icons
-- No drop-shadow glow on logos/icons
+1. What is the primary user question?
+2. What is the primary safe action?
+3. Which information can become quieter or be progressively disclosed?
+4. Does this need a card or only grouping?
+5. What changes in hierarchy at 390px?
 
-### Financial
-
-- Green = credit/positive ONLY — never mixed
-- Red = debit/negative ONLY — never mixed
-- No NumberTicker animation on money values
-- No rounding totals — show exact calculated values
-- Tabular-nums ALWAYS on numbers
-- Right-align all numerical columns
-- Alternating row backgrounds when > 5 rows
-- Sticky header on scrollable tables
-- Status = color + icon, never color alone
-- No compact table padding below `py-3 px-5`
-
-### Thai UI
-
-- No bilingual double-labels
-- No internal vocabulary in UI (no "Screen 06", no "PostgreSQL 17")
-- No raw exception strings in UI
-- No vague declarative copy — say the state, not an essay about it
-
----
-
-## Responsive Breakpoints
-
-| Breakpoint | Width    | Behavior                             |
-| ---------- | -------- | ------------------------------------ |
-| Mobile     | < 540px  | Single column, full-width actions    |
-| Tablet     | < 768px  | Sidebar → bottom nav, stacked header |
-| Desktop    | > 900px  | Two-column layouts, sidebar visible  |
-| Wide       | > 1024px | Max content width `--gl-page-max`    |
-
----
-
-## Dark Mode
-
-- Token-based via `.dark` class on `<html>`
-- Toggle via `prefers-color-scheme` or user preference (localStorage)
-- All colors defined in `:root` and `.dark` blocks
-- Background: slate dark, card: slightly lighter
-- Text: off-white
-- Border: white-alpha
-
----
-
-## Accessibility
-
-- `--touch-target-min` (44px) on all interactive elements
-- Visible focus ring: `2px solid var(--ring)`, offset 2px
-- `aria-label` on icon-only buttons
-- `aria-live` on dynamic content
-- `prefers-reduced-motion`: collapse animations
-- `prefers-contrast: more`: increase contrast
-- Skip-to-content link
-- Semantic HTML: `<button>`, `<a>`, `<nav>`, `<main>`
-
----
-
-## File Structure
-
-| File                                   | Responsibility         |
-| -------------------------------------- | ---------------------- |
-| `design-system-extracted/tokens/*.css` | Design tokens (values) |
-| `src/styles/app.css`                   | Component classes      |
-| `src/components/layout/AppShell.ts`    | Shell + nav            |
-| `src/pages/*.ts`                       | Page rendering         |
-| `src/services/*.ts`                    | Data layer             |
-
-**Single source of truth:** Token NAMES in `design-system-extracted/` are the public API. Values can change; names cannot. Component classes in `app.css` consume tokens. Pages consume component classes. No page defines its own color, radius, shadow, or font-size.
+If these questions are unanswered, do not call the change a redesign.
