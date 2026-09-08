@@ -53,6 +53,51 @@ If a UI or refactor task requires one of these, **stop and report**: problem, im
 
 Do not add an AI-looking design system on top of the existing one. Banned: generic glass cards, gradients-for-decoration, glowing borders, giant hero sections, fake charts, decorative metrics, emoji as UI iconography.
 
+## Modern UI protocol — mandatory for visual work
+
+Read these files **before** changing a route's hierarchy, markup, CSS, or responsive behavior:
+
+1. `DECISIONS.md` — decisions that cannot be silently reversed
+2. `DESIGN.md` — identity, tokens, semantics, and component constraints
+3. `DESIGN_MODERN.md` — modern hierarchy, density, composition, and inspiration rules
+4. `COMPONENTS.md` — reusable implementation catalogue
+
+### Do not interpret “modernize the UI” as “restyle the UI”
+
+Before writing code, identify:
+
+- the user's primary question on this screen
+- the primary safe action
+- the information that should become secondary or progressively disclosed
+- unnecessary cards or equal-weight widgets
+- what must change in hierarchy at 390px
+
+A redesign that only changes color, radius, shadows, gradients, or animation is incomplete.
+
+### Inspiration workflow
+
+When GitHub, Figma, screenshots, or external products are available as inspiration:
+
+1. inspect the current implementation first
+2. extract **patterns**, not another product's identity
+3. state the user problem each borrowed pattern solves
+4. map it onto existing Grace Ledger tokens/classes before implementation
+5. reject the pattern if it requires a new framework or a foreign design system without explicit approval
+
+Do not copy a screenshot blindly. Understand the information hierarchy and interaction model first.
+
+### Modern UI review questions
+
+Before completion, answer with evidence:
+
+1. Can the user identify the most important number or state within seconds?
+2. Is the primary action obvious without making all actions loud?
+3. Did the change reduce complexity rather than merely decorate it?
+4. Is every card an actual independent surface?
+5. Does every chart answer a real decision question using real data?
+6. Does the mobile view deliberately reorder hierarchy rather than only shrink desktop?
+7. Are keyboard, focus, contrast, loading, empty, error, and permission states still usable?
+
 ## Writing (Thai UI copy)
 
 - Concise human Thai. Say the state, not an essay about the state.
@@ -72,7 +117,7 @@ GOOD: ยังไม่มีรายการ
 
 ## Design source of truth
 
-Read `DESIGN.md` and `COMPONENTS.md` before writing or changing any CSS, inline style, or render markup.
+Read `DESIGN.md`, `DESIGN_MODERN.md`, and `COMPONENTS.md` before writing or changing any CSS, inline style, or render markup.
 
 ```
 1. design-system-extracted/tokens/*.css   VALUES
@@ -82,13 +127,9 @@ Read `DESIGN.md` and `COMPONENTS.md` before writing or changing any CSS, inline 
 5. inline style=""                         LAYOUT ONLY — flex/grid/gap/min-width. Never color, radius, shadow, font-size.
 ```
 
-Never re-declare an existing `.gl-*` selector a second time in `app.css` — edit the one declaration that
-exists. A literal color/radius/shadow/font-size value appearing in `src/**` outside `DESIGN.md`'s documented
-exceptions is either a bug or an undocumented decision — fix the bug, or add a `DECISIONS.md` entry, never
-both silently. `npm run lint:design` enforces this mechanically; it must pass.
+Never re-declare an existing `.gl-*` selector a second time in `app.css` — edit the one declaration that exists. A literal color/radius/shadow/font-size value appearing in `src/**` outside `DESIGN.md`'s documented exceptions is either a bug or an undocumented decision — fix the bug, or add a `DECISIONS.md` entry, never both silently. `npm run lint:design` enforces this mechanically; it must pass.
 
-Status labels and colors for `TransactionStatus` come from exactly one place (see `DESIGN.md` → Status
-semantics). Do not add a second status→label map anywhere.
+Status labels and colors for `TransactionStatus` come from exactly one place (see `DESIGN.md` → Status semantics). Do not add a second status→label map anywhere.
 
 ## Single source of truth — mandatory
 
@@ -100,14 +141,7 @@ When duplicate truth is found, do not patch matches one at a time and stop. Firs
 
 A task is not complete until a repository-wide search proves the migration is complete. The completion report must state: the old literal or rule searched for, the number and paths of matches before and after, the new source-of-truth file, every intentional remaining match, and the tests/build/browser checks performed. Never say “แก้ครบแล้ว” based only on one screen or one file.
 
-For visual changes, verify every route and shared component at desktop and 390px. For a brand color change, search all color literals and token references, inspect generated CSS, and open each affected route. Prefer semantic tokens such as `--primary`, `--income`, or a named TypeScript constant over raw hex values. Example:
-
-```ts
-// src/config/theme.ts
-export const BRAND = "#16a34a";
-```
-
-Every consumer imports `BRAND`; no consumer retypes `#16a34a`. Do not add a second theme/config file without first proving the existing one cannot own the value.
+For visual changes, verify every route and shared component at desktop and 390px. For a brand color change, search all color literals and token references, inspect generated CSS, and open each affected route. Prefer semantic tokens such as `--primary`, `--income`, or a named TypeScript constant over raw hex values.
 
 ## No lazy shortcuts
 
