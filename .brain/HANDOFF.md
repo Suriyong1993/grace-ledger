@@ -8,6 +8,18 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-08 (Quiet Luxury UI polish)
+
+- **ผู้ส่งมอบ:** v0
+- **บริบทงาน:** ผู้ใช้ต้องการยกระดับ UI ทั้งระบบเป็น Quiet Luxury แบบ “$1,000 design” โดยคง Vanilla TypeScript, Coral Vault identity และ semantic financial colors เดิม
+- **สิ่งที่ทำเสร็จ:** ปรับ `.gl-card` ให้มี border ผสม foreground ที่ละเอียดและเงาเบา, เพิ่มจังหวะ page header, ปรับ hero dashboard ให้มีกรอบ coral ที่สุขุม และลบ HMR indicator CSS ที่หลงอยู่ใน `.gl-card--attention`
+- **ไฟล์ที่แก้:** `src/styles/app.css`, `scripts/lint-design.mjs`, `.brain/WORKING_CONTEXT.md`, `.brain/HANDOFF.md`
+- **หลักฐาน:** `npm run typecheck` ผ่าน, `npm test -- --run` ผ่าน 63 test files (3 skipped), `npm run lint:design` ผ่าน, `npm run build` ผ่าน; browser mobile 390×844 เปิดหน้า Login ได้ ไม่มี horizontal overflow ที่เห็นจาก screenshot
+- **ข้อจำกัด:** sandbox ไม่มีข้อมูล Supabase จึงตรวจ dashboard หลัง login แบบ interactive ไม่ได้; หน้า Login แสดง error state และยังเห็นข้อความ `HMR DEMO` จากระบบเดิมที่อยู่นอกไฟล์ที่แก้ในรอบนี้
+- **สิ่งที่ต้องทำต่อ:** ผู้ใช้ควรตรวจ Dashboard, Transactions, Approvals และ Reports หลังเข้าสู่ระบบจริงที่ desktop และ 390px
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-06 (Brand rebrand — "Emerald Vault" → "Coral Vault", D21)
 
 - **ผู้ส่งมอบ (Handed off by):** Claude Code
@@ -106,7 +118,7 @@
   - `npm run lint:design`: **ผ่าน**
   - `npm run build`: **ผ่าน**
   - `grep` บน `dist/`: `cta-2026`, `gl-cta-accent`, `gl-ai-greeting`, `gl-fade-slide-in` = **0 occurrences** ใน bundle จริง
-- **สิ่งที่ต้องทำต่อ (Next Actions) — P2 ที่ผู้ใช้อนุมัติแล้วแต่ยังไม่ได้ทำ:**
+- **สิ่งที่ต้องทำต่อ (Next Actions) — P2 ที่ผู้ใช้อนุมัติแล้วแต่ยังไม่ได้ท��:**
   1. **Mobile bottom-nav ซ่อน destination จริง** — role สิทธิ์สูง (เช่น `super_admin`) เห็น sidebar 8 ปลายทาง แต่ bottom nav แสดงแค่ 3 content tabs (`buildMobileComposition` ใน `AppShell.ts` `.slice(0, 3)`) ที่เหลือ **เข้าไม่ถึงจาก bottom bar เลย** — ผู้ใช้ยืนยันแล้วให้ใส่ overflow แบบเบาๆ กลับมา (ไม่จำเป็นต้องเป็น sheet ตัวเดิมที่เคยถอดออกวันที่ 2026-09-04) — **ต้องอัปเดต `tests/unit/app-shell-navigation.test.ts` ที่ปัจจุบัน assert ว่าไม่มีปุ่ม more**
   2. Topbar grouping (page context → primary action → utility → identity) — ตอนนี้เป็น flex row เดียวเรียงติดกันหมด
   3. P3 ที่ยังไม่แตะ: sidebar polish, login, tables, charts, recent-activity empty state ที่ยังไม่ใช้ `renderEmptyStateHtml` (`DashboardPage.ts` ~บรรทัด 543)
@@ -179,7 +191,7 @@
 - **หลักฐานการทดสอบ (Verification Evidence):**
   - `npm run lint:design`: **ผ่าน**
   - `npm test`: **ผ่านครบ 64 test files / 595 tests (0 failures)** — รวมทั้ง 32 tests ใน `dashboard-page-ui.test.ts` ที่คุ้มครองโครงสร้าง hero/context เดิม
-  - `npm run build`: **ผ่าน 100%** (verify ด้วย `grep` ว่า HMR indicator string ไม่อยู่ใน `dist/`)
+  - `npm run build`: **ผ่าน 100%** (verify ด้วย `grep` ว่า HMR indicator string ไม่อยู่ใ�� `dist/`)
   - Browser: render `DashboardPage.renderHtml()` จริงผ่าน temp harness (ไม่ใช่ mockup) ตรวจ desktop + 390px (ผ่าน iframe เพราะ `resize_window` ใช้ไม่ได้บนเครื่องนี้) + trend-empty-state + all-clear attention state — ผ่านหมด
   - Production: เปิด `https://grace-ledger-mu.vercel.app` จริง — โหลดสำเร็จ, console ไม่มี error, เห็น delta chip แสดงข้อมูลจริง (รายรับ ↓−฿14,120.00, รายจ่าย ↓−฿23,177.00)
 - **สิ่งที่ต้องทำต่อ (Next Actions):**
@@ -305,7 +317,7 @@
 
 ---
 
-## 📋 บันทึกส่งมอบ: 2026-09-04 14:22 (นำปุ่มและแผง 'เมนูเพิ่มเติม' ออกจาก Mobile Navigation ตามความต้องการของผู้ใช้)
+## 📋 บันทึกส่งมอบ: 2026-09-04 14:22 (นำปุ่มและแผง 'เมนูเพิ่มเติม' ออกจาก Mobile Navigation ตามความต้องการของผู้ใช���)
 
 - **ผู้ส่งมอบ (Handed off by):** Gemini (Antigravity IDE)
 - **ผู้รับมอบ (Next Agent):** Claude Code / Codex / Gemini ในรอบถัดไป
@@ -443,7 +455,7 @@
   - `npm test` (vitest run): **ผ่าน 63/64 test suites (582 passed, 15 skipped for unprivileged embedded-pg)**
   - `npm run build`: **ผ่าน 100% (Production bundle built cleanly in ~3.2s)**
 - **สิ่งที่ต้องทำต่อ (Pending / Next Steps):**
-  - ตรวจสอบการใช้งาน JoejaBrain ในการทำงานร่วมกับ Claude Code และ Agents อื่น
+  - ตรวจสอบการใช้งาน JoejaBrain ในก���รทำงานร่วมกับ Claude Code และ Agents อื่น
   - หากเริ่มฟีเจอร์ใหม่ ให้อัปเดตสถานะใน `.brain/WORKING_CONTEXT.md` ก่อนลงมือเสมอ
 - **ข้อควรระวังสำคัญ (Important Gotchas):**
   - ดูรายละเอียดใน `.brain/MEMORY.md` โดยเฉพาะเรื่อง schema ของ `transaction_splits` และการห้ามแตะกฎการเงินโดยพลการ

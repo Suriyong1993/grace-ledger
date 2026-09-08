@@ -8,9 +8,9 @@
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
 - **เป้าหมายหลัก (Goal):** Premium UI/UX Transformation — Dashboard 4-tier hierarchy, Topbar 4-cluster micro-architecture, Sidebar & Mobile Navigation refinement, 15-question Red-Team verification
-- **สถานะรวม (Overall Status):** `VERIFICATION_COMPLETE` (ทุกเฟส 1–6 สำเร็จสมบูรณ์, 65 test suites / 599 tests ผ่าน 100%, screenshots บันทึกเรียบร้อย)
-- **Agent ที่กำลังทำงาน (Active Agent):** Antigravity
-- **อัปเดตล่าสุด (Last Updated):** 2026-09-05 20:05 (Asia/Bangkok)
+- **สถานะรวม (Overall Status):** `WAITING_FOR_REVIEW` (Quiet Luxury UI refinement เสร็จ, quality gates ผ่าน, รอผู้ใช้ตรวจภาพรวม)
+- **Agent ที่กำลังทำงาน (Active Agent):** v0
+- **อัปเดตล่าสุด (Last Updated):** 2026-09-08 (Asia/Bangkok)
 
 ---
 
@@ -32,11 +32,13 @@
   - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 2.30s)
 
 - [x] สอบถามและยืนยันขอบเขตการแก้ไขกับผู้ใช้ (เลือกแก้ไขใน `scripts/capture_*.mjs`)
-- [/] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ:
+- [ ] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ:
   - [ ] `scripts/capture_all_pages.mjs`
   - [ ] `scripts/capture_emerald_vault.mjs`
   - [ ] `scripts/capture_premium_screenshots.mjs`
-- [ ] รันการทดสอบระบบ (`npm run typecheck`, `npm test`) เพื่อยืนยันว่าไม่มีผลกระทบข้างเคียง
+- [x] Quiet Luxury polish: ปรับพื้นผิวการ์ด, กรอบหน้า, hero dashboard และลบ HMR badge styling ที่หลงอยู่
+- [x] รันการทดสอบระบบ (`npm run typecheck`, `npm test`, `npm run lint:design`, `npm run build`)
+- [ ] ผู้ใช้ตรวจ dashboard และหน้าภายในหลัง login ด้วยตาจริง
 
 - [x] สำรวจและทำ Architecture Audit โครงสร้างเดิมทั้งหมด
 - [x] ออกแบบโครงสร้าง JoejaBrain (`.brain/`, workflows, memory, handoff)

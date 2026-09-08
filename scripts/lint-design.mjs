@@ -38,20 +38,19 @@ const ALLOWLIST = {
   // pass; before that only .ts files were scanned, which is how the "2026
   // Evolved Glassmorphism" layer landed unnoticed. Every remaining literal is
   // accounted for here:
-  //   font-size 1, border-radius 3 — dev-only HMR badge (1 of each) and two
-  //     hairline/pill radii below the smallest radius token. R6 cleanup.
-  //   rgb/rgba 7 — dev-only HMR badge (2), two overlay scrims that need a plain
-  //     black veil (2), and three faint ink-tinted shadows written inline
-  //     rather than as tokens (3). R6 cleanup.
-  //   hex 10 — dev-only HMR badge (1) and the print stylesheet (9), which must
-  //     use pure black and white on paper.
+  //   font-size 0, border-radius 2 — two hairline/pill radii below the smallest
+  //     radius token. R6 cleanup.
+  //   rgb/rgba 5 — two overlay scrims that need a plain black veil (2), and
+  //     three faint ink-tinted shadows written inline rather than as tokens (3).
+  //     R6 cleanup.
+  //   hex 9 — the print stylesheet, which must use pure black and white on paper.
   //   backdrop-filter 5 — overlay scrims only: modal backdrop, sheet backdrop,
   //     sticky mobile action bar. No content surface may blur.
   "src/styles/app.css": {
-    "literal font-size": 1,
-    "literal border-radius": 3,
-    "rgba()/rgb() color literal": 7,
-    "hex color literal": 10,
+    "literal font-size": 0,
+    "literal border-radius": 2,
+    "rgba()/rgb() color literal": 5,
+    "hex color literal": 9,
     "backdrop-filter": 5,
   },
 };
