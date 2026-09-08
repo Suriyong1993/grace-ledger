@@ -154,7 +154,7 @@ def analyse(path: str, ocr) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("inputs", nargs="+", help="image paths or globs")
-    ap.add_argument("--out", default="ui-lab/reference-analysis.md")
+    ap.add_argument("--out", default="docs/ui-reference.md")
     args = ap.parse_args()
 
     paths: list[str] = []

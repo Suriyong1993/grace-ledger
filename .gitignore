@@ -20,5 +20,6 @@ tmp_queries/
 .zcode/
 .screenshots/
 .impeccable/
+graphify-out/
 pnpm-lock.yaml
 pnpm-workspace.yaml

@@ -8,7 +8,7 @@ import { escapeHtml, formatDateThai, toUserMessage } from "../lib/format";
 import { type AppShellUser } from "../components/layout/AppShell";
 import { roleLabelTh } from "../lib/rbac";
 
-/* Per-page ICON_* inline SVGs — the repo convention (see design-plans/08).
+/* Per-page ICON_* inline SVGs — the repo convention (see docs/archive/design-plans/08).
    Lucide-style stroke icons; decorative ones are aria-hidden at the call site. */
 const ICON_CLOCK = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
 const ICON_CHECK_CIRCLE = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>`;
