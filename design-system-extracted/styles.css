@@ -6,3 +6,4 @@
 @import "tokens/motion.css";
 @import "tokens/fonts.css";
 @import "tokens/base.css";
+@import "../src/styles/dashboard-premium.css";
