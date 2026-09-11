@@ -2,6 +2,7 @@ import { describe, it, expect, afterAll } from "vitest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PgLab } from "../../scripts/pg-lab.mjs";
+import { handleRealPgBootFailure } from "./real-pg-boot";
 
 // REAL-PostgreSQL integration test: Two-Person Rule / Segregation of Duties
 // enforced at the DATABASE, not the client.
@@ -16,9 +17,10 @@ import { PgLab } from "../../scripts/pg-lab.mjs";
 // every client-side check (a raw fetch to PostgREST, a compromised client, a
 // malicious script) still cannot self-approve or self-post.
 //
-// If the lab cannot boot in this environment (no binaries / not elevated),
-// the suite is SKIPPED rather than failed so the deterministic unit suite
-// stays green; run under an elevated shell for the full verification.
+// If the lab cannot boot on a developer machine (binaries not installed), the
+// suite SKIPS so the local run stays usable — but under PGLAB_REQUIRED=1 (CI)
+// a boot failure fails the run, because a skipped suite means the database's
+// own Segregation-of-Duties guard ships unverified. See ./real-pg-boot.ts.
 //
 // Verification points required by the task:
 //   (1) draft -> posted (direct post) by the creator is rejected by
@@ -88,23 +90,12 @@ try {
   await seed();
   booted = true;
 } catch (err) {
-  booted = false;
-  const reason = (err as Error).message;
-  console.warn(
-    [
-      "",
-      "############################################################",
-      "# SKIPPED: two-person-rule-direct-rpc-bypass (real PostgreSQL 17)",
-      "# This suite did NOT run. A Segregation-of-Duties regression in",
-      "# post_transaction()/approve_transaction() would reach",
-      "# production undetected while this stays skipped.",
-      `# Reason: ${reason}`,
-      "# Fix: run under an elevated shell so the embedded PG lab can",
-      "# create its unprivileged service account, then re-run.",
-      "############################################################",
-      "",
-    ].join("\n"),
-  );
+  booted = handleRealPgBootFailure(err, [
+    "# SKIPPED: two-person-rule-direct-rpc-bypass (real PostgreSQL 17)",
+    "# This suite did NOT run. A Segregation-of-Duties regression in",
+    "# post_transaction()/approve_transaction() would reach",
+    "# production undetected while this stays skipped.",
+  ]);
 }
 
 describe.runIf(booted)(

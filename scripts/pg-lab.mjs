@@ -1,9 +1,22 @@
 // Grace Ledger — real-PostgreSQL lab harness (no Docker, no production access).
 //
-// Boots a throwaway PostgreSQL 17 instance on this machine using the
-// @embedded-postgres/windows-x64 binaries. PostgreSQL refuses to run under an
-// administrative token, so the server runs as a dedicated unprivileged local
-// account via a temporary Windows service. Everything is torn down on stop().
+// Boots a throwaway PostgreSQL 17 instance on this machine from the
+// @embedded-postgres binaries. Everything is torn down on stop().
+//
+// Two boot strategies, because the two host OSes constrain PostgreSQL
+// differently:
+//
+//   win32   PostgreSQL refuses to run under an administrative token, so the
+//           server runs as a dedicated unprivileged local account via a
+//           temporary Windows service (the original strategy — unchanged).
+//   posix   Linux/macOS already run the test process as an unprivileged user,
+//           so the cluster is spawned directly through the cross-platform
+//           `embedded-postgres` package (the same one scripts/pg-lab-smoke.mjs
+//           uses). No service account, no elevation required.
+//
+// Keeping the POSIX path alive matters: CI runs on ubuntu-latest, and without
+// it every *.real-pg.test.ts suite silently skips there — a Segregation-of-
+// Duties or RLS regression in the SQL would reach production undetected.
 //
 // This is a TEST-ONLY lab: a fresh data directory per boot, no persistence
 // between runs, and no connection to any Supabase project.
@@ -19,18 +32,33 @@ import pg from "pg";
 
 const execFileAsync = promisify(execFile);
 
+const IS_WINDOWS = process.platform === "win32";
+/** npm publishes the binaries as @embedded-postgres/<platform>-<arch>. */
+const NATIVE_PLATFORM =
+  { win32: "windows", linux: "linux", darwin: "darwin" }[process.platform] ??
+  process.platform;
+const NATIVE_ARCH =
+  { x64: "x64", arm64: "arm64", arm: "arm", ia32: "ia32", ppc64: "ppc64" }[
+    process.arch
+  ] ?? process.arch;
+
 const LAB_USER = "gl_pg_lab_runner";
 const LAB_PASSWORD = "GLpg#Lab2026x";
 const LAB_SERVICE = "gl_pg_lab";
-const LAB_ROOT = path.join(
-  process.env.ProgramData ?? "C:\\ProgramData",
-  "gl_pg_lab",
-);
+// Windows: one fixed root (the service name is fixed too, so only one lab may
+// exist at a time). POSIX: a unique root per instance, so a stale directory
+// from a crashed run can never collide with the next boot.
+const LAB_ROOT = IS_WINDOWS
+  ? path.join(process.env.ProgramData ?? "C:\\ProgramData", "gl_pg_lab")
+  : path.join(
+      os.tmpdir(),
+      `gl_pg_lab_${process.pid}_${Date.now().toString(36)}`,
+    );
 const NATIVE_SRC = path.join(
   path.dirname(fileURLToPath(new URL("../package.json", import.meta.url))),
   "node_modules",
   "@embedded-postgres",
-  "windows-x64",
+  `${NATIVE_PLATFORM}-${NATIVE_ARCH}`,
   "native",
 );
 
@@ -172,14 +200,29 @@ END $$;
 
 CREATE SCHEMA IF NOT EXISTS auth;
 
+-- Must match Supabase's own definitions, including the NULLIF *before* the
+-- ::jsonb cast. Casting first (the previous shim) made an empty
+-- request.jwt.claims setting raise 22P02 "invalid input syntax for type json"
+-- instead of resolving to a NULL uid — so any query touching auth.uid() after
+-- asUser() had reset the claims to '' blew up, and the lab disagreed with
+-- production about what an unauthenticated caller looks like.
 CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
 LANGUAGE sql STABLE AS $$
-  SELECT NULLIF(current_setting('request.jwt.claims', true)::jsonb ->> 'sub', '')::uuid
+  SELECT NULLIF(
+           COALESCE(NULLIF(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'sub',
+           ''
+         )::uuid
 $$;
 
 CREATE OR REPLACE FUNCTION auth.role() RETURNS text
 LANGUAGE sql STABLE AS $$
-  SELECT COALESCE(NULLIF(current_setting('request.jwt.claims', true)::jsonb ->> 'role', ''), 'anon')
+  SELECT COALESCE(
+           NULLIF(
+             COALESCE(NULLIF(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role',
+             ''
+           ),
+           'anon'
+         )
 $$;
 
 CREATE SCHEMA IF NOT EXISTS extensions;
@@ -201,12 +244,28 @@ export class PgLab {
     this.client = null;
     this.datadir = null;
     this.started = false;
+    /** POSIX only: the `embedded-postgres` cluster owning this lab. */
+    this.cluster = null;
   }
 
   /** Boot the lab and apply every migration in supabase/migrations, in filename order. */
   async start({ migrationsDir } = {}) {
-    await cleanupLeftovers();
     this.port = await freePort();
+    if (IS_WINDOWS) {
+      await this.bootWindows();
+    } else {
+      await this.bootPosix();
+    }
+    return this.provision(migrationsDir);
+  }
+
+  /**
+   * Windows boot: run the cluster as a dedicated unprivileged local account
+   * behind a temporary service, because PostgreSQL refuses to run under an
+   * administrative token.
+   */
+  async bootWindows() {
+    await cleanupLeftovers();
 
     fs.mkdirSync(LAB_ROOT, { recursive: true });
     await ensureLabUser();
@@ -264,7 +323,58 @@ export class PgLab {
     await run("net", ["start", LAB_SERVICE]);
     await waitForPort(this.port, 30000);
     this.started = true;
+  }
 
+  /**
+   * POSIX boot: spawn the cluster directly as the current (already
+   * unprivileged) user through the cross-platform `embedded-postgres` package.
+   * No Windows service, no `net user`, no elevation.
+   */
+  async bootPosix() {
+    if (typeof process.getuid === "function" && process.getuid() === 0) {
+      throw new Error(
+        "PgLab refuses to boot as root: PostgreSQL will not run under uid 0. " +
+          "Re-run the tests as a normal user (CI runners already do).",
+      );
+    }
+    if (!fs.existsSync(path.join(NATIVE_SRC, "bin", "postgres"))) {
+      throw new Error(
+        `PgLab found no PostgreSQL binaries for ${NATIVE_PLATFORM}-${NATIVE_ARCH} at ${NATIVE_SRC}. ` +
+          "Run `npm ci` so the @embedded-postgres optional dependency is installed.",
+      );
+    }
+
+    // Imported lazily: the package pulls in async-exit-hook, and the Windows
+    // path must not pay for it.
+    const { default: EmbeddedPostgres } = await import("embedded-postgres");
+
+    fs.mkdirSync(LAB_ROOT, { recursive: true });
+    this.datadir = path.join(LAB_ROOT, "data");
+
+    this.cluster = new EmbeddedPostgres({
+      databaseDir: this.datadir,
+      port: this.port,
+      user: "postgres",
+      password: LAB_PASSWORD,
+      authMethod: "password",
+      // Throwaway cluster: stop() deletes the data directory for us.
+      persistent: false,
+      initdbFlags: ["-E", "UTF8", "--locale=C"],
+      // Bind loopback only — the lab must never be reachable off this machine.
+      postgresFlags: ["-c", "listen_addresses=127.0.0.1"],
+      // The cluster's own chatter would drown the test reporter.
+      onLog: () => {},
+      onError: () => {},
+    });
+
+    await this.cluster.initialise();
+    await this.cluster.start();
+    await waitForPort(this.port, 30000);
+    this.started = true;
+  }
+
+  /** Connect, install the Supabase platform shim, then apply every migration. */
+  async provision(migrationsDir) {
     this.client = new pg.Client({
       host: "127.0.0.1",
       port: this.port,
@@ -339,15 +449,29 @@ export class PgLab {
       }
       this.client = null;
     }
-    if (this.started) {
-      await runOk("net", ["stop", LAB_SERVICE]);
+    if (IS_WINDOWS) {
+      if (this.started) {
+        await runOk("net", ["stop", LAB_SERVICE]);
+        this.started = false;
+      }
+      await runOk("sc", ["delete", LAB_SERVICE]);
+      await runOk("net", ["user", LAB_USER, "/delete"]);
+    } else if (this.cluster) {
+      // persistent:false makes stop() delete the data directory too.
+      try {
+        await this.cluster.stop();
+      } catch {
+        /* already stopped */
+      }
+      this.cluster = null;
       this.started = false;
     }
-    await runOk("sc", ["delete", LAB_SERVICE]);
-    await runOk("net", ["user", LAB_USER, "/delete"]);
     if (this.datadir) {
       fs.rmSync(this.datadir, { recursive: true, force: true });
       this.datadir = null;
+    }
+    if (!IS_WINDOWS) {
+      fs.rmSync(LAB_ROOT, { recursive: true, force: true });
     }
   }
 }

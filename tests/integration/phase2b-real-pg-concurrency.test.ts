@@ -17,17 +17,23 @@
 // See docs/history/root-reports/PHASE_2B_REPORT.md for the narrated
 // findings, root causes and PASS/FAIL/NOT VERIFIED matrix.
 //
-// Single test file, single PgLab boot: PgLab (scripts/pg-lab.mjs) registers
-// a fixed-name Windows service + local account for its embedded Postgres.
-// Two PgLab instances booting concurrently (e.g. from vitest's default
+// Single test file, single PgLab boot: on Windows PgLab (scripts/pg-lab.mjs)
+// registers a fixed-name service + local account for its embedded Postgres, so
+// two PgLab instances booting concurrently (e.g. from vitest's default
 // parallel-file workers) would collide on that shared name. Every Phase 2B
 // scenario therefore lives in this one file/module so only one lab ever
-// boots for the whole suite.
+// boots for the whole suite. (The POSIX boot path uses a unique data directory
+// per instance and has no such collision, but vitest.config.ts still keeps
+// fileParallelism off so one policy holds on every platform.)
+//
+// Boot-failure policy: skips locally, fails the run under PGLAB_REQUIRED=1
+// (CI) — see ./real-pg-boot.ts.
 
 import { afterAll, describe, expect, it } from "vitest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PgLab } from "../../scripts/pg-lab.mjs";
+import { handleRealPgBootFailure } from "./real-pg-boot";
 import {
   beginAsUser,
   commit,
@@ -71,21 +77,12 @@ try {
   await seedChurch(lab);
   booted = true;
 } catch (err) {
-  booted = false;
-  const reason = (err as Error).message;
-  console.warn(
-    [
-      "",
-      "############################################################",
-      "# PHASE 2B = NOT VERIFIED",
-      "# Real PostgreSQL 17 lab could not boot in this environment.",
-      `# Reason: ${reason}`,
-      "# Fix: run under an elevated shell so the embedded PG lab can",
-      "# create its unprivileged service account, then re-run.",
-      "############################################################",
-      "",
-    ].join("\n"),
-  );
+  booted = handleRealPgBootFailure(err, [
+    "# PHASE 2B = NOT VERIFIED",
+    "# Real PostgreSQL 17 lab could not boot in this environment.",
+    "# Concurrency, lock-ordering, split-immutability and the",
+    "# lifecycle state machine all go unverified while this skips.",
+  ]);
 }
 
 // Drives a fresh draft transaction to a target lifecycle state via the real

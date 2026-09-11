@@ -1,15 +1,25 @@
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
-export default defineConfig({
+// `npm test`        — real-PostgreSQL suites skip if the lab cannot boot.
+// `npm run test:pg` — same suites, but a lab boot failure FAILS the run.
+//                     This is what CI uses: a skip there would mean RLS,
+//                     Segregation of Duties, split immutability and the
+//                     concurrency/lock-ordering guarantees all ship
+//                     unverified while the build still reports green.
+//                     See tests/integration/real-pg-boot.ts.
+export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     environment: "node",
     include: ["tests/**/*.test.ts"],
-    // Test files must not run in parallel: phase2b-real-pg-concurrency and
-    // execute-confirmed-financial-action.real-pg each boot a PgLab embedded
-    // PostgreSQL on a fixed Windows service name, and one lab's
-    // cleanupLeftovers() would stop the other lab's service mid-run.
+    env: mode === "pg" ? { PGLAB_REQUIRED: "1" } : {},
+    // Test files must not run in parallel: on Windows, PgLab registers its
+    // embedded PostgreSQL under a fixed service name, and one lab's
+    // cleanupLeftovers() would stop the other lab's service mid-run. The POSIX
+    // boot path uses a unique data directory per instance and has no such
+    // collision, but one serialization policy keeps behavior identical
+    // everywhere.
     fileParallelism: false,
   },
   resolve: {
@@ -17,4 +27,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+}));

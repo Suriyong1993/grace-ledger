@@ -2,6 +2,7 @@ import { describe, it, expect, afterAll } from "vitest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PgLab } from "../../scripts/pg-lab.mjs";
+import { handleRealPgBootFailure } from "./real-pg-boot";
 
 // REAL-PostgreSQL integration test for execute_confirmed_financial_action.
 //
@@ -10,9 +11,10 @@ import { PgLab } from "../../scripts/pg-lab.mjs";
 // that fixes the orchestrator — and exercises the fixed function end to end.
 // This is NOT a mock and NOT the Map-based fake in financial-action-endpoint.
 //
-// If the lab cannot boot in this environment (no binaries / not elevated), the
-// suite is SKIPPED rather than failed so the deterministic unit suite stays
-// green; run under an elevated shell for the full verification.
+// If the lab cannot boot on a developer machine (binaries not installed), the
+// suite SKIPS so the local run stays usable — but under PGLAB_REQUIRED=1 (CI)
+// a boot failure fails the run, because a skipped suite means RLS and the
+// Segregation-of-Duties guards ship unverified. See ./real-pg-boot.ts.
 //
 // Verification points required by the task:
 //   (1) confirmed transaction gets posted
@@ -140,23 +142,12 @@ try {
   await seedChurchB();
   booted = true;
 } catch (err) {
-  booted = false;
-  const reason = (err as Error).message;
-  console.warn(
-    [
-      "",
-      "############################################################",
-      "# SKIPPED: execute_confirmed_financial_action (real PostgreSQL 17)",
-      "# This suite did NOT run. Financial RPC/schema bugs it would",
-      "# catch (e.g. the 2026-08-25 ERROR 42703 schema drift) can",
-      "# reach production undetected while this stays skipped.",
-      `# Reason: ${reason}`,
-      "# Fix: run under an elevated shell so the embedded PG lab can",
-      "# create its unprivileged service account, then re-run.",
-      "############################################################",
-      "",
-    ].join("\n"),
-  );
+  booted = handleRealPgBootFailure(err, [
+    "# SKIPPED: execute_confirmed_financial_action (real PostgreSQL 17)",
+    "# This suite did NOT run. Financial RPC/schema bugs it would",
+    "# catch (e.g. the 2026-08-25 ERROR 42703 schema drift) can",
+    "# reach production undetected while this stays skipped.",
+  ]);
 }
 
 describe.runIf(booted)("execute_confirmed_financial_action (real PostgreSQL 17)", () => {
