@@ -9,6 +9,10 @@ export interface StatusBadgeProps {
  * Status colour has fixed meaning and the text always sits on the `-muted`
  * surface, so it uses the `--on-*-muted` text tokens — never `--*-foreground`,
  * which is near-white and is meant for text on the solid colour.
+ *
+ * Single source of truth for TransactionStatus labels/colors (see DESIGN.md
+ * "Status semantics"). Do not add a second status→label map anywhere —
+ * import renderStatusBadgeHtml / STATUS_CONFIG from here instead.
  */
 export const STATUS_CONFIG: Record<
   TransactionStatus,

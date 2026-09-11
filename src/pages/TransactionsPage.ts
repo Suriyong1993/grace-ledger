@@ -1,5 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderEmptyStateHtml } from "../components/shared/EmptyState";
+import { renderStatusBadgeHtml } from "../components/shared/StatusBadge";
+import { renderTxnRowHtml } from "../components/shared/TxnRow";
 import { fieldErrorHtml } from "../components/shared/FieldError";
 import { escapeHtml } from "../lib/format";
 import { Database } from "../lib/supabase/types";
@@ -47,28 +49,9 @@ export interface TransactionItem {
 }
 
 const ICON_SEARCH = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>`;
-const ICON_INCOME = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>`;
-const ICON_EXPENSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
-const ICON_TRANSFER = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>`;
 const ICON_DOWNLOAD = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
 const ICON_PLUS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`;
 const ICON_CLOSE = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
-
-// Real transaction lifecycle status -> Thai label + badge class.
-const TXN_STATUS: Record<
-  TransactionItem["status"],
-  {
-    label: string;
-    badge: "neutral" | "pending" | "approved" | "rejected" | "info";
-  }
-> = {
-  draft: { label: "ร่าง", badge: "neutral" },
-  pending_approval: { label: "รออนุมัติ", badge: "pending" },
-  approved: { label: "อนุมัติแล้ว", badge: "approved" },
-  posted: { label: "ลงบัญชีแล้ว", badge: "approved" },
-  rejected: { label: "ไม่อนุมัติ", badge: "rejected" },
-  voided: { label: "ยกเลิก", badge: "rejected" },
-};
 
 export type TxnPeriod = "this_month" | "last_month" | "last_3_months" | "all";
 export type TxnSort = "newest" | "oldest" | "amount_desc" | "amount_asc";
@@ -677,44 +660,21 @@ export class TransactionsPage {
           <div class="kicker gl-txn-group__title">${title}</div>
           <div class="gl-card gl-txn-list">
             ${items
-              .map((item) => {
-                const isIncome = item.direction === "income";
-                const isExpense = item.direction === "expense";
-                const iconSvg = isIncome
-                  ? ICON_INCOME
-                  : isExpense
-                    ? ICON_EXPENSE
-                    : ICON_TRANSFER;
-                const iconClass = isIncome
-                  ? "gl-row__icon--income"
-                  : isExpense
-                    ? "gl-row__icon--expense"
-                    : "gl-row__icon--transfer";
-                const amountColor = isIncome
-                  ? "var(--income)"
-                  : isExpense
-                    ? "var(--expense)"
-                    : "var(--foreground)";
-                const amountPrefix = isIncome ? "+" : isExpense ? "−" : "";
-                const statusInfo = TXN_STATUS[item.status];
-
-                return `
-                <a href="#/transactions/${item.id}" class="gl-row gl-txn-row" data-txn-id="${item.id}" aria-label="ดูรายละเอียด ${escapeHtml(item.description)}">
-                  <span class="gl-row__icon ${iconClass}" aria-hidden="true">${iconSvg}</span>
-                  <span class="gl-row__body">
-                    <span class="gl-row__title">${escapeHtml(item.description)}</span>
-                    <span class="gl-row__meta">
-                      <span class="gl-tag">${escapeHtml(item.fundName)}</span>
-                      <span class="gl-tag">${escapeHtml(item.categoryName)}</span>
-                      ${item.date ? `<span>${formatDateThai(item.date)}</span>` : ""}
-                    </span>
-                  </span>
-                  <span class="gl-row__end">
-                    <span class="num-display" style="color: ${amountColor};">${amountPrefix}${item.amount.format()}</span>
-                    <span class="gl-badge gl-badge--${statusInfo.badge}">${statusInfo.label}</span>
-                  </span>
-                </a>`;
-              })
+              .map((item) =>
+                renderTxnRowHtml({
+                  href: `#/transactions/${item.id}`,
+                  direction: item.direction,
+                  title: item.description,
+                  metaHtml: `<span class="gl-tag">${escapeHtml(item.fundName)}</span><span class="gl-tag">${escapeHtml(item.categoryName)}</span>${item.date ? `<span>${formatDateThai(item.date)}</span>` : ""}`,
+                  amount: item.amount,
+                  statusBadgeHtml: renderStatusBadgeHtml({
+                    status: item.status,
+                  }),
+                  className: "gl-txn-row",
+                  dataTxnId: item.id,
+                  ariaLabel: `ดูรายละเอียด ${escapeHtml(item.description)}`,
+                }),
+              )
               .join("")}
           </div>
         </div>`;

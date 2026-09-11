@@ -166,7 +166,7 @@ describe("TransactionsPage UI — Unit Tests", () => {
     expect(html).toContain("ซื้ออุปกรณ์ระบบเสียงห้องเยาวชน");
     expect(html).toContain("+฿18,450.00");
     expect(html).toContain("−฿8,500.00");
-    expect(html).toContain("ลงบัญชีแล้ว");
+    expect(html).toContain("บันทึกบัญชีแล้ว");
     expect(html).toContain("รออนุมัติ");
   });
 

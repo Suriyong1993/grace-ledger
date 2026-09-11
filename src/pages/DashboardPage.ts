@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { renderEmptyStateHtml } from "../components/shared/EmptyState";
+import { renderTxnRowHtml, ICON_TRANSFER } from "../components/shared/TxnRow";
 import { Database } from "../lib/supabase/types";
 import { ApprovalsService } from "../lib/transactions/approvals-service";
 import { HistoricalService } from "../lib/reports/historical-service";
@@ -56,9 +57,6 @@ export interface DashboardData {
 
 const ICON_CLOCK = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`;
 const ICON_ARROW = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>`;
-const ICON_INCOME = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg>`;
-const ICON_EXPENSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M6 13l6 6 6-6"/></svg>`;
-const ICON_TRANSFER = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>`;
 const ICON_PLUS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>`;
 const ICON_RECEIPT = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>`;
 const ICON_LIST = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h10"/></svg>`;
@@ -559,24 +557,6 @@ export class DashboardPage {
         : `<div class="gl-card gl-txn-list">
             ${recent
               .map((item) => {
-                const isIncome = item.direction === "income";
-                const isExpense = item.direction === "expense";
-                const iconSvg = isIncome
-                  ? ICON_INCOME
-                  : isExpense
-                    ? ICON_EXPENSE
-                    : ICON_TRANSFER;
-                const iconClass = isIncome
-                  ? "gl-row__icon--income"
-                  : isExpense
-                    ? "gl-row__icon--expense"
-                    : "gl-row__icon--transfer";
-                const amountColor = isIncome
-                  ? "var(--income)"
-                  : isExpense
-                    ? "var(--expense)"
-                    : "var(--foreground)";
-                const sign = isIncome ? "+" : isExpense ? "−" : "";
                 const statusLabel =
                   item.status === "approved"
                     ? "อนุมัติแล้ว"
@@ -584,18 +564,14 @@ export class DashboardPage {
                       ? "ไม่อนุมัติ"
                       : "รอตรวจสอบ";
 
-                return `
-                <a href="#/transactions" class="gl-row">
-                  <span class="gl-row__icon ${iconClass}" aria-hidden="true">${iconSvg}</span>
-                  <span class="gl-row__body">
-                    <span class="gl-row__title">${escapeHtml(item.title)}</span>
-                    <span class="gl-row__meta">${escapeHtml(item.subtitle)}</span>
-                  </span>
-                  <span class="gl-row__end">
-                    <span class="num-display" style="color: ${amountColor};">${sign}${item.amount.format()}</span>
-                    <span class="gl-badge gl-badge--${item.status}">${statusLabel}</span>
-                  </span>
-                </a>`;
+                return renderTxnRowHtml({
+                  href: "#/transactions",
+                  direction: item.direction,
+                  title: item.title,
+                  metaHtml: escapeHtml(item.subtitle),
+                  amount: item.amount,
+                  statusBadgeHtml: `<span class="gl-badge gl-badge--${item.status}">${statusLabel}</span>`,
+                });
               })
               .join("")}
           </div>`;

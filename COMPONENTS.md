@@ -40,14 +40,28 @@
 
 ## Feedback / route-level patterns (not yet promoted to reusable components — R3 candidates)
 
-- Transaction row markup is currently duplicated between `DashboardPage.ts` and `TransactionsPage.ts`. **Do
-  not copy it a third time.** R3 will extract a shared `TxnRow` helper — until then, if you need a third
-  instance, flag it rather than pasting.
-- Status label/color is currently defined in three places (`approvals/StatusBadge.ts`, `TransactionsPage.ts`'s
-  `TXN_STATUS`, and an inline ternary in `DashboardPage.ts`). **Use `DESIGN.md`'s status table as the
-  intended single truth**; R3 consolidates the code to match. Do not add a fourth definition.
-- Empty-state blocks exist with three different paddings across `TransactionsPage`, `FundsPage`,
-  `MembersPage`, `ApprovalsQueueView`. R3 candidate for a shared `EmptyState` helper.
+- ~~Transaction row markup is currently duplicated~~ **Resolved.** `renderTxnRowHtml` /
+  `txnDirectionPresentation` / `ICON_INCOME` / `ICON_EXPENSE` / `ICON_TRANSFER` now live in
+  `src/components/shared/TxnRow.ts`. Both `DashboardPage.ts` and `TransactionsPage.ts` call it — each still
+  supplies its own `metaHtml` and `statusBadgeHtml` (they use different status vocabularies and row density),
+  but the icon/color/sign derivation and row shell markup are single-sourced. If you need a third row
+  instance, use this component; do not paste the markup again.
+- ~~Status label/color is currently defined in three places~~ **Resolved.** `renderStatusBadgeHtml` /
+  `STATUS_CONFIG` now live in `src/components/shared/StatusBadge.ts` (moved from `approvals/`, still
+  re-exported from `components/approvals` for existing importers) and are the single source for
+  `TransactionStatus` → label/color. `TransactionsPage.ts`'s local `TXN_STATUS` map was removed and replaced
+  with a call to `renderStatusBadgeHtml`. Note: `DashboardPage.ts`'s "recent activity" widget keeps its own
+  inline 3-way label (`approved`/`pending`/`rejected`) — this is a deliberately narrower, dashboard-local
+  summary type (`RecentTransaction["status"]`), not a duplicate of the full `TransactionStatus` lifecycle, so
+  it was left as-is rather than forced into the shared map.
+- ~~Empty-state blocks exist with three different paddings~~ **Mostly resolved.** `renderEmptyStateHtml`
+  (`components/shared/EmptyState.ts`) is now used by `ApprovalsPage`, `ApprovalsQueueView`, `DashboardPage`,
+  `FundsPage`, `MembersPage`, `OfferingPage`, `ReportsPage` (2 of its 4 empty blocks), and `TransactionsPage`.
+  **Still open:** `ReportsPage.ts` has two empty-state blocks (`renderStatementView`'s no-posted-transactions
+  case, and `renderHistoricalMonthView`'s no-archive case) that use a `gl-card--pad-lg` size variant and an
+  icon+title layout `EmptyState.ts` doesn't support yet. Consolidating them needs the helper extended first
+  (a `size` prop and an icon+title layout option) — do not force-fit them into the current shape without that,
+  it will likely regress their padding/icon layout.
 
 ## Utilities
 

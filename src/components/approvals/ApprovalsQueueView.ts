@@ -1,7 +1,8 @@
 import { PendingApprovalItem } from "../../lib/transactions/types";
 import { escapeHtml } from "../../lib/format";
 import { Money } from "../../lib/money";
-import { renderStatusBadgeHtml } from "./StatusBadge";
+import { renderStatusBadgeHtml } from "../shared/StatusBadge";
+import { renderEmptyStateHtml } from "../shared/EmptyState";
 
 export interface ApprovalsQueueViewProps {
   items: PendingApprovalItem[];
@@ -71,17 +72,16 @@ export function renderApprovalsQueueViewHtml(
   if (items.length === 0) {
     return `
     ${renderHeaderHtml(0, "฿0.00")}
-    <div class="gl-approvals-queue-empty gl-card" style="text-align: center; padding: var(--space-12) var(--space-5);">
-      <h2 style="font-size: var(--text-lg); font-weight: var(--weight-semibold); margin: 0 0 var(--space-1);">
-        ไม่มีรายการค้างอนุมัติ
-      </h2>
-      <p style="font-size: var(--text-sm); color: var(--muted-foreground); margin: 0 0 var(--space-4);">
-        รายการที่ส่งมาขออนุมัติจะแสดงที่นี่
-      </p>
-      <a href="#/transactions" class="gl-btn gl-btn--secondary gl-btn--sm" style="display: inline-flex;">
-        ดูประวัติรายการเงินทั้งหมด
-      </a>
-    </div>
+    ${renderEmptyStateHtml({
+      message: "ไม่มีรายการค้างอนุมัติ",
+      hint: "รายการที่ส่งมาขออนุมัติจะแสดงที่นี่",
+      action: {
+        type: "link",
+        href: "#/transactions",
+        label: "ดูประวัติรายการเงินทั้งหมด",
+        variant: "secondary",
+      },
+    })}
     `;
   }
 

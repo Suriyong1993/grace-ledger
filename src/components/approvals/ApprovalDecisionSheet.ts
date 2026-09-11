@@ -3,7 +3,7 @@ import {
   ProjectedFundBalanceResult,
 } from "../../lib/transactions/types";
 import { escapeHtml } from "../../lib/format";
-import { renderStatusBadgeHtml } from "./StatusBadge";
+import { renderStatusBadgeHtml } from "../shared/StatusBadge";
 import { renderProjectedBalanceCardHtml } from "./ProjectedBalanceCard";
 
 export interface ApprovalDecisionSheetProps {

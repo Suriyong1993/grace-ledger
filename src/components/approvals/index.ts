@@ -1,4 +1,4 @@
-export * from "./StatusBadge";
+export * from "../shared/StatusBadge";
 export * from "./ProjectedBalanceCard";
 export * from "./RejectionModal";
 export * from "./ApprovalDecisionSheet";
