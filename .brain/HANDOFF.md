@@ -8,6 +8,62 @@
 
 ---
 
+## 📋 บันทึกส่งมอบ: 2026-09-11 (Production-Readiness Audit & Ledger Hardening — พบ CRITICAL 7 รายการ แก้แล้ว 6)
+
+- **ผู้ส่งมอบ (Handed off by):** Arena.ai Agent Mode
+- **ผู้รับมอบ (Next Agent):** Agent ใดๆ ในรอบถัดไป / มนุษย์ผู้ดูแลระบบ
+- **บริบทงาน (Context):** ผู้ใช้ (ในฐานะ lead engineer) สั่ง audit ทั้ง repo 30 ด้าน แล้วทำให้ Grace Ledger พร้อมขึ้น production ตามเฟส 0–7 โดยมีกฎเหล็กว่าห้ามลบตาราง ห้ามปิด RLS ห้ามแก้ข้อมูลการเงินย้อนหลัง ห้าม commit secrets และห้ามอ้างผลเทสต์ที่ไม่ได้รันจริง ทุกข้อสรุปในรายงานนี้มาจากการยิงทดสอบกับ **PostgreSQL 17.10 จริง** ไม่ใช่การอ่านโค้ดแล้วเดา
+- **สิ่งที่ทำเสร็จแล้ว (Completed Work):**
+  1. **ยืนยันช่องโหว่ด้วยการโจมตีจริง (isolated probes บน DB จริง):**
+     - C1/C2: `UPDATE funds.current_balance` และ `accounts.current_balance` ในฐานะ treasurer → **แก้ได้จริง 1 row** (ควรเป็น 0)
+     - C3: `posted → draft → DELETE` → **ทำลายทั้งธุรกรรมและ splits**
+     - C3b/C3c: `posted → voided` (ไม่มี reversal entry) และ `posted → rejected` (ข้าม RPC) → **ผ่าน**
+     - C4: แก้ `description` / `metadata` / `posted_at` / `approved_by` / `created_by` / `reference_number` ของธุรกรรมที่ posted แล้ว → **ผ่านหมด** (trigger เดิม `prevent_posted_txn_fields_update` คุมคนละชุดฟิลด์ ไม่ซ้อนกันเลย)
+  2. **Migration ใหม่ (additive ล้วน):** `supabase/migrations/20260911000001_ledger_immutability_hardening.sql`
+     - `guard_balance_columns()` → errcode **GL007** (ยกเว้น table owner / BYPASSRLS / superuser เท่านั้น)
+     - `guard_transaction_lifecycle()` → **GL005** (ฟิลด์ provenance ของแถว posted) และ **GL006** (status transition อนุญาตเฉพาะ `draft→pending_approval`, `pending_approval→rejected`, `pending_approval→draft` และเฉพาะเมื่อเรียกจาก definer RPC `post_transaction` / `reject_transaction` / `return_transaction_to_draft`)
+  3. **เทสต์ใหม่:** `tests/integration/ledger-immutability.real-pg.test.ts` **22 เทสต์** — รวมเคส adversarial และเคสที่ยืนยันว่า *ทางที่ถูกต้องยังใช้ได้* (migration ที่ทำให้ posting พัง แย่กว่าไม่มี migration)
+  4. **อุด secret leak (CRITICAL):** พบ `service_role` JWT จริงของ project `jeklcfpqmytdmwczxqlx` (ชื่อโปรเจกต์ `grace-ledger-test`, `exp` 2036-08-17) ถูก commit ใน 3 สคริปต์ — `perform_and_verify_deletion.mjs`, `test_email_delivery.mjs`, `test_open_magiclink.mjs` และพบรหัสผ่าน plaintext ของ seeded user ในอีก 5 สคริปต์
+     - สร้าง `scripts/supabase-credentials.mjs` (env เท่านั้น, fail-loud, ไม่มี hardcoded fallback) + แก้ **9 สคริปต์** ให้มาใช้
+     - สร้าง `scripts/lint-secrets.mjs` (กฎ 9 ข้อ + `ALLOWED_VALUES` แบบระบุค่า 1 รายการคือรหัสของ lab DB ชั่วคราว) ผูกเข้า `npm run lint` และ CI
+     - ถอน `supabase/.temp/` ออกจาก git index (ไฟล์ยังอยู่บนดิสก์), แดงรหัสผ่านใน `docs/M3_FINAL_VERIFICATION_REPORT.md`, อัปเดต `.env.example`
+  5. **แก้บั๊กใบอนุโมทนาบัตร (CRITICAL):** RPC `get_member_giving_history` คืนคอลัมน์ `given_at` / `confidential_note` แต่ `members-service.ts` map `r.giving_date` / `r.notes` → ได้ `undefined` ทุกแถว และเพราะ `undefined >= "2026-01-01"` เป็น false เสมอ **ยอดรวมทุกปีภาษีจึงเป็น ฿0.00** โดยไม่ throw อะไรเลย
+     - เพิ่ม `toGivingDate()` (รองรับทั้ง date string จาก PostgREST และ JS Date) และแก้ mapping
+     - **mock ในเทสต์ก็ฝังบั๊กเดียวกันไว้** (คืนชื่อคอลัมน์ผิด) จึงแก้ mock ให้ใช้ชื่อคอลัมน์จริง + เพิ่ม assertion
+     - UI ไม่ได้รับผลกระทบ เพราะ `MembersPage.ts` เรียก RPC ตรงและใช้ `given_at` ถูกต้องอยู่แล้ว — สองเมธอดนี้ยังไม่มี UI เรียกใช้ จึงเป็น **latent bug**
+  6. **ทำให้เทสต์ DB จริงรันได้จริง:** `scripts/pg-lab.mjs` เดิมข้ามเงียบๆ บน Linux → เพิ่ม POSIX branch, ปฏิเสธการรันด้วย uid 0, แก้ `auth.uid()` shim ที่พังด้วย 22P02 (ใช้ COALESCE/NULLIF) + สร้าง `tests/integration/real-pg-boot.ts` และตั้ง `PGLAB_REQUIRED=1` ในโหมด `pg` (fail-loud แทน skip)
+  7. **ตรวจ AI/MCP layer แล้วพบว่าออกแบบดี:** ไม่มี arbitrary SQL, executor ใช้ SupabaseClient ของผู้ใช้เอง (RLS ผูกกับ session), tool เขียนเงินทุกตัวชื่อ `propose_*` และ `requiresConfirmation: true`, ยืนยันแล้วว่า audit log บันทึกการ *อ่าน* ข้อมูลบริจาคที่เป็นความลับ (`ACCESS` / `VIEW_MEMBER_GIVING` พร้อม `member_name` + `access_reason`)
+  8. **ทบทวน `verify-pin` edge function:** ผ่าน — ใช้ service key จาก env, ตอบ error แบบ uniform, มี rate limit, ผูก church ฝั่ง server, ตรวจ session subject, มี `requires_reset` gating
+  9. **ออกรายงานฉบับเต็ม:** `docs/ENGINEERING_REPORT_2026-09-11.md` (13 หัวข้อตามที่ถูกสั่ง + Appendix หลักฐานการทดสอบ) และอัปเดต baseline ใน `CLAUDE.md`
+- **ไฟล์ที่แก้ไข (Modified Files):**
+  - NEW: `supabase/migrations/20260911000001_ledger_immutability_hardening.sql`, `tests/integration/ledger-immutability.real-pg.test.ts`, `tests/integration/real-pg-boot.ts`, `tests/integration/real-pg-boot.test.ts`, `tests/unit/lint-secrets.test.ts`, `scripts/lint-secrets.mjs`, `scripts/supabase-credentials.mjs`, `docs/ENGINEERING_REPORT_2026-09-11.md`
+  - MODIFY: `src/lib/members/members-service.ts`, `tests/unit/members-service.test.ts`, `scripts/pg-lab.mjs`, 8 สคริปต์ที่ถือ credential, 3 ไฟล์ `*.real-pg.test.ts`, `vitest.config.ts`, `package.json`, `.github/workflows/ci.yml`, `.env.example`, `docs/M3_FINAL_VERIFICATION_REPORT.md`, `CLAUDE.md`, `.brain/*`
+  - UNTRACK: `supabase/.temp/` (9 ไฟล์)
+- **หลักฐานการทดสอบ (Verification Evidence):** ทุกบรรทัดรันจริงบน branch นี้
+  - ✅ `npm run test:pg` → **Test Files 69 passed (69) / Tests 652 passed (652)** (ก่อนหน้าคือ 63 passed + 3 skipped / 592 passed + 24 skipped — 3 ไฟล์ที่ skip คือเทสต์ DB จริงทั้งหมด)
+  - ✅ `npm run typecheck` → 0 errors
+  - ✅ `npm run lint` → `lint-design passed.` + `lint-secrets passed. (scanned 557 tracked files)`
+  - ✅ `npm run build` → สำเร็จ (เหลือ warning cosmetic 1 ข้อ: `Module "crypto" has been externalized` จาก `confirmation-engine.ts`)
+  - ✅ Migration ทั้ง **32** ไฟล์ apply บน PostgreSQL 17.10 เปล่าๆ ได้สะอาด, `scripts/verify-schema-drift.mjs` ไม่พบ drift
+  - ✅ **Adversarial re-verification:** ใส่บั๊กกลับทีละตัวแล้วยืนยันว่าเทสต์ *แดง* — ลบ GL007 → `UPDATE funds.current_balance` ผ่าน 1 row / ลบ GL006 → `posted → draft` ผ่าน / คืน mapping `r.giving_date` → `expected '฿0.00' to be '฿30,000.00'` / ใส่ service_role JWT ลงไฟล์ → `lint-secrets` exit 1
+- **สิ่งที่ต้องทำต่อ (Next Actions):**
+  1. 🔴 **[มนุษย์เท่านั้น] Rotate `service_role` key** ของ project `jeklcfpqmytdmwczxqlx` (Project Settings → API → Reset) **และเปลี่ยนรหัสผ่านของ seeded test user** — การลบออกจาก HEAD ไม่ช่วย เพราะคีย์ยังอยู่ใน git history และ repo เป็นสาธารณะ ถ้ายืนยันว่า rotate แล้วให้รัน `npm run test:pg` ด้วย key ใหม่ใน `.env.local`
+  2. 🟠 **[ต้องตัดสินใจก่อน] B5:** `get_budget_vs_actual` เรียกตาราง `budgets` ที่ไม่มีอยู่ใน migration ใดเลย → throw `relation "public.budgets" does not exist` เสมอ ทั้งที่ถูกขึ้นทะเบียนเป็น AI tool ที่อนุมัติแล้ว ต้องเลือก: (ก) ใช้ `funds.target_amount` ที่มีจริง โดย delegate ไป `ReportsService.getFundBalancesSummary()` (แต่ต้องตัด `year` ออกจาก schema เพราะโมเดลกองทุนไม่ผูกกับรอบปี) หรือ (ข) สร้างตาราง `budgets` แบบ period-scoped จริงๆ — *รอบนี้จงใจไม่แก้ เพราะเป็นการตัดสินใจเชิงสถาปัตยกรรม ไม่ใช่บั๊กที่แก้แบบเดาได้*
+  3. 🟠 **[ต้องตัดสินใจก่อน] B6:** `src/lib/rbac.ts` ให้ treasurer อ่าน `member_giving` แต่ DB ต้องการ pastor-tier → nav โชว์ของที่ backend จะปฏิเสธ (ไม่ใช่ช่องโหว่ เพราะ DB ชนะเสมอ แต่เป็น UX พัง + เอกสารความปลอดภัยที่โกหก)
+  4. 🟡 `src/lib/ai/financial-action-endpoint.ts` เขียน invariant ว่า "ONLY this server endpoint executes" ทั้งที่โค้ดนี้รันในเบราว์เซอร์ — ความปลอดภัยยังอยู่เพราะ RPC ทำงานจริง แต่คอมเมนต์อธิบายสถาปัตยกรรมที่ไม่มีอยู่ ควรเปลี่ยนชื่อเป็น `financial-action-service.ts` หรือย้ายไป Edge Function จริง
+  5. 🟡 ทำหน้า Audit Log viewer (backend ดีมากแต่ UI เข้าถึงไม่ได้), ไล่ทำ `fiscal_periods` / `reconciliation_runs` / `document_uploads` ที่มี schema + policy ครบแล้วแต่ไม่มีโค้ดฝั่งแอป
+  6. 🟡 `src/lib/hermes/` (5 โมดูล + 2 เทสต์) ไม่มีใคร import เลย — ตัดสินใจว่าจะต่อสายหรือลบ (รอบนี้ไม่ลบ เพราะเป็นการทำลายที่ไม่มีใครสั่ง)
+- **คำเตือน/จุดที่ต้องระวัง (Gotchas):**
+  1. **ห้ามตีความผล probe ผิด:** `ALLOWED 0 rows` มักหมายถึง RLS กรองออก (พฤติกรรมถูกต้อง) ไม่ใช่ "อนุญาตให้เข้าถึง" — ต้องดู `rowCount > 0` เท่านั้นจึงจะนับว่าข้อมูลถูกแก้จริง มีหลายเคสที่ตอนแรกเข้าใจผิดว่าเป็นช่องโหว่
+  2. **ห้ามอ่อนกฎ GL005/GL006/GL007 เพื่อให้งานอื่นผ่าน:** ถ้า `post_transaction` / `reject_transaction` / `return_transaction_to_draft` พัง ให้แก้ที่ *ข้อยกเว้นใน trigger* ไม่ใช่ลบ trigger
+  3. **`ALLOWED_VALUES` ใน `lint-secrets.mjs` ต้องมีเหตุผลกำกับเสมอ** และคีย์ด้วย "ค่า" ไม่ใช่ชื่อไฟล์ — ถ้ามี credential จริงหลุดเข้ามา คำตอบคือ rotate แล้วเอาออก ไม่ใช่เพิ่ม allowlist
+  4. **Supabase anon key ไม่ใช่ finding** — มันเป็น public by design และอยู่ใน browser bundle อย่างถูกต้อง (`src/lib/supabase/client.ts`) ส่วน `dist/` ถูก gitignore อยู่แล้ว key จึงไม่เคยหลุดผ่าน build artifact
+  5. **Financial hard stops ยังอยู่ครบ:** ไม่มีการลบตาราง ไม่มีการปิด RLS ไม่มีการอ่อน policy ไม่มีการแก้ข้อมูลการเงินย้อนหลัง ไม่มีการ redesign UI — guard ทั้งสองตัวเป็น `BEFORE UPDATE` ที่ "ปฏิเสธ" อย่างเดียว จึงเขียนทับข้อมูลไม่ได้โดยธรรมชาติ
+  6. **Embedded PostgreSQL ปฏิเสธการรันเป็น root** — `pg-lab.mjs` จะ throw ทันทีถ้า uid เป็น 0 (จงใจให้ fail-loud แทนที่จะผ่านเงียบๆ)
+  7. **sandbox นี้ไม่มี network egress** (`curl` ไป Supabase ล้มที่ TLS) จึง *ตรวจไม่ได้* ว่าโปรเจกต์ยังออนไลน์อยู่หรือไม่ — ต้องสมมติว่า key ที่รั่วยังใช้ได้
+
+---
+
 ## 📋 บันทึกส่งมอบ: 2026-09-11 (Resume Development — Cleanup Pending Tasks + Fix Canonical Identity Memory Violation)
 
 - **ผู้ส่งมอบ (Handed off by):** TRAE (Vanilla TS Agent)

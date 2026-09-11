@@ -7,14 +7,28 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
-- **เป้าหมายหลัก (Goal):** Resume Development — Clean up pending tasks, fix MEMORY.md canonical identity violations in audit scripts, verify code quality (typecheck + lint:design), handoff with zero-scope-creep
-- **สถานะรวม (Overall Status):** `PENDING_TASKS_CLEARED` (งานค้าง 2 รายการจาก WORKING_CONTEXT ยกเลิกสำเร็จ, canonical identity violations ถูกล้าง, typecheck + lint:design ผ่าน 100%)
-- **Agent ที่กำลังทำงาน (Active Agent):** TRAE (Vanilla TS Agent)
+- **เป้าหมายหลัก (Goal):** Production-readiness audit ทั้ง 7 เฟส (การเงิน / ความปลอดภัย / UX / AI / Audit / Testing) พร้อมแก้จุดเสี่ยงสูงสุดที่พบ — รายงานฉบับเต็มอยู่ที่ `docs/ENGINEERING_REPORT_2026-09-11.md`
+- **สถานะรวม (Overall Status):** `AUDIT_HARDENING_COMPLETE` — พบ CRITICAL 7 รายการ แก้แล้ว 6 รายการ / **เหลือ 1 รายการที่ต้องใช้มนุษย์ทำ (rotate `service_role` key)**
+- **Agent ที่กำลังทำงาน (Active Agent):** Arena.ai Agent Mode (branch `arena/01a091ad-grace-ledger`)
 - **อัปเดตล่าสุด (Last Updated):** 2026-09-11 (Asia/Bangkok)
 
 ---
 
 ## 2. งานที่ทำเสร็จสิ้น (Completed Tasks)
+
+### รอบ 2026-09-11 — Production-Readiness Audit & Hardening
+
+- [x] **อุดช่องโหว่ Ledger Immutability (CRITICAL):** migration ใหม่ `supabase/migrations/20260911000001_ledger_immutability_hardening.sql`
+  - `GL007` — บล็อก `UPDATE funds.current_balance` / `accounts.current_balance` ตรงๆ (เดิม treasurer ทำได้ 1 row)
+  - `GL005` — บล็อกแก้ `description` / `metadata` / `posted_at` / `approved_by` / `created_by` / `reference_number` ของธุรกรรมที่ `posted` แล้ว
+  - `GL006` — บล็อกเปลี่ยน status ตรงๆ (`posted → draft/voided/rejected`) ยกเว้นผ่าน RPC ที่ถูกต้องเท่านั้น
+  - เป็นแบบ additive ล้วน: ไม่ลบตาราง ไม่แก้ RLS ไม่แตะข้อมูลย้อนหลัง ไม่ปิด trigger เดิม
+- [x] **ลบ `service_role` key ที่ถูก commit ไว้ (CRITICAL):** สร้าง `scripts/supabase-credentials.mjs` (อ่านจาก env เท่านั้น, fail-loud, ไม่มี fallback) แล้วแก้ 9 สคริปต์ให้มาใช้ตัวนี้
+- [x] **สร้าง `scripts/lint-secrets.mjs`:** กฎตรวจจับ 9 ข้อ + allowlist แบบระบุค่า, ผูกเข้ากับ `npm run lint` และ CI — มีเทสต์ของตัวเอง 10 ข้อ
+- [x] **แก้บั๊กใบอนุโมทนาบัตร (CRITICAL):** `members-service.ts` map คอลัมน์ผิด (`giving_date`/`notes` แทน `given_at`/`confidential_note`) ทำให้ยอดรวมทุกปีภาษีเป็น **฿0.00** — เพิ่ม `toGivingDate()` และแก้ mock ในเทสต์ที่เคย "ฝังบั๊ก" ไว้
+- [x] **ทำให้เทสต์ฐานข้อมูลจริงรันได้บน Linux:** แก้ `scripts/pg-lab.mjs` + เพิ่ม `tests/integration/real-pg-boot.ts` และตั้ง `PGLAB_REQUIRED=1` ในโหมด `pg` เพื่อไม่ให้เทสต์ "ข้ามเงียบๆ" อีก
+- [x] ถอน `supabase/.temp/` ออกจาก git index, แดงข้อมูลรหัสผ่านใน `docs/M3_FINAL_VERIFICATION_REPORT.md`, อัปเดต `.env.example`
+
 
 - [x] จัดทำเอกสาร UX/UI Audit: `docs/ONE_DAY_UX_AUDIT.md` ครอบคลุมเป้าหมาย Modern Financial Dashboard 2026
 - [x] ยกระดับการเข้าถึงและความปลอดภัย (Accessibility & Factual Indicators):
@@ -75,14 +89,27 @@
 
 ## 4. สถานะการทดสอบล่าสุด (System Health Baseline)
 
-- **Vitest**: 64 passed (595 tests passing 100%, 0 failures)
+- **Vitest (`npm run test:pg`)**: **69 test files passed / 652 tests / 0 failures**
+  - ในจำนวนนี้มี 4 suites ที่ boot **PostgreSQL 17.10 จริง** และ apply ทั้ง 32 migrations
+  - `ledger-immutability.real-pg.test.ts` (ใหม่) 22 เทสต์ — ยิงโจมตีจริง C1–C4 แล้วยืนยันว่าถูกปฏิเสธ
 - **TypeScript**: `tsc --noEmit` ผ่าน 0 error / 0 warning
-- **Vite Build**: Production bundle สำเร็จเรียบร้อย (dist/)
+- **Lint**: `lint-design` ผ่าน + `lint-secrets` ผ่าน (สแกน 557 tracked files, 0 findings, 0 false positives)
+- **Vite Build**: Production bundle สำเร็จเรียบร้อย (เหลือ warning cosmetic 1 ข้อ: `Module "crypto" has been externalized`)
 
 ---
 
 ## 5. ขั้นตอนถัดไป (Next Steps)
 
-- ดำเนินการ Commit การปรับปรุงชื่อคริสตจักรและผลการทดสอบ
-- ดำเนินการ Push ขึ้น GitHub (`origin/main`)
-- ดำเนินการ Deploy ขึ้น Vercel Production
+> ⚠️ **ข้อ 1 ทำแทนจากโค้ดไม่ได้ และต้องทำก่อนเปิดใช้งานจริง**
+
+1. **[มนุษย์ทำ] Rotate `service_role` key** ของ Supabase project `jeklcfpqmytdmwczxqlx`
+   (Project Settings → API → Reset `service_role`) และเปลี่ยนรหัสผ่านของ test user ที่ถูก commit ไว้
+   — การลบออกจาก HEAD **ไม่ได้** ทำให้ key ปลอดภัย เพราะมันยังอยู่ใน git history และ repo เป็นสาธารณะ
+   - key ที่รั่วมี `exp` ถึงปี 2036 และข้าม RLS ทั้งหมด = อ่าน/เขียนบัญชีการเงินของทุกคริสตจักรได้
+2. **[ต้องตัดสินใจ] โมเดลงบประมาณ (B5):** `get_budget_vs_actual` ใน AI tool registry เรียกตาราง `budgets` ที่**ไม่มีอยู่จริง**ในทุก migration จึง throw เสมอ —
+   ทางเลือก (ก) ใช้ `funds.target_amount` ซึ่งเป็นของจริงที่มีอยู่แล้ว โดย delegate ไป `ReportsService.getFundBalancesSummary()` หรือ (ข) สร้างตาราง `budgets` แบบผูกกับรอบปี
+   - *ยังไม่แก้ในรอบนี้* เพราะเป็นการตัดสินใจเชิงสถาปัตยกรรม ต้องได้คำตอบก่อน
+3. **[ต้องตัดสินใจ] RBAC ฝั่ง client ไม่ตรงกับ DB (B6):** `src/lib/rbac.ts` ให้ treasurer อ่าน `member_giving` ได้ แต่ DB ต้องการ pastor-tier — ต้องเลือกให้ตรงกันข้างใดข้างหนึ่ง
+4. แก้ชื่อ/คอมเมนต์ของ `src/lib/ai/financial-action-endpoint.ts` ซึ่งอ้างว่าเป็น "server endpoint" ทั้งที่รันในเบราว์เซอร์
+5. ทำหน้า Audit Log viewer — backend ดีมากแต่ยังมองไม่เห็นจาก UI
+6. อ่านรายงานฉบับเต็ม: **`docs/ENGINEERING_REPORT_2026-09-11.md`** (13 หัวข้อ + Appendix หลักฐานการทดสอบ)

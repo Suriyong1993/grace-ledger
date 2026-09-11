@@ -8,10 +8,15 @@ Church financial OS. Thai UI. Money is the product; a wrong number is worse than
 - Rendering: `render*Html(props): string` functions + `attachEventListeners(root)`. Full re-render on state change.
 - `decimal.js` via `src/lib/money.ts` for every amount. Never `number` for money.
 - Supabase (PostgreSQL 17) — RPCs, RLS, RBAC in `supabase/`.
-- Tests: vitest (`npm test`). Typecheck: `npm run build` (= `tsc --noEmit`).
+- Tests: vitest. `npm test` runs everything that does not need a database; `npm run test:pg` is the
+  real gate — it additionally boots an embedded PostgreSQL 17.10, applies all migrations, and
+  exercises RLS, triggers and RPCs. Typecheck: `npm run typecheck`. Lint: `npm run lint`
+  (= typecheck + `lint:design` + `lint-secrets`).
 - Design tokens: `design-system-extracted/tokens/*.css`, imported through `src/styles/app.css`.
 
-Baseline as of 2026-08-20: 19 test files / 148 tests green, typecheck clean. Keep it that way.
+Baseline as of 2026-09-11: **69 test files / 652 tests green under `npm run test:pg`** (4 of those
+files run against a real PostgreSQL), typecheck clean, `lint:design` + `lint-secrets` clean,
+production build clean. Keep it that way.
 
 ## QUALITY GATES
 
