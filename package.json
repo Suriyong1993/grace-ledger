@@ -10,9 +10,11 @@
     "preview": "vite preview --port 5500 --strictPort",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:pg": "vitest run --mode pg",
     "test:watch": "vitest",
     "lint:design": "node scripts/lint-design.mjs",
-    "lint": "tsc --noEmit && npm run lint:design"
+    "lint:secrets": "node scripts/lint-secrets.mjs",
+    "lint": "tsc --noEmit && npm run lint:design && npm run lint:secrets"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

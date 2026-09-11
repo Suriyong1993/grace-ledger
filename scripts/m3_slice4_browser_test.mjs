@@ -4,11 +4,13 @@ import fs from "fs";
 import path from "path";
 import http from "http";
 import { createClient } from "@supabase/supabase-js";
+import {
+  anonKey,
+  supabaseUrl,
+  testUserPassword,
+} from "./supabase-credentials.mjs";
 
-const DEFAULT_SUPABASE_URL = "https://jeklcfpqmytdmwczxqlx.supabase.co";
-const DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impla2xjZnBxbXl0ZG13Y3p4cWx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5NzY0NDUsImV4cCI6MjEwMjU1MjQ0NX0.ZSM88SkzsWhqsD7x8gpyTSguKB2oG51lZqKLGHQETHA";
-
-const supabase = createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY);
+const supabase = createClient(supabaseUrl(), anonKey());
 const CHURCH_ID = "66666666-6666-6666-6666-111111111111";
 
 const screenshotsDir = path.resolve("docs/screenshots");
@@ -45,7 +47,7 @@ async function runSlice4BrowserTests() {
   // 1. Sign in as Pastor Somchai
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email: "somchai_pastor@grace.org",
-    password: "GracePassword123!",
+    password: testUserPassword(),
   });
   if (authError) throw new Error("Auth failed: " + authError.message);
 

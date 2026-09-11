@@ -24,8 +24,24 @@ jobs:
       # legible in the run summary instead of hiding inside "build".
       - run: npm run typecheck
 
+      # PGLAB_REQUIRED=1 turns the four *.real-pg.test.ts suites (RLS and
+      # role authorization, Segregation of Duties, ledger immutability,
+      # concurrency/lock ordering)
+      # from "skip if the embedded PostgreSQL cannot boot" into "fail if it
+      # cannot boot". `npm ci` installs @embedded-postgres/linux-x64 on this
+      # runner, so a boot failure here is a real regression — and a silent
+      # skip would mean the database-level security controls ship unverified.
       - run: npm test
+        env:
+          PGLAB_REQUIRED: "1"
 
       - run: npm run lint:design
+
+      # Fails if a privileged credential (a Supabase service_role JWT, a
+      # database URL with a password, a vendor API key) is present in any
+      # tracked file. The service_role key bypasses RLS entirely, so one
+      # committed literal hands out every church's ledger. The anon key is
+      # public by design and is not a finding.
+      - run: npm run lint:secrets
 
       - run: npm run build

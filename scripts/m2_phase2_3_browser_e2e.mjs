@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import http from "http";
 import { createClient } from "@supabase/supabase-js";
+import { anonKey, supabaseUrl, testUserPassword } from "./supabase-credentials.mjs";
 
 const tmpDir = path.resolve("tmp_queries");
 if (!fs.existsSync(tmpDir)) {
@@ -88,14 +89,12 @@ async function runBrowserE2E() {
   const FUND_BUILDING = "66666666-ffff-2222-2222-222222222222";
   const CAT_ID = "66666666-eeee-1111-1111-111111111111";
 
-  const anonClient = createClient(
-    "https://jeklcfpqmytdmwczxqlx.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impla2xjZnBxbXl0ZG13Y3p4cWx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5NzY0NDUsImV4cCI6MjEwMjU1MjQ0NX0.ZSM88SkzsWhqsD7x8gpyTSguKB2oG51lZqKLGHQETHA"
-  );
+  const anonClient = createClient(supabaseUrl(), anonKey());
 
   const APPROVER_EMAIL = "somchai_pastor@grace.org";
   const CREATOR_EMAIL = "manas_staff@grace.org";
-  const PASSWORD = "GracePassword123!";
+  // A real credential for a seeded user: read from the environment, never committed.
+  const PASSWORD = testUserPassword();
 
   const APPROVER_1 = "3aeb81bd-0ae5-49a4-95b1-c7a877e447fc"; // Verified Pastor Somchai
   const CREATOR_ID = "66666666-aaaa-1111-1111-111111111111"; // Verified Staff Manas

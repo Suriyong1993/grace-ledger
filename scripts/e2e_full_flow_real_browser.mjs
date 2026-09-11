@@ -18,11 +18,13 @@ import { chromium } from "playwright";
 import { spawn } from "child_process";
 import http from "http";
 import { mkdirSync } from "node:fs";
+import { testUserPassword } from "./supabase-credentials.mjs";
 
 const PORT = 5179;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const EMAIL = "somchai_pastor@grace.org";
-const PASSWORD = "GracePassword123!";
+// A real credential for a seeded user: read from the environment, never committed.
+const PASSWORD = testUserPassword();
 const SHOT_DIR = "docs/screenshots/after/e2e";
 
 mkdirSync(SHOT_DIR, { recursive: true });

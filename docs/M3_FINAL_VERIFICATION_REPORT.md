@@ -152,7 +152,7 @@ Two test scripts required minor robustness fixes during the final regression run
 | Check | Result |
 | --- | --- |
 | Debug code (`console.log`, `debugger`) in `src/` | ✅ None found |
-| Hardcoded secrets in `src/` | ⚠️ One demo seed credential in `src/main.ts` (line 37: `somchai_pastor@grace.org` / `GracePassword123!`) — acceptable for dev/demo environment |
+| Hardcoded secrets in `src/` | ⚠️ One demo seed credential in `src/main.ts` (line 37: `somchai_pastor@grace.org` / password redacted here — see the 2026-09-11 audit: seeded-user passwords and the committed `service_role` key were moved to the environment and must be rotated) |
 | TODO / FIXME / HACK markers | ✅ None found |
 | Temp files left in repo root | ✅ Cleaned (m3_final_*.txt removed) |
 

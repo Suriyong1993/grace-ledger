@@ -2,9 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { serviceRoleKey, supabaseUrl } from "./supabase-credentials.mjs";
 
-const SUPABASE_URL = "https://jeklcfpqmytdmwczxqlx.supabase.co";
-const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impla2xjZnBxbXl0ZG13Y3p4cWx4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4Njk3NjQ0NSwiZXhwIjoyMTAyNTUyNDQ1fQ.goxdjDIYz5hk0wSypHqVVWQr-fHbPbNMX4fG968Mn6k";
+// service_role BYPASSES RLS: it is read from the environment, never committed.
+const SUPABASE_URL = supabaseUrl();
+const SERVICE_ROLE_KEY = serviceRoleKey();
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: {
