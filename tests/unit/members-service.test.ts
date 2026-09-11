@@ -124,7 +124,22 @@ describe("MembersService — Comprehensive Unit Tests", () => {
           if (fn === "get_member_giving_history") {
             rpcArgs = args;
             return Promise.resolve({
-              data: [{ id: "g-1", amount: "5000.00", giving_type: "tithe", giving_date: "2026-08-01", notes: null }],
+              // get_member_giving_history() is `RETURNS SETOF
+              // member_giving_records`, so the row carries the TABLE's column
+              // names — given_at / confidential_note — not the view-model names
+              // GivingHistoryRecord uses. Verified against a real PostgreSQL 17
+              // (tests/integration/ledger-immutability.real-pg.test.ts). A mock
+              // that returned giving_date/notes would encode the mapping bug it
+              // is supposed to catch.
+              data: [
+                {
+                  id: "g-1",
+                  amount: "5000.00",
+                  giving_type: "tithe",
+                  given_at: "2026-08-01",
+                  confidential_note: "ถวายเพื่อพันธกิจเด็ก",
+                },
+              ],
               error: null,
             });
           }
@@ -142,6 +157,11 @@ describe("MembersService — Comprehensive Unit Tests", () => {
       expect(rpcArgs.p_member_id).toBe(dummyMemberId);
       expect(rpcArgs.p_reason).toBe("ตรวจสอบข้อมูลการถวายเพื่อการอภิบาล");
       expect(result.data?.[0].amount.format()).toBe("฿5,000.00");
+      // The mapping is the point: without it both fields come back undefined,
+      // the giving history renders blank dates and notes, and the tax-year
+      // filter below selects nothing at all.
+      expect(result.data?.[0].giving_date).toBe("2026-08-01");
+      expect(result.data?.[0].notes).toBe("ถวายเพื่อพันธกิจเด็ก");
     });
 
     it("DENIES giving history access if justification reason is shorter than 5 characters", async () => {
@@ -204,11 +224,12 @@ describe("MembersService — Comprehensive Unit Tests", () => {
 
   describe("3. Giving Certificate Generation", () => {
     it("calculates server-side giving certificate data accurately for tax year", async () => {
+      // Real member_giving_records column names — see the note above.
       const mockGivingHistory = [
-        { id: "g-1", amount: "10000.00", giving_type: "tithe", giving_date: "2026-02-14", notes: null },
-        { id: "g-2", amount: "15000.00", giving_type: "tithe", giving_date: "2026-05-20", notes: null },
-        { id: "g-3", amount: "5000.00", giving_type: "special", giving_date: "2026-08-10", notes: "ถวายค่าย" },
-        { id: "g-4", amount: "12000.00", giving_type: "tithe", giving_date: "2025-12-25", notes: "ปีก่อน" }, // 2025 excluded
+        { id: "g-1", amount: "10000.00", giving_type: "tithe", given_at: "2026-02-14", confidential_note: null },
+        { id: "g-2", amount: "15000.00", giving_type: "tithe", given_at: "2026-05-20", confidential_note: null },
+        { id: "g-3", amount: "5000.00", giving_type: "special", given_at: "2026-08-10", confidential_note: "ถวายค่าย" },
+        { id: "g-4", amount: "12000.00", giving_type: "tithe", given_at: "2025-12-25", confidential_note: "ปีก่อน" }, // 2025 excluded
       ];
 
       const mockSupabase = {

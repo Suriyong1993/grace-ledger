@@ -37,11 +37,30 @@ export interface MemberModel {
   created_at: string;
 }
 
+/**
+ * Normalizes `member_giving_records.given_at` to a `YYYY-MM-DD` string.
+ *
+ * PostgREST returns a DATE column as "2026-08-03", but anything that parses it
+ * into a JS Date first (node-postgres, a serialized timestamp) yields a full
+ * ISO string. The tax-year filter in getGivingCertificateData() compares this
+ * value against "YYYY-01-01" / "YYYY-12-31" as strings, so it must be exactly
+ * ten characters or the comparison silently selects nothing.
+ */
+function toGivingDate(givenAt: unknown): string {
+  if (typeof givenAt === "string") return givenAt.slice(0, 10);
+  if (givenAt instanceof Date && !Number.isNaN(givenAt.getTime())) {
+    return givenAt.toISOString().slice(0, 10);
+  }
+  return "";
+}
+
 export interface GivingHistoryRecord {
   id: string;
   amount: Money;
   giving_type: string;
+  /** `member_giving_records.given_at`, normalized to YYYY-MM-DD. */
   giving_date: string;
+  /** `member_giving_records.confidential_note`. */
   notes: string | null;
 }
 
@@ -227,8 +246,8 @@ export class MembersService {
         id: r.id,
         amount: Money.from(r.amount),
         giving_type: r.giving_type || "general",
-        giving_date: r.giving_date,
-        notes: r.notes || null,
+        giving_date: toGivingDate(r.given_at),
+        notes: r.confidential_note || null,
       }));
 
       return { success: true, data: records };
