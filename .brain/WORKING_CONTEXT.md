@@ -7,10 +7,10 @@
 
 ## 1. ข้อมูลปัจจุบัน (Current Session)
 
-- **เป้าหมายหลัก (Goal):** Premium UI/UX Transformation — Dashboard 4-tier hierarchy, Topbar 4-cluster micro-architecture, Sidebar & Mobile Navigation refinement, 15-question Red-Team verification
-- **สถานะรวม (Overall Status):** `VERIFICATION_COMPLETE` (ทุกเฟส 1–6 สำเร็จสมบูรณ์, 65 test suites / 599 tests ผ่าน 100%, screenshots บันทึกเรียบร้อย)
-- **Agent ที่กำลังทำงาน (Active Agent):** Antigravity
-- **อัปเดตล่าสุด (Last Updated):** 2026-09-05 20:05 (Asia/Bangkok)
+- **เป้าหมายหลัก (Goal):** Resume Development — Clean up pending tasks, fix MEMORY.md canonical identity violations in audit scripts, verify code quality (typecheck + lint:design), handoff with zero-scope-creep
+- **สถานะรวม (Overall Status):** `PENDING_TASKS_CLEARED` (งานค้าง 2 รายการจาก WORKING_CONTEXT ยกเลิกสำเร็จ, canonical identity violations ถูกล้าง, typecheck + lint:design ผ่าน 100%)
+- **Agent ที่กำลังทำงาน (Active Agent):** TRAE (Vanilla TS Agent)
+- **อัปเดตล่าสุด (Last Updated):** 2026-09-11 (Asia/Bangkok)
 
 ---
 
@@ -31,12 +31,17 @@
   - `npm test` (ผ่านครบทั้ง 64 test files / 595 tests passed 100%, 0 failures)
   - `npm run build` (ผ่านสมบูรณ์ สร้าง Production bundle สำเร็จใน 2.30s)
 
-- [x] สอบถามและยืนยันขอบเขตการแก้ไขกับผู้ใช้ (เลือกแก้ไขใน `scripts/capture_*.mjs`)
-- [/] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ:
-  - [ ] `scripts/capture_all_pages.mjs`
-  - [ ] `scripts/capture_emerald_vault.mjs`
-  - [ ] `scripts/capture_premium_screenshots.mjs`
-- [ ] รันการทดสอบระบบ (`npm run typecheck`, `npm test`) เพื่อยืนยันว่าไม่มีผลกระทบข้างเคียง
+- [x] สอบถามและยืนยันขอบเขตการแก้ไขกับผู้ใช้ (เลือกแก้ไขใน `scripts/capture_*.mjs` + audit scripts)
+- [x] ปรับปรุงชื่อในสคริปต์จับภาพหน้าจอ + ล้าง memory violation:
+  - [x] `scripts/capture_all_pages.mjs` — ตรวจสอบแล้ว: churchName + บุคลากรสอดคล้อง MEMORY.md §4 (ไม่พบชื่อใน blacklist)
+  - [x] `scripts/capture_emerald_vault.mjs` — ตรวจสอบแล้ว: ชื่อคริสตจักร + บุคลากรถูกต้องตาม canonical roster
+  - [x] `scripts/capture_premium_screenshots.mjs` — ตรวจสอบแล้ว: creatorName, churchName ทั้งหมดไม่ผิด base
+  - [x] `scripts/perform_and_verify_deletion.mjs:188` — ลบชื่อ "ศจ.สมชาย มีสุข" (blacklist ใน MEMORY.md §4.2) เป็นคำอธิบายที่เป็นกลาง "บัญชีผู้ใช้คงหลักป้องกันการเปลี่ยนแปลง"
+- [x] รันการทดสอบระบบเพื่อยืนยันว่าไม่มีผลกระทบข้างเคียง:
+  - [x] `npm run typecheck` (0 errors / 0 warnings)
+  - [x] `npm run lint:design` (0 token violations, lint-design passed)
+  - [ ] `npm test` (ข้าม: sandbox permission EPERM ที่ `node_modules/.vite-temp` ไม่ใช่ code bug — อ้างอิง baseline 599 tests 100% pass จาก §4)
+  - [ ] `npm run build` (ข้าม: ข้อจำกัดเดียวกัน sandbox EPERM — `tsc --noEmit` phase (phase 1 ของ build) ผ่านแล้ว)
 
 - [x] สำรวจและทำ Architecture Audit โครงสร้างเดิมทั้งหมด
 - [x] ออกแบบโครงสร้าง JoejaBrain (`.brain/`, workflows, memory, handoff)

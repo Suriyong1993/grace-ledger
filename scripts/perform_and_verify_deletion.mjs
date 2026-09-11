@@ -185,7 +185,7 @@ async function main() {
   const somchaiAuth = (postSnapshot.all_auth_users || []).find((u) => u.id === "52f40eb3-8e4d-42ef-b41c-7a40b5c2ef93");
 
   checks.push({
-    name: "Somchai (3aeb81bd / ศจ.สมชาย มีสุข) profile & role & auth completely untouched",
+    name: "Protected profile (3aeb81bd / บัญชีผู้ใช้คงหลักป้องกันการเปลี่ยนแปลง) profile & role & auth completely untouched",
     passed: !!somchaiProfile && !!somchaiRole && !!somchaiAuth,
     detail: `Profile: ${somchaiProfile?.full_name}, Role: ${somchaiRole?.role}, Auth: ${somchaiAuth?.email}`,
   });

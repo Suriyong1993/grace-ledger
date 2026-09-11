@@ -14,7 +14,7 @@
 // scenario pass. Where the matrix's *stated policy* diverges from *observed*
 // PostgreSQL behavior, the assertion is written against the stated policy —
 // so a genuine gap shows up as a failing test, not a silently softened one.
-// See PHASE_2B_REPORT.md (written after this suite runs) for the narrated
+// See docs/history/root-reports/PHASE_2B_REPORT.md for the narrated
 // findings, root causes and PASS/FAIL/NOT VERIFIED matrix.
 //
 // Single test file, single PgLab boot: PgLab (scripts/pg-lab.mjs) registers

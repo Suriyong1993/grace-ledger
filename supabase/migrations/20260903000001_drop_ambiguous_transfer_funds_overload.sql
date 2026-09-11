@@ -15,7 +15,8 @@
 --   - tests/integration/phase2b-real-pg-concurrency.test.ts calls 6
 --     positional arguments.
 --   - supabase/functions/**: no callers.
--- The 5-arg form has zero callers. PHASE_2B_REPORT.md's recommended fix:
+-- The 5-arg form has zero callers. docs/history/root-reports/PHASE_2B_REPORT.md
+-- contains the recommended fix:
 -- drop it once confirmed.
 
 DROP FUNCTION IF EXISTS transfer_funds(UUID, UUID, UUID, NUMERIC(14,2), TEXT);

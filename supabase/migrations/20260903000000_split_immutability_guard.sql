@@ -1,6 +1,7 @@
 -- Grace Ledger — Split immutability guard (Phase 2B Finding #1, CRITICAL)
 --
--- PHASE_2B_REPORT.md Finding #1: transaction_splits had no immutability
+-- docs/history/root-reports/PHASE_2B_REPORT.md Finding #1:
+-- transaction_splits had no immutability
 -- enforcement at all. Its only trigger was the AFTER CDC audit trigger
 -- (trg_audit_transaction_splits — records, never blocks), and its RLS
 -- policies (p_splits_insert/update/delete) check church access only. As a

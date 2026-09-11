@@ -56,7 +56,26 @@ npm run build
 
 ---
 
-## 🛡️ กฎเหล็กความปลอดภัยทางการเงิน (Financial Safety Hard Stops)
+## �️ โครงสร้างโปรเจกต์ (ฉบับย่อ)
+
+```text
+src/                   แอปหลักและ UI runtime
+supabase/              migrations, functions, config ฝั่งฐานข้อมูล
+tests/                 unit/integration tests
+scripts/               utility scripts และ verification scripts
+design-system-extracted/  design token และ prototype reference ที่ยังใช้งานอ้างอิงอยู่
+docs/                  เอกสารหลักทั้งหมด
+  ├── adr/             architecture decisions
+  ├── history/         รายงานและ baseline เก่าที่เก็บไว้เป็นประวัติ
+  ├── reference/       ไฟล์อ้างอิงและ archive ต้นทาง
+  └── archive/         handoff และ artifact จากรอบก่อน
+```
+
+ดูรายละเอียดเพิ่มเติมที่ [`docs/PROJECT_STRUCTURE.md`](./docs/PROJECT_STRUCTURE.md)
+
+---
+
+## �🛡️ กฎเหล็กความปลอดภัยทางการเงิน (Financial Safety Hard Stops)
 
 - **ห้ามใช้ `number` คำนวณเงิน**: ทุกยอดเงินต้องผ่าน `Money` (`decimal.js` จาก `src/lib/money.ts`)
 - **Split Parity Invariant**: ผลรวมของ Split ทุกแถวต้องเท่ากับยอดรวมของ Transaction พอดีเป๊ะ

@@ -11,8 +11,8 @@
 Prior to creating any database migrations or TypeScript domain layer files, a complete recursive inspection of the workspace was executed:
 
 - **Root Directory:**
-  - `Grace Ledger Design System.zip` (Source UI kit & tokens bundle)
-  - `Grace Ledger UI Mockups.zip` (Source 18 mobile screens bundle)
+  - `docs/reference/archives/Grace Ledger Design System.zip` (Source UI kit & tokens bundle)
+  - `docs/reference/archives/Grace Ledger UI Mockups.zip` (Source 18 mobile screens bundle)
   - `design-system-extracted/` (Unpacked design system assets, CSS tokens, React JSX components)
   - `mockups-extracted/` (Unpacked mobile mockup canvas and device frames)
   - `docs/` (`PRODUCTION_AUDIT.md`, `FOUNDATION_IMPLEMENTATION.md`)
